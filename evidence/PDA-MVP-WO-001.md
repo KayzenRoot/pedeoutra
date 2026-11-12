@@ -8,7 +8,7 @@
 | Work Order | `PDA-MVP-WO-001` (PDF, 12/11/2026) |
 | Branch | `feat/PDA-MVP-WO-001-pedeoutra-mvp` |
 | Base SHA | `40990e437a455f161fd8c60f35be983f29209794` |
-| Head de código | `02e3da2bd90108096c15997e26229cb927079eaf` |
+| Head de código | `652fadda7ec3796ad7a49cfb6f3ce199d3aa131b` |
 | Head da branch na abertura do PR | `1e7898f7df098c50b1877349ce9885cfd75db23e` |
 | Data da execução | 2026-11-12 |
 | Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.8, Supabase CLI 2.113, Chrome headless |
@@ -80,7 +80,7 @@ Logs completos em `evidence/logs/`.
 | `supabase start` | 4 migrations aplicadas no stack local | 0 | `local-supabase-start.log` |
 | `npm run test:local` | NÃO EXECUTADO — Edge Runtime local bloqueado | — | `local-edge-runtime-blocked.txt` |
 | `npm run test:full-local` | 7 PASS / 0 FAIL no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` |
-| GitHub Actions (PR #12) | 4 jobs verdes: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43311754455](https://github.com/KayzenRoot/pedeoutra/actions/runs/43311754455) |
+| GitHub Actions (PR #12) | 4 jobs verdes: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43312787193](https://github.com/KayzenRoot/pedeoutra/actions/runs/43312787193) |
 
 ### Harness E2E completo (GoTrue real + Asaas mock)
 

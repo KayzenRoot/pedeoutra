@@ -1,267 +1,267 @@
-Web, unit tests and build	Set up job	﻿2026-11-12T21:35:33.1152812Z Current runner version: '2.338.2'
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1176070Z ##[group]Runner Image Provisioner
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1177162Z Hosted Compute Agent
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1177649Z Version: 20261028.624
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1178198Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1178799Z Build Date: 2026-10-28T21:51:42Z
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1179357Z Worker ID: {e811fd6a-578f-4889-bb8a-40c3466e4e90}
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1179976Z Region: eastus2
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1180424Z Cloud: Azure
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1180843Z ##[endgroup]
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1182334Z ##[group]Operating System
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1182883Z Ubuntu
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1183364Z 26.04.1
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1183784Z LTS
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1184190Z ##[endgroup]
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1184687Z ##[group]Runner Image
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1185171Z Image: ubuntu-26.04
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1185679Z Version: 20261101.186.1
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1186529Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1188121Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1188937Z ##[endgroup]
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1189874Z ##[group]GITHUB_TOKEN Permissions
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1191584Z Contents: read
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1192124Z Metadata: read
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1192595Z ##[endgroup]
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1194249Z Secret source: Actions
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1195059Z Cache mode: write
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1195790Z Prepare workflow directory
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1464268Z Prepare all required actions
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.1502321Z Getting action download info
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.2969397Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.3960006Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
-Web, unit tests and build	Set up job	2026-11-12T21:35:33.6008662Z Complete job name: Web, unit tests and build
-Web, unit tests and build	Run actions/checkout@v4	﻿2026-11-12T21:35:33.6711791Z ##[group]Run actions/checkout@v4
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6713057Z with:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6713650Z   repository: KayzenRoot/pedeoutra
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6719014Z   token: ***
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6719622Z   ssh-strict: true
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6720183Z   ssh-user: git
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6720748Z   persist-credentials: true
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6721363Z   clean: true
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6721916Z   sparse-checkout-cone-mode: true
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6722584Z   fetch-depth: 1
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6723145Z   fetch-tags: false
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6723698Z   show-progress: true
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6724242Z   lfs: false
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6724768Z   submodules: false
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6725344Z   set-safe-directory: true
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6725981Z   allow-unsafe-pr-checkout: false
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:33.6727140Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0309719Z Syncing repository: KayzenRoot/pedeoutra
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0312297Z ##[group]Getting Git version info
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0313432Z Working directory is '/home/runner/work/pedeoutra/pedeoutra'
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0315156Z [command]/usr/bin/git version
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0316014Z git version 2.56.0
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0330040Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0348229Z Temporarily overriding HOME='/home/runner/work/_temp/ac7b1581-8800-4e42-b3e1-5f6e16463e8f' before making global git config changes
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0357923Z Adding repository directory to the temporary git global config as a safe directory
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0369771Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0409053Z Deleting the contents of '/home/runner/work/pedeoutra/pedeoutra'
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0411945Z ##[group]Initializing the repository
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0415915Z [command]/usr/bin/git init /home/runner/work/pedeoutra/pedeoutra
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0511114Z hint: Using 'master' as the name for the initial branch. This default branch name
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0512251Z hint: will change to "main" in Git 3.0. To configure the initial branch name
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0513456Z hint: to use in all of your new repositories, which will suppress this warning,
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0514185Z hint: call:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0514594Z hint:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0515118Z hint: 	git config --global init.defaultBranch <name>
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0515711Z hint:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0516262Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0517364Z hint: 'development'. The just-created branch can be renamed via this command:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0518061Z hint:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0518491Z hint: 	git branch -m <name>
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0518985Z hint:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0519563Z hint: Disable this message with "git config set advice.defaultBranchName false"
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0530241Z Initialized empty Git repository in /home/runner/work/pedeoutra/pedeoutra/.git/
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0541646Z [command]/usr/bin/git remote add origin https://github.com/KayzenRoot/pedeoutra
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0590125Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0591364Z ##[group]Disabling automatic garbage collection
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0593262Z [command]/usr/bin/git config --local gc.auto 0
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0637145Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0638262Z ##[group]Setting up auth
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0644168Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.0675976Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1254245Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1285998Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1530930Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1562223Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1808905Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1846580Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1847599Z ##[group]Fetching the repository
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.1854433Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0cdc2229610f28476a4049669b6bfbbfdf8e2858:refs/remotes/pull/12/merge
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7149550Z From https://github.com/KayzenRoot/pedeoutra
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7151546Z  * [new ref]         0cdc2229610f28476a4049669b6bfbbfdf8e2858 -> pull/12/merge
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7154511Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7155766Z ##[group]Determining the checkout info
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7157046Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7160105Z [command]/usr/bin/git sparse-checkout disable
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7272695Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7302422Z ##[group]Checking out the ref
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7304815Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/12/merge
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7486883Z Note: switching to 'refs/remotes/pull/12/merge'.
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7487768Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7488383Z You are in 'detached HEAD' state. You can look around, make experimental
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7489811Z changes and commit them, and you can discard any commits you make in this
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7491227Z state without impacting any branches by switching back to a branch.
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7492025Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7492684Z If you want to create a new branch to retain commits you create, you may
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7493952Z do so (now or later) by using -c with the switch command. Example:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7494654Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7495163Z   git switch -c <new-branch-name>
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7496108Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7496550Z Or undo this operation with:
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7497377Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7497881Z   git switch -
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7498405Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7499324Z Turn off this advice by setting config variable advice.detachedHead to false
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7500371Z 
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7501638Z HEAD is now at 0cdc222 Merge 1a56fbee7e24eab86bfd30e8c8c7f0f0fdc56552 into 40990e437a455f161fd8c60f35be983f29209794
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7505744Z ##[endgroup]
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7538318Z [command]/usr/bin/git log -1 --format=%H
-Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:35:34.7559947Z 0cdc2229610f28476a4049669b6bfbbfdf8e2858
-Web, unit tests and build	Run actions/setup-node@v4	﻿2026-11-12T21:35:34.7977617Z ##[group]Run actions/setup-node@v4
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7978657Z with:
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7979409Z   node-version: 22
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7980175Z   cache: npm
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7980909Z   always-auth: false
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7981714Z   check-latest: false
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7989692Z   token: ***
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.7990484Z ##[endgroup]
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.9192146Z (node:2186) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.9195512Z (Use `node --trace-deprecation ...` to show where the warning was created)
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.9198600Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:34.9200462Z ##[group]Environment details
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.2854296Z node: v22.23.4
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.2854707Z npm: 10.9.9
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.2854936Z yarn: 1.22.22
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.2855714Z ##[endgroup]
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.2869904Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.6573493Z /home/runner/.npm
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.7714554Z Cache hit for: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:36.7874793Z (node:2186) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:37.2926940Z Received 42034298 of 42034298 (100.0%), 88.9 MBs/sec
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:37.2927451Z Cache Size: ~40 MB (42034298 B)
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:37.2947266Z [command]/usr/bin/tar -xf /home/runner/work/_temp/5c3171c6-5b3c-467b-9da3-cefd4ed04ff7/cache.tzst -P -C /home/runner/work/pedeoutra/pedeoutra --use-compress-program unzstd
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:37.4287121Z Cache restored successfully
-Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:35:37.4307950Z Cache restored from key: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
-Web, unit tests and build	Run npm ci	﻿2026-11-12T21:35:37.4536930Z ##[group]Run npm ci
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:37.4537252Z ^[[36;1mnpm ci^[[0m
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:37.4592583Z shell: /usr/bin/bash -e {0}
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:37.4592816Z ##[endgroup]
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:40.5537567Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:44.8980341Z npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.1230971Z 
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.1231729Z added 296 packages, and audited 297 packages in 8s
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.1232090Z 
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.1232298Z 64 packages are looking for funding
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.1232676Z   run `npm fund` for details
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2870330Z 
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2871212Z 12 vulnerabilities (10 moderate, 2 critical)
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2871545Z 
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2871843Z To address issues that do not require attention, run:
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2872280Z   npm audit fix
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2872540Z 
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2872820Z To address all issues (including breaking changes), run:
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2873259Z   npm audit fix --force
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2873442Z 
-Web, unit tests and build	Run npm ci	2026-11-12T21:35:45.2873587Z Run `npm audit` for details.
-Web, unit tests and build	Run npm run lint	﻿2026-11-12T21:35:45.3433673Z ##[group]Run npm run lint
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.3433926Z ^[[36;1mnpm run lint^[[0m
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.3479832Z shell: /usr/bin/bash -e {0}
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.3480065Z ##[endgroup]
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.4315522Z 
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.4316229Z > pedeoutra@0.1.0 lint
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.4316527Z > eslint .
-Web, unit tests and build	Run npm run lint	2026-11-12T21:35:45.4316642Z 
-Web, unit tests and build	Run npm run typecheck	﻿2026-11-12T21:35:46.9137258Z ##[group]Run npm run typecheck
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9137557Z ^[[36;1mnpm run typecheck^[[0m
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9181978Z shell: /usr/bin/bash -e {0}
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9182214Z ##[endgroup]
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9964677Z 
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9965191Z > pedeoutra@0.1.0 typecheck
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9965846Z > tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json
-Web, unit tests and build	Run npm run typecheck	2026-11-12T21:35:46.9966218Z 
-Web, unit tests and build	Run npm run test:unit	﻿2026-11-12T21:35:50.6156499Z ##[group]Run npm run test:unit
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.6157028Z ^[[36;1mnpm run test:unit^[[0m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.6202921Z shell: /usr/bin/bash -e {0}
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.6203199Z ##[endgroup]
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.7021408Z 
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.7022088Z > pedeoutra@0.1.0 test:unit
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.7022374Z > vitest run
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.7022517Z 
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.9768160Z 
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.9770178Z ^[[1m^[[46m RUN ^[[49m^[[22m ^[[36mv3.2.7 ^[[39m^[[90m/home/runner/work/pedeoutra/pedeoutra^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:50.9770994Z 
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:51.8109481Z  ^[[32m✓^[[39m supabase/functions/_shared/validation.test.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:51.8118204Z  ^[[32m✓^[[39m supabase/functions/_shared/asaas.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 13^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:51.8136440Z  ^[[32m✓^[[39m supabase/functions/_shared/billing.test.ts ^[[2m(^[[22m^[[2m22 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:52.5464991Z  ^[[32m✓^[[39m supabase/functions/_shared/access.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:52.6049598Z  ^[[32m✓^[[39m supabase/functions/_shared/tokens.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:52.6092147Z  ^[[32m✓^[[39m src/lib/format.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 6^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.2369258Z  ^[[32m✓^[[39m supabase/functions/_shared/request-ip.test.ts ^[[2m(^[[22m^[[2m4 tests^[[22m^[[2m)^[[22m^[[32m 4^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.5845789Z  ^[[32m✓^[[39m src/pages/Demo.test.tsx ^[[2m(^[[22m^[[2m2 tests^[[22m^[[2m)^[[22m^[[32m 216^[[2mms^[[22m^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.6028589Z 
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.6032819Z ^[[2m Test Files ^[[22m ^[[1m^[[32m8 passed^[[39m^[[22m^[[90m (8)^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.6033440Z ^[[2m      Tests ^[[22m ^[[1m^[[32m68 passed^[[39m^[[22m^[[90m (68)^[[39m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.6033929Z ^[[2m   Start at ^[[22m 21:35:50
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.6050826Z ^[[2m   Duration ^[[22m 2.63s^[[2m (transform 301ms, setup 594ms, collect 593ms, tests 276ms, environment 2.94s, prepare 727ms)^[[22m
-Web, unit tests and build	Run npm run test:unit	2026-11-12T21:35:53.6051490Z 
-Web, unit tests and build	Run npm run build	﻿2026-11-12T21:35:53.7148150Z ##[group]Run npm run build
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7148589Z ^[[36;1mnpm run build^[[0m
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7209457Z shell: /usr/bin/bash -e {0}
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7209812Z ##[endgroup]
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7995445Z 
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7996236Z > pedeoutra@0.1.0 build
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7996548Z > vite build
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.7996659Z 
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:53.9790651Z ^[[36mvite v7.3.8 ^[[32mbuilding client environment for production...^[[36m^[[39m
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:54.0363279Z transforming...
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.0477754Z ^[[32m✓^[[39m 102 modules transformed.
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.2404332Z rendering chunks...
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.2494696Z computing gzip size...
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.2616578Z ^[[2mdist/^[[22m^[[32mindex.html                 ^[[39m^[[1m^[[2m  1.07 kB^[[22m^[[1m^[[22m^[[2m │ gzip:   0.53 kB^[[22m
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.2617854Z ^[[2mdist/^[[22m^[[2massets/^[[22m^[[35mindex-DrVvcpDK.css  ^[[39m^[[1m^[[2m 36.10 kB^[[22m^[[1m^[[22m^[[2m │ gzip:   7.63 kB^[[22m
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.2618580Z ^[[2mdist/^[[22m^[[2massets/^[[22m^[[36mindex-CnMyHzhS.js   ^[[39m^[[1m^[[2m489.79 kB^[[22m^[[1m^[[22m^[[2m │ gzip: 139.63 kB^[[22m
-Web, unit tests and build	Run npm run build	2026-11-12T21:35:55.2619442Z ^[[32m✓ built in 1.26s^[[39m
-Web, unit tests and build	Run npm run smoke:preview	﻿2026-11-12T21:35:55.2966097Z ##[group]Run npm run smoke:preview
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.2966391Z ^[[36;1mnpm run smoke:preview^[[0m
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.3011236Z shell: /usr/bin/bash -e {0}
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.3011470Z ##[endgroup]
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.3804999Z 
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.3805363Z > pedeoutra@0.1.0 smoke:preview
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.3805757Z > node scripts/smoke.mjs
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.3805961Z 
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.7007571Z Smoke em http://127.0.0.1:45825
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:55.7008049Z Browser: /usr/bin/google-chrome
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:58.2996136Z   PASS axe landing desktop (0 violações; 0 serious/critical)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:58.6150934Z   PASS / (landing desktop renderizada)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:59.3775844Z   PASS axe demo desktop (0 violações; 0 serious/critical)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:35:59.5796379Z   PASS /demo (fluxo fictício completo)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:00.6612526Z   PASS /privacidade e /termos
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:01.2013632Z   PASS rota 404 (SPA fallback)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:02.2116156Z   PASS axe landing mobile (0 violações; 0 serious/critical)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:03.5471509Z   PASS axe demo mobile (0 violações; 0 serious/critical)
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:03.8680395Z   PASS screenshots salvos em evidence/screenshots/
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:03.9533100Z 
-Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:36:03.9533974Z PASS smoke do build estático
-Web, unit tests and build	Post Run actions/setup-node@v4	﻿2026-11-12T21:36:03.9897365Z Post job cleanup.
-Web, unit tests and build	Post Run actions/setup-node@v4	2026-11-12T21:36:04.0874207Z (node:2964) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-Web, unit tests and build	Post Run actions/setup-node@v4	2026-11-12T21:36:04.0875322Z (Use `node --trace-deprecation ...` to show where the warning was created)
-Web, unit tests and build	Post Run actions/setup-node@v4	2026-11-12T21:36:04.0877635Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc, not saving cache.
-Web, unit tests and build	Post Run actions/checkout@v4	﻿2026-11-12T21:36:04.1010176Z Post job cleanup.
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1683965Z [command]/usr/bin/git version
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1719862Z git version 2.56.0
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1748527Z Temporarily overriding HOME='/home/runner/work/_temp/9be3988f-4021-4f16-b41b-5b92e7f7e4ae' before making global git config changes
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1749854Z Adding repository directory to the temporary git global config as a safe directory
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1751897Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1786088Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.1816180Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.2079731Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.2102327Z http.https://github.com/.extraheader
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.2117736Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.2145535Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.2412761Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:36:04.2443212Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-Web, unit tests and build	Complete job	﻿2026-11-12T21:36:04.2799686Z Cleaning up orphan processes
-Web, unit tests and build	Complete job	2026-11-12T21:36:04.3150056Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Web, unit tests and build	Set up job	﻿2026-11-12T21:41:55.0389554Z Current runner version: '2.338.2'
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0415658Z ##[group]Runner Image Provisioner
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0416865Z Hosted Compute Agent
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0417561Z Version: 20261028.624
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0418212Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0418947Z Build Date: 2026-10-28T21:51:42Z
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0419897Z Worker ID: {58202da7-18bd-4c10-99fa-b55c644c1e2b}
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0420637Z Region: eastus2
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0421241Z Cloud: Azure
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0421821Z ##[endgroup]
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0423274Z ##[group]Operating System
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0424383Z Ubuntu
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0424985Z 26.04.1
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0425576Z LTS
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0426136Z ##[endgroup]
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0426717Z ##[group]Runner Image
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0427452Z Image: ubuntu-26.04
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0428381Z Version: 20261101.186.1
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0430158Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0432706Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0433808Z ##[endgroup]
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0435221Z ##[group]GITHUB_TOKEN Permissions
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0437463Z Contents: read
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0438116Z Metadata: read
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0438699Z ##[endgroup]
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0440942Z Secret source: Actions
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0441894Z Cache mode: write
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0443047Z Prepare workflow directory
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0765973Z Prepare all required actions
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.0813171Z Getting action download info
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.2530263Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.3576163Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Web, unit tests and build	Set up job	2026-11-12T21:41:55.5296358Z Complete job name: Web, unit tests and build
+Web, unit tests and build	Run actions/checkout@v4	﻿2026-11-12T21:41:55.6251469Z ##[group]Run actions/checkout@v4
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6252400Z with:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6252871Z   repository: KayzenRoot/pedeoutra
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6257061Z   token: ***
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6257515Z   ssh-strict: true
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6257978Z   ssh-user: git
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6258446Z   persist-credentials: true
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6258961Z   clean: true
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6259429Z   sparse-checkout-cone-mode: true
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6259969Z   fetch-depth: 1
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6260416Z   fetch-tags: false
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6260877Z   show-progress: true
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6261347Z   lfs: false
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6261779Z   submodules: false
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6262247Z   set-safe-directory: true
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6262773Z   allow-unsafe-pr-checkout: false
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.6263561Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8817819Z Syncing repository: KayzenRoot/pedeoutra
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8821372Z ##[group]Getting Git version info
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8822902Z Working directory is '/home/runner/work/pedeoutra/pedeoutra'
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8825575Z [command]/usr/bin/git version
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8826716Z git version 2.56.0
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8846070Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8861518Z Temporarily overriding HOME='/home/runner/work/_temp/9d490e73-e6cd-4455-8eb6-ccce62af2325' before making global git config changes
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8864349Z Adding repository directory to the temporary git global config as a safe directory
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8866458Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8931032Z Deleting the contents of '/home/runner/work/pedeoutra/pedeoutra'
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8936733Z ##[group]Initializing the repository
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.8942729Z [command]/usr/bin/git init /home/runner/work/pedeoutra/pedeoutra
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9042345Z hint: Using 'master' as the name for the initial branch. This default branch name
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9044317Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9045928Z hint: to use in all of your new repositories, which will suppress this warning,
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9046863Z hint: call:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9047488Z hint:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9048180Z hint: 	git config --global init.defaultBranch <name>
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9048947Z hint:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9049698Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9050867Z hint: 'development'. The just-created branch can be renamed via this command:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9051770Z hint:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9052307Z hint: 	git branch -m <name>
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9052994Z hint:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9053758Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9058834Z Initialized empty Git repository in /home/runner/work/pedeoutra/pedeoutra/.git/
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9070695Z [command]/usr/bin/git remote add origin https://github.com/KayzenRoot/pedeoutra
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9120901Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9122624Z ##[group]Disabling automatic garbage collection
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9125905Z [command]/usr/bin/git config --local gc.auto 0
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9162575Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9164643Z ##[group]Setting up auth
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9170972Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9210410Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9680421Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:55.9722191Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.0021436Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.0059742Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.0338800Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.0382926Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.0384875Z ##[group]Fetching the repository
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.0394341Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2bac96e8a0f828262f6a095ccd69ddb032ac1ba1:refs/remotes/pull/12/merge
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3276575Z From https://github.com/KayzenRoot/pedeoutra
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3278502Z  * [new ref]         2bac96e8a0f828262f6a095ccd69ddb032ac1ba1 -> pull/12/merge
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3283018Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3285054Z ##[group]Determining the checkout info
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3287092Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3293613Z [command]/usr/bin/git sparse-checkout disable
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3345517Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3373735Z ##[group]Checking out the ref
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3378771Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/12/merge
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3597100Z Note: switching to 'refs/remotes/pull/12/merge'.
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3597698Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3598159Z You are in 'detached HEAD' state. You can look around, make experimental
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3599227Z changes and commit them, and you can discard any commits you make in this
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3600271Z state without impacting any branches by switching back to a branch.
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3600853Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3601284Z If you want to create a new branch to retain commits you create, you may
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3602272Z do so (now or later) by using -c with the switch command. Example:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3602872Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3603250Z   git switch -c <new-branch-name>
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3604669Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3605209Z Or undo this operation with:
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3605973Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3606449Z   git switch -
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3607028Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3607905Z Turn off this advice by setting config variable advice.detachedHead to false
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3609143Z 
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3610506Z HEAD is now at 2bac96e Merge 652fadda7ec3796ad7a49cfb6f3ce199d3aa131b into 40990e437a455f161fd8c60f35be983f29209794
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3614864Z ##[endgroup]
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3653218Z [command]/usr/bin/git log -1 --format=%H
+Web, unit tests and build	Run actions/checkout@v4	2026-11-12T21:41:56.3701013Z 2bac96e8a0f828262f6a095ccd69ddb032ac1ba1
+Web, unit tests and build	Run actions/setup-node@v4	﻿2026-11-12T21:41:56.4067838Z ##[group]Run actions/setup-node@v4
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4068445Z with:
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4068859Z   node-version: 22
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4069297Z   cache: npm
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4069735Z   always-auth: false
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4070191Z   check-latest: false
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4074376Z   token: ***
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.4074823Z ##[endgroup]
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.5523793Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.5526706Z (node:2544) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.5528491Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.5530323Z ##[group]Environment details
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.9679864Z node: v22.23.4
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.9682116Z npm: 10.9.9
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.9683329Z yarn: 1.22.22
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.9686184Z ##[endgroup]
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:56.9705603Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.0774380Z /home/runner/.npm
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.1782509Z Cache hit for: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.1911814Z (node:2544) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.4790448Z Received 42034298 of 42034298 (100.0%), 150.1 MBs/sec
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.4793750Z Cache Size: ~40 MB (42034298 B)
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.4827380Z [command]/usr/bin/tar -xf /home/runner/work/_temp/1ba7bf2f-e810-4f17-8875-5f96cc38fe50/cache.tzst -P -C /home/runner/work/pedeoutra/pedeoutra --use-compress-program unzstd
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.6557471Z Cache restored successfully
+Web, unit tests and build	Run actions/setup-node@v4	2026-11-12T21:41:57.6579422Z Cache restored from key: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Web, unit tests and build	Run npm ci	﻿2026-11-12T21:41:57.6848817Z ##[group]Run npm ci
+Web, unit tests and build	Run npm ci	2026-11-12T21:41:57.6849987Z ^[[36;1mnpm ci^[[0m
+Web, unit tests and build	Run npm ci	2026-11-12T21:41:57.6913465Z shell: /usr/bin/bash -e {0}
+Web, unit tests and build	Run npm ci	2026-11-12T21:41:57.6915003Z ##[endgroup]
+Web, unit tests and build	Run npm ci	2026-11-12T21:41:59.4806885Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.5053704Z npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.7788179Z 
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.7789128Z added 296 packages, and audited 297 packages in 4s
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.7789687Z 
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.7790032Z 64 packages are looking for funding
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.7790587Z   run `npm fund` for details
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.9841823Z 
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:01.9842793Z 12 vulnerabilities (10 moderate, 2 critical)
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0610595Z 
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0611213Z To address issues that do not require attention, run:
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0611637Z   npm audit fix
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0611879Z 
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0612141Z To address all issues (including breaking changes), run:
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0612522Z   npm audit fix --force
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0612684Z 
+Web, unit tests and build	Run npm ci	2026-11-12T21:42:02.0613588Z Run `npm audit` for details.
+Web, unit tests and build	Run npm run lint	﻿2026-11-12T21:42:02.0660573Z ##[group]Run npm run lint
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.0660893Z ^[[36;1mnpm run lint^[[0m
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.0713631Z shell: /usr/bin/bash -e {0}
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.0714045Z ##[endgroup]
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.1728550Z 
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.1729275Z > pedeoutra@0.1.0 lint
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.1729829Z > eslint .
+Web, unit tests and build	Run npm run lint	2026-11-12T21:42:02.1730066Z 
+Web, unit tests and build	Run npm run typecheck	﻿2026-11-12T21:42:04.4001826Z ##[group]Run npm run typecheck
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.4002186Z ^[[36;1mnpm run typecheck^[[0m
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.4052361Z shell: /usr/bin/bash -e {0}
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.4052644Z ##[endgroup]
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.5052536Z 
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.5053373Z > pedeoutra@0.1.0 typecheck
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.5054344Z > tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json
+Web, unit tests and build	Run npm run typecheck	2026-11-12T21:42:04.5054732Z 
+Web, unit tests and build	Run npm run test:unit	﻿2026-11-12T21:42:09.1756712Z ##[group]Run npm run test:unit
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.1757045Z ^[[36;1mnpm run test:unit^[[0m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.1807187Z shell: /usr/bin/bash -e {0}
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.1807471Z ##[endgroup]
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.2799048Z 
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.2799772Z > pedeoutra@0.1.0 test:unit
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.2800341Z > vitest run
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.2800630Z 
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.6144671Z 
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.6146784Z ^[[1m^[[46m RUN ^[[49m^[[22m ^[[36mv3.2.7 ^[[39m^[[90m/home/runner/work/pedeoutra/pedeoutra^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:09.6147805Z 
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:10.7237730Z  ^[[32m✓^[[39m supabase/functions/_shared/validation.test.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m)^[[22m^[[32m 14^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:10.7335837Z  ^[[32m✓^[[39m supabase/functions/_shared/asaas.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 20^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:10.7381541Z  ^[[32m✓^[[39m supabase/functions/_shared/billing.test.ts ^[[2m(^[[22m^[[2m22 tests^[[22m^[[2m)^[[22m^[[32m 15^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:11.6466532Z  ^[[32m✓^[[39m supabase/functions/_shared/access.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:11.8156126Z  ^[[32m✓^[[39m supabase/functions/_shared/tokens.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 26^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:11.8736194Z  ^[[32m✓^[[39m src/lib/format.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:12.6756748Z  ^[[32m✓^[[39m supabase/functions/_shared/request-ip.test.ts ^[[2m(^[[22m^[[2m4 tests^[[22m^[[2m)^[[22m^[[32m 4^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0713768Z  ^[[32m✓^[[39m src/pages/Demo.test.tsx ^[[2m(^[[22m^[[2m2 tests^[[22m^[[2m)^[[22m^[[32m 296^[[2mms^[[22m^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0913776Z 
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0918470Z ^[[2m Test Files ^[[22m ^[[1m^[[32m8 passed^[[39m^[[22m^[[90m (8)^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0919492Z ^[[2m      Tests ^[[22m ^[[1m^[[32m68 passed^[[39m^[[22m^[[90m (68)^[[39m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0934429Z ^[[2m   Start at ^[[22m 21:42:09
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0936432Z ^[[2m   Duration ^[[22m 3.48s^[[2m (transform 399ms, setup 755ms, collect 777ms, tests 392ms, environment 4.08s, prepare 990ms)^[[22m
+Web, unit tests and build	Run npm run test:unit	2026-11-12T21:42:13.0937936Z 
+Web, unit tests and build	Run npm run build	﻿2026-11-12T21:42:13.2246364Z ##[group]Run npm run build
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.2246683Z ^[[36;1mnpm run build^[[0m
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.2294988Z shell: /usr/bin/bash -e {0}
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.2295281Z ##[endgroup]
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.3288889Z 
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.3289337Z > pedeoutra@0.1.0 build
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.3289776Z > vite build
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.3289954Z 
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.5492143Z ^[[36mvite v7.3.8 ^[[32mbuilding client environment for production...^[[36m^[[39m
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:13.6255165Z transforming...
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:14.9440933Z ^[[32m✓^[[39m 102 modules transformed.
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:15.1818816Z rendering chunks...
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:15.1928619Z computing gzip size...
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:15.2070463Z ^[[2mdist/^[[22m^[[32mindex.html                 ^[[39m^[[1m^[[2m  1.07 kB^[[22m^[[1m^[[22m^[[2m │ gzip:   0.53 kB^[[22m
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:15.2072052Z ^[[2mdist/^[[22m^[[2massets/^[[22m^[[35mindex-DrVvcpDK.css  ^[[39m^[[1m^[[2m 36.10 kB^[[22m^[[1m^[[22m^[[2m │ gzip:   7.63 kB^[[22m
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:15.2073668Z ^[[2mdist/^[[22m^[[2massets/^[[22m^[[36mindex-CnMyHzhS.js   ^[[39m^[[1m^[[2m489.79 kB^[[22m^[[1m^[[22m^[[2m │ gzip: 139.63 kB^[[22m
+Web, unit tests and build	Run npm run build	2026-11-12T21:42:15.2074986Z ^[[32m✓ built in 1.63s^[[39m
+Web, unit tests and build	Run npm run smoke:preview	﻿2026-11-12T21:42:15.2469232Z ##[group]Run npm run smoke:preview
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.2469586Z ^[[36;1mnpm run smoke:preview^[[0m
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.2519281Z shell: /usr/bin/bash -e {0}
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.2519552Z ##[endgroup]
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.3573188Z 
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.3574114Z > pedeoutra@0.1.0 smoke:preview
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.3574881Z > node scripts/smoke.mjs
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.3575188Z 
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.6968241Z Smoke em http://127.0.0.1:36321
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:15.6968936Z Browser: /usr/bin/google-chrome
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:25.2133220Z   PASS axe landing desktop (0 violações; 0 serious/critical)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:25.6524980Z   PASS / (landing desktop renderizada)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:26.5353248Z   PASS axe demo desktop (0 violações; 0 serious/critical)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:26.9253290Z   PASS /demo (fluxo fictício completo)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:28.0322718Z   PASS /privacidade e /termos
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:28.5831157Z   PASS rota 404 (SPA fallback)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:29.7993094Z   PASS axe landing mobile (0 violações; 0 serious/critical)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:31.2852234Z   PASS axe demo mobile (0 violações; 0 serious/critical)
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:31.6271965Z   PASS screenshots salvos em evidence/screenshots/
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:31.7062129Z 
+Web, unit tests and build	Run npm run smoke:preview	2026-11-12T21:42:31.7063126Z PASS smoke do build estático
+Web, unit tests and build	Post Run actions/setup-node@v4	﻿2026-11-12T21:42:31.7481303Z Post job cleanup.
+Web, unit tests and build	Post Run actions/setup-node@v4	2026-11-12T21:42:31.8748272Z (node:3307) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Web, unit tests and build	Post Run actions/setup-node@v4	2026-11-12T21:42:31.8749353Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Web, unit tests and build	Post Run actions/setup-node@v4	2026-11-12T21:42:31.8753085Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc, not saving cache.
+Web, unit tests and build	Post Run actions/checkout@v4	﻿2026-11-12T21:42:31.8922063Z Post job cleanup.
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9791799Z [command]/usr/bin/git version
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9830247Z git version 2.56.0
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9871186Z Temporarily overriding HOME='/home/runner/work/_temp/2d4dd6ea-ca5f-4b19-8f36-d51dce1357c1' before making global git config changes
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9872901Z Adding repository directory to the temporary git global config as a safe directory
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9877654Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9919233Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:31.9957328Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:32.0259122Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:32.0284545Z http.https://github.com/.extraheader
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:32.0297737Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:32.0344394Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:32.0795321Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Web, unit tests and build	Post Run actions/checkout@v4	2026-11-12T21:42:32.0853417Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Web, unit tests and build	Complete job	﻿2026-11-12T21:42:32.1299392Z Cleaning up orphan processes
+Web, unit tests and build	Complete job	2026-11-12T21:42:32.1745558Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

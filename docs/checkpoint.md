@@ -26,7 +26,7 @@
   PostgREST, 17 testes HTTP dos handlers Deno, restore, typecheck das 11 Edge
   Functions, build e smoke de browser com axe WCAG 2 A/AA verdes.
 - Harness E2E completo com GoTrue real + Asaas mock: 7 grupos PASS no CI
-  (run 43311754455), incluindo checkout, webhook, reembolso e reconciliação.
+  (run 43312787193), incluindo checkout, webhook, reembolso e reconciliação.
 - Migrations aplicadas com sucesso em stack Supabase local.
 - Edge Runtime Docker local bloqueado por imagem publicada com binário 0-byte;
   handlers executados via router Deno local para os testes.
