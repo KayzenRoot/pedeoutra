@@ -1,0 +1,262 @@
+Edge Functions typecheck	Set up job	﻿2026-11-12T21:35:33.7111338Z Current runner version: '2.338.2'
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7149848Z ##[group]Runner Image Provisioner
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7150865Z Hosted Compute Agent
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7151475Z Version: 20261028.624
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7152102Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7152947Z Build Date: 2026-10-28T21:51:42Z
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7153941Z Worker ID: {96f6c3b4-3ad9-42c6-affc-3f64c2b244ea}
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7154857Z Region: southcentralus
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7155488Z Cloud: Azure
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7156023Z ##[endgroup]
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7157648Z ##[group]Operating System
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7158323Z Ubuntu
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7158961Z 26.04.1
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7159506Z LTS
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7160040Z ##[endgroup]
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7160648Z ##[group]Runner Image
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7161331Z Image: ubuntu-26.04
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7161947Z Version: 20261101.186.1
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7163038Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7165059Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7166089Z ##[endgroup]
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7167230Z ##[group]GITHUB_TOKEN Permissions
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7169255Z Contents: read
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7169990Z Metadata: read
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7170600Z ##[endgroup]
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7172756Z Secret source: Actions
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7174029Z Cache mode: write
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7174758Z Prepare workflow directory
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7531228Z Prepare all required actions
+Edge Functions typecheck	Set up job	2026-11-12T21:35:33.7604435Z Getting action download info
+Edge Functions typecheck	Set up job	2026-11-12T21:35:34.0178025Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Edge Functions typecheck	Set up job	2026-11-12T21:35:34.1778381Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Edge Functions typecheck	Set up job	2026-11-12T21:35:34.2759855Z Download action repository 'denoland/setup-deno@v2' (SHA:22d081ff2d3a40755e97629de92e3bcbfa7cf2ed)
+Edge Functions typecheck	Set up job	2026-11-12T21:35:34.7627322Z Complete job name: Edge Functions typecheck
+Edge Functions typecheck	Run actions/checkout@v4	﻿2026-11-12T21:35:34.8598622Z ##[group]Run actions/checkout@v4
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8599535Z with:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8600014Z   repository: KayzenRoot/pedeoutra
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8604154Z   token: ***
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8604619Z   ssh-strict: true
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8605086Z   ssh-user: git
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8605550Z   persist-credentials: true
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8606060Z   clean: true
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8606522Z   sparse-checkout-cone-mode: true
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8607052Z   fetch-depth: 1
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8607499Z   fetch-tags: false
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8607982Z   show-progress: true
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8608446Z   lfs: false
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8608891Z   submodules: false
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8609367Z   set-safe-directory: true
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8609893Z   allow-unsafe-pr-checkout: false
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:34.8610669Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3751722Z Syncing repository: KayzenRoot/pedeoutra
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3755287Z ##[group]Getting Git version info
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3756703Z Working directory is '/home/runner/work/pedeoutra/pedeoutra'
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3758784Z [command]/usr/bin/git version
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3759760Z git version 2.56.0
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3778504Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3794757Z Temporarily overriding HOME='/home/runner/work/_temp/29a5bd0e-82e8-40ce-a6b9-f47fcaf90fff' before making global git config changes
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3797931Z Adding repository directory to the temporary git global config as a safe directory
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3812921Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3892330Z Deleting the contents of '/home/runner/work/pedeoutra/pedeoutra'
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3896724Z ##[group]Initializing the repository
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.3902016Z [command]/usr/bin/git init /home/runner/work/pedeoutra/pedeoutra
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4057448Z hint: Using 'master' as the name for the initial branch. This default branch name
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4060174Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4061941Z hint: to use in all of your new repositories, which will suppress this warning,
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4062845Z hint: call:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4063303Z hint:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4064395Z hint: 	git config --global init.defaultBranch <name>
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4065323Z hint:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4065996Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4067006Z hint: 'development'. The just-created branch can be renamed via this command:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4067793Z hint:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4068253Z hint: 	git branch -m <name>
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4068785Z hint:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4069781Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4081586Z Initialized empty Git repository in /home/runner/work/pedeoutra/pedeoutra/.git/
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4097425Z [command]/usr/bin/git remote add origin https://github.com/KayzenRoot/pedeoutra
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4155409Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4157341Z ##[group]Disabling automatic garbage collection
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4159097Z [command]/usr/bin/git config --local gc.auto 0
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4197193Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4199283Z ##[group]Setting up auth
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4206851Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4249990Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4761614Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.4800207Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.5074921Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.5112004Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.5384610Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.5424334Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.5433036Z ##[group]Fetching the repository
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:35.5435199Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0cdc2229610f28476a4049669b6bfbbfdf8e2858:refs/remotes/pull/12/merge
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1111852Z From https://github.com/KayzenRoot/pedeoutra
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1114040Z  * [new ref]         0cdc2229610f28476a4049669b6bfbbfdf8e2858 -> pull/12/merge
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1118516Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1120213Z ##[group]Determining the checkout info
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1122536Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1130359Z [command]/usr/bin/git sparse-checkout disable
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1187261Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1219409Z ##[group]Checking out the ref
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1223427Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/12/merge
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1439400Z Note: switching to 'refs/remotes/pull/12/merge'.
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1440276Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1440913Z You are in 'detached HEAD' state. You can look around, make experimental
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1442362Z changes and commit them, and you can discard any commits you make in this
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1443932Z state without impacting any branches by switching back to a branch.
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1444813Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1445358Z If you want to create a new branch to retain commits you create, you may
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1446667Z do so (now or later) by using -c with the switch command. Example:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1448197Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1448761Z   git switch -c <new-branch-name>
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1449669Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1450197Z Or undo this operation with:
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1450994Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1451465Z   git switch -
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1452083Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1453011Z Turn off this advice by setting config variable advice.detachedHead to false
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1454605Z 
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1456173Z HEAD is now at 0cdc222 Merge 1a56fbee7e24eab86bfd30e8c8c7f0f0fdc56552 into 40990e437a455f161fd8c60f35be983f29209794
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1460423Z ##[endgroup]
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1500079Z [command]/usr/bin/git log -1 --format=%H
+Edge Functions typecheck	Run actions/checkout@v4	2026-11-12T21:35:36.1525879Z 0cdc2229610f28476a4049669b6bfbbfdf8e2858
+Edge Functions typecheck	Run actions/setup-node@v4	﻿2026-11-12T21:35:36.1945826Z ##[group]Run actions/setup-node@v4
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1946573Z with:
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1947072Z   node-version: 22
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1947611Z   cache: npm
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1948127Z   always-auth: false
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1948730Z   check-latest: false
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1954139Z   token: ***
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.1954674Z ##[endgroup]
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.3473418Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.3479219Z (node:2400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.3481547Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.3483062Z ##[group]Environment details
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.7995681Z node: v22.23.4
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.7997343Z npm: 10.9.9
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.7998682Z yarn: 1.22.22
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.8001533Z ##[endgroup]
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.8024113Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:36.9164387Z /home/runner/.npm
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:37.0971034Z Cache hit for: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:37.1085380Z (node:2400) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:37.8252411Z Received 42034298 of 42034298 (100.0%), 69.4 MBs/sec
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:37.8253551Z Cache Size: ~40 MB (42034298 B)
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:37.8280748Z [command]/usr/bin/tar -xf /home/runner/work/_temp/57a763ee-1cc4-4203-9272-14c231fd1188/cache.tzst -P -C /home/runner/work/pedeoutra/pedeoutra --use-compress-program unzstd
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:38.0111603Z Cache restored successfully
+Edge Functions typecheck	Run actions/setup-node@v4	2026-11-12T21:35:38.0133039Z Cache restored from key: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Edge Functions typecheck	Run npm ci	﻿2026-11-12T21:35:38.0355235Z ##[group]Run npm ci
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:38.0355591Z ^[[36;1mnpm ci^[[0m
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:38.0418175Z shell: /usr/bin/bash -e {0}
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:38.0418493Z ##[endgroup]
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:39.7776558Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:41.8896140Z npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.1510705Z 
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.1511641Z added 296 packages, and audited 297 packages in 4s
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.1512188Z 
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.1512782Z 64 packages are looking for funding
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.1513452Z   run `npm fund` for details
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3575810Z 
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3577178Z 12 vulnerabilities (10 moderate, 2 critical)
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3577676Z 
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3578152Z To address issues that do not require attention, run:
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3578814Z   npm audit fix
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3579167Z 
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3579625Z To address all issues (including breaking changes), run:
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3580278Z   npm audit fix --force
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3580559Z 
+Edge Functions typecheck	Run npm ci	2026-11-12T21:35:42.3580815Z Run `npm audit` for details.
+Edge Functions typecheck	Run denoland/setup-deno@v2	﻿2026-11-12T21:35:42.4266375Z ##[group]Run denoland/setup-deno@v2
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.4266700Z with:
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.4266901Z   deno-version: v2.x
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.4267138Z   deno-binary-name: deno
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.4267364Z   cache: false
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.4267563Z ##[endgroup]
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.7201670Z Going to install stable version 2.9.8.
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:42.7213424Z Downloading Deno from https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-unknown-linux-gnu.zip.
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:43.1374257Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/c431ac67-35c0-42c3-ac82-36bbac131578
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:43.9075317Z Cached Deno to /opt/hostedtoolcache/deno/2.9.8/x64.
+Edge Functions typecheck	Run denoland/setup-deno@v2	2026-11-12T21:35:43.9091501Z Installation complete.
+Edge Functions typecheck	Run npm run test:edge	﻿2026-11-12T21:35:43.9250072Z ##[group]Run npm run test:edge
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:43.9250403Z ^[[36;1mnpm run test:edge^[[0m
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:43.9301370Z shell: /usr/bin/bash -e {0}
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:43.9301644Z ##[endgroup]
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0322611Z 
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0323226Z > pedeoutra@0.1.0 test:edge
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0323971Z > node scripts/edge-typecheck.mjs
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0324216Z 
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0678152Z Verificando 11 Edge Functions com deno…
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0875627Z ^[[0m^[[32mCheck^[[0m supabase/functions/asaas-webhook/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0877097Z ^[[0m^[[32mCheck^[[0m supabase/functions/billing-reconcile/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0878442Z ^[[0m^[[32mCheck^[[0m supabase/functions/cancel-subscription/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0879791Z ^[[0m^[[32mCheck^[[0m supabase/functions/create-checkout/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0880982Z ^[[0m^[[32mCheck^[[0m supabase/functions/link-order-customer/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0882184Z ^[[0m^[[32mCheck^[[0m supabase/functions/public-catalog/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0883389Z ^[[0m^[[32mCheck^[[0m supabase/functions/public-order/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0884738Z ^[[0m^[[32mCheck^[[0m supabase/functions/reorder-create/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0885860Z ^[[0m^[[32mCheck^[[0m supabase/functions/reorder-get/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0886984Z ^[[0m^[[32mCheck^[[0m supabase/functions/reorder-revoke/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:44.0888101Z ^[[0m^[[32mCheck^[[0m supabase/functions/reorder-submit/index.ts
+Edge Functions typecheck	Run npm run test:edge	2026-11-12T21:35:45.7949605Z PASS Edge Functions typecheck
+Edge Functions typecheck	Run npm run test:edge-http	﻿2026-11-12T21:35:45.8090762Z ##[group]Run npm run test:edge-http
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.8091102Z ^[[36;1mnpm run test:edge-http^[[0m
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.8140385Z shell: /usr/bin/bash -e {0}
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.8140660Z ##[endgroup]
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.9169563Z 
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.9170560Z > pedeoutra@0.1.0 test:edge-http
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.9171351Z > node scripts/test-edge-http.mjs
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.9171617Z 
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:45.9754942Z PedeOutra Edge HTTP test — PostgREST http://127.0.0.1:42575, Deno http://127.0.0.1:45893
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:52.6783035Z [1/5] Migrations e seed
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:52.8979615Z   applied 20261112000100_core.sql
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:52.9875671Z   applied 20261112000200_rls.sql
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:53.0646932Z   applied 20261112000300_rpc.sql
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:53.1349226Z   applied 20261112000400_api_wrappers.sql
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:53.2040051Z [2/5] PostgREST em /rest/v1
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:54.7913180Z [3/5] Router Deno com handlers reais
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.0493235Z   router pronto
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.0494586Z [4/5] Catálogo, pedido e anti-spam
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.0907771Z   PASS  catálogo público só com produtos ativos e CORS
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.0926602Z   PASS  slug inválido retorna 400
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.1209336Z   PASS  pedido público cria pedido e total server-side
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.1949893Z   PASS  request_id repetido não duplica pedido
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.2025592Z   PASS  quantidade inválida é rejeitada
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.2078321Z   PASS  honeypot é rejeitado
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.2079388Z [5/5] Recompra, revogação e rate limit
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.2285671Z   PASS  reorder-get não expõe PII
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.2442705Z   PASS  reorder-submit cria pedido com preço atual
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.2525881Z   PASS  token desconhecido falha de forma neutra
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.3692261Z   PASS  link revogado retorna 410 com catálogo
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.5092159Z   PASS  rate limit bloqueia excesso de pedidos
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.5101111Z   PASS  preflight CORS responde 204
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.5102058Z [6/6] Funções autenticadas (stub GoTrue)
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.5902714Z   PASS  link-order-customer autenticado vincula cliente
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.6812278Z   PASS  reorder-create autenticado emite link
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.6916498Z   PASS  reorder-revoke autenticado revoga link
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.6980435Z   PASS  create-checkout retorna PROD BLOCKED sem credenciais
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.7020137Z   PASS  cancel-subscription retorna PROD BLOCKED sem credenciais
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.7020498Z 
+Edge Functions typecheck	Run npm run test:edge-http	2026-11-12T21:35:55.7020643Z Resultado: 17 PASS, 0 FAIL
+Edge Functions typecheck	Post Run denoland/setup-deno@v2	﻿2026-11-12T21:35:56.0393167Z Post job cleanup.
+Edge Functions typecheck	Post Run denoland/setup-deno@v2	2026-11-12T21:35:56.1674335Z Caching is not enabled. Caching is skipped.
+Edge Functions typecheck	Post Run actions/setup-node@v4	﻿2026-11-12T21:35:56.1834708Z Post job cleanup.
+Edge Functions typecheck	Post Run actions/setup-node@v4	2026-11-12T21:35:56.3115131Z (node:3434) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Edge Functions typecheck	Post Run actions/setup-node@v4	2026-11-12T21:35:56.3116193Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Edge Functions typecheck	Post Run actions/setup-node@v4	2026-11-12T21:35:56.3119844Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc, not saving cache.
+Edge Functions typecheck	Post Run actions/checkout@v4	﻿2026-11-12T21:35:56.3268427Z Post job cleanup.
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4135799Z [command]/usr/bin/git version
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4180172Z git version 2.56.0
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4225288Z Temporarily overriding HOME='/home/runner/work/_temp/1a86f6a8-9dac-4463-aae1-f26f23470a38' before making global git config changes
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4227342Z Adding repository directory to the temporary git global config as a safe directory
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4228949Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4270606Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4318778Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4735143Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4761361Z http.https://github.com/.extraheader
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4776044Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.4846027Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.5146318Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Edge Functions typecheck	Post Run actions/checkout@v4	2026-11-12T21:35:56.5187350Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Edge Functions typecheck	Complete job	﻿2026-11-12T21:35:56.5654187Z Cleaning up orphan processes
+Edge Functions typecheck	Complete job	2026-11-12T21:35:56.6155284Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -31,8 +31,8 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
 | PDA-004 Catálogo e pedido público | DONE | `public-catalog`, `public-order`, 17 testes HTTP dos handlers, total server-side |
 | PDA-005 Recompra segura | DONE | tokens unitários, RPC/DB, `reorder-create/get/submit/revoke`, 17 testes HTTP |
 | PDA-006 Painel e WhatsApp manual | DONE (UI) | telas de pedidos/status/histórico, links `wa.me` manuais; sem API WhatsApp |
-| PDA-007 Trial, plano e Asaas | PARTIAL / PROD BLOCKED | trial e gate server-side testados, máquina de billing com 22 testes, checkout/webhook implementados; Asaas sem credenciais |
-| PDA-008 Testes críticos e restore | DONE | 68 unit, 29 DB, 13 PostgREST, 17 Edge HTTP, axe, restore PASS |
+| PDA-007 Trial, plano e Asaas | PARTIAL / PROD BLOCKED | trial e gate server-side testados; checkout, webhook, duplicata, valor, cancelamento, reembolso e reconcile validados com Asaas mock; Asaas Sandbox real sem credenciais |
+| PDA-008 Testes críticos e restore | DONE | 68 unit, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, restore PASS |
 | PDA-009 Landing e onboarding | DONE | landing, demo, privacidade/termos preliminares, smoke de browser |
 | PDA-010 Deploy e smoke comercial | BLOCKED | sem credenciais; runbook em `docs/deployment.md`; nenhuma URL declarada |
 | PDA-011 Evidence Bundle e PR | DONE (sem merge) | este bundle + PR Draft |
@@ -71,35 +71,32 @@ Logs completos em `evidence/logs/`.
 | `npm run typecheck` | `tsc` app + config | 0 | `typecheck.log` |
 | `npm run test:unit` | 68 testes em 8 arquivos | 0 | `test-unit.log` |
 | `npm run build` | JS 489,74 kB (gzip 139,59 kB); CSS 36,10 kB (gzip 7,63 kB) | 0 | `build.log` |
-| `npm run test:db` | 29 PASS / 0 FAIL (RLS, trial, pedido, recompra, status, billing event) | 0 | `test-db.log` |
-| `npm run test:postgrest` | 13 PASS / 0 FAIL (RPC/RLS/status via HTTP real) | 0 | `test-postgrest.log` |
+| `npm run test:db` | 30 PASS / 0 FAIL no CI (RLS, trial, reembolso, pedido, recompra, status, billing event) | 0 | `ci-database.log` (29 no log local anterior) |
+| `npm run test:postgrest` | 13 PASS / 0 FAIL (RPC/RLS/status via HTTP real) | 0 | `ci-database.log` |
 | `npm run test:restore` | dump/restore, contagens e checksums idênticos | 0 | `test-restore.log` |
 | `npm run test:edge` | 11 Edge Functions typechecked | 0 | `test-edge.log` |
-| `npm run test:edge-http` | 17 PASS / 0 FAIL (handlers Deno reais + PostgREST) | 0 | `test-edge-http.log` |
+| `npm run test:edge-http` | 17 PASS / 0 FAIL (handlers Deno reais + PostgREST) | 0 | `ci-edge.log` |
 | `npm run smoke:preview` | landing/demo/legal/404 + axe WCAG 2 A/AA (0 serious/critical) + screenshots | 0 | `smoke.log` |
 | `supabase start` | 4 migrations aplicadas no stack local | 0 | `local-supabase-start.log` |
 | `npm run test:local` | NÃO EXECUTADO — Edge Runtime local bloqueado | — | `local-edge-runtime-blocked.txt` |
-| `npm run test:full-local` | GoTrue real + Asaas mock; execução completa **BLOCKED** pelo daemon Docker | — | ver seção abaixo |
-| GitHub Actions (PR #12) | 3 jobs verdes: web, banco/PostgREST/restore e Deno/Edge HTTP | 0 | [run 43302144744](https://github.com/KayzenRoot/pedeoutra/actions/runs/43302144744) |
+| `npm run test:full-local` | 7 PASS / 0 FAIL no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` |
+| GitHub Actions (PR #12) | 4 jobs verdes: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43311754455](https://github.com/KayzenRoot/pedeoutra/actions/runs/43311754455) |
 
 ### Harness E2E completo (GoTrue real + Asaas mock)
 
 `scripts/test-full-local.mjs` sobe Postgres, GoTrue real, PostgREST, os handlers
 Deno, um proxy `/auth/v1` + `/rest/v1` + `/functions/v1` e um mock HTTP do Asaas.
-Cobre signup/login reais, organização, produto, catálogo, pedido, vínculo de
-cliente, recompra, checkout, webhook idempotente, valor adulterado, cancelamento,
-reembolso e reconciliação.
+O job de CI `Full local E2E` executou 7 grupos, 0 FAIL (`ci-full-e2e.log`):
 
-Execução parcial registrada nesta máquina:
+- GoTrue saudável; signup/login/`getUser` reais com JWT `role=authenticated`.
+- Organização, produto, catálogo público, pedido público e vínculo de cliente.
+- Recompra: token opaco, ausência de PII, submit e revogação.
+- Billing mock: checkout, webhook sem token (401), `CHECKOUT_PAID`, duplicata,
+  valor adulterado, cancelamento, reembolso, bloqueio de escrita após trial
+  expirado e reconciliação.
 
-- PASS: GoTrue saudável, signup/login/`getUser` reais, JWT com
-  `role=authenticated`.
-- PASS: organização, produto, catálogo público, pedido público e vínculo de
-  cliente via Edge Function autenticada real.
-- A execução foi interrompida ao chegar em recompra/billing porque o daemon
-  Docker deixou de criar/remover containers (`docker run` timeout; containers
-  antigos não foram removidos). O script permanece versionado para rodar em um
-  ambiente Docker saudável; **não é declarado como PASS completo**.
+Isso valida o caminho HTTP/real de Auth e billing contra um provedor mock. O
+Asaas Sandbox real continua **PROD BLOCKED** por falta de credenciais.
 
 ### Bloqueio de infraestrutura local
 
@@ -166,8 +163,8 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 - Webhook Asaas não executado de ponta a ponta; lógica e validações unitárias/DB
   cobertas.
 - Edge Runtime Docker local indisponível nesta máquina (imagem 0-byte/exit 137).
-- O daemon Docker também deixou de criar containers durante o harness E2E completo;
-  a validação de billing com GoTrue/Asaas mock ficou parcialmente executada.
+- O daemon Docker local deixou de criar containers em parte da execução; o E2E
+  full foi executado no GitHub Actions, onde o Docker estava saudável.
 - Sem WAF dedicado, pentest externo ou teste de carga.
 - Supabase Free pode pausar; revisar plano antes de pagantes.
 - Bundle JS ~490 kB (139 kB gzip); aceitável para MVP, monitorar.
@@ -189,7 +186,7 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 ## 11. Veredito
 
 - **Implementação local:** PASS (app, schema, RLS, pedido, recompra, 68 testes
-  unitários, axe, build e smoke).
+  unitários, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, build e smoke).
 - **Segurança testada:** PASS no escopo de tenant, pedido, recompra, rate limit e
   restore; sem defeito HIGH/CRITICAL conhecido.
 - **Billing real:** BLOCKED (sem Asaas).

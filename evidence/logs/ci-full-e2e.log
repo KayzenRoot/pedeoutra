@@ -1,0 +1,232 @@
+Full local E2E (GoTrue + Asaas mock)	Set up job	﻿2026-11-12T21:35:33.8354184Z Current runner version: '2.338.2'
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8381914Z ##[group]Runner Image Provisioner
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8382779Z Hosted Compute Agent
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8383296Z Version: 20261028.624
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8383847Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8384485Z Build Date: 2026-10-28T21:51:42Z
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8385052Z Worker ID: {e790f7d7-bcee-4a44-a70c-e81f9b469e06}
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8385617Z Region: westus2
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8386149Z Cloud: Azure
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8386652Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8388339Z ##[group]Operating System
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8388885Z Ubuntu
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8389312Z 26.04.1
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8389860Z LTS
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8390307Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8390788Z ##[group]Runner Image
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8391301Z Image: ubuntu-26.04
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8391767Z Version: 20261101.186.1
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8392658Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8394192Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8395003Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8395984Z ##[group]GITHUB_TOKEN Permissions
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8397978Z Contents: read
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8398840Z Metadata: read
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8399384Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8401730Z Secret source: Actions
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8402629Z Cache mode: write
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.8403452Z Prepare workflow directory
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.9587320Z Prepare all required actions
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:33.9633525Z Getting action download info
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:34.3037500Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:34.6683956Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:35.2297702Z Download action repository 'denoland/setup-deno@v2' (SHA:22d081ff2d3a40755e97629de92e3bcbfa7cf2ed)
+Full local E2E (GoTrue + Asaas mock)	Set up job	2026-11-12T21:35:35.6054353Z Complete job name: Full local E2E (GoTrue + Asaas mock)
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	﻿2026-11-12T21:35:35.6904380Z ##[group]Run actions/checkout@v4
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6905656Z with:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6906475Z   repository: KayzenRoot/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6914485Z   token: ***
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6915248Z   ssh-strict: true
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6916020Z   ssh-user: git
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6916794Z   persist-credentials: true
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6917713Z   clean: true
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6918741Z   sparse-checkout-cone-mode: true
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6919681Z   fetch-depth: 1
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6920434Z   fetch-tags: false
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6921232Z   show-progress: true
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6922015Z   lfs: false
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6922744Z   submodules: false
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6923527Z   set-safe-directory: true
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6924411Z   allow-unsafe-pr-checkout: false
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.6925568Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.9992967Z Syncing repository: KayzenRoot/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.9996589Z ##[group]Getting Git version info
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:35.9998541Z Working directory is '/home/runner/work/pedeoutra/pedeoutra'
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0001303Z [command]/usr/bin/git version
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0010082Z git version 2.56.0
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0027726Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0041837Z Temporarily overriding HOME='/home/runner/work/_temp/4ef8222a-c4bd-4b32-b03a-c1cc7450ce23' before making global git config changes
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0045611Z Adding repository directory to the temporary git global config as a safe directory
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0049103Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0119512Z Deleting the contents of '/home/runner/work/pedeoutra/pedeoutra'
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0124062Z ##[group]Initializing the repository
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0128235Z [command]/usr/bin/git init /home/runner/work/pedeoutra/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0240554Z hint: Using 'master' as the name for the initial branch. This default branch name
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0243394Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0245840Z hint: to use in all of your new repositories, which will suppress this warning,
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0247722Z hint: call:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0249336Z hint:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0250853Z hint: 	git config --global init.defaultBranch <name>
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0252576Z hint:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0254183Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0257529Z hint: 'development'. The just-created branch can be renamed via this command:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0259749Z hint:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0260952Z hint: 	git branch -m <name>
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0262289Z hint:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0264096Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0266819Z Initialized empty Git repository in /home/runner/work/pedeoutra/pedeoutra/.git/
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0270904Z [command]/usr/bin/git remote add origin https://github.com/KayzenRoot/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0328593Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0331166Z ##[group]Disabling automatic garbage collection
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0333394Z [command]/usr/bin/git config --local gc.auto 0
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0796815Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0798813Z ##[group]Setting up auth
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0803405Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.0839471Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1257691Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1290051Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1530909Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1563597Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1815771Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1852489Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1854586Z ##[group]Fetching the repository
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.1863156Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0cdc2229610f28476a4049669b6bfbbfdf8e2858:refs/remotes/pull/12/merge
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6790974Z From https://github.com/KayzenRoot/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6793462Z  * [new ref]         0cdc2229610f28476a4049669b6bfbbfdf8e2858 -> pull/12/merge
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6800869Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6802991Z ##[group]Determining the checkout info
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6805470Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6807234Z [command]/usr/bin/git sparse-checkout disable
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6859948Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6891154Z ##[group]Checking out the ref
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.6892957Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/12/merge
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7076606Z Note: switching to 'refs/remotes/pull/12/merge'.
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7077560Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7078493Z You are in 'detached HEAD' state. You can look around, make experimental
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7080343Z changes and commit them, and you can discard any commits you make in this
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7082179Z state without impacting any branches by switching back to a branch.
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7083105Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7084019Z If you want to create a new branch to retain commits you create, you may
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7085759Z do so (now or later) by using -c with the switch command. Example:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7087235Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7087886Z   git switch -c <new-branch-name>
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7088674Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7089302Z Or undo this operation with:
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7089861Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7090455Z   git switch -
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7090885Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7091835Z Turn off this advice by setting config variable advice.detachedHead to false
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7092783Z 
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7094115Z HEAD is now at 0cdc222 Merge 1a56fbee7e24eab86bfd30e8c8c7f0f0fdc56552 into 40990e437a455f161fd8c60f35be983f29209794
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7097567Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7131195Z [command]/usr/bin/git log -1 --format=%H
+Full local E2E (GoTrue + Asaas mock)	Run actions/checkout@v4	2026-11-12T21:35:36.7154115Z 0cdc2229610f28476a4049669b6bfbbfdf8e2858
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	﻿2026-11-12T21:35:36.7541505Z ##[group]Run actions/setup-node@v4
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7542443Z with:
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7543115Z   node-version: 22
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7543834Z   cache: npm
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7544529Z   always-auth: false
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7545312Z   check-latest: false
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7552768Z   token: ***
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.7553466Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.8849882Z (node:2202) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.8852472Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.8858607Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:36.8860355Z ##[group]Environment details
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:37.8825155Z node: v22.23.4
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:37.8825944Z npm: 10.9.9
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:37.8826965Z yarn: 1.22.22
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:37.8828201Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:37.8844372Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:37.9840958Z /home/runner/.npm
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:38.2747095Z Cache hit for: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:38.2834735Z (node:2202) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:39.5681627Z Received 16777216 of 42034298 (39.9%), 16.0 MBs/sec
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:39.9414632Z Received 42034298 of 42034298 (100.0%), 29.2 MBs/sec
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:39.9415337Z Cache Size: ~40 MB (42034298 B)
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:39.9439329Z [command]/usr/bin/tar -xf /home/runner/work/_temp/64390868-db72-4a33-b550-315ad78d06a2/cache.tzst -P -C /home/runner/work/pedeoutra/pedeoutra --use-compress-program unzstd
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:40.0700227Z Cache restored successfully
+Full local E2E (GoTrue + Asaas mock)	Run actions/setup-node@v4	2026-11-12T21:35:40.0720838Z Cache restored from key: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	﻿2026-11-12T21:35:40.0918550Z ##[group]Run npm ci
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:40.0918903Z ^[[36;1mnpm ci^[[0m
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:40.0978884Z shell: /usr/bin/bash -e {0}
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:40.0979185Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:41.5520183Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:45.9807749Z npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.1696881Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.1697950Z added 296 packages, and audited 297 packages in 6s
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.1698535Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.1698758Z 64 packages are looking for funding
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.1699156Z   run `npm fund` for details
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3394674Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3395599Z 12 vulnerabilities (10 moderate, 2 critical)
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3395870Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3396078Z To address issues that do not require attention, run:
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3396412Z   npm audit fix
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3396626Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3396816Z To address all issues (including breaking changes), run:
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3397121Z   npm audit fix --force
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3397686Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm ci	2026-11-12T21:35:46.3397821Z Run `npm audit` for details.
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	﻿2026-11-12T21:35:46.4004561Z ##[group]Run denoland/setup-deno@v2
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.4004927Z with:
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.4005110Z   deno-version: v2.x
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.4005317Z   deno-binary-name: deno
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.4005521Z   cache: false
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.4005704Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.7139355Z Going to install stable version 2.9.8.
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.7146708Z Downloading Deno from https://github.com/denoland/deno/releases/download/v2.9.8/deno-x86_64-unknown-linux-gnu.zip.
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:46.9965683Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/8744f879-05a5-4ca6-b316-5eb548090154
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:48.1287202Z Cached Deno to /opt/hostedtoolcache/deno/2.9.8/x64.
+Full local E2E (GoTrue + Asaas mock)	Run denoland/setup-deno@v2	2026-11-12T21:35:48.1294207Z Installation complete.
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	﻿2026-11-12T21:35:48.1446879Z ##[group]Run npm run test:full-local
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.1447183Z ^[[36;1mnpm run test:full-local^[[0m
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.1492619Z shell: /usr/bin/bash -e {0}
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.1492888Z ##[endgroup]
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.2313895Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.2314786Z > pedeoutra@0.1.0 test:full-local
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.2315228Z > node scripts/test-full-local.mjs
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.2315407Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:48.3170122Z PedeOutra FULL local E2E — proxy http://127.0.0.1:41103
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:35:58.4097224Z [1/7] GoTrue real
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:00.5749621Z   PASS  GoTrue saudável
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:00.5750327Z [2/7] Bootstrap, migrations e PostgREST
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:00.7679451Z   applied 20261112000100_core.sql
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:00.9456811Z   applied 20261112000200_rls.sql
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:01.0135155Z   applied 20261112000300_rpc.sql
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:01.0807929Z   applied 20261112000400_api_wrappers.sql
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:02.3213046Z   PASS  PostgREST saudável
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:02.3213623Z [3/7] Proxy, Asaas mock e roteador Deno
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:02.5919866Z   PASS  proxy e roteador prontos
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:02.5920611Z [4/7] Supabase Auth real (signup/login)
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:02.8700056Z   PASS  signup/login/GoTrue getUser reais
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:02.8700907Z [5/7] Organização, produto e pedido
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.0034477Z   PASS  organização, produto, catálogo, pedido e vínculo reais
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.0034926Z [6/7] Recompra real
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.1702775Z   PASS  recompra, PII, revogação reais
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.1703205Z [7/7] Billing real com Asaas mock
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.6723823Z   PASS  checkout, webhook, duplicado, valor, cancelamento, reembolso e reconcile
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.6724355Z 
+Full local E2E (GoTrue + Asaas mock)	Run npm run test:full-local	2026-11-12T21:36:03.6724535Z Resultado: 7 PASS, 0 FAIL
+Full local E2E (GoTrue + Asaas mock)	Post Run denoland/setup-deno@v2	﻿2026-11-12T21:36:04.3131637Z Post job cleanup.
+Full local E2E (GoTrue + Asaas mock)	Post Run denoland/setup-deno@v2	2026-11-12T21:36:04.4131016Z Caching is not enabled. Caching is skipped.
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/setup-node@v4	﻿2026-11-12T21:36:04.4293786Z Post job cleanup.
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/setup-node@v4	2026-11-12T21:36:04.5378858Z (node:3380) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/setup-node@v4	2026-11-12T21:36:04.5379925Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/setup-node@v4	2026-11-12T21:36:04.5381532Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc, not saving cache.
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	﻿2026-11-12T21:36:04.5513927Z Post job cleanup.
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6259336Z [command]/usr/bin/git version
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6305940Z git version 2.56.0
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6351050Z Temporarily overriding HOME='/home/runner/work/_temp/469d9989-8604-435e-b6b9-d5052864ecf2' before making global git config changes
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6352570Z Adding repository directory to the temporary git global config as a safe directory
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6356788Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6431213Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.6482604Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.7479032Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.7506164Z http.https://github.com/.extraheader
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.7515919Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.7563607Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.7811343Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Full local E2E (GoTrue + Asaas mock)	Post Run actions/checkout@v4	2026-11-12T21:36:04.7842867Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Full local E2E (GoTrue + Asaas mock)	Complete job	﻿2026-11-12T21:36:04.8222409Z Cleaning up orphan processes
+Full local E2E (GoTrue + Asaas mock)	Complete job	2026-11-12T21:36:04.8607922Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

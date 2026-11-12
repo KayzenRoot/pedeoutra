@@ -60,10 +60,10 @@ Cobre signup/login, organização, produto, catálogo, pedido, vínculo de clien
 recompra, checkout, webhook idempotente, valor adulterado, cancelamento,
 reembolso e reconciliação.
 
-Status nesta máquina: execução parcial (Auth real, organização, produto,
-catálogo, pedido e vínculo passaram); bloqueada pelo daemon Docker antes de
-concluir recompra/billing. O script fica versionado para ambiente Docker
-saudável e não é contado como PASS completo.
+Status: PASS no GitHub Actions (run 43311754455), 7 grupos e 0 FAIL — inclui
+Auth real, pedido, recompra, checkout, webhook, duplicata, valor adulterado,
+cancelamento, reembolso e reconciliação. O Docker local desta máquina ficou
+instável, por isso a execução de referência é o CI.
 
 ### 5. Restore
 

@@ -22,11 +22,11 @@
 
 ## Resultado final
 
-- 68 testes unitários/componente, 29 testes de banco/RLS, 13 testes HTTP via
+- 68 testes unitários/componente, 30 testes de banco/RLS, 13 testes HTTP via
   PostgREST, 17 testes HTTP dos handlers Deno, restore, typecheck das 11 Edge
   Functions, build e smoke de browser com axe WCAG 2 A/AA verdes.
-- Harness E2E completo com GoTrue real + Asaas mock executado parcialmente;
-  bloqueado pelo daemon Docker antes de concluir billing.
+- Harness E2E completo com GoTrue real + Asaas mock: 7 grupos PASS no CI
+  (run 43311754455), incluindo checkout, webhook, reembolso e reconciliação.
 - Migrations aplicadas com sucesso em stack Supabase local.
 - Edge Runtime Docker local bloqueado por imagem publicada com binário 0-byte;
   handlers executados via router Deno local para os testes.
@@ -44,7 +44,7 @@
 
 PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/12
 
-CI real: run 43302144744 — 3 jobs verdes (web, banco/PostgREST/restore, Deno/Edge HTTP).
+CI real: runs 43311754455 — 4 jobs verdes (web/axe, banco/PostgREST/restore, Deno/Edge HTTP, E2E full).
 
 Revisar o PR Draft, executar auditoria independente e, com credenciais
 autorizadas, configurar Supabase/Asaas/Cloudflare e repetir os smokes de
