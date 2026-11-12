@@ -121,12 +121,32 @@ async function runAxe(page, label) {
     (violation) => violation.impact === 'serious' || violation.impact === 'critical',
   )
 
+  if (result.violations.length > 0) {
+    console.log(
+      `  axe detail ${label}: ${JSON.stringify(
+        result.violations.map((violation) => ({
+          id: violation.id,
+          impact: violation.impact,
+          nodes: violation.nodes.map((node) => ({
+            target: node.target,
+            summary: node.failureSummary,
+          })),
+        })),
+        null,
+        2,
+      )}`,
+    )
+  }
+
   if (blocking.length > 0) {
     const detail = blocking
-      .map(
-        (violation) =>
-          `${violation.id} (${violation.impact}): ${violation.help} — ${violation.nodes.length} nó(s)`,
-      )
+      .map((violation) => {
+        const nodes = violation.nodes
+          .slice(0, 8)
+          .map((node) => `  - ${node.target.join(' ')} :: ${node.failureSummary ?? ''}`)
+          .join('\n')
+        return `${violation.id} (${violation.impact}): ${violation.help} — ${violation.nodes.length} nó(s)\n${nodes}`
+      })
       .join('\n')
     throw new Error(`Acessibilidade ${label}:\n${detail}`)
   }
@@ -158,6 +178,8 @@ async function browserSmoke(browserPath) {
       viewport: { width: 1360, height: 900 },
       locale: 'pt-BR',
       deviceScaleFactor: 1,
+      colorScheme: 'light',
+      forcedColors: 'none',
     })
     const page = await context.newPage()
     page.on('pageerror', (error) => errors.push(error.message))
@@ -200,6 +222,8 @@ async function browserSmoke(browserPath) {
       viewport: { width: 390, height: 844 },
       locale: 'pt-BR',
       deviceScaleFactor: 2,
+      colorScheme: 'light',
+      forcedColors: 'none',
       isMobile: true,
       hasTouch: true,
     })
