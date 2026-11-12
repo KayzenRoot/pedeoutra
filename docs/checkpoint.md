@@ -40,6 +40,8 @@
 
 ## Próxima ação autorizada
 
+PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/12
+
 Revisar o PR Draft, executar auditoria independente e, com credenciais
 autorizadas, configurar Supabase/Asaas/Cloudflare e repetir os smokes de
 produção. Não há merge automático.

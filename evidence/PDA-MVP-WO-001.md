@@ -9,9 +9,10 @@
 | Branch | `feat/PDA-MVP-WO-001-pedeoutra-mvp` |
 | Base SHA | `40990e437a455f161fd8c60f35be983f29209794` |
 | Head de código | `02e3da2bd90108096c15997e26229cb927079eaf` |
+| Head da branch na abertura do PR | `1e7898f7df098c50b1877349ce9885cfd75db23e` |
 | Data da execução | 2026-11-12 |
 | Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.8, Supabase CLI 2.113, Chrome headless |
-| PR Draft | criado após o push; URL final no relatório de entrega |
+| PR Draft | [#12](https://github.com/KayzenRoot/pedeoutra/pull/12) — Draft, sem merge |
 | Deploy | **NÃO EXECUTADO / BLOCKED** — sem credenciais Cloudflare/Supabase Cloud |
 | Billing | **PROD BLOCKED** — sem credenciais Asaas Sandbox |
 
