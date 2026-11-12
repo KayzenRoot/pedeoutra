@@ -79,6 +79,7 @@ Logs completos em `evidence/logs/`.
 | `npm run smoke:preview` | landing/demo/legal/404 + screenshots | 0 | `smoke.log` |
 | `supabase start` | 4 migrations aplicadas no stack local | 0 | `local-supabase-start.log` |
 | `npm run test:local` | NÃO EXECUTADO — Edge Runtime local bloqueado | — | `local-edge-runtime-blocked.txt` |
+| GitHub Actions (PR #12) | 3 jobs verdes: web, banco/PostgREST/restore e Deno/Edge HTTP | 0 | [run 43302144744](https://github.com/KayzenRoot/pedeoutra/actions/runs/43302144744) |
 
 ### Bloqueio de infraestrutura local
 
