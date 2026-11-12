@@ -158,13 +158,13 @@ export async function processBillingEventById(
     // A API do Asaas não expõe GET de checkout (404). O próprio evento
     // CHECKOUT_PAID, autenticado pelo token do webhook, é a evidência de
     // status/valor; a assinatura é confirmada por getSubscription abaixo.
-    if (event.type === 'CHECKOUT_PAID' && !verified) {
-      verified = {
+    if (event.type === 'CHECKOUT_PAID') {
+      verified = mergeVerified(verified, {
         checkoutStatus: event.status,
         checkoutId: event.checkoutId,
         externalReference: event.externalReference,
         valueCents: event.valueCents,
-      }
+      })
     }
 
     const subscription = await findSubscriptionRow(supabase, event, verified)
