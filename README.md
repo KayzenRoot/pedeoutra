@@ -78,7 +78,8 @@ npm run test:postgrest  # HTTP real via PostgREST: RPC, RLS e status
 npm run test:restore    # dump/restore em dados sintéticos
 npm run test:edge       # typecheck das Edge Functions (Deno)
 npm run test:edge-http  # handlers Deno reais contra PostgREST (auth stub)
-npm run smoke:preview   # smoke do build (browser headless ou HTTP)
+npm run test:full-local # GoTrue real + Asaas mock + Edge handlers (requer Docker)
+npm run smoke:preview   # smoke do build + axe WCAG 2 A/AA (browser ou HTTP)
 npm run verify          # lint + typecheck + unit + build + smoke
 ```
 

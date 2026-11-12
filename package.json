@@ -21,7 +21,8 @@
     "smoke:preview": "node scripts/smoke.mjs",
     "test:local": "node scripts/integration-local.mjs",
     "test:postgrest": "node scripts/test-postgrest.mjs",
-    "test:edge-http": "node scripts/test-edge-http.mjs"
+    "test:edge-http": "node scripts/test-edge-http.mjs",
+    "test:full-local": "node scripts/test-full-local.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
@@ -39,6 +40,7 @@
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^5.0.2",
+    "axe-core": "^4.14.0",
     "eslint": "^9.35.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

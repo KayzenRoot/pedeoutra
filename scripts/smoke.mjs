@@ -6,11 +6,13 @@
  */
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { createServer } from 'node:net'
 import { join, resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const SCREENSHOTS_DIR = join(ROOT, 'evidence', 'screenshots')
+const AXE_PATH = createRequire(import.meta.url).resolve('axe-core/axe.min.js')
 
 function findFreePort() {
   return new Promise((resolvePort, reject) => {
@@ -107,6 +109,33 @@ async function staticSmoke() {
   }
 }
 
+async function runAxe(page, label) {
+  await page.addScriptTag({ path: AXE_PATH })
+  const result = await page.evaluate(async () => {
+    return await globalThis.axe.run(globalThis.document, {
+      runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
+    })
+  })
+
+  const blocking = result.violations.filter(
+    (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+  )
+
+  if (blocking.length > 0) {
+    const detail = blocking
+      .map(
+        (violation) =>
+          `${violation.id} (${violation.impact}): ${violation.help} — ${violation.nodes.length} nó(s)`,
+      )
+      .join('\n')
+    throw new Error(`Acessibilidade ${label}:\n${detail}`)
+  }
+
+  console.log(
+    `  PASS axe ${label} (${result.violations.length} violações; 0 serious/critical)`,
+  )
+}
+
 async function browserSmoke(browserPath) {
   let chromium
   try {
@@ -135,6 +164,7 @@ async function browserSmoke(browserPath) {
 
     await page.goto(`${BASE}/`, { waitUntil: 'networkidle' })
     await page.getByRole('heading', { name: /Pediu uma vez/i }).waitFor()
+    await runAxe(page, 'landing desktop')
     await page.screenshot({
       path: join(SCREENSHOTS_DIR, 'landing-desktop.png'),
       fullPage: true,
@@ -143,6 +173,7 @@ async function browserSmoke(browserPath) {
 
     await page.goto(`${BASE}/demo`, { waitUntil: 'networkidle' })
     await page.getByRole('heading', { name: 'Bella Limpeza' }).waitFor()
+    await runAxe(page, 'demo desktop')
     await page.getByLabel('Nome fictício').fill('Empresa de Teste')
     await page.getByLabel(/Entendo que esta é uma simulação/i).check()
     await page.getByRole('button', { name: /Simular envio do pedido/i }).click()
@@ -177,6 +208,7 @@ async function browserSmoke(browserPath) {
 
     await mobilePage.goto(`${BASE}/`, { waitUntil: 'networkidle' })
     await mobilePage.getByRole('heading', { name: /Pediu uma vez/i }).waitFor()
+    await runAxe(mobilePage, 'landing mobile')
     await mobilePage.screenshot({
       path: join(SCREENSHOTS_DIR, 'landing-mobile.png'),
       fullPage: true,
@@ -184,6 +216,7 @@ async function browserSmoke(browserPath) {
 
     await mobilePage.goto(`${BASE}/demo`, { waitUntil: 'networkidle' })
     await mobilePage.getByRole('heading', { name: 'Bella Limpeza' }).waitFor()
+    await runAxe(mobilePage, 'demo mobile')
     await mobilePage.screenshot({
       path: join(SCREENSHOTS_DIR, 'demo-mobile.png'),
       fullPage: true,

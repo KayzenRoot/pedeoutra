@@ -2,12 +2,16 @@
 > pedeoutra@0.1.0 smoke:preview
 > node scripts/smoke.mjs
 
-Smoke em http://127.0.0.1:52488
+Smoke em http://127.0.0.1:61796
 Browser: C:/Program Files/Google/Chrome/Application/chrome.exe
+  PASS axe landing desktop (0 violações; 0 serious/critical)
   PASS / (landing desktop renderizada)
+  PASS axe demo desktop (0 violações; 0 serious/critical)
   PASS /demo (fluxo fictício completo)
   PASS /privacidade e /termos
   PASS rota 404 (SPA fallback)
+  PASS axe landing mobile (0 violações; 0 serious/critical)
+  PASS axe demo mobile (0 violações; 0 serious/critical)
   PASS screenshots salvos em evidence/screenshots/
 
 PASS smoke do build estático

@@ -1,5 +1,6 @@
 import { sha256Hex } from './tokens.ts'
 import { MAX_BODY_BYTES } from './validation.ts'
+import { clientIpFromHeaders } from './request-ip.ts'
 
 export class HttpError extends Error {
   readonly status: number
@@ -113,13 +114,7 @@ export function appBaseUrl(): string {
 }
 
 export function clientIp(req: Request): string {
-  const forwarded = req.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown'
-  return (
-    req.headers.get('cf-connecting-ip') ??
-    req.headers.get('x-real-ip') ??
-    'unknown'
-  )
+  return clientIpFromHeaders(req.headers)
 }
 
 export async function rateBucket(req: Request, scope: string): Promise<string> {

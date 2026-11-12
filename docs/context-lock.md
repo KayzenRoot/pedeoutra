@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
-- HEAD no momento da geração: `02e3da2bd90108096c15997e26229cb927079eaf`
+- HEAD no momento da geração: `e011e50c0372a3ef7f18ef9e5c78e5250994c1af`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -18,31 +18,36 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 
 | Arquivo | SHA-256 |
 | --- | --- |
-| `.github/workflows/ci.yml` | `f3a8ab90b2a1f9ec153f6bddc6732cd73e5084e815ea155f95ca7a0d8db39c10` |
-| `README.md` | `81caffc167f9e37cf322705591d7bea4dade98b28de7ab31afc1932ad61de170` |
+| `.github/workflows/ci.yml` | `b2fb8fbf2ad5e5479b91c2164386f83734e672614f6a06636350d37c41050a7d` |
+| `README.md` | `7e347cc89688a8eb3f05e1866dde794224ce14395d6ca90b7827e92f3a39b3d3` |
 | `docs/architecture.md` | `a07314d1ff352fd0e6997b4c7a0599ab983ce59e39e797f6260f9cecbfa10553` |
 | `docs/backlog.md` | `9f58ab2e6cf1e217e38083aa32be50783b4d9c3fe3cfdc76abeeceba217ea921` |
-| `docs/checkpoint.md` | `8d1ef7cdc08b9e633e3b67ea96040dfd92cce805e63d579e6489091265a97fe7` |
+| `docs/checkpoint.md` | `83039b7b9d10663737aae96088b980bc6c25b80781ef5a1cf875bc7644383abb` |
 | `docs/decisions-ledger.md` | `54bde31b9f67b88687998ca93c9509b898dd8cd5a4497a2417fc6cde9f869fe9` |
 | `docs/definition-of-done.md` | `254be49cb375fdc5d1618be2c9292329038bf41161b596e6c44e9bae2a02cf86` |
 | `docs/deployment.md` | `8985564513837367d636132b660d6083920382de05f1c6c5798e488defbc6b79` |
 | `docs/project-overview.md` | `c8942184a0aef2cd67a3533866f64d06c374b784eaef324e1d904ec04d353496` |
 | `docs/requirements.md` | `3afaa5ab2294d2169859f0db1f4c8ae8899759c5240470d1247440e23462c2c7` |
 | `docs/scope.md` | `c29249118df01f474514024e27703a9e938144f288767fac527d88dc22137db8` |
-| `docs/security.md` | `a55411169dfb5724cf4a7e1f32aadc248794377bf2802db3f574db1930af6494` |
-| `docs/test-plan.md` | `da54710a657e2af6e604f13105e8df1cd08e7d3835fd349b56dbf6ccbd001d73` |
+| `docs/security.md` | `7c29a0157c8226d9bccac2ef682df7474db18556168ce42f5a21ef02a17d7f61` |
+| `docs/test-plan.md` | `8b02bd44bdac9015719c9daf10d61a8f563e93bad725e47502a78b8ad125e569` |
 | `eslint.config.js` | `f7cf4897dc619b3c7db13920430b8713a8536fbaee95528f200662ea3ecdff6d` |
 | `index.html` | `adb2161b3eca55dca479a11fa09696f3ef25bf2ddcc204b07237e8d0396c8a92` |
-| `package-lock.json` | `1e11b40c5f0d7f0f82731ed859d20f036cdeb9f68a7abf6d4fa4ec6c978c7bc4` |
-| `package.json` | `abb1b46ffd5f9253c23bad75adde56f338c7e1bb4fa4a5fa2490f57f18ae728d` |
+| `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |
+| `package.json` | `938eda21226fc8a305ea829cafbe6d304973d37ce417f0dea314af66ccb2d877` |
 | `public/_headers` | `3c5255aabcc6dfc8045737fb6df144729d151c6e12da610d19b12ec694c6c39b` |
 | `public/_redirects` | `6036983e5fc00f0169c9e939b1816ed771eee00e27f2fcc517b819041460b9ef` |
 | `scripts/context-lock.mjs` | `4457178617c7c3668bc3dcec4080d10601ae1599ca4ac7994a405d1bf92f54a1` |
 | `scripts/db-test.mjs` | `3e0dfe2ad5c9e2f40b2a7eca5fc7d1c51a2bd637dd96ba20eac3d3fa0a534799` |
 | `scripts/edge-typecheck.mjs` | `ce4f1356637b87adc351d9ef5bee02b4cdbab1b16b7d94eb669a39cee3fa09dd` |
+| `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
+| `scripts/local-edge-router.ts` | `09bb2dd9fdc686ed26e6abf82341aa6b1ea312c20af9cc13439bf4ed87e9300a` |
+| `scripts/smoke.mjs` | `f251506f95ce6cd3d9bebdfcacbbbaa244f6a87f3e3cec3768d5c95501db4829` |
+| `scripts/test-edge-http.mjs` | `0b87df43be7f0e955f93c20c2733888c63d6700a66c27bc04d8e0d0e1e206616` |
+| `scripts/test-full-local.mjs` | `565c0f799715667c9c53eb9e0c7257592236e833db87bab7b1df0a50a750a882` |
 | `scripts/test-postgrest.mjs` | `de7683e514f848f5622eab991d36050417f8f6b8920a12824bdfdb442dd44381` |
 | `scripts/verify-restore.mjs` | `974a876705cd69b6314b1f73d6a206c85345e2cd4f59d8312a2a68193e332d56` |
-| `src/App.tsx` | `26d15ca95b47818672b6ce86d32435974f7a15aff514e6ea5a13496be6ebcf34` |
+| `src/App.tsx` | `5e89b784c8eb9e6a8581380feb65e4afffa1359d2697984d93b8d2f1299bf511` |
 | `src/components/AppShell.tsx` | `e3d304664de475c357104bbef2b68bc6720c61325dcf59447464c1743872e2ff` |
 | `src/components/AuthLayout.tsx` | `8262f53c10c9e1c7adefd935bd2a20466fa0ac51c36676f123e16cb3be8ad016` |
 | `src/components/Brand.tsx` | `5213fe0508199f8fd9b272b17c44774a93fe826021d67bfc39d1ac7207f9b0bf` |
@@ -63,7 +68,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `src/pages/Catalog.tsx` | `c963c284535d75bfc3ebc17d6cbd7ceb1cfd88be31cbd9744ef9ba0f9efe7734` |
 | `src/pages/Customers.tsx` | `edfea1cf42a2d69fc401d46ae61ed46e2ae1f9f5b6a3082f1665f0eaeab38331` |
 | `src/pages/Dashboard.tsx` | `1305a84a3792c7a4630dfe02f9ffa7c01547e62a0c74b5d0ce0f49ecc5ec29f4` |
-| `src/pages/Demo.test.tsx` | `ee1443e2767d5823bc9a2cd3d9e5ee7b7ce312e0499f10f5bcc1ccd009c48b46` |
+| `src/pages/Demo.test.tsx` | `6bc133ba4a474bbd8d51183c516f1d88babcd279c9fcd73cbeb285d29fa61646` |
 | `src/pages/Demo.tsx` | `d3bf574f604782ac1d9410b5d1853064918657970493ddfe61c30e21a4439212` |
 | `src/pages/Landing.tsx` | `bdfcc294902dd20d11eb62b16de462bb5c0b39fa4ade0d9c4d17fd0ef21b9a20` |
 | `src/pages/Legal.tsx` | `26525a5bead087e71191c76b043ba0ffa1237ddc8a51c43ea1a99fff9f201e4e` |
@@ -90,10 +95,12 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `supabase/functions/_shared/billing-processor.ts` | `ad5fe9566aeb99d77121f2daaf1d9a10a81057d9001c657d2bfc37a94f0e0130` |
 | `supabase/functions/_shared/billing.test.ts` | `5f9622025d28f0888df4b4252dd09740c2dfa1607281501b496e31352fb8508e` |
 | `supabase/functions/_shared/billing.ts` | `93af9d19e7cb81195826292d42e805c7724dcdeaf988411ddcdfe14e0259c636` |
-| `supabase/functions/_shared/http.ts` | `16b2ce96a695493c3526b4467863b476df17587290da84d41037b32b65c0e496` |
+| `supabase/functions/_shared/http.ts` | `d01be86015da0dcb8f91d041cc517ae4c6a2c38bc218d2f601743548c177acc5` |
 | `supabase/functions/_shared/order-errors.ts` | `9ce2abc323734c1436426d1737093fcfcc3c85430436c9deb0546f15603d3ecc` |
 | `supabase/functions/_shared/org.ts` | `7c81de0ff1cf8a60311dc1b6d977dce41cc57ad603e28099b9e729b9dd9282fa` |
 | `supabase/functions/_shared/rate-limit.ts` | `7268aa2f7005e11e6bc8e75d2a02da4d70cba3c27abf71df0cfdc5bbbbeefdda` |
+| `supabase/functions/_shared/request-ip.test.ts` | `7e726067c1bf1b4e4deca3473657ffd96c5da0c6259419f25b5b8b2cfb05aa8c` |
+| `supabase/functions/_shared/request-ip.ts` | `b3692c17ce85b5810e148158095fe16c0b6af52b18d62bacb19233fc716f7116` |
 | `supabase/functions/_shared/supabase.ts` | `726077048b32b0fcca43f47a565ef0ecf5058de0354b578ec23b16a4f3b2a8da` |
 | `supabase/functions/_shared/tokens.test.ts` | `a22b05476883c465df15cd2e8df441d7bb98e472c1c12b449b6bd2e04f2d8e72` |
 | `supabase/functions/_shared/tokens.ts` | `9bd355e9acdd9ff865f02ad4d69f32f338ae266a0144ea03eb0d9593f99ec630` |

@@ -7,7 +7,7 @@ import { Demo } from './Demo'
 describe('demonstração pública', () => {
   it('mostra catálogo fictício e não chama backend', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Demo />
       </MemoryRouter>,
     )
@@ -20,7 +20,7 @@ describe('demonstração pública', () => {
   it('simula envio com sucesso e deixa claro que nada foi enviado', async () => {
     const user = userEvent.setup()
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Demo />
       </MemoryRouter>,
     )

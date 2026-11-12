@@ -21,6 +21,8 @@
 - Pedido público valida tamanho, quantidade, produto ativo do tenant correto e
   calcula total no banco; preço enviado pelo cliente é ignorado.
 - Rate limit atômico em `app.consume_rate_limit` (bucket = hash de IP/escopo).
+  O IP prioriza `cf-connecting-ip` e `x-real-ip` da borda; `x-forwarded-for` é
+  fallback pelo último salto. Em self-hosting, a borda deve sobrescrever headers.
 - Honeypot e tempo mínimo de formulário como barreira adicional; limites de
   50 itens, quantidade 1..999, nome/telefone/observação com tamanho máximo.
 
@@ -52,6 +54,7 @@
 
 ### Web
 
+- Smoke de acessibilidade com axe (WCAG 2 A/AA) em landing e demo, desktop e mobile.
 - CSP, `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy:
   no-referrer`, `Permissions-Policy` mínima em `public/_headers`.
 - Nenhum `dangerouslySetInnerHTML`; textos escapados pelo React.

@@ -22,9 +22,11 @@
 
 ## Resultado final
 
-- 64 testes unitários/componente, 29 testes de banco/RLS, 13 testes HTTP via
+- 68 testes unitários/componente, 29 testes de banco/RLS, 13 testes HTTP via
   PostgREST, 17 testes HTTP dos handlers Deno, restore, typecheck das 11 Edge
-  Functions, build e smoke de browser verdes.
+  Functions, build e smoke de browser com axe WCAG 2 A/AA verdes.
+- Harness E2E completo com GoTrue real + Asaas mock executado parcialmente;
+  bloqueado pelo daemon Docker antes de concluir billing.
 - Migrations aplicadas com sucesso em stack Supabase local.
 - Edge Runtime Docker local bloqueado por imagem publicada com binário 0-byte;
   handlers executados via router Deno local para os testes.

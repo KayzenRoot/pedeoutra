@@ -52,19 +52,33 @@ Script `scripts/db-test.mjs`:
   para validar o caminho de sessão; não substitui o teste com Supabase Auth real.
 - Billing sem credenciais retorna `503 billing_not_configured` (esperado).
 
-### 4. Restore
+### 4. E2E completo local (GoTrue real + Asaas mock)
+
+`npm run test:full-local` sobe Postgres, GoTrue real, PostgREST, proxy
+`/auth/v1` + `/rest/v1` + `/functions/v1`, handlers Deno e mock HTTP do Asaas.
+Cobre signup/login, organização, produto, catálogo, pedido, vínculo de cliente,
+recompra, checkout, webhook idempotente, valor adulterado, cancelamento,
+reembolso e reconciliação.
+
+Status nesta máquina: execução parcial (Auth real, organização, produto,
+catálogo, pedido e vínculo passaram); bloqueada pelo daemon Docker antes de
+concluir recompra/billing. O script fica versionado para ambiente Docker
+saudável e não é contado como PASS completo.
+
+### 5. Restore
 
 `scripts/verify-restore.mjs` cria dados sintéticos, faz `pg_dump`, restaura em
 outro banco e compara contagens/checksums. Nenhum dado real é usado.
 
-### 5. Build e CI
+### 6. Build e CI
 
 - ESLint.
 - `tsc --noEmit` (app e configuração).
 - `vite build`.
 - `deno check` das Edge Functions.
 - Smoke do build: browser headless (Chrome/Chromium) percorre landing, demo,
-  privacidade, termos e 404; sem browser, verifica shell SPA e assets.
+  privacidade, termos e 404, roda axe WCAG 2 A/AA em landing/demo (desktop e
+  mobile) e salva screenshots; sem browser, verifica shell SPA e assets.
 
 ## Matriz de risco
 
