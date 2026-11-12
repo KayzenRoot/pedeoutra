@@ -1,0 +1,53 @@
+
+> pedeoutra@0.1.0 test:db
+> node scripts/db-test.mjs
+
+PedeOutra DB test — container pedeoutra-db-test-7268 na porta 60493
+
+[1/6] Bootstrap e migrations
+  applied 20261112000100_core.sql
+  applied 20261112000200_rls.sql
+  applied 20261112000300_rpc.sql
+  applied 20261112000400_api_wrappers.sql
+  PASS  4 migrations aplicadas
+
+[2/6] Seed sintético e criação de organizações
+
+[3/6] RLS A/B
+  PASS  A lê apenas a própria organização
+  PASS  A lê apenas os próprios produtos
+  PASS  A não lê clientes de B
+  PASS  A não insere produto forjando org B
+  PASS  A não atualiza produto de B
+  PASS  A não altera trial ou owner da organização
+  PASS  A não lê token_hash direto (apenas view segura)
+  PASS  anon não lê tabelas de negócio
+  PASS  A não lê billing_events
+
+[4/6] Trial, assinatura e escrita
+  PASS  trial expirado bloqueia escrita
+  PASS  assinatura ativa libera escrita
+  PASS  reembolso revoga escrita
+  PASS  cancelado mantém acesso até o fim do período
+  PASS  past_due tem carência de 3 dias e depois bloqueia
+
+[5/6] Pedido público, recompra, rate limit e idempotência
+  PASS  pedido público calcula total no servidor e ignora preço do cliente
+  PASS  mesmo request_id não duplica pedido
+  PASS  produto inativo é rejeitado
+  PASS  produto de outro tenant é rejeitado
+  PASS  quantidade e duplicidade inválidas são rejeitadas
+  PASS  rate limit atômico bloqueia após o limite
+  PASS  recompra válida cria pedido vinculado ao cliente sem PII
+  PASS  link revogado é rejeitado
+  PASS  link expirado é rejeitado
+
+[6/6] Status do pedido e billing
+  PASS  transição válida grava evento com autor
+  PASS  transição inválida é rejeitada
+  PASS  A não altera pedido de B
+  PASS  evento de billing duplicado é inofensivo e idempotente
+  PASS  billing event inválido é rejeitado
+
+Resultado: 29 PASS, 0 FAIL
+exit=0

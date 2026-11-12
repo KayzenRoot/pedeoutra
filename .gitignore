@@ -16,3 +16,6 @@ supabase/functions/.env.*
 *.log
 .DS_Store
 Thumbs.db
+
+# Logs de evidência versionados intencionalmente
+!evidence/logs/*.log

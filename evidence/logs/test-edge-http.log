@@ -1,0 +1,38 @@
+
+> pedeoutra@0.1.0 test:edge-http
+> node scripts/test-edge-http.mjs
+
+PedeOutra Edge HTTP test — PostgREST http://127.0.0.1:62055, Deno http://127.0.0.1:62057
+(node:28764) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[1/5] Migrations e seed
+  applied 20261112000100_core.sql
+  applied 20261112000200_rls.sql
+  applied 20261112000300_rpc.sql
+  applied 20261112000400_api_wrappers.sql
+[2/5] PostgREST em /rest/v1
+[3/5] Router Deno com handlers reais
+  router pronto
+[4/5] Catálogo, pedido e anti-spam
+  PASS  catálogo público só com produtos ativos e CORS
+  PASS  slug inválido retorna 400
+  PASS  pedido público cria pedido e total server-side
+  PASS  request_id repetido não duplica pedido
+  PASS  quantidade inválida é rejeitada
+  PASS  honeypot é rejeitado
+[5/5] Recompra, revogação e rate limit
+  PASS  reorder-get não expõe PII
+  PASS  reorder-submit cria pedido com preço atual
+  PASS  token desconhecido falha de forma neutra
+  PASS  link revogado retorna 410 com catálogo
+  PASS  rate limit bloqueia excesso de pedidos
+  PASS  preflight CORS responde 204
+[6/6] Funções autenticadas (stub GoTrue)
+  PASS  link-order-customer autenticado vincula cliente
+  PASS  reorder-create autenticado emite link
+  PASS  reorder-revoke autenticado revoga link
+  PASS  create-checkout retorna PROD BLOCKED sem credenciais
+  PASS  cancel-subscription retorna PROD BLOCKED sem credenciais
+
+Resultado: 17 PASS, 0 FAIL
+exit=0

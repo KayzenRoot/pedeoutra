@@ -1,0 +1,29 @@
+
+> pedeoutra@0.1.0 test:postgrest
+> node scripts/test-postgrest.mjs
+
+PedeOutra PostgREST test — http://127.0.0.1:61237
+[1/4] Bootstrap e migrations
+  applied 20261112000100_core.sql
+  applied 20261112000200_rls.sql
+  applied 20261112000300_rpc.sql
+  applied 20261112000400_api_wrappers.sql
+  PASS  auth.users sintéticos
+[2/4] PostgREST
+  PASS  PostgREST respondendo
+[3/4] RPC e RLS via HTTP
+  PASS  create_organization via RPC (A e B)
+  PASS  insert de produto com RLS
+  PASS  A lê apenas o próprio produto
+  PASS  A não insere produto forjando org B
+  PASS  A não lê billing_events
+  PASS  anon não lê products
+  PASS  view segura de links não expõe token_hash
+[4/4] Pedido via RPC e status
+  PASS  api_submit_order via service_role calcula total
+  PASS  A lê o pedido com RLS
+  PASS  A confirma o pedido e transição inválida falha
+  PASS  api_org_can_write via service_role
+
+Resultado: 13 PASS, 0 FAIL
+exit=0
