@@ -346,6 +346,25 @@ async function main() {
       )
     })
 
+    await test('reembolso não estende trial vigente', async () => {
+      await client.query(
+        `update public.organizations set trial_ends_at = now() + interval '1 day' where id = $1`,
+        [orgA.id],
+      )
+      const product = await asUser(USER_A, () => insertProduct(orgA.id, 'Trial vigente', 100))
+      assert(product.id, 'trial vigente deveria permitir escrita')
+
+      await client.query(
+        `update public.organizations set trial_ends_at = now() - interval '1 day' where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => asUser(USER_A, () => insertProduct(orgA.id, 'Trial expirado', 100)),
+        'row-level security',
+        'insert após trial expirado com reembolso',
+      )
+    })
+
     await test('cancelado mantém acesso até o fim do período', async () => {
       await client.query(
         `update public.subscriptions

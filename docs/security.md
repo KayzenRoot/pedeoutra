@@ -46,6 +46,8 @@
 
 - Plano e preço fixados no servidor (R$ 29,90 = 2990 centavos).
 - `successUrl` é informativa; não ativa assinatura.
+- Reembolso revoga o acesso pago. Um trial ainda vigente continua até seu fim,
+  sem extensão; depois dele, a escrita é bloqueada.
 - Webhook exige `asaas-access-token` em tempo constante; evento persistido com
   `provider_event_id UNIQUE` antes de processar.
 - Validação de valor, moeda, tenant, assinatura e estado no provedor.

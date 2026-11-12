@@ -646,6 +646,14 @@ async function main() {
       .single()
     assert(subscription.data?.state === 'refunded', `refund state ${subscription.data?.state}`)
 
+    // Política: reembolso revoga o acesso pago, mas não encurta um trial ainda
+    // vigente. Para provar o bloqueio, o trial é expirado antes da tentativa.
+    const expireTrial = await admin
+      .from('organizations')
+      .update({ trial_ends_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() })
+      .eq('id', organization.id)
+    assert(!expireTrial.error, `expire trial: ${expireTrial.error?.message}`)
+
     const blockedWrite = await client.from('products').insert({
       organization_id: organization.id,
       name: 'Bloqueado',
