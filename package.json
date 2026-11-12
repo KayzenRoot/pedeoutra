@@ -1,0 +1,57 @@
+{
+  "name": "pedeoutra",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MVP de recompra B2B — catálogo, pedidos e links de recompra para pequenos distribuidores.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:db": "node scripts/db-test.mjs",
+    "test:restore": "node scripts/verify-restore.mjs",
+    "test:edge": "node scripts/edge-typecheck.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run smoke:preview",
+    "context-lock": "node scripts/context-lock.mjs",
+    "smoke:preview": "node scripts/smoke.mjs",
+    "test:local": "node scripts/integration-local.mjs",
+    "test:postgrest": "node scripts/test-postgrest.mjs",
+    "test:edge-http": "node scripts/test-edge-http.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^22.18.0",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.0.2",
+    "eslint": "^9.35.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "jsdom": "^26.1.0",
+    "pg": "^8.16.3",
+    "playwright-core": "^1.65.0",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.42.0",
+    "vite": "^7.1.4",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
