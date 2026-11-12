@@ -12,7 +12,7 @@ import { runInBackground } from '../_shared/background.ts'
 import { parseAsaasEvent } from '../_shared/billing-event.ts'
 import { processBillingEventById } from '../_shared/billing-processor.ts'
 
-Deno.serve((req) =>
+export const handler = (req: Request) =>
   withHttpErrors(req, 'asaas-webhook', async () => {
     if (req.method !== 'POST') return methodNotAllowed(req, ['POST', 'OPTIONS'])
 
@@ -57,5 +57,6 @@ Deno.serve((req) =>
     )
 
     return jsonResponse(req, { received: true })
-  }),
-)
+  })
+
+if (import.meta.main) Deno.serve(handler)

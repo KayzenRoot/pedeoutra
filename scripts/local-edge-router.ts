@@ -12,6 +12,8 @@ import { handler as reorderCreate } from '../supabase/functions/reorder-create/i
 import { handler as reorderRevoke } from '../supabase/functions/reorder-revoke/index.ts'
 import { handler as createCheckout } from '../supabase/functions/create-checkout/index.ts'
 import { handler as cancelSubscription } from '../supabase/functions/cancel-subscription/index.ts'
+import { handler as asaasWebhook } from '../supabase/functions/asaas-webhook/index.ts'
+import { handler as billingReconcile } from '../supabase/functions/billing-reconcile/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -25,6 +27,8 @@ const routes: Record<string, Handler> = {
   'reorder-revoke': reorderRevoke,
   'create-checkout': createCheckout,
   'cancel-subscription': cancelSubscription,
+  'asaas-webhook': asaasWebhook,
+  'billing-reconcile': billingReconcile,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

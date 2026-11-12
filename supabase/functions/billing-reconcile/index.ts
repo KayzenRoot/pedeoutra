@@ -13,7 +13,7 @@ import {
   reconcileProviderSubscriptions,
 } from '../_shared/billing-processor.ts'
 
-Deno.serve((req) =>
+export const handler = (req: Request) =>
   withHttpErrors(req, 'billing-reconcile', async () => {
     if (req.method !== 'POST') return methodNotAllowed(req, ['POST', 'OPTIONS'])
 
@@ -64,5 +64,6 @@ Deno.serve((req) =>
       ...outcomes,
       subscriptions,
     })
-  }),
-)
+  })
+
+if (import.meta.main) Deno.serve(handler)
