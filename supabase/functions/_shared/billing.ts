@@ -39,6 +39,7 @@ export interface VerifiedProviderState {
   subscriptionId?: string | null
   subscriptionStatus?: string | null
   paymentStatus?: string | null
+  customerId?: string | null
   nextDueDate?: string | null
   externalReference?: string | null
   valueCents?: number | null
@@ -198,7 +199,8 @@ export function decideBillingTransition(
     return { kind: 'ignore', reason: 'stale_event' }
   }
 
-  const subscriptionId = verified?.subscriptionId ?? event.subscriptionId
+  const subscriptionId =
+    verified?.subscriptionId ?? event.subscriptionId ?? snapshot.providerSubscriptionId
 
   switch (event.type) {
     case 'CHECKOUT_PAID': {
@@ -214,8 +216,12 @@ export function decideBillingTransition(
       if (!subscriptionId) return { kind: 'verify', reason: 'subscription_not_found' }
 
       const periodEnd =
-        asaasDateToPeriodEnd(verified?.nextDueDate ?? event.nextDueDate ?? event.dueDate) ??
-        fallbackPeriodEnd(now)
+        asaasDateToPeriodEnd(
+          verified?.nextDueDate ??
+            snapshot.currentPeriodEnd ??
+            event.nextDueDate ??
+            event.dueDate,
+        ) ?? fallbackPeriodEnd(now)
 
       return apply(snapshot, event, now, 'active', periodEnd, 'checkout_paid_verified')
     }
@@ -225,12 +231,15 @@ export function decideBillingTransition(
         return { kind: 'ignore', reason: 'subscription_inactive' }
       }
       const nextState: SubscriptionState = snapshot.state === 'active' ? 'active' : 'pending'
+      const periodEnd =
+        asaasDateToPeriodEnd(verified?.nextDueDate ?? event.nextDueDate) ??
+        snapshot.currentPeriodEnd
       return apply(
         snapshot,
         event,
         now,
         nextState,
-        snapshot.currentPeriodEnd,
+        periodEnd,
         'subscription_created',
       )
     }
@@ -250,8 +259,12 @@ export function decideBillingTransition(
       }
 
       const periodEnd =
-        asaasDateToPeriodEnd(verified?.nextDueDate ?? event.nextDueDate ?? event.dueDate) ??
-        fallbackPeriodEnd(now)
+        asaasDateToPeriodEnd(
+          verified?.nextDueDate ??
+            snapshot.currentPeriodEnd ??
+            event.nextDueDate ??
+            event.dueDate,
+        ) ?? fallbackPeriodEnd(now)
 
       return apply(snapshot, event, now, 'active', periodEnd, 'payment_confirmed')
     }

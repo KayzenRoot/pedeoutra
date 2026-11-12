@@ -113,9 +113,6 @@ export class AsaasClient {
 
   async createRecurringCheckout(input: {
     organizationId: string
-    organizationName: string
-    ownerEmail: string
-    whatsapp: string
     now?: Date
   }): Promise<CheckoutResult> {
     const now = input.now ?? new Date()
@@ -139,11 +136,6 @@ export class AsaasClient {
             value: PLAN_PRICE_CENTS / 100,
           },
         ],
-        customerData: {
-          name: input.organizationName,
-          email: input.ownerEmail,
-          phone: input.whatsapp,
-        },
         subscription: {
           cycle: SUBSCRIPTION_CYCLE,
           nextDueDate: nextFirstDueDate(now),
@@ -182,6 +174,8 @@ export class AsaasClient {
       subscriptionId: typeof payload.id === 'string' ? payload.id : id,
       subscriptionStatus: typeof payload.status === 'string' ? payload.status : null,
       nextDueDate: typeof payload.nextDueDate === 'string' ? payload.nextDueDate : null,
+      checkoutId: typeof payload.checkoutSession === 'string' ? payload.checkoutSession : null,
+      customerId: typeof payload.customer === 'string' ? payload.customer : null,
       externalReference:
         typeof payload.externalReference === 'string' ? payload.externalReference : null,
       valueCents: typeof payload.value === 'number' ? Math.round(payload.value * 100) : null,
@@ -193,6 +187,8 @@ export class AsaasClient {
     return {
       paymentStatus: typeof payload.status === 'string' ? payload.status : null,
       subscriptionId: typeof payload.subscription === 'string' ? payload.subscription : null,
+      checkoutId: typeof payload.checkoutSession === 'string' ? payload.checkoutSession : null,
+      customerId: typeof payload.customer === 'string' ? payload.customer : null,
       externalReference:
         typeof payload.externalReference === 'string' ? payload.externalReference : null,
       valueCents: typeof payload.value === 'number' ? Math.round(payload.value * 100) : null,

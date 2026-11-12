@@ -15,6 +15,6 @@ Verificando 11 Edge Functions com npx.cmd…
 [0m[32mCheck[0m supabase/functions/reorder-revoke/index.ts
 [0m[32mCheck[0m supabase/functions/reorder-submit/index.ts
 PASS Edge Functions typecheck
-(node:13768) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(node:4936) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 exit=0

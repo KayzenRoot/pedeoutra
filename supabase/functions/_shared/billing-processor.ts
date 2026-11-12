@@ -35,6 +35,7 @@ interface SubscriptionRow {
 async function findSubscriptionRow(
   supabase: SupabaseClient,
   event: BillingEventData,
+  verified: VerifiedProviderState | null,
 ): Promise<SubscriptionRow | null> {
   const byColumn = async (column: string, value: string | null) => {
     if (!value) return null
@@ -52,6 +53,9 @@ async function findSubscriptionRow(
     ['provider_checkout_id', event.checkoutId],
     ['provider_customer_id', event.customerId],
     ['organization_id', isUuid(event.externalReference) ? event.externalReference : null],
+    ['provider_subscription_id', verified?.subscriptionId ?? null],
+    ['provider_checkout_id', verified?.checkoutId ?? null],
+    ['provider_customer_id', verified?.customerId ?? null],
   ]
 
   for (const [column, value] of attempts) {
@@ -81,11 +85,41 @@ async function verifyWithProvider(
     verified = mergeVerified(verified, await client.getPayment(event.paymentId))
   }
 
-  if (event.checkoutId && (event.type === 'CHECKOUT_PAID' || !verified)) {
-    verified = mergeVerified(verified, await client.getCheckout(event.checkoutId))
+  return verified
+}
+
+async function correlateSubscription(
+  supabase: SupabaseClient,
+  subscription: SubscriptionRow,
+  event: BillingEventData,
+  verified: VerifiedProviderState | null,
+): Promise<void> {
+  const updates: Record<string, string> = {}
+  const subscriptionId =
+    subscription.provider_subscription_id ?? event.subscriptionId ?? verified?.subscriptionId
+  const customerId =
+    subscription.provider_customer_id ?? event.customerId ?? verified?.customerId
+  const checkoutId =
+    subscription.provider_checkout_id ?? event.checkoutId ?? verified?.checkoutId
+
+  if (!subscription.provider_subscription_id && subscriptionId) {
+    updates.provider_subscription_id = subscriptionId
+  }
+  if (!subscription.provider_customer_id && customerId) {
+    updates.provider_customer_id = customerId
+  }
+  if (!subscription.provider_checkout_id && checkoutId) {
+    updates.provider_checkout_id = checkoutId
   }
 
-  return verified
+  if (Object.keys(updates).length === 0) return
+
+  const { error } = await supabase
+    .from('subscriptions')
+    .update(updates)
+    .eq('id', subscription.id)
+  if (error) throw new Error('subscription_correlation_failed')
+  Object.assign(subscription, updates)
 }
 
 function safeFailureReason(error: unknown): string {
@@ -119,7 +153,21 @@ export async function processBillingEventById(
   }
 
   try {
-    const subscription = await findSubscriptionRow(supabase, event)
+    let verified = await verifyWithProvider(client, event)
+
+    // A API do Asaas não expõe GET de checkout (404). O próprio evento
+    // CHECKOUT_PAID, autenticado pelo token do webhook, é a evidência de
+    // status/valor; a assinatura é confirmada por getSubscription abaixo.
+    if (event.type === 'CHECKOUT_PAID' && !verified) {
+      verified = {
+        checkoutStatus: event.status,
+        checkoutId: event.checkoutId,
+        externalReference: event.externalReference,
+        valueCents: event.valueCents,
+      }
+    }
+
+    const subscription = await findSubscriptionRow(supabase, event, verified)
     if (!subscription) {
       await supabase.rpc('api_mark_billing_event', {
         p_event_id: eventId,
@@ -129,13 +177,18 @@ export async function processBillingEventById(
       return 'failed'
     }
 
-    const requiresVerification = [
-      'CHECKOUT_PAID',
-      'PAYMENT_RECEIVED',
-      'PAYMENT_CONFIRMED',
-    ].includes(event.type)
+    await correlateSubscription(supabase, subscription, event, verified)
 
-    const verified = await verifyWithProvider(client, event)
+    if (event.type === 'CHECKOUT_PAID' && client && subscription.provider_subscription_id) {
+      const providerSubscription = await client.getSubscription(
+        subscription.provider_subscription_id,
+      )
+      verified = mergeVerified(verified, providerSubscription)
+    }
+
+    const requiresVerification = ['PAYMENT_RECEIVED', 'PAYMENT_CONFIRMED'].includes(
+      event.type,
+    )
     if (requiresVerification && !verified) {
       await supabase.rpc('api_mark_billing_event', {
         p_event_id: eventId,

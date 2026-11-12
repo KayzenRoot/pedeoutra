@@ -2,7 +2,7 @@
 > pedeoutra@0.1.0 smoke:preview
 > node scripts/smoke.mjs
 
-Smoke em http://127.0.0.1:61796
+Smoke em http://127.0.0.1:61705
 Browser: C:/Program Files/Google/Chrome/Application/chrome.exe
   PASS axe landing desktop (0 violações; 0 serious/critical)
   PASS / (landing desktop renderizada)

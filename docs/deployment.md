@@ -2,9 +2,33 @@
 
 ## Status desta WO
 
-`BLOCKED` para produção: não há credenciais autorizadas de Supabase Cloud,
-Asaas ou Cloudflare neste ambiente. A infraestrutura como código, os
-procedimentos e os smoke tests estão prontos. Nenhuma URL pública é inventada.
+**Staging/sandbox: PASS.** Frontend em Cloudflare Pages, banco/funções em
+Supabase Cloud e cobrança em Asaas Sandbox foram configurados e validados com
+dados sintéticos.
+
+**Produção monetizada: BLOCKED.** Ainda faltam credenciais/checkout Asaas de
+produção, domínio próprio e auditoria independente. Nenhuma cobrança real foi
+executada.
+
+## Ambiente atual (staging)
+
+| Item | Valor |
+| --- | --- |
+| Frontend | `https://pedeoutra.pages.dev` (Cloudflare Pages, projeto `pedeoutra`) |
+| Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
+| Migrations | 4 migrations aplicadas via `supabase db push` |
+| Edge Functions | 11 publicadas; públicas com `--no-verify-jwt`, autenticadas com JWT |
+| Auth | Site URL/redirects do Pages; `mailer_autoconfirm=true` no MVP |
+| Asaas | Sandbox; checkout hospedado e webhook autenticado ativos |
+| Smoke | cadastro, organização, produto, catálogo, pedido, recompra e assinatura ativa |
+
+O webhook Asaas aponta para
+`https://waygtbclkxklexnabwvj.supabase.co/functions/v1/asaas-webhook` e usa o
+header `asaas-access-token`. O token não é versionado.
+
+O Supabase Free pode pausar por inatividade. Revisar plano/limites antes de
+usuários pagantes. A região East US foi a recomendada pelo painel; uma migração
+para São Paulo exigiria recriar o projeto.
 
 ## Topologia alvo
 

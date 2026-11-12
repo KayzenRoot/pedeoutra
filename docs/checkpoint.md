@@ -22,16 +22,17 @@
 
 ## Resultado final
 
-- 68 testes unitários/componente, 30 testes de banco/RLS, 13 testes HTTP via
+- 70 testes unitários/componente, 30 testes de banco/RLS, 13 testes HTTP via
   PostgREST, 17 testes HTTP dos handlers Deno, restore, typecheck das 11 Edge
   Functions, build e smoke de browser com axe WCAG 2 A/AA verdes.
-- Harness E2E completo com GoTrue real + Asaas mock: 7 grupos PASS no CI
-  (run 43312787193), incluindo checkout, webhook, reembolso e reconciliação.
-- Migrations aplicadas com sucesso em stack Supabase local.
-- Edge Runtime Docker local bloqueado por imagem publicada com binário 0-byte;
-  handlers executados via router Deno local para os testes.
-- Asaas Sandbox e deploy Cloudflare/Supabase Cloud `BLOCKED` por ausência de
-  credenciais autorizadas. Nenhuma URL de produção foi declarada.
+- Harness E2E completo com GoTrue real + Asaas mock: 7 grupos PASS no CI.
+- Migrations aplicadas no Supabase Cloud (`waygtbclkxklexnabwvj`).
+- Frontend publicado em Cloudflare Pages: `https://pedeoutra.pages.dev`.
+- 11 Edge Functions publicadas; secrets configurados (sem valores no repo).
+- Asaas Sandbox: checkout real, pagamento de teste, webhook autenticado e
+  assinatura ativada; smoke completo de produção PASS.
+- Docker local continua bloqueado por WSL travado; exige reinício do Windows.
+- Produção monetizada permanece BLOCKED (Asaas produção, domínio e auditoria).
 
 ## Checkpoint Delta (PROPOSED)
 

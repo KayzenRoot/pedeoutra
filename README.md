@@ -10,14 +10,15 @@ um link de recompra. O comprador não baixa app e não cria conta.
 
 | Área | Estado |
 | --- | --- |
-| Aplicação web (landing, painel, catálogo, recompra) | implementada |
-| Banco, migrations e RLS | implementados e testados em Postgres local |
-| Edge Functions (pedido, recompra, billing) | implementadas; lógica testada com mocks |
-| Asaas Sandbox | `PROD BLOCKED` — sem credenciais autorizadas |
-| Deploy Cloudflare Pages/Supabase Cloud | `BLOCKED` — sem credenciais autorizadas |
+| Aplicação web (landing, painel, catálogo, recompra) | implementada e publicada em staging |
+| Banco, migrations e RLS | aplicados no Supabase Cloud e testados |
+| Edge Functions (pedido, recompra, billing) | 11 funções publicadas |
+| Asaas Sandbox | **PASS** — checkout, pagamento e webhook reais validados |
+| Deploy staging | **PASS** — https://pedeoutra.pages.dev |
+| Produção monetizada | `BLOCKED` — Asaas produção, domínio e auditoria pendentes |
 
-Nenhuma URL de produção, cobrança real ou deploy é declarada sem evidência.
 O bundle de evidências fica em [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md).
+O ambiente de staging usa Supabase Cloud (`waygtbclkxklexnabwvj`) e Asaas Sandbox.
 
 ## Source Hierarchy
 

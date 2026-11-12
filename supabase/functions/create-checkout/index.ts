@@ -53,9 +53,6 @@ export const handler = (req: Request) =>
     try {
       checkout = await client.createRecurringCheckout({
         organizationId: organization.id,
-        organizationName: organization.name,
-        ownerEmail: user.email,
-        whatsapp: organization.whatsapp,
       })
     } catch (error) {
       logError('create_checkout', error, { organization_id: organization.id })

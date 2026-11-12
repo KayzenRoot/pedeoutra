@@ -513,8 +513,11 @@ async function main() {
       assert(response.status === 204, `HTTP ${response.status}`)
       assert(
         response.headers.get('access-control-allow-origin') === 'http://127.0.0.1:5173',
-        'CORS',
+        'CORS origin',
       )
+      const allowedHeaders = response.headers.get('access-control-allow-headers') ?? ''
+      assert(allowedHeaders.includes('apikey'), 'CORS deve permitir apikey')
+      assert(allowedHeaders.includes('authorization'), 'CORS deve permitir authorization')
     })
 
     console.log('[6/6] Funções autenticadas (stub GoTrue)')

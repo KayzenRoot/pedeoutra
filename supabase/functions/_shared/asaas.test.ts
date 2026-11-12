@@ -60,9 +60,6 @@ describe('AsaasClient', () => {
     const client = new AsaasClient(config(), fetchMock as unknown as typeof fetch)
     const result = await client.createRecurringCheckout({
       organizationId: ORG,
-      organizationName: 'Distribuidora Aurora',
-      ownerEmail: 'dono@aurora.test',
-      whatsapp: '11999998888',
       now: new Date('2026-11-12T12:00:00Z'),
     })
 
@@ -107,9 +104,6 @@ describe('AsaasClient', () => {
     const client = new AsaasClient(config(), fetchMock as unknown as typeof fetch)
     const result = await client.createRecurringCheckout({
       organizationId: ORG,
-      organizationName: 'Aurora',
-      ownerEmail: 'a@b.test',
-      whatsapp: '11999998888',
     })
     expect(result.link).toBe('https://sandbox.asaas.com/checkoutSession/show?id=chk_2')
   })
@@ -123,9 +117,6 @@ describe('AsaasClient', () => {
     await expect(
       client.createRecurringCheckout({
         organizationId: ORG,
-        organizationName: 'Aurora',
-        ownerEmail: 'a@b.test',
-        whatsapp: '11999998888',
       }),
     ).rejects.toMatchObject({ status: 400, safeDetail: 'Valor inválido' })
   })
@@ -139,6 +130,8 @@ describe('AsaasClient', () => {
           nextDueDate: '2026-12-12',
           externalReference: ORG,
           value: 29.9,
+          checkoutSession: 'chk_1',
+          customer: 'cus_1',
         })
       }
       return jsonResponse({
@@ -147,6 +140,8 @@ describe('AsaasClient', () => {
         subscription: 'sub_1',
         externalReference: ORG,
         value: 29.9,
+        checkoutSession: 'chk_1',
+        customer: 'cus_1',
       })
     })
     const client = new AsaasClient(config(), fetchMock as unknown as typeof fetch)
@@ -155,12 +150,16 @@ describe('AsaasClient', () => {
       subscriptionId: 'sub_1',
       subscriptionStatus: 'ACTIVE',
       nextDueDate: '2026-12-12',
+      checkoutId: 'chk_1',
+      customerId: 'cus_1',
       externalReference: ORG,
       valueCents: 2990,
     })
     await expect(client.getPayment('pay_1')).resolves.toEqual({
       paymentStatus: 'RECEIVED',
       subscriptionId: 'sub_1',
+      checkoutId: 'chk_1',
+      customerId: 'cus_1',
       externalReference: ORG,
       valueCents: 2990,
     })

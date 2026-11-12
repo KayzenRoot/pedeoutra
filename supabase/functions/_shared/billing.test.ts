@@ -116,6 +116,38 @@ describe('máquina de estados de billing', () => {
     expect(decision.reason).toBe('checkout_paid_verified')
   })
 
+  it('CHECKOUT_PAID usa assinatura já correlacionada no snapshot', () => {
+    const decision = decideBillingTransition(
+      snapshot({
+        state: 'pending',
+        providerSubscriptionId: 'sub_1',
+        currentPeriodEnd: '2026-12-13T02:59:59.000Z',
+      }),
+      event({ type: 'CHECKOUT_PAID', subscriptionId: null, nextDueDate: null }),
+      verified({ paymentStatus: null, subscriptionId: null, nextDueDate: null }),
+      NOW,
+    )
+    expect(decision.kind).toBe('apply')
+    if (decision.kind !== 'apply') return
+    expect(decision.state).toBe('active')
+    expect(decision.providerSubscriptionId).toBe('sub_1')
+    expect(decision.currentPeriodEnd).toBe('2026-12-13T02:59:59.000Z')
+  })
+
+  it('SUBSCRIPTION_CREATED permanece pendente e grava o período', () => {
+    const decision = decideBillingTransition(
+      snapshot({ providerSubscriptionId: null, currentPeriodEnd: null }),
+      event({ type: 'SUBSCRIPTION_CREATED', paymentId: null, dueDate: null }),
+      verified({ paymentStatus: null }),
+      NOW,
+    )
+    expect(decision.kind).toBe('apply')
+    if (decision.kind !== 'apply') return
+    expect(decision.state).toBe('pending')
+    expect(decision.currentPeriodEnd).toBe('2026-12-13T02:59:59.000Z')
+    expect(decision.providerSubscriptionId).toBe('sub_1')
+  })
+
   it('CHECKOUT_PAID não verificado não ativa', () => {
     expect(
       decideBillingTransition(snapshot(), event({ type: 'CHECKOUT_PAID' }), null, NOW),
