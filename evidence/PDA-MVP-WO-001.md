@@ -71,7 +71,7 @@ Logs completos em `evidence/logs/`.
 | `npm run typecheck` | `tsc` app + config | 0 | `typecheck.log` |
 | `npm run test:unit` | 70 testes em 8 arquivos | 0 | `test-unit.log` |
 | `npm run build` | JS 489,74 kB (gzip 139,59 kB); CSS 36,10 kB (gzip 7,63 kB) | 0 | `build.log` |
-| `npm run test:db` | 30 PASS / 0 FAIL no CI (RLS, trial, reembolso, pedido, recompra, status, billing event) | 0 | `ci-database.log` (29 no log local anterior) |
+| `npm run test:db` | 30 PASS / 0 FAIL local e no CI (RLS, trial, reembolso, pedido, recompra, status, billing event) | 0 | `ci-database.log` + execução local |
 | `npm run test:postgrest` | 13 PASS / 0 FAIL (RPC/RLS/status via HTTP real) | 0 | `ci-database.log` |
 | `npm run test:restore` | dump/restore, contagens e checksums idênticos | 0 | `test-restore.log` |
 | `npm run test:edge` | 11 Edge Functions typechecked | 0 | `test-edge.log` |
@@ -178,9 +178,10 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 - Auth Cloud/GoTrue real foi validado no harness E2E; Auth Cloud de produção
   usa o mesmo GoTrue e está configurado no staging.
 - Webhook Asaas foi executado de ponta a ponta no Sandbox (pagamento real de teste).
-- Docker local indisponível: distro `docker-desktop` com init control API sem
-  resposta; requer reinício do Windows ou reset de dados do Docker. O E2E full e
-  os testes de banco rodaram no GitHub Actions, onde o Docker estava saudável.
+- Docker local corrigido via `wsl --update` + reinício do backend do Docker
+  Desktop; `test:db` 30/30, `test:postgrest` 13/13 e `test:restore` PASS
+  executados localmente.
+- O E2E full continua rodando no GitHub Actions, onde o ambiente é limpo.
 - Sem WAF dedicado, pentest externo ou teste de carga.
 - Supabase Free pode pausar; revisar plano antes de pagantes.
 - Região East US (Ohio) foi a recomendada pelo painel; migrar para São Paulo

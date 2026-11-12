@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
-- HEAD no momento da geração: `c1178338a6806371c880dab31b83746c83bc08b0`
+- HEAD no momento da geração: `faac7a3488db68099295ffe749df2fe99a8e3961`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -22,7 +22,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `README.md` | `10fb86ceeca9046bf7272a9cdde05662a94e433696aa49b3b7af17e376341c80` |
 | `docs/architecture.md` | `a07314d1ff352fd0e6997b4c7a0599ab983ce59e39e797f6260f9cecbfa10553` |
 | `docs/backlog.md` | `9f58ab2e6cf1e217e38083aa32be50783b4d9c3fe3cfdc76abeeceba217ea921` |
-| `docs/checkpoint.md` | `335c23266d5ce806ed15519994692a91faaa818c98bae9a8ac70b5ff4f7f1c72` |
+| `docs/checkpoint.md` | `83d621e865011d8ccf5bff14da5518d122fd96fc965e71c83e7ea80eb1d03a84` |
 | `docs/decisions-ledger.md` | `54bde31b9f67b88687998ca93c9509b898dd8cd5a4497a2417fc6cde9f869fe9` |
 | `docs/definition-of-done.md` | `254be49cb375fdc5d1618be2c9292329038bf41161b596e6c44e9bae2a02cf86` |
 | `docs/deployment.md` | `1d8c3cae09fb474f39c4a93d23f681b4c45d6b3a12cc5ccf23b6609140466f76` |
