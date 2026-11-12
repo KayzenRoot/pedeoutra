@@ -16,7 +16,7 @@ const head = git('rev-parse HEAD')
 const branch = git('branch --show-current')
 const date = new Date().toISOString().slice(0, 10)
 
-const include = /^(README\.md|package\.json|package-lock\.json|\.github\/workflows\/ci\.yml|docs\/.*\.md|supabase\/config\.toml|supabase\/migrations\/.*\.sql|supabase\/functions\/[^/]+\/index\.ts|src\/.*\.(ts|tsx)|scripts\/.*\.mjs)$/
+const include = /^(README\.md|package\.json|package-lock\.json|index\.html|eslint\.config\.js|tsconfig(\.node)?\.json|vite\.config\.ts|public\/_(headers|redirects)|\.github\/workflows\/ci\.yml|docs\/.*\.md|supabase\/config\.toml|supabase\/migrations\/.*\.sql|supabase\/tests\/.*\.sql|supabase\/functions\/(_shared\/.*|[^/]+\/index)\.ts|src\/.*\.(ts|tsx|css)|scripts\/.*\.(mjs|ts))$/
 
 const files = git('ls-files')
   .split(/\r?\n/)

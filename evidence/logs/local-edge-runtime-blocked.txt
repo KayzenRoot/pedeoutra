@@ -1,0 +1,23 @@
+# Edge Runtime local — tentativa e bloqueio (2026-11-12)
+
+$ docker run --rm public.ecr.aws/supabase/edge-runtime:v1.74.3 --version
+exec /usr/local/bin/edge-runtime: exec format error
+
+$ MSYS_NO_PATHCONV=1 docker run --rm --entrypoint /bin/sh \
+    public.ecr.aws/supabase/edge-runtime:v1.74.3 \
+    -c "ls -l /usr/local/bin/edge-runtime"
+-rwxr-xr-x 1 root root 0 ... /usr/local/bin/edge-runtime
+
+A imagem publicada v1.74.3 estava com binário de 0 byte nesta máquina.
+A tag anterior v1.69.4 foi baixada e executa:
+  edge-runtime 0.1.0
+  deno 2.1.4 (release, x86_64-unknown-linux-gnu)
+
+O stack Supabase local aplicou as 4 migrations (ver local-supabase-start.log),
+mas o container de Edge Runtime não permaneceu saudável e o stack foi encerrado
+com exit 137 (pressão de recursos Docker). Nenhuma URL ou deploy foi declarado.
+
+Workaround de teste, sem alterar produção:
+- os handlers Deno reais foram importados por scripts/local-edge-router.ts;
+- executados contra PostgREST + Postgres reais;
+- resultado: npm run test:edge-http => 17 PASS, 0 FAIL.
