@@ -31,7 +31,8 @@
 - 11 Edge Functions publicadas; secrets configurados (sem valores no repo).
 - Asaas Sandbox: checkout real, pagamento de teste, webhook autenticado e
   assinatura ativada; smoke completo de produção PASS.
-- Docker local continua bloqueado por WSL travado; exige reinício do Windows.
+- Docker local continua bloqueado (init control API do distro docker-desktop
+  sem resposta); exige reinício do Windows ou reset de dados do Docker.
 - Produção monetizada permanece BLOCKED (Asaas produção, domínio e auditoria).
 
 ## Checkpoint Delta (PROPOSED)

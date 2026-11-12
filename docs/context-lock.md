@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
-- HEAD no momento da geração: `b4b483024e8dde00185db88823a9230f5e1297d7`
+- HEAD no momento da geração: `c1178338a6806371c880dab31b83746c83bc08b0`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -22,7 +22,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `README.md` | `10fb86ceeca9046bf7272a9cdde05662a94e433696aa49b3b7af17e376341c80` |
 | `docs/architecture.md` | `a07314d1ff352fd0e6997b4c7a0599ab983ce59e39e797f6260f9cecbfa10553` |
 | `docs/backlog.md` | `9f58ab2e6cf1e217e38083aa32be50783b4d9c3fe3cfdc76abeeceba217ea921` |
-| `docs/checkpoint.md` | `eb8dfc4a92dcdfc62138d246520dc568ae8867d53682603031715559d94e65a0` |
+| `docs/checkpoint.md` | `335c23266d5ce806ed15519994692a91faaa818c98bae9a8ac70b5ff4f7f1c72` |
 | `docs/decisions-ledger.md` | `54bde31b9f67b88687998ca93c9509b898dd8cd5a4497a2417fc6cde9f869fe9` |
 | `docs/definition-of-done.md` | `254be49cb375fdc5d1618be2c9292329038bf41161b596e6c44e9bae2a02cf86` |
 | `docs/deployment.md` | `1d8c3cae09fb474f39c4a93d23f681b4c45d6b3a12cc5ccf23b6609140466f76` |
@@ -30,7 +30,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `docs/requirements.md` | `3afaa5ab2294d2169859f0db1f4c8ae8899759c5240470d1247440e23462c2c7` |
 | `docs/scope.md` | `c29249118df01f474514024e27703a9e938144f288767fac527d88dc22137db8` |
 | `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `2d8b82b9726c73e4d14d7b4f3338e48844d096bb44e73375dc0eee00e8c95853` |
+| `docs/test-plan.md` | `f06e9af56ab3fffcd6276b6efb1904034996af158eda2bae1f30a24fd35e354b` |
 | `eslint.config.js` | `f7cf4897dc619b3c7db13920430b8713a8536fbaee95528f200662ea3ecdff6d` |
 | `index.html` | `adb2161b3eca55dca479a11fa09696f3ef25bf2ddcc204b07237e8d0396c8a92` |
 | `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |
@@ -93,7 +93,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `supabase/functions/_shared/auth.ts` | `c7acff07cf7b9d2967aa18b9c16250ef2e4e737ce83dca7e6df63b8dac027d85` |
 | `supabase/functions/_shared/background.ts` | `b97b58ed1ccf1e4b83be2c7bfbb2ea73f1b037f516961ceec3fd29a9799532da` |
 | `supabase/functions/_shared/billing-event.ts` | `7400c4cbbc8148ae0a1002baf6fab48ae2d997b76691b93aecf07e384f932ae4` |
-| `supabase/functions/_shared/billing-processor.ts` | `293e902f919808fa8a24434da33ecee4fac2af4cdbdf7837ce5b4b1ec32a3050` |
+| `supabase/functions/_shared/billing-processor.ts` | `868f4b090ea3d5aaeea41efce082a8655d351cbfef82a3c7d462b3233b3b75d8` |
 | `supabase/functions/_shared/billing.test.ts` | `951f385b0aecd9e55adbe79ddc733463cb985e5f47faecd791aa41f247e8bb46` |
 | `supabase/functions/_shared/billing.ts` | `478435740e0eb97cdd9ea1faea36b07d9a69f03787e6ce54e882a790e94a83e1` |
 | `supabase/functions/_shared/http.ts` | `c18e69a55e11a4bf1b0ed95496a71b631654bf65df22ff34cd0a282527d9166e` |
