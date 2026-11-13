@@ -149,3 +149,17 @@ de execução; os dados sintéticos foram removidos pelos próprios harnesses.
   superadmin; o Profissional está intencionalmente indisponível.
 - A promoção de ADR/checkpoint e o merge só ocorrem após auditoria e
   autorização explícita do proprietário.
+
+## 11. Adendo — CI do PR #89
+
+- PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/89
+- Head de código com CI verde: `eccb59dc3b147665e7aa4a5b20369fdb5d0a663b`
+- Checks verdes: Cloudflare Pages (preview), Edge Functions typecheck, Full
+  local E2E, Postgres/RLS/restore, Web/unit/build, Socket Project Report,
+  Socket PR Alerts e SonarCloud Code Analysis.
+- O SonarCloud falhou na primeira execução por dois achados MINOR `S4036`
+  (lookup de `docker`/`taskkill` via PATH em script de teste). O harness foi
+  corrigido para reutilizar o helper e usar caminho absoluto do `taskkill.exe`;
+  o gate final passou.
+- O PR permanece **Draft**; `mergeStateStatus` não é aprovação. Nenhum merge,
+  deploy de produção ou migração foi executado.

@@ -90,6 +90,7 @@ gates de lançamento.
   15 Edge Functions typechecked, 25 Edge HTTP, 7 grupos full-local, restore
   com as 8 tabelas V2 e smoke light/dark/system desktop/mobile. `npm audit`
   mantém 0 HIGH/CRITICAL e 9 moderate.
+- **PR da Parte 1:** [#89](https://github.com/KayzenRoot/pedeoutra/pull/89), Draft, CI verde no HEAD de código `eccb59d`; sem merge.
 - **Status proposto:** `PART 1 IMPLEMENTED — PENDING AUDIT`, mantendo
   `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` (SMTP, backup, suporte/legal,
   primeira cobrança e gates das Partes 2–5). Nenhum merge, deploy, migration

@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `73b600effd83ca233c0e1604ee6a17c902ef5861`
+- HEAD no momento da geração: `eccb59dc3b147665e7aa4a5b20369fdb5d0a663b`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -26,7 +26,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `b178c80b7b776cabfc252095eba682c6a146605b4ffd396ea0d33015ea05007e` |
+| `docs/checkpoint.md` | `2b2056f61fddb952e266b25b79f0e14031874159032844e7d8df025cda307a82` |
 | `docs/decisions-ledger.md` | `f8a49ab27df7691a1c7eb2cbfe60ae9adc4872caed4290eb09d01fc23831341e` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `57724d845a994b1c91f3e8372f921b415f0625bee4d01f1b19e6ff7474cf6947` |
@@ -50,7 +50,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `scripts/local-edge-router.ts` | `ec7067b7984d65d50eee88200b5333b78e0d9469ccbd7b048fc3b13dffd39765` |
 | `scripts/prod-smoke.mjs` | `3062842803b4166b2298ae670862a0afa45880df8d1995edd7b9b58ba7c1e969` |
 | `scripts/smoke.mjs` | `fad4623f819551291c695efa2a825e92168270f790c8b166dfbf0db6a0d27f7b` |
-| `scripts/test-edge-http.mjs` | `2d298839d1f649dfee38fb5b12978d65ced43b9b9f475d0298a7fe82b2eecd90` |
+| `scripts/test-edge-http.mjs` | `1624f6a7466dc77b5bf12003ccc8aae6d4222e1dcdaf33e82fecf74cb1fae7a0` |
 | `scripts/test-full-local.mjs` | `f8dd3d8bf744ebe71556874128800568e0e3f8c24531a6b9aa0ca2feabd1afb4` |
 | `scripts/test-postgrest.mjs` | `6831366b2c6338d566a67fba44a6978bae77de9314d8fea9a87165409142ac1a` |
 | `scripts/verify-restore.mjs` | `537d045c5514b043224f0b360ebd54e2111d9ace24d47af6d2801028310b2d77` |
