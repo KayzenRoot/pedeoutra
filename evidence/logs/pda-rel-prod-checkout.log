@@ -1,0 +1,10 @@
+user created true
+signin ok
+organization created true
+{"checkout_status":201,"checkout_host":"www.asaas.com","checkout_path_prefix":"/000/checkoutSession/show/50ff","price_cents":2990,"cycle":"MONTHLY","checkout_id_present":true}
+subscription rows [{"id":"d84579c1-a213-4fb7-ba9b-ec5e7f95b21c","state":"pending","provider_checkout_id":"50ff5528-ae4f-4c99-a2bc-15621390e8ae","provider_subscription_id":null}]
+test events [{"type":"CHECKOUT_CREATED","state":"ignored","error":"unknown_event"}]
+test events removed 1
+user cleanup 200
+asaas checkout cleanup 404
+org rows after cleanup 0

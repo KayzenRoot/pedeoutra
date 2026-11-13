@@ -92,5 +92,28 @@ webhook, idempotência e estados de billing no Sandbox.
 e o mesmo código de Edge Functions. Validar com checkout de produção sem
 pagamento; a primeira cobrança real exige autorização explícita.
 **Consequências:** produção pronta para teste controlado, sem dinheiro real
-movimentado; Sandbox removido. Domínio, Supabase Pro/migração e auditoria
-continuam pré-requisitos do go-live comercial.
+movimentado; Sandbox removido. Domínio não é requisito da fase; backup
+(ADR-009 PROPOSED), SMTP, suporte/legal e auditoria continuam gates do go-live
+comercial.
+
+## ADR PDA-ADR-009 — Backup e continuidade para lançamento pago (PROPOSED)
+
+**Status:** PROPOSED (não substitui a ADR-007 aprovada; exige aceite do proprietário)
+**Data:** 2026-11-13
+**Contexto:** a ADR-007 aceita Free/Ohio no lançamento, mas o Free não tem
+backup automático nem PITR. O restore sintético prova a capacidade de
+exportação/restauração, não garante backup contínuo de produção. A decisão
+precisa equilibrar custo, RPO/RTO, residência de dados e continuidade.
+**Decisão proposta:** antes do primeiro cliente pagante, contratar Supabase Pro
+em Ohio (US$ 25/mês, backup diário com retenção de 7 dias) e manter export
+manual periódico off-site. PITR (US$ 100/mês por 7 dias, RPO de até 2 minutos)
+fica opcional após receita. Migrar para `sa-east-1` apenas com decisão de
+latência/residência e janela aprovada.
+**Consequências:** custo recorrente mínimo de US$ 25/mês; RPO de até 24h com
+backup diário e RTO dependente do tamanho do banco (meta operacional de 1–2h);
+dados em Ohio exigem avaliação de transferência internacional/LGPD. Sem Pro ou
+sem export off-site aceito formalmente, o lançamento pago permanece
+`GO_LIVE_BLOCKED`.
+**Alternativas:** Free + export manual somente (RPO alto, não recomendado para
+pagantes); Pro + PITR (maior custo, menor RPO); Pro em `sa-east-1` (melhor
+latência, exige migração e reconfiguração).

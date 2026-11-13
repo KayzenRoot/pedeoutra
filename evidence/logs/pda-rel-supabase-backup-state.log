@@ -1,0 +1,2 @@
+/v1/projects/waygtbclkxklexnabwvj 200 {"id":"waygtbclkxklexnabwvj","ref":"waygtbclkxklexnabwvj","organization_id":"ebssviuwplsckvffdjat","organization_slug":"ebssviuwplsckvffdjat","name":"pedeoutra","region":"us-east-2","created_at":"2026-11-12T20:03:16.289269Z","status":"ACTIVE_HEALTHY","database":{"host":"db.waygtbclkxklexnabwvj.supabase.co","version":"17.11.0.019","postgres_engine":"17","release_channel":"ga"}}
+/v1/projects/waygtbclkxklexnabwvj/database/backups 200 {"region":"us-east-2","walg_enabled":true,"pitr_enabled":false,"backups":[],"physical_backup_data":{}}

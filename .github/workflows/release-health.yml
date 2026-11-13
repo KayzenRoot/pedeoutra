@@ -1,0 +1,72 @@
+name: Release health
+
+# Alerta mínimo: falha aqui deixa o workflow vermelho e notifica os watchers do
+# repositório. Cobre Pages, Auth, webhook (token inválido deve dar 401) e
+# reconciliador. Não cria cobranças nem altera assinaturas.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pages publica HTML
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            --retry 3 --retry-delay 5 --max-time 20 \
+            https://pedeoutra.pages.dev/ >/dev/null
+          echo "Pages OK"
+
+      - name: Supabase Auth health
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_ANON_KEY"
+          curl --fail --silent --show-error \
+            --retry 3 --retry-delay 5 --max-time 20 \
+            "$SUPABASE_URL/auth/v1/health" \
+            -H "apikey: $SUPABASE_ANON_KEY" >/dev/null
+          echo "Auth OK"
+
+      - name: Webhook rejeita token inválido
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: |
+          set -euo pipefail
+          code=$(curl --silent --show-error --max-time 20 \
+            -o /dev/null -w '%{http_code}' \
+            -X POST "$SUPABASE_URL/functions/v1/asaas-webhook" \
+            -H "content-type: application/json" \
+            -H "asaas-access-token: invalid" \
+            --data '{}')
+          test "$code" = "401"
+          echo "Webhook OK (401)"
+
+      - name: Reconciliador responde
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          BILLING_RECONCILE_TOKEN: ${{ secrets.BILLING_RECONCILE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$BILLING_RECONCILE_TOKEN"
+          curl --fail --silent --show-error \
+            --retry 3 --retry-delay 5 --max-time 30 \
+            -X POST "$SUPABASE_URL/functions/v1/billing-reconcile" \
+            -H "content-type: application/json" \
+            -H "x-reconcile-token: $BILLING_RECONCILE_TOKEN" \
+            --data '{}' >/dev/null
+          echo "Reconcile OK"

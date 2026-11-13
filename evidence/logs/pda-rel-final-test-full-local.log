@@ -1,0 +1,27 @@
+
+> pedeoutra@0.1.0 test:full-local
+> node scripts/test-full-local.mjs
+
+PedeOutra FULL local E2E — proxy http://127.0.0.1:51532
+[1/7] GoTrue real
+  PASS  GoTrue saudável
+[2/7] Bootstrap, migrations e PostgREST
+  applied 20261112000100_core.sql
+  applied 20261112000200_rls.sql
+  applied 20261112000300_rpc.sql
+  applied 20261112000400_api_wrappers.sql
+  PASS  PostgREST saudável
+[3/7] Proxy, Asaas mock e roteador Deno
+(node:26336) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+  PASS  proxy e roteador prontos
+[4/7] Supabase Auth real (signup/login)
+  PASS  signup/login/GoTrue getUser reais
+[5/7] Organização, produto e pedido
+  PASS  organização, produto, catálogo, pedido e vínculo reais
+[6/7] Recompra real
+  PASS  recompra, PII, revogação reais
+[7/7] Billing real com Asaas mock
+  PASS  checkout, webhook, duplicado, valor, cancelamento, reembolso e reconcile
+
+Resultado: 7 PASS, 0 FAIL

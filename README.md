@@ -18,7 +18,7 @@ um link de recompra. O comprador não baixa app e não cria conta.
 | PR #12 / CI | **MERGED** em `main` (`26d55e0`); CI 4/4 verde |
 | Supabase Free | Ohio/Free aceito no lançamento com keepalive diário; risco de pausa/backup |
 | Recuperação de senha | fluxo implementado; envio real depende de SMTP próprio |
-| Produção monetizada | `CONFIGURADA` — primeira cobrança real, domínio, Pro/região e auditoria pendentes |
+| Produção monetizada | `CONFIGURADA` — primeira cobrança real, backup/continuidade, SMTP e revisão jurídica pendentes |
 
 O bundle de evidências fica em [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md).
 O ambiente de staging usa Supabase Cloud (`waygtbclkxklexnabwvj`) e Asaas
@@ -99,7 +99,8 @@ servidor. Detalhes em [`docs/security.md`](docs/security.md).
 
 O trabalho segue as issues já publicadas em
 [KayzenRoot/pedeoutra/issues](https://github.com/KayzenRoot/pedeoutra/issues):
-PDA-001 a PDA-011. Nenhuma issue duplicada foi criada.
+PDA-001 a PDA-011 foram concluídas. A release readiness atual está nas issues
+#17–#23 (`PDA-REL-WO-001`).
 
 ## Licença e marca
 

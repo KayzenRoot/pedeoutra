@@ -1,0 +1,13 @@
+project status 200
+{
+  "success": true,
+  "name": "pedeoutra",
+  "subdomain": "pedeoutra.pages.dev",
+  "production_branch": "main",
+  "source": "pedeoutra",
+  "domains": [
+    "pedeoutra.pages.dev"
+  ]
+}
+deployments status 503
+upstream connect error or disconnect/reset before headers. reset reason: connection termination

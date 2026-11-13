@@ -4,15 +4,15 @@
 
 - Data do lock: 2026-11-13
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
-- Branch: `feat/password-recovery`
-- Base SHA: `6328c490bd1e153859c1287e41534ce359fc77f8`
-- HEAD no momento da geração: `6328c490bd1e153859c1287e41534ce359fc77f8`
-- Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
+- Branch: `feat/PDA-REL-WO-001-release-readiness`
+- Base SHA: `203f91b64ad661cb4c707fa782c950e213701ec4`
+- HEAD no momento da geração: `203f91b64ad661cb4c707fa782c950e213701ec4`
+- Work Order: `PDA-REL-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
 
-PDA-001 a PDA-011 estavam abertas na base. Nenhuma issue foi criada ou
-duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
+Issues #17 a #23 estavam abertas na base. Nenhuma issue foi criada ou duplicada. Links:
+`https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 
 ## Hashes SHA-256 dos arquivos críticos
 
@@ -21,25 +21,25 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `.github/workflows/billing-reconcile.yml` | `8659f39309351494d1d4f25187bbf1e380807ded9871ab767e00b7b46c9d95e1` |
 | `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
 | `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
-| `README.md` | `127fc8f38887477800589df1d0ac9aea424800671776a1f22e2123d6bd136080` |
-| `docs/architecture.md` | `370493984b49de7076bb271921064a5cd6e7351cb6ad84096dfaec5896cb8441` |
+| `README.md` | `f30528128cc927463bbf74ea1a55dc74ab38c5f229c45d663b08f044944b1263` |
+| `docs/architecture.md` | `dd1f82b6f2e8b1d89ba8346db0181b7cc251e6044114fe77bd603cf2262e8130` |
 | `docs/backlog.md` | `9dddbc084637deb8764a818fcf1e112b02ad8b3434d7054b1e81beff02d6482d` |
-| `docs/checkpoint.md` | `59d621840cb69353a4f49368ac77ed6f18513cc32bca9670ee7148d25e6f25ac` |
-| `docs/decisions-ledger.md` | `e78ac3ff2407369d2a0206a8ebe0c3ba45b920e1076db1e4b8d893dd66f69aa5` |
+| `docs/checkpoint.md` | `f0327228f30c771ff525067b9cc000b946162b428cae61747a839d982c371d98` |
+| `docs/decisions-ledger.md` | `6f90d9028454e535b2abf33a20423d7cee17a5032081f94635abbda35a517101` |
 | `docs/definition-of-done.md` | `3e278f66cf608c0a52daff110977504b04a45d117fd781ff2f25b7bf0f2e79ec` |
-| `docs/deployment.md` | `6d6b147a0de92bbcac2151a2f524f994f11f159fb73249c9760bc24bd54241a8` |
+| `docs/deployment.md` | `d6e70c1014ece57c503d6ce75946bea7bf93b50f226edee52a3bf93c9e7a0413` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
 | `docs/requirements.md` | `0f456ae240278d69f2a1f02dbb6c1a215e9ac6a58b3023145011acc4fa531a45` |
 | `docs/scope.md` | `f6c890b298092c479776d8a1f26f0ac0db48cf74a896ef796b724f04f9922cd7` |
-| `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `8e644f5d52722c9ab4e8b63df6a71e640110eca6a8f3cf892eb41c6213f6048f` |
+| `docs/security.md` | `a6aff8c42f12656289a00a84043f1d4b74caedfb8364639458e1118dd5df46ac` |
+| `docs/test-plan.md` | `0d4305e5e43b8a912b28752d174327640c6557225e4ec69d28890fdb161fc81d` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `7d05d97afb19077db3e4445fdee174346672b0ba0a2d4ec1075d4ea903d097d7` |
-| `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |
-| `package.json` | `938eda21226fc8a305ea829cafbe6d304973d37ce417f0dea314af66ccb2d877` |
+| `package-lock.json` | `9022bfabf83a2a0cd3cead128de9d58417b23ed9f80377200a7a7bd1b5dca530` |
+| `package.json` | `4fff85ad499c280a4307e4b8d14b8d17b27b92ad9647416992fb793bef88dd02` |
 | `public/_headers` | `160de590442a81ad2969510c727cc210a813897bf9b5e6a74a3aa33bc287d973` |
 | `public/_redirects` | `94f76bf42ffc51f446f54963735cab3da50e9db2eb45d4934da61e45c717d599` |
-| `scripts/context-lock.mjs` | `893c0cec6a8450cc32d11c3b83571b3d0c3bbe3dc6b0fa0dc764212e352fdfc7` |
+| `scripts/context-lock.mjs` | `d6c84d9092670f12cd1c895d8cc66b68ed9681c9b3ce6dbb07b61ef560b1d277` |
 | `scripts/db-test.mjs` | `8d131b0069c8ac9290bf0ec1913419a1118b415c2e813864f690d3b65fece34c` |
 | `scripts/edge-typecheck.mjs` | `a889d22856be6694413a71a6c8f8c004deb319b6a9ac16a043a256609d971a25` |
 | `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
@@ -56,7 +56,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `src/components/Brand.tsx` | `270b850ed4b611f0ea950c253ca422dba36d1c78056f65ed2a56897600934d82` |
 | `src/components/ProtectedRoute.tsx` | `6ed279f45f355dcaedf8709290cc0ae5ac620ad6d2a1aa9170aa8fe8b0de3916` |
 | `src/components/ui.tsx` | `eb9750af063357811242015f8ade53359c1da6e1187422afe245b5cb4f6a73e9` |
-| `src/context/AuthContext.tsx` | `29cfdc94e72262310ae82e7074fc9ecde74b7dcc095e3321a6dd09dc7061c3bf` |
+| `src/context/AuthContext.tsx` | `81236f02f2a187bd058aaf6eb1e309443a4aae396e7f4504a58ab7c03b4c183a` |
 | `src/context/auth-context.ts` | `92b7a64adfcb7c314f1ce96b44e98d2b3546f3a184afc9f14d724064067844b9` |
 | `src/lib/access.ts` | `193b810fc35452fecea93fcdf7eafbd902c1ba304f4fcfcdc01bfc622d13aa5b` |
 | `src/lib/analytics.ts` | `be8a9df62b15f005dcaba45361de77e78071cc4212a12087540f2d83f0a21cfe` |
@@ -73,15 +73,18 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `src/pages/Dashboard.tsx` | `1305a84a3792c7a4630dfe02f9ffa7c01547e62a0c74b5d0ce0f49ecc5ec29f4` |
 | `src/pages/Demo.test.tsx` | `6bc133ba4a474bbd8d51183c516f1d88babcd279c9fcd73cbeb285d29fa61646` |
 | `src/pages/Demo.tsx` | `d3bf574f604782ac1d9410b5d1853064918657970493ddfe61c30e21a4439212` |
+| `src/pages/ForgotPassword.tsx` | `7ca0edd303f21130f8fb37444be006addcd0bf7a62fd345eebcc77d24a97dc52` |
 | `src/pages/Landing.tsx` | `14d185ce222d9c36b7e01b1efe74df166b1821c53dc0d12be990aa2575fdedef` |
-| `src/pages/Legal.tsx` | `01174238a5e5a0313c7d0639f698d16ce8466db21d7432ecdfbcbdbe50961c4a` |
-| `src/pages/Login.tsx` | `2d69c56b53c1fdd46768d702f0d9032702f631c29eab3b117dd03c1909d7b151` |
+| `src/pages/Legal.tsx` | `10b7ce4ff2ec14284a6b4a17133e9bb31a072126f6addb3b7694847f21e1295b` |
+| `src/pages/Login.tsx` | `55fbec6995d18df4356f126b3fe877780fcca7575a2dfc5841a1e485d989923d` |
 | `src/pages/NotFound.tsx` | `c78ec47ea4c925ce52da2893d508a8d7c78de49d10c5f8f2d29a5de5fc308108` |
 | `src/pages/Onboarding.tsx` | `6e3720b9aec18e03d8b5246f7805783ed8b54e236cfbbaba4f7e0541120e78ee` |
 | `src/pages/OrderDetail.tsx` | `34338319858f603ed49a2e4de59e907161c3bc092b98348428ee9d0587dcce5e` |
 | `src/pages/Orders.tsx` | `fd782b03abfdf185ebff01a0b6a9826b9a18bcccda762101128210e78fb7b81d` |
+| `src/pages/PasswordReset.test.tsx` | `2a65404a067a7a21f29558566cfa4b11da3735de2be61d681e36e4a86ad43164` |
 | `src/pages/Products.tsx` | `701acda68ecd6bac9b2890ce640b53c3b5bd834513ddd523f8364e575caed9da` |
 | `src/pages/Reorder.tsx` | `0ac605ee282354bc7a2f5391977cfa9a2ae16d618da762870cc6c51b8e5187e2` |
+| `src/pages/ResetPassword.tsx` | `07443cdbee5ba5d07f3955f6c58877c938301cd12f3bdca7d0bbcc2b86d82976` |
 | `src/pages/Signup.tsx` | `2d9a43738237c7135abd28d156643713b2c40c16b94a9b347e5e546f28841fe3` |
 | `src/styles.css` | `f63fcd39c127a67771906b96dc6612cfbb3414a4be485711215f472801796659` |
 | `src/test/setup.ts` | `31f9b0650fa5a1fc26d640fce75f0a6bda14af4e40dd624576c5a075ff8d14ed` |
@@ -96,7 +99,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `supabase/functions/_shared/background.ts` | `dff7a17de7838e1b9cdf0860c73a0a62c08ed5237f09d5dde35398e25da7489b` |
 | `supabase/functions/_shared/billing-event.ts` | `4ce020b0971cff3b0bb38fced7be4cc1ea837cf391289d8db7d8ca7e4b8c4d07` |
 | `supabase/functions/_shared/billing-processor.ts` | `868f4b090ea3d5aaeea41efce082a8655d351cbfef82a3c7d462b3233b3b75d8` |
-| `supabase/functions/_shared/billing.test.ts` | `951f385b0aecd9e55adbe79ddc733463cb985e5f47faecd791aa41f247e8bb46` |
+| `supabase/functions/_shared/billing.test.ts` | `0cd4c751060c40c3ffcb17642bff48a09747ae2b5fc9e745b4f7ce26efd35107` |
 | `supabase/functions/_shared/billing.ts` | `c1585c86dfce66e53747e2759f7f9bc4fdc140d0963291855c1f4416f3377af4` |
 | `supabase/functions/_shared/http.ts` | `c18e69a55e11a4bf1b0ed95496a71b631654bf65df22ff34cd0a282527d9166e` |
 | `supabase/functions/_shared/order-errors.ts` | `01f37421b9f112342f7c9f3ebf8e38b1903cd94eefca0583b48c9b806d84756b` |

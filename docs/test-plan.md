@@ -19,6 +19,12 @@ cobertura.
 - Cliente Asaas: endpoint, header `access_token`, preço fixo, parsing de erro.
 - Formatação BRL/data em `America/Sao_Paulo`.
 - Reducer do carrinho e regras de acesso exibidas no frontend.
+- Recuperação de senha (solicitação genérica anti-enumeração, senhas
+  divergentes, link inválido/sem sessão) e `safeInternalPath` contra open
+  redirect no parâmetro `next`.
+- Billing: 26 testes unitários cobrindo valor/tenant, duplicata, fora de ordem,
+  reembolso, cancelamento, checkout e reconciliação.
+- Total atual: 78 testes unitários/componente em 10 arquivos.
 
 ### 2. Banco real (Postgres em Docker)
 
@@ -118,8 +124,12 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
 - Reconciliação diária (`billing-reconcile`) chama a Edge Function com
   `x-reconcile-token`; validação manual: 401 com token errado e 200 com
   `events_checked=0`/`checked=0` no staging limpo.
-- Primeira cobrança real, domínio próprio, Supabase Pro/migração e auditoria
-  permanecem fora do escopo até autorização explícita.
+- Release health local: Pages 200, Auth health 200, webhook com token inválido
+  401 e reconcile 200; workflow `release-health` preparado para rodar a cada 6h
+  após o merge.
+- Primeira cobrança real, SMTP, backup/continuidade (ADR-009 PROPOSED),
+  suporte/legal e auditoria permanecem fora do escopo até autorização explícita;
+  `pedeoutra.pages.dev` é a URL aprovada.
 
 ## Riscos não cobertos
 

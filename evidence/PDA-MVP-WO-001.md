@@ -1,5 +1,8 @@
 # Evidence Bundle — PDA-MVP-WO-001
 
+> Documento histórico da WO de MVP. O estado de release readiness atual está em
+> `evidence/PDA-REL-WO-001.md`.
+
 ## 1. Identificação
 
 | Campo | Valor |
@@ -33,7 +36,7 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
 | PDA-005 Recompra segura | DONE | tokens unitários, RPC/DB, `reorder-create/get/submit/revoke`, 17 testes HTTP |
 | PDA-006 Painel e WhatsApp manual | DONE (UI) | telas de pedidos/status/histórico, links `wa.me` manuais; sem API WhatsApp |
 | PDA-007 Trial, plano e Asaas | DONE sandbox + produção configurada | checkout e pagamento sandbox reais; produção com API key, checkout e webhook validados sem pagamento; duplicata, valor, reembolso e reconcile testados; primeira cobrança real pendente |
-| PDA-008 Testes críticos e restore | DONE | 70 unit, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, restore e smoke de produção PASS |
+| PDA-008 Testes críticos e restore | DONE | 78 unit, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, restore e smoke de produção PASS |
 | PDA-009 Landing e onboarding | DONE | landing, demo, privacidade/termos preliminares, smoke de browser |
 | PDA-010 Deploy e smoke comercial | DONE staging / produção configurada | Cloudflare Pages Git com auto-deploy + Supabase Cloud + Asaas produção; smoke completo, checkout de produção e webhook validados; staging limpo |
 | PDA-011 Evidence Bundle e PR | DONE (mesclado) | este bundle + PR #12 merged |
@@ -70,7 +73,7 @@ Logs completos em `evidence/logs/`.
 | --- | --- | --- | --- |
 | `npm run lint` | ESLint sem erros/avisos | 0 | `lint.log` |
 | `npm run typecheck` | `tsc` app + config | 0 | `typecheck.log` |
-| `npm run test:unit` | 70 testes em 8 arquivos | 0 | `test-unit.log` |
+| `npm run test:unit` | 78 testes em 10 arquivos | 0 | `pda-rel-test-unit-vitest5.log` |
 | `npm run build` | JS 489,74 kB (gzip 139,59 kB); CSS 36,10 kB (gzip 7,63 kB) | 0 | `build.log` |
 | `npm run test:db` | 30 PASS / 0 FAIL local e no CI (RLS, trial, reembolso, pedido, recompra, status, billing event) | 0 | `ci-database.log` + execução local |
 | `npm run test:postgrest` | 13 PASS / 0 FAIL (RPC/RLS/status via HTTP real) | 0 | `ci-database.log` |
@@ -256,7 +259,7 @@ GoTrue real em container.
 
 ## 11. Veredito
 
-- **Implementação local/staging:** PASS (app, schema, RLS, pedido, recompra, 70
+- **Implementação local/staging:** PASS (app, schema, RLS, pedido, recompra, 78
   testes unitários, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe,
   build, smoke de produção e assinatura ativa validada no sandbox).
 - **Segurança testada:** PASS no escopo de tenant, pedido, recompra, rate limit e

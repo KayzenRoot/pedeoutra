@@ -61,7 +61,8 @@ Tabelas: `organizations`, `products`, `customers`, `orders`, `order_items`,
 ## Limites conhecidos
 
 - Staging usa Supabase Cloud, Cloudflare Pages Git e Asaas produção
-  configurado (Sandbox para testes). Sem domínio próprio, Supabase Pro/região e
-  auditoria, o go-live comercial fica bloqueado.
+  configurado (Sandbox para testes). Sem SMTP, backup/continuidade aceitos e
+  revisão jurídica, o go-live comercial fica bloqueado; `pedeoutra.pages.dev` é
+  a URL aprovada nesta fase.
 - Sem WhatsApp API: apenas links `wa.me` acionados por humano.
 - Sem upload de arquivos, estoque, nota fiscal ou pagamento dos pedidos.

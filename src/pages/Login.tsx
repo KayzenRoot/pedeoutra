@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { BackendNotice, FormMessage } from '../components/ui'
 import { useAuth } from '../context/auth-context'
+import { safeInternalPath } from '../lib/navigation'
 
 export function Login() {
   const { configured, session, organization, signIn } = useAuth()
@@ -24,8 +25,8 @@ export function Login() {
     setSubmitting(true)
     try {
       await signIn(email.trim(), password)
-      const next = searchParams.get('next')
-      navigate(next && next.startsWith('/') ? next : '/app', { replace: true })
+      const next = safeInternalPath(searchParams.get('next'))
+      navigate(next, { replace: true })
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Não foi possível entrar.')
     } finally {
