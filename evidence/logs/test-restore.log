@@ -1,0 +1,31 @@
+
+> pedeoutra@0.1.0 test:restore
+> node scripts/verify-restore.mjs
+
+PedeOutra restore test — container pedeoutra-restore-28428 na porta 57441
+[1/5] Bootstrap e migrations
+  applied 20261112000100_core.sql
+  applied 20261112000200_rls.sql
+  applied 20261112000300_rpc.sql
+  applied 20261112000400_api_wrappers.sql
+[2/5] Dados sintéticos
+  seeded
+[3/5] pg_dump
+  dump criado
+[4/5] Restore em banco novo
+  restore concluído
+[5/5] Comparação source x target
+  organizations=1
+  products=1
+  customers=1
+  orders=1
+  order_items=1
+  reorder_links=1
+  subscriptions=1
+  billing_events=1
+  audit_events=1
+  orders_hash=3fff98e55f8bfbcb12c3ea221b45c4e1
+  items_hash=0a3f2e08dc731ef40ab56e2c2a72ac08
+
+PASS restore: contagens e checksums idênticos em dados sintéticos
+exit=0

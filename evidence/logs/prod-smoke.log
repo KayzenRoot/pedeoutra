@@ -1,0 +1,10 @@
+Smoke de produção em https://pedeoutra.pages.dev
+  PASS signup + autoconfirm
+  PASS onboarding + organização
+  PASS produto criado
+  PASS pedido público PD-E2D2212660
+  PASS vínculo + link de recompra
+  PASS recompra submetida
+
+PASS smoke de produção (https://pedeoutra.pages.dev)
+exit=0

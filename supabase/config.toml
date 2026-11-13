@@ -1,0 +1,71 @@
+# PedeOutra — configuração mínima do Supabase local/CLI.
+# Não contém segredos. Em produção, configure secrets no painel/CLI.
+# Portas não padrão para não conflitar com outros projetos locais.
+
+project_id = "pedeoutra"
+
+[api]
+enabled = true
+port = 54421
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54422
+major_version = 17
+
+[db.seed]
+enabled = false
+
+[studio]
+enabled = true
+port = 54423
+
+[local_smtp]
+enabled = true
+port = 54424
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173", "http://localhost:54421"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[functions.public-catalog]
+verify_jwt = false
+
+[functions.public-order]
+verify_jwt = false
+
+[functions.reorder-get]
+verify_jwt = false
+
+[functions.reorder-submit]
+verify_jwt = false
+
+[functions.asaas-webhook]
+verify_jwt = false
+
+[functions.reorder-create]
+verify_jwt = true
+
+[functions.reorder-revoke]
+verify_jwt = true
+
+[functions.link-order-customer]
+verify_jwt = true
+
+[functions.create-checkout]
+verify_jwt = true
+
+[functions.cancel-subscription]
+verify_jwt = true
+
+[functions.billing-reconcile]
+verify_jwt = false

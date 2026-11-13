@@ -1,0 +1,312 @@
+Postgres, RLS and restore	Set up job	﻿2026-11-12T21:41:55.9960619Z Current runner version: '2.338.2'
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9982222Z ##[group]Runner Image Provisioner
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9982914Z Hosted Compute Agent
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9983440Z Version: 20261103.629
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9983999Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9984580Z Build Date: 2026-11-03T17:26:59Z
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9985169Z Worker ID: {a7f670c5-2cc3-45df-95ec-0bc6ef01b83d}
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9985743Z Region: westus3
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9986252Z Cloud: Azure
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9987045Z ##[endgroup]
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9988465Z ##[group]Operating System
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9989050Z Ubuntu
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9989479Z 26.04.1
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9989890Z LTS
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9990396Z ##[endgroup]
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9990845Z ##[group]Runner Image
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9991365Z Image: ubuntu-26.04
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9991844Z Version: 20261111.196.1
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9992708Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261111.196/images/ubuntu/Ubuntu2604-Readme.md
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9994190Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261111.196
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9994987Z ##[endgroup]
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9995902Z ##[group]GITHUB_TOKEN Permissions
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9997985Z Contents: read
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9998497Z Metadata: read
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:55.9998943Z ##[endgroup]
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.0000807Z Secret source: Actions
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.0001554Z Cache mode: write
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.0002521Z Prepare workflow directory
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.0258242Z Prepare all required actions
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.0298615Z Getting action download info
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.3362781Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.4892937Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Postgres, RLS and restore	Set up job	2026-11-12T21:41:56.6845624Z Complete job name: Postgres, RLS and restore
+Postgres, RLS and restore	Run actions/checkout@v4	﻿2026-11-12T21:41:56.7540773Z ##[group]Run actions/checkout@v4
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7541663Z with:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7542041Z   repository: KayzenRoot/pedeoutra
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7545183Z   token: ***
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7545554Z   ssh-strict: true
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7545913Z   ssh-user: git
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7546275Z   persist-credentials: true
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7546880Z   clean: true
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7547249Z   sparse-checkout-cone-mode: true
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7547671Z   fetch-depth: 1
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7548023Z   fetch-tags: false
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7548381Z   show-progress: true
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7548741Z   lfs: false
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7549076Z   submodules: false
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7549448Z   set-safe-directory: true
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7549854Z   allow-unsafe-pr-checkout: false
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:56.7550487Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0140500Z Syncing repository: KayzenRoot/pedeoutra
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0141974Z ##[group]Getting Git version info
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0142587Z Working directory is '/home/runner/work/pedeoutra/pedeoutra'
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0143580Z [command]/usr/bin/git version
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0332640Z git version 2.56.1
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0355236Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0362356Z Temporarily overriding HOME='/home/runner/work/_temp/c4ddf066-3ab7-43b0-85c8-1be1ae3fdee9' before making global git config changes
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0364078Z Adding repository directory to the temporary git global config as a safe directory
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0366998Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0420726Z Deleting the contents of '/home/runner/work/pedeoutra/pedeoutra'
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0427960Z ##[group]Initializing the repository
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0437508Z [command]/usr/bin/git init /home/runner/work/pedeoutra/pedeoutra
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0514728Z hint: Using 'master' as the name for the initial branch. This default branch name
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0516277Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0518114Z hint: to use in all of your new repositories, which will suppress this warning,
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0520785Z hint: call:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0521532Z hint:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0522334Z hint: 	git config --global init.defaultBranch <name>
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0523329Z hint:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0524208Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0525712Z hint: 'development'. The just-created branch can be renamed via this command:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0527141Z hint:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0528027Z hint: 	git branch -m <name>
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0528782Z hint:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0530230Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0532782Z Initialized empty Git repository in /home/runner/work/pedeoutra/pedeoutra/.git/
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0536295Z [command]/usr/bin/git remote add origin https://github.com/KayzenRoot/pedeoutra
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0600898Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0602918Z ##[group]Disabling automatic garbage collection
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0603731Z [command]/usr/bin/git config --local gc.auto 0
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0638974Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0639952Z ##[group]Setting up auth
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0645981Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.0688436Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1216324Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1246267Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1484783Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1516213Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1753797Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1789829Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1790810Z ##[group]Fetching the repository
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:57.1798707Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2bac96e8a0f828262f6a095ccd69ddb032ac1ba1:refs/remotes/pull/12/merge
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.0940297Z From https://github.com/KayzenRoot/pedeoutra
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.0941902Z  * [new ref]         2bac96e8a0f828262f6a095ccd69ddb032ac1ba1 -> pull/12/merge
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.0952121Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.0960630Z ##[group]Determining the checkout info
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.0961999Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.0962797Z [command]/usr/bin/git sparse-checkout disable
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1002134Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1030378Z ##[group]Checking out the ref
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1033371Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/12/merge
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1220288Z Note: switching to 'refs/remotes/pull/12/merge'.
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1221081Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1221584Z You are in 'detached HEAD' state. You can look around, make experimental
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1222721Z changes and commit them, and you can discard any commits you make in this
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1223816Z state without impacting any branches by switching back to a branch.
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1224441Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1225005Z If you want to create a new branch to retain commits you create, you may
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1226336Z do so (now or later) by using -c with the switch command. Example:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1227457Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1227909Z   git switch -c <new-branch-name>
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1229028Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1229452Z Or undo this operation with:
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1230116Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1230511Z   git switch -
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1231047Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1231917Z Turn off this advice by setting config variable advice.detachedHead to false
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1233849Z 
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1235418Z HEAD is now at 2bac96e Merge 652fadda7ec3796ad7a49cfb6f3ce199d3aa131b into 40990e437a455f161fd8c60f35be983f29209794
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1239987Z ##[endgroup]
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1275865Z [command]/usr/bin/git log -1 --format=%H
+Postgres, RLS and restore	Run actions/checkout@v4	2026-11-12T21:41:58.1298421Z 2bac96e8a0f828262f6a095ccd69ddb032ac1ba1
+Postgres, RLS and restore	Run actions/setup-node@v4	﻿2026-11-12T21:41:58.1702997Z ##[group]Run actions/setup-node@v4
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1704089Z with:
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1704839Z   node-version: 22
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1705613Z   cache: npm
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1706361Z   always-auth: false
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1707464Z   check-latest: false
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1715516Z   token: ***
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.1716307Z ##[endgroup]
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.2934297Z (node:2197) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.2937121Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.2940259Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.2942097Z ##[group]Environment details
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.8325888Z node: v22.23.4
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.8326359Z npm: 10.9.9
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.8340391Z yarn: 1.22.22
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.8341348Z ##[endgroup]
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.8341706Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:58.9263393Z /home/runner/.npm
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:59.3493730Z Cache hit for: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:41:59.3572061Z (node:2197) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:42:00.5714688Z Received 33645690 of 42034298 (80.0%), 32.1 MBs/sec
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:42:00.6208258Z Received 42034298 of 42034298 (100.0%), 38.2 MBs/sec
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:42:00.6208863Z Cache Size: ~40 MB (42034298 B)
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:42:00.6309348Z [command]/usr/bin/tar -xf /home/runner/work/_temp/efe5d857-940c-4f71-bc22-c09c191910a1/cache.tzst -P -C /home/runner/work/pedeoutra/pedeoutra --use-compress-program unzstd
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:42:00.7607598Z Cache restored successfully
+Postgres, RLS and restore	Run actions/setup-node@v4	2026-11-12T21:42:00.7628207Z Cache restored from key: node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc
+Postgres, RLS and restore	Run npm ci	﻿2026-11-12T21:42:00.7802966Z ##[group]Run npm ci
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:00.7803289Z ^[[36;1mnpm ci^[[0m
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:00.7857255Z shell: /usr/bin/bash -e {0}
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:00.7857518Z ##[endgroup]
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:03.7541081Z npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.0379265Z npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.2351087Z 
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.2351623Z added 296 packages, and audited 297 packages in 7s
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.2352117Z 
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.2352556Z 64 packages are looking for funding
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.2352955Z   run `npm fund` for details
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4005398Z 
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4007032Z 12 vulnerabilities (10 moderate, 2 critical)
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4007303Z 
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4007516Z To address issues that do not require attention, run:
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4007838Z   npm audit fix
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4008057Z 
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4008237Z To address all issues (including breaking changes), run:
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4008544Z   npm audit fix --force
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4008688Z 
+Postgres, RLS and restore	Run npm ci	2026-11-12T21:42:08.4008976Z Run `npm audit` for details.
+Postgres, RLS and restore	Run npm run test:db	﻿2026-11-12T21:42:08.4625172Z ##[group]Run npm run test:db
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.4625627Z ^[[36;1mnpm run test:db^[[0m
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.4671507Z shell: /usr/bin/bash -e {0}
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.4671743Z ##[endgroup]
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.5476099Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.5476957Z > pedeoutra@0.1.0 test:db
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.5477409Z > node scripts/db-test.mjs
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.5477640Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:08.5995124Z PedeOutra DB test — container pedeoutra-db-test-2286 na porta 35871
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.0765024Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.0765688Z [1/6] Bootstrap e migrations
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1399776Z   applied 20261112000100_core.sql
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1528271Z   applied 20261112000200_rls.sql
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1582512Z   applied 20261112000300_rpc.sql
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1612529Z   applied 20261112000400_api_wrappers.sql
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1620588Z   PASS  4 migrations aplicadas
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1620908Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1621471Z [2/6] Seed sintético e criação de organizações
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1812513Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1813167Z [3/6] RLS A/B
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1823756Z   PASS  A lê apenas a própria organização
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1836779Z   PASS  A lê apenas os próprios produtos
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1848922Z   PASS  A não lê clientes de B
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1864384Z   PASS  A não insere produto forjando org B
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1879689Z   PASS  A não atualiza produto de B
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1892754Z   PASS  A não altera trial ou owner da organização
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1910297Z   PASS  A não lê token_hash direto (apenas view segura)
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1921917Z   PASS  anon não lê tabelas de negócio
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1938789Z   PASS  A não lê billing_events
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1939038Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1939234Z [4/6] Trial, assinatura e escrita
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1971561Z   PASS  trial expirado bloqueia escrita
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.1995094Z   PASS  assinatura ativa libera escrita
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2014336Z   PASS  reembolso revoga escrita
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2050918Z   PASS  reembolso não estende trial vigente
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2071197Z   PASS  cancelado mantém acesso até o fim do período
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2133297Z   PASS  past_due tem carência de 3 dias e depois bloqueia
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2139995Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2140469Z [5/6] Pedido público, recompra, rate limit e idempotência
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2245112Z   PASS  pedido público calcula total no servidor e ignora preço do cliente
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2258934Z   PASS  mesmo request_id não duplica pedido
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2351035Z   PASS  produto inativo é rejeitado
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2365911Z   PASS  produto de outro tenant é rejeitado
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2397112Z   PASS  quantidade e duplicidade inválidas são rejeitadas
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2431820Z   PASS  rate limit atômico bloqueia após o limite
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2498057Z   PASS  recompra válida cria pedido vinculado ao cliente sem PII
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2525697Z   PASS  link revogado é rejeitado
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2544922Z   PASS  link expirado é rejeitado
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2545195Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2545432Z [6/6] Status do pedido e billing
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2584501Z   PASS  transição válida grava evento com autor
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2600785Z   PASS  transição inválida é rejeitada
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2623766Z   PASS  A não altera pedido de B
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2654346Z   PASS  evento de billing duplicado é inofensivo e idempotente
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2660778Z   PASS  billing event inválido é rejeitado
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2661057Z 
+Postgres, RLS and restore	Run npm run test:db	2026-11-12T21:42:17.2661238Z Resultado: 30 PASS, 0 FAIL
+Postgres, RLS and restore	Run npm run test:postgrest	﻿2026-11-12T21:42:17.4266236Z ##[group]Run npm run test:postgrest
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.4266526Z ^[[36;1mnpm run test:postgrest^[[0m
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.4311078Z shell: /usr/bin/bash -e {0}
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.4311317Z ##[endgroup]
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.5127794Z 
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.5128325Z > pedeoutra@0.1.0 test:postgrest
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.5128842Z > node scripts/test-postgrest.mjs
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.5129013Z 
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:17.5471415Z PedeOutra PostgREST test — http://127.0.0.1:43769
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:19.4916329Z [1/4] Bootstrap e migrations
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:19.7439558Z   applied 20261112000100_core.sql
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:19.8188483Z   applied 20261112000200_rls.sql
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:19.8815017Z   applied 20261112000300_rpc.sql
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:19.9810236Z   applied 20261112000400_api_wrappers.sql
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:20.0337317Z   PASS  auth.users sintéticos
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:20.0337769Z [2/4] PostgREST
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:21.9829857Z   PASS  PostgREST respondendo
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:21.9834253Z [3/4] RPC e RLS via HTTP
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0134732Z   PASS  create_organization via RPC (A e B)
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0222822Z   PASS  insert de produto com RLS
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0249451Z   PASS  A lê apenas o próprio produto
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0298279Z   PASS  A não insere produto forjando org B
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0325343Z   PASS  A não lê billing_events
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0349681Z   PASS  anon não lê products
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0384172Z   PASS  view segura de links não expõe token_hash
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0384876Z [4/4] Pedido via RPC e status
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0508040Z   PASS  api_submit_order via service_role calcula total
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0533479Z   PASS  A lê o pedido com RLS
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0603441Z   PASS  A confirma o pedido e transição inválida falha
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0624651Z   PASS  api_org_can_write via service_role
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0624950Z 
+Postgres, RLS and restore	Run npm run test:postgrest	2026-11-12T21:42:22.0625124Z Resultado: 13 PASS, 0 FAIL
+Postgres, RLS and restore	Run npm run test:restore	﻿2026-11-12T21:42:22.4907330Z ##[group]Run npm run test:restore
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.4907691Z ^[[36;1mnpm run test:restore^[[0m
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.4952413Z shell: /usr/bin/bash -e {0}
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.4952656Z ##[endgroup]
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.5763016Z 
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.5763670Z > pedeoutra@0.1.0 test:restore
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.5764190Z > node scripts/verify-restore.mjs
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.5764449Z 
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:22.6081486Z PedeOutra restore test — container pedeoutra-restore-3271 na porta 45929
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.0815964Z [1/5] Bootstrap e migrations
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.2844416Z   applied 20261112000100_core.sql
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.3608441Z   applied 20261112000200_rls.sql
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.4254885Z   applied 20261112000300_rpc.sql
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.4850366Z   applied 20261112000400_api_wrappers.sql
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.4850968Z [2/5] Dados sintéticos
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.5526116Z   seeded
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.5526449Z [3/5] pg_dump
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.6942235Z   dump criado
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.6942586Z [4/5] Restore em banco novo
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.9824985Z   restore concluído
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:25.9825403Z [5/5] Comparação source x target
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1018172Z   organizations=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1018575Z   products=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1018825Z   customers=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1019070Z   orders=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1019317Z   order_items=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1019577Z   reorder_links=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1019851Z   subscriptions=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1020112Z   billing_events=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1020373Z   audit_events=1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1020728Z   orders_hash=3fff98e55f8bfbcb12c3ea221b45c4e1
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1021249Z   items_hash=0a3f2e08dc731ef40ab56e2c2a72ac08
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1021507Z 
+Postgres, RLS and restore	Run npm run test:restore	2026-11-12T21:42:26.1022149Z PASS restore: contagens e checksums idênticos em dados sintéticos
+Postgres, RLS and restore	Post Run actions/setup-node@v4	﻿2026-11-12T21:42:26.2810039Z Post job cleanup.
+Postgres, RLS and restore	Post Run actions/setup-node@v4	2026-11-12T21:42:26.3811781Z (node:3927) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Postgres, RLS and restore	Post Run actions/setup-node@v4	2026-11-12T21:42:26.3812495Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Postgres, RLS and restore	Post Run actions/setup-node@v4	2026-11-12T21:42:26.3814348Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-3324d0061e5728eef72cc5585f8bee90ccf1a0a59f80851f2bec23b13ef323dc, not saving cache.
+Postgres, RLS and restore	Post Run actions/checkout@v4	﻿2026-11-12T21:42:26.3961482Z Post job cleanup.
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4643453Z [command]/usr/bin/git version
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4681341Z git version 2.56.1
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4710808Z Temporarily overriding HOME='/home/runner/work/_temp/88a5e633-fac8-481e-b369-7a73dd8b34da' before making global git config changes
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4712046Z Adding repository directory to the temporary git global config as a safe directory
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4714687Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/pedeoutra/pedeoutra
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4750204Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.4782911Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.5050403Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.5075755Z http.https://github.com/.extraheader
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.5086354Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.5130341Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.5391022Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Postgres, RLS and restore	Post Run actions/checkout@v4	2026-11-12T21:42:26.5420962Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Postgres, RLS and restore	Complete job	﻿2026-11-12T21:42:26.5791473Z Cleaning up orphan processes
+Postgres, RLS and restore	Complete job	2026-11-12T21:42:26.6126466Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

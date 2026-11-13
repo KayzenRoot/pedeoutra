@@ -1,0 +1,17 @@
+# Asaas Sandbox — evidência de webhook real (2026-11-12)
+
+Webhook Asaas: id 59fac921-68c2-4912-826b-ab2dd4170153
+Endpoint: https://waygtbclkxklexnabwvj.supabase.co/functions/v1/asaas-webhook
+Token: configurado no Asaas e no Supabase; valor não versionado.
+
+Assinatura: state=active checkout=2bca540b-c86c-420b-a7d1-fcf6481d647b subscription=sub_idaryje3c0ty1g1p period_end=2026-12-14T02:59:59+00:00 verified=2026-11-12T23:02:10.144+00:00
+
+Eventos recebidos (id do provedor, tipo, estado interno, erro):
+- evt_37260be8159d4472b4458d3de13efc2d&25005833 | CHECKOUT_CREATED | ignored | unknown_event | 2026-11-12T22:50:01.806053+00:00
+- evt_6561b631fa5580caadd00bbe3b858607&25006036 | SUBSCRIPTION_CREATED | processed | - | 2026-11-12T22:55:34.266456+00:00
+- evt_20f793f686aa4783d486a40e3c6b91d1&25006037 | CHECKOUT_PAID | processed | - | 2026-11-12T22:55:34.921205+00:00
+- evt_05b708f961d739ea7eba7e4db318f621&25006038 | PAYMENT_CREATED | ignored | unknown_event | 2026-11-12T22:55:35.520909+00:00
+- evt_37260be8159d4472b4458d3de13efc2d&25006082 | CHECKOUT_CREATED | ignored | unknown_event | 2026-11-12T22:56:55.334096+00:00
+
+Resultado: CHECKOUT_PAID + SUBSCRIPTION_CREATED processados; assinatura ativa.
+Observação: nenhum pagamento de dinheiro real; cartão de teste do Sandbox.

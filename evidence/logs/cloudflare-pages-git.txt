@@ -1,0 +1,54 @@
+Cloudflare Pages — Git integration
+Data: 2026-11-13 (UTC)
+Projeto: pedeoutra
+URL pública: https://pedeoutra.pages.dev
+Repositório: KayzenRoot/pedeoutra (GitHub)
+Branch de produção: feat/PDA-MVP-WO-001-pedeoutra-mvp (temporária até o merge)
+Build command: npm run build
+Build output directory: dist
+Node: 22 (NODE_VERSION)
+Variáveis Production/Preview: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY,
+  VITE_APP_URL, NODE_VERSION (somente nomes; valores não versionados)
+
+Histórico da migração:
+- O projeto original havia sido criado por Direct Upload. A API do Cloudflare
+  rejeitou anexar Git source (erro 8000069: "You cannot update the `source`
+  object in a Direct Uploads project").
+- O projeto antigo foi renomeado para backup e um novo projeto Git foi criado
+  com o mesmo nome. O subdomínio antigo permaneceu preso ao projeto renomeado
+  (pedeoutra.pages.dev), então backup e projeto novo foram removidos e o
+  projeto `pedeoutra` foi recriado como Git, recuperando o subdomínio limpo.
+- Nenhum dado de aplicação vive no Pages; o banco permanece no Supabase.
+
+Build inicial validado:
+- Deployment ID: 8bf03fa3-316b-481b-ab8d-6b6a79a43d4d
+- Commit: 564bc2d6fc9f3969bca0055e03524506af73a604
+- Branch: feat/PDA-MVP-WO-001-pedeoutra-mvp
+- Etapas: initialize -> clone_repo -> build -> deploy
+- Resultado: success
+- URL do deployment: https://8bf03fa3.pedeoutra.pages.dev
+- URL de produção: https://pedeoutra.pages.dev
+- Bundle publicado contém https://waygtbclkxklexnabwvj.supabase.co
+
+Verificação HTTP:
+- GET https://pedeoutra.pages.dev/ -> 200
+- Shell SPA com asset /assets/index-DXFN1pMS.js
+- Asset contém a URL do Supabase configurada nas variáveis de build
+
+Auto-deploy validado:
+- Push do commit cdbceafa17782d0875f0aad67f3b8b046670f209
+  ("docs: connect Pages to GitHub and clean staging data") na branch de produção.
+- Deployment automático: 40e745f0-60f8-4d43-a1de-76d82a513277
+- Etapas: initialize -> clone_repo -> build -> deploy
+- Resultado: success (deploy concluído em 2026-11-13T03:10:11Z)
+- URL do deployment: https://40e745f0.pedeoutra.pages.dev
+- URL de produção: https://pedeoutra.pages.dev
+- CI do mesmo commit: run 43357088095 (push) e 43357095327 (pull_request),
+  4/4 jobs verdes em ambos.
+
+Build final de código/teste:
+- Commit: 2993e67528e416e2136e28925b14b7d3c9092179
+- Deployment ID: 1fae02ae-141b-4ba5-82aa-ea2db7860418
+- Resultado: success (deploy concluído em 2026-11-13T03:14:53Z)
+- URL do deployment: https://1fae02ae.pedeoutra.pages.dev
+- CI: run 43357841432 (push) e 43357847244 (pull_request), 4/4 jobs verdes.
