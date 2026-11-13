@@ -235,7 +235,9 @@ begin
      and s.organization_id <> p_organization_id;
 
   v_risk := least(100, coalesce(v_email_dupes, 0) * 35 + coalesce(v_phone_dupes, 0) * 25);
-  if v_risk >= 35 then
+  -- Qualquer sinal repetido abre revisão manual; o trial continua ativo até
+  -- decisão do admin. Sinal fraco nunca é veto automático.
+  if v_risk > 0 then
     v_status := 'review_required';
   end if;
 

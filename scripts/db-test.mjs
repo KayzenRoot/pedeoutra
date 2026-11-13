@@ -779,7 +779,7 @@ async function main() {
       )
     })
 
-    await test('telefone repetido é sinal de risco, não bloqueio automático', async () => {
+    await test('telefone repetido abre revisão sem bloquear o trial', async () => {
       await client.query('insert into auth.users (id, email) values ($1, $2)', [
         USER_D,
         'd@example.test',
@@ -790,7 +790,7 @@ async function main() {
         [USER_D],
       )
       assert(grant.rows[0].risk_score >= 25, `risco ${grant.rows[0].risk_score}`)
-      assert(grant.rows[0].status === 'granted', 'telefone isolado não deve bloquear')
+      assert(grant.rows[0].status === 'review_required', 'telefone repetido deve abrir revisão')
       const access = await client.query(
         'select access_state from public.organizations where id = $1',
         [orgD.id],

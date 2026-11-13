@@ -48,7 +48,7 @@ Duas migrations aditivas, aplicadas apenas em bancos sintéticos/isolados:
 | Migration | SHA-256 |
 | --- | --- |
 | `20261113000100_plans_entitlements.sql` | `67e47cdf1db42d70b963a380bcf90a61f4a0fa7cb199acaabd99a271544d7e02` |
-| `20261113000200_admin_trial.sql` | `43866990c10c0ec6674cd728f4fe7c54c0b6a969a6366a41ccc8ae0f2eb2e271` |
+| `20261113000200_admin_trial.sql` | `e4a82425c7b7edd869d361db6c3f308e201b5f06b24a8f4fb70e8319aabb0e00` |
 
 - `plan_catalog`/`plan_feature_entitlements` semeados com 2 planos e 48 linhas
   de matriz; preços 2990/6990 BRL.
@@ -89,7 +89,7 @@ de execução; os dados sintéticos foram removidos pelos próprios harnesses.
 | PO-01 | Tenant A não lê/escreve B em DB, RLS e PostgREST | PASS — 39 DB + 13 PostgREST |
 | PO-02 | Trial/assinatura inválida não escreve | PASS — DB |
 | PO-03 | Trial é único por usuário e sobrevive à recriação da org | PASS — DB |
-| PO-04 | Telefone repetido gera risco sem bloqueio automático | PASS — DB |
+| PO-04 | Telefone repetido abre revisão sem bloquear o trial | PASS — DB |
 | PO-05 | E-mail repetido abre revisão; admin limpa/suspende com auditoria | PASS — DB |
 | PO-06 | Superadmin é singleton; segundo admin é rejeitado | PASS — DB |
 | PO-07 | Admin global exige UUID + AAL2/TOTP; AAL1, fornecedor, anônimo e expirado são rejeitados | PASS — 4 negativos Edge HTTP |
