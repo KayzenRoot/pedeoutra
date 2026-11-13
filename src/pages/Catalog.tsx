@@ -272,7 +272,8 @@ export function Catalog() {
         )}
 
         {categories.length > 0 && (
-          <div className="category-filter" role="group" aria-label="Filtrar por categoria">
+          <fieldset className="category-filter">
+            <legend className="sr-only">Filtrar por categoria</legend>
             <button
               type="button"
               className="category-chip"
@@ -292,7 +293,7 @@ export function Catalog() {
                 {category.name}
               </button>
             ))}
-          </div>
+          </fieldset>
         )}
 
         {visibleProducts.length === 0 ? (

@@ -3346,6 +3346,8 @@ svg {
   gap: 8px;
   flex-wrap: wrap;
   margin: 0 0 18px;
+  border: 0;
+  padding: 0;
 }
 
 .category-chip {

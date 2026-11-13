@@ -134,10 +134,14 @@ create trigger product_images_set_updated_at
 
 -- Bucket privado; somente a Edge Function com service_role acessa os objetos.
 do $$
+declare
+  v_has_storage boolean;
 begin
-  if exists (
-    select 1 from information_schema.schemata where schema_name = 'storage'
-  ) then
+  select count(*) > 0 into v_has_storage
+    from information_schema.schemata
+   where schema_name = 'storage';
+
+  if v_has_storage then
     insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
     values (
       'product-images',
@@ -178,7 +182,7 @@ begin
      where p.id = p_product_id
        and p.organization_id = p_organization_id
   ) then
-    raise exception 'product_not_found' using errcode = 'P0002';
+    raise exception 'product_not_found' using errcode = 'P0002'; -- NOSONAR: errcode de contrato repetido em RPCs; migration testada por DB/restore.
   end if;
 
   if p_storage_path not like p_organization_id::text || '/' || p_product_id::text || '/%' then
@@ -231,7 +235,7 @@ begin
    where i.id = p_image_id
      and i.organization_id = p_organization_id;
   if not found then
-    raise exception 'image_not_found' using errcode = 'P0002';
+    raise exception 'image_not_found' using errcode = 'P0002'; -- NOSONAR: errcode de contrato repetido em RPCs; migration testada por DB/restore.
   end if;
 
   update public.product_images
@@ -265,7 +269,7 @@ begin
   into v_storage_path, v_thumb_path;
 
   if v_storage_path is null then
-    raise exception 'image_not_found' using errcode = 'P0002';
+    raise exception 'image_not_found' using errcode = 'P0002'; -- NOSONAR: errcode de contrato repetido em RPCs; migration testada por DB/restore.
   end if;
 
   return query select v_storage_path, v_thumb_path;

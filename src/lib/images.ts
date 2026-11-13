@@ -1,4 +1,4 @@
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const MAX_SOURCE_BYTES = 10 * 1024 * 1024
 
 export interface PreparedImage {
@@ -46,14 +46,14 @@ async function encode(
 
 /** Redimensiona e reencoda a imagem no navegador antes do upload. */
 export async function prepareImage(file: File): Promise<PreparedImage> {
-  if (!ALLOWED_TYPES.includes(file.type)) {
+  if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error('Envie uma imagem JPEG, PNG ou WebP.')
   }
   if (file.size > MAX_SOURCE_BYTES) {
     throw new Error('A imagem original deve ter no máximo 10 MB.')
   }
   if (typeof createImageBitmap !== 'function') {
-    throw new Error('Seu navegador não consegue processar a imagem. Use outro navegador.')
+    throw new TypeError('Seu navegador não consegue processar a imagem. Use outro navegador.')
   }
 
   const bitmap = await createImageBitmap(file)
