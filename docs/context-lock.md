@@ -2,11 +2,11 @@
 
 ## Identificação
 
-- Data do lock: 2026-11-12
+- Data do lock: 2026-11-13
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
-- HEAD no momento da geração: `faac7a3488db68099295ffe749df2fe99a8e3961`
+- HEAD no momento da geração: `564bc2d6fc9f3969bca0055e03524506af73a604`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -20,17 +20,17 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | --- | --- |
 | `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
 | `README.md` | `10fb86ceeca9046bf7272a9cdde05662a94e433696aa49b3b7af17e376341c80` |
-| `docs/architecture.md` | `a07314d1ff352fd0e6997b4c7a0599ab983ce59e39e797f6260f9cecbfa10553` |
+| `docs/architecture.md` | `19a53bd3d47e5c4be86b1fcc407ae95563aa972feae29fe6e2e4e24585580705` |
 | `docs/backlog.md` | `9f58ab2e6cf1e217e38083aa32be50783b4d9c3fe3cfdc76abeeceba217ea921` |
-| `docs/checkpoint.md` | `83d621e865011d8ccf5bff14da5518d122fd96fc965e71c83e7ea80eb1d03a84` |
+| `docs/checkpoint.md` | `ad4b09d92ff53a7b4c371db76f8b6d7033ff4d74efd84f44269a63635e7d3b31` |
 | `docs/decisions-ledger.md` | `54bde31b9f67b88687998ca93c9509b898dd8cd5a4497a2417fc6cde9f869fe9` |
 | `docs/definition-of-done.md` | `254be49cb375fdc5d1618be2c9292329038bf41161b596e6c44e9bae2a02cf86` |
-| `docs/deployment.md` | `1d8c3cae09fb474f39c4a93d23f681b4c45d6b3a12cc5ccf23b6609140466f76` |
+| `docs/deployment.md` | `26ace92f7cf909f5e4239d884662a64c1532572fae5dd6e022575fc2b345807c` |
 | `docs/project-overview.md` | `c8942184a0aef2cd67a3533866f64d06c374b784eaef324e1d904ec04d353496` |
 | `docs/requirements.md` | `3afaa5ab2294d2169859f0db1f4c8ae8899759c5240470d1247440e23462c2c7` |
 | `docs/scope.md` | `c29249118df01f474514024e27703a9e938144f288767fac527d88dc22137db8` |
 | `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `f06e9af56ab3fffcd6276b6efb1904034996af158eda2bae1f30a24fd35e354b` |
+| `docs/test-plan.md` | `37afd0810f15f5baffbb9b69f81e47a419dd66c93eb64bcf3d1f84b569227853` |
 | `eslint.config.js` | `f7cf4897dc619b3c7db13920430b8713a8536fbaee95528f200662ea3ecdff6d` |
 | `index.html` | `adb2161b3eca55dca479a11fa09696f3ef25bf2ddcc204b07237e8d0396c8a92` |
 | `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |

@@ -60,10 +60,9 @@ Cobre signup/login, organização, produto, catálogo, pedido, vínculo de clien
 recompra, checkout, webhook idempotente, valor adulterado, cancelamento,
 reembolso e reconciliação.
 
-Status: PASS no GitHub Actions (run 43326733690), 7 grupos e 0 FAIL — inclui
-Auth real, pedido, recompra, checkout, webhook, duplicata, valor adulterado,
-cancelamento, reembolso e reconciliação. O Docker local desta máquina ficou
-instável, por isso a execução de referência é o CI.
+Status: PASS no GitHub Actions (run 43331325741) e localmente após o reparo do
+Docker, 7 grupos e 0 FAIL — inclui Auth real, pedido, recompra, checkout,
+webhook, duplicata, valor adulterado, cancelamento, reembolso e reconciliação.
 
 ### 5. Restore
 
@@ -100,17 +99,20 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
 
 ## 7. Staging/sandbox
 
-- URL: `https://pedeoutra.pages.dev`.
+- URL: `https://pedeoutra.pages.dev`, projeto Cloudflare Pages Git conectado a
+  `KayzenRoot/pedeoutra`; push na branch de produção dispara build/deploy.
 - `node scripts/prod-smoke.mjs` cria dados sintéticos e valida signup,
   organização, produto, catálogo, pedido, vínculo e recompra contra a URL real.
 - Asaas Sandbox: checkout + cartão de teste + webhook autenticado + assinatura
-  ativa; evidência em `evidence/logs/asaas-webhook-real.txt`.
+  ativa; evidência em `evidence/logs/asaas-webhook-real.txt`. Os dados
+  sintéticos e a assinatura/cliente sandbox foram removidos em 13/11/2026
+  (`evidence/logs/staging-cleanup-2026-11-13.txt`).
 - Produção monetizada (dinheiro real/domínio próprio) permanece fora do escopo
   até credenciais, KYC e auditoria.
 
 ## Riscos não cobertos
 
 - Fluxo real de cartão no Asaas (sem credenciais).
-- Deploy e smoke em produção (sem credenciais).
+- Produção monetizada (Asaas real, KYC e domínio próprio).
 - WhatsApp oficial (fora de escopo).
 - Carga/estresse além de rate limit funcional.

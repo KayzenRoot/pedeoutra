@@ -2,14 +2,13 @@
 
 ## Base da execução
 
-- Data: 2026-11-12
+- Data: 2026-11-12/13
 - Repositório: `KayzenRoot/pedeoutra` (público)
 - Branch de trabalho: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
 - Estado da base: somente `README.md` inicial; 11 issues abertas (PDA-001..011).
-- Credenciais disponíveis: GitHub autenticado. Ausentes: Supabase Cloud,
-  Asaas e Cloudflare.
-- Docker disponível: sim (Postgres 17 local para testes).
+- Credenciais usadas: GitHub, Supabase Cloud, Asaas Sandbox e Cloudflare Pages.
+- Docker disponível: sim; reparado com `wsl --update` + reinício do backend.
 
 ## Incrementos desta WO
 
@@ -27,27 +26,32 @@
   Functions, build e smoke de browser com axe WCAG 2 A/AA verdes.
 - Harness E2E completo com GoTrue real + Asaas mock: 7 grupos PASS no CI.
 - Migrations aplicadas no Supabase Cloud (`waygtbclkxklexnabwvj`).
-- Frontend publicado em Cloudflare Pages: `https://pedeoutra.pages.dev`.
+- Frontend publicado em Cloudflare Pages: `https://pedeoutra.pages.dev`, agora
+  projeto Git conectado a `KayzenRoot/pedeoutra` com auto-deploy por push.
 - 11 Edge Functions publicadas; secrets configurados (sem valores no repo).
 - Asaas Sandbox: checkout real, pagamento de teste, webhook autenticado e
-  assinatura ativada; smoke completo de produção PASS.
+  assinatura ativada; smoke completo de produção PASS. Assinatura/cliente e
+  dados sintéticos removidos em 13/11 para deixar o staging limpo.
 - Docker local corrigido com `wsl --update` + reinício do backend do Docker
-  Desktop; `test:db` 30/30 e `test:restore` PASS executados localmente.
+  Desktop; `test:db` 30/30, `test:postgrest` 13/13, `test:edge-http` 17/17,
+  `test:full-local` 7/7 e `test:restore` PASS executados localmente.
 - Produção monetizada permanece BLOCKED (Asaas produção, domínio e auditoria).
 
-## Checkpoint Delta (PROPOSED)
+## Pendências
 
-- ADR PDA-ADR-003/004/005/006 propostos.
-- Billing Asaas sandbox e deploy permanecem bloqueados por ausência de
-  credenciais; integração e runbooks entregues.
-- Nenhuma alteração de escopo, marca ou domínio foi promovida.
+- Auditoria independente e autorização explícita antes de merge do PR #12.
+- Trocar a branch de produção do Pages para `main` depois do merge.
+- Asaas produção (KYC/credenciais), domínio próprio e revisão do plano Supabase
+  Free antes de usuários pagantes.
+- Região East US (Ohio) documentada; migrar para São Paulo exige recriar o
+  projeto Supabase.
 
 ## Próxima ação autorizada
 
 PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/12
 
-CI real: runs 43311754455 — 4 jobs verdes (web/axe, banco/PostgREST/restore, Deno/Edge HTTP, E2E full).
+CI real: run 43331325741 — 4 jobs verdes (web/axe, banco/PostgREST/restore,
+Deno/Edge HTTP, E2E full).
 
-Revisar o PR Draft, executar auditoria independente e, com credenciais
-autorizadas, configurar Supabase/Asaas/Cloudflare e repetir os smokes de
-produção. Não há merge automático.
+Revisar o PR Draft, executar auditoria independente e, com autorização
+explícita, fazer o merge. Não há merge automático.

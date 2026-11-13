@@ -1,0 +1,36 @@
+staging cleanup 2026-11-13T03:05:11.221Z
+auth users total=4 synthetic=4 unexpected=0
+organizations to remove=4
+org 8822e8f8-4703-4235-9c4e-c298cb9bb604 Distribuidora Smoke 1794523042983
+org 72876358-63fe-4d76-b7e5-976dd72fd375 Distribuidora Smoke 1794523250164
+org 8606609a-34f2-4587-8161-9be9257b6a61 Distribuidora Smoke 1794524556031
+org 555e18ae-d6a4-483c-9684-a1cef27212fe Distribuidora Smoke 1794524806427
+delete orders organization_id=eq.8822e8f8-4703-4235-9c4e-c298cb9bb604 -> HTTP 204
+delete products organization_id=eq.8822e8f8-4703-4235-9c4e-c298cb9bb604 -> HTTP 204
+delete customers organization_id=eq.8822e8f8-4703-4235-9c4e-c298cb9bb604 -> HTTP 204
+delete subscriptions organization_id=eq.8822e8f8-4703-4235-9c4e-c298cb9bb604 -> HTTP 204
+delete organizations id=eq.8822e8f8-4703-4235-9c4e-c298cb9bb604 -> HTTP 204
+delete orders organization_id=eq.72876358-63fe-4d76-b7e5-976dd72fd375 -> HTTP 204
+delete products organization_id=eq.72876358-63fe-4d76-b7e5-976dd72fd375 -> HTTP 204
+delete customers organization_id=eq.72876358-63fe-4d76-b7e5-976dd72fd375 -> HTTP 204
+delete subscriptions organization_id=eq.72876358-63fe-4d76-b7e5-976dd72fd375 -> HTTP 204
+delete organizations id=eq.72876358-63fe-4d76-b7e5-976dd72fd375 -> HTTP 204
+delete orders organization_id=eq.8606609a-34f2-4587-8161-9be9257b6a61 -> HTTP 204
+delete products organization_id=eq.8606609a-34f2-4587-8161-9be9257b6a61 -> HTTP 204
+delete customers organization_id=eq.8606609a-34f2-4587-8161-9be9257b6a61 -> HTTP 204
+delete subscriptions organization_id=eq.8606609a-34f2-4587-8161-9be9257b6a61 -> HTTP 204
+delete organizations id=eq.8606609a-34f2-4587-8161-9be9257b6a61 -> HTTP 204
+delete orders organization_id=eq.555e18ae-d6a4-483c-9684-a1cef27212fe -> HTTP 204
+delete products organization_id=eq.555e18ae-d6a4-483c-9684-a1cef27212fe -> HTTP 204
+delete customers organization_id=eq.555e18ae-d6a4-483c-9684-a1cef27212fe -> HTTP 204
+delete subscriptions organization_id=eq.555e18ae-d6a4-483c-9684-a1cef27212fe -> HTTP 204
+delete organizations id=eq.555e18ae-d6a4-483c-9684-a1cef27212fe -> HTTP 204
+deleted user smoke+1794524806427@pedeoutra.test -> HTTP 200
+deleted user smoke+1794524556031@pedeoutra.test -> HTTP 200
+deleted user smoke+1794523250164@pedeoutra.test -> HTTP 200
+deleted user smoke+1794523042983@pedeoutra.test -> HTTP 200
+cleared billing_events -> HTTP 204
+cleared rate_limits -> HTTP 204
+after: users=0 organizations=0 subscriptions=0
+asaas cancel subscription sub_idaryje3c0ty1g1p -> HTTP 200
+asaas delete customer cus_000009950428 -> HTTP 200

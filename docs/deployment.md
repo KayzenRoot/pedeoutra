@@ -2,9 +2,10 @@
 
 ## Status desta WO
 
-**Staging/sandbox: PASS.** Frontend em Cloudflare Pages, banco/funções em
-Supabase Cloud e cobrança em Asaas Sandbox foram configurados e validados com
-dados sintéticos.
+**Staging/sandbox: PASS.** Frontend em Cloudflare Pages com deploy automático
+via GitHub, banco/funções em Supabase Cloud e cobrança em Asaas Sandbox foram
+configurados e validados com dados sintéticos. Os dados sintéticos de staging
+foram removidos em 13/11/2026; o ambiente começa vazio para novos testes.
 
 **Produção monetizada: BLOCKED.** Ainda faltam credenciais/checkout Asaas de
 produção, domínio próprio e auditoria independente. Nenhuma cobrança real foi
@@ -14,7 +15,9 @@ executada.
 
 | Item | Valor |
 | --- | --- |
-| Frontend | `https://pedeoutra.pages.dev` (Cloudflare Pages, projeto `pedeoutra`) |
+| Frontend | `https://pedeoutra.pages.dev` (Cloudflare Pages Git, projeto `pedeoutra`) |
+| Repositório Pages | `KayzenRoot/pedeoutra`, branch de produção `feat/PDA-MVP-WO-001-pedeoutra-mvp` até o merge |
+| Build Pages | `npm run build`; output `dist`; Node 22; auto-deploy a cada push na branch |
 | Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
 | Migrations | 4 migrations aplicadas via `supabase db push` |
 | Edge Functions | 11 publicadas; públicas com `--no-verify-jwt`, autenticadas com JWT |
@@ -29,6 +32,20 @@ header `asaas-access-token`. O token não é versionado.
 O Supabase Free pode pausar por inatividade. Revisar plano/limites antes de
 usuários pagantes. A região East US foi a recomendada pelo painel; uma migração
 para São Paulo exigiria recriar o projeto.
+
+## Deploy automático do frontend
+
+O projeto `pedeoutra` foi recriado como projeto Git do Cloudflare Pages. O
+projeto antigo de upload direto não pode ser convertido (`source` imutável), e a
+recriação manteve a URL pública `https://pedeoutra.pages.dev`. A branch de
+produção é a branch da WO até o merge; depois deve ser trocada para `main` em
+Settings → Build → Production branch. Builds são disparados por push; o build
+inicial validado foi `8bf03fa3-316b-481b-ab8d-6b6a79a43d4d` no commit
+`564bc2d`.
+
+Variáveis configuradas em Production e Preview: `VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL` e `NODE_VERSION=22`. Nenhum segredo de
+servidor (service role/Asaas) existe no Pages.
 
 ## Topologia alvo
 
@@ -48,6 +65,7 @@ para São Paulo exigiria recriar o projeto.
 - `VITE_SUPABASE_ANON_KEY` (chave anon; pública por design, protegida por RLS)
 - `VITE_APP_URL` (URL pública do frontend)
 - `VITE_ANALYTICS_ENDPOINT` (opcional; eventos sem PII)
+- `NODE_VERSION=22` (build do Pages)
 
 Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 `ASAAS_WEBHOOK_TOKEN` no frontend.
@@ -76,8 +94,9 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
      `reorder-get`, `reorder-submit`, `asaas-webhook`.
 6. Configurar no Asaas o webhook `https://<ref>.supabase.co/functions/v1/asaas-webhook`
    com o token exclusivo `ASAAS_WEBHOOK_TOKEN`.
-7. Cloudflare Pages: build `npm ci && npm run build`, output `dist`, variáveis
-   do frontend, domínio/TLS.
+7. Cloudflare Pages: conectar o repositório GitHub, branch de produção
+   (temporariamente a branch da WO; `main` após o merge), build `npm run build`,
+   output `dist`, Node 22 e variáveis do frontend em Production/Preview.
 8. Smoke com dados sintéticos:
    - cadastro + organização;
    - 5 produtos;
@@ -101,7 +120,8 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 
 ## Rollback
 
-1. Frontend: promover o deployment anterior no Cloudflare Pages.
+1. Frontend: promover o deployment anterior no Cloudflare Pages ou reverter o
+   commit na branch de produção; o push seguinte reconstrói automaticamente.
 2. Funções: redeploy da versão anterior; manter migrations compatíveis.
 3. Banco: migrations são aditivas nesta versão; restaurar backup verificado se
    houver mudança destrutiva.

@@ -8,12 +8,12 @@
 | Work Order | `PDA-MVP-WO-001` (PDF, 12/11/2026) |
 | Branch | `feat/PDA-MVP-WO-001-pedeoutra-mvp` |
 | Base SHA | `40990e437a455f161fd8c60f35be983f29209794` |
-| Head de código | `c1178338a6806371c880dab31b83746c83bc08b0` |
+| Head de código | `564bc2d6fc9f3969bca0055e03524506af73a604` |
 | Head da branch na abertura do PR | `1e7898f7df098c50b1877349ce9885cfd75db23e` |
-| Data da execução | 2026-11-12 |
-| Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.8, Supabase CLI 2.113, Chrome headless |
+| Data da execução | 2026-11-12/13 |
+| Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.9.3, Supabase CLI 2.113, Chrome headless |
 | PR Draft | [#12](https://github.com/KayzenRoot/pedeoutra/pull/12) — Draft, sem merge |
-| Deploy staging | **PASS** — https://pedeoutra.pages.dev (Cloudflare Pages + Supabase Cloud) |
+| Deploy staging | **PASS** — https://pedeoutra.pages.dev (Cloudflare Pages Git + Supabase Cloud) |
 | Billing | **PASS Sandbox** — checkout, pagamento e webhook reais; PROD BLOCKED para dinheiro real |
 
 A URL de staging é real e foi validada com dados sintéticos. Nenhum pagamento de dinheiro real foi executado.
@@ -26,7 +26,7 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
 | Issue | Status | Evidência |
 | --- | --- | --- |
 | PDA-001 Source Pack, base e CI | DONE | `docs/`, `README.md`, `.github/workflows/ci.yml`, logs de lint/typecheck/build |
-| PDA-002 Auth, organizações e RLS | DONE (local) | migrations, `create_organization`, 29 testes de banco, 13 testes PostgREST; Auth Cloud não configurado |
+| PDA-002 Auth, organizações e RLS | DONE | migrations, `create_organization`, 30 testes de banco, 13 testes PostgREST; Auth Cloud validado no staging |
 | PDA-003 Produtos e clientes | DONE | UI, RLS, testes de banco/PostgREST |
 | PDA-004 Catálogo e pedido público | DONE | `public-catalog`, `public-order`, 17 testes HTTP dos handlers, total server-side |
 | PDA-005 Recompra segura | DONE | tokens unitários, RPC/DB, `reorder-create/get/submit/revoke`, 17 testes HTTP |
@@ -34,7 +34,7 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
 | PDA-007 Trial, plano e Asaas | DONE sandbox / PROD BLOCKED | checkout e pagamento sandbox reais; webhook autenticado ativou assinatura; duplicata, valor, reembolso e reconcile testados; produção com dinheiro real bloqueada |
 | PDA-008 Testes críticos e restore | DONE | 70 unit, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, restore e smoke de produção PASS |
 | PDA-009 Landing e onboarding | DONE | landing, demo, privacidade/termos preliminares, smoke de browser |
-| PDA-010 Deploy e smoke comercial | DONE staging / PROD BLOCKED | Cloudflare Pages + Supabase Cloud + Asaas Sandbox; smoke completo e assinatura ativa; domínio/Asaas produção pendentes |
+| PDA-010 Deploy e smoke comercial | DONE staging / PROD BLOCKED | Cloudflare Pages Git com auto-deploy + Supabase Cloud + Asaas Sandbox; smoke completo e assinatura ativa validada; dados sintéticos limpos; domínio/Asaas produção pendentes |
 | PDA-011 Evidence Bundle e PR | DONE (sem merge) | este bundle + PR Draft |
 
 ## 3. Entregáveis
@@ -46,7 +46,7 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
   RLS default-deny, funções `security definer`, view segura e wrappers de API.
 - 11 Edge Functions: catálogo/pedido/recompra, vínculo de cliente, checkout,
   cancelamento, webhook Asaas, reconciliação.
-- CI GitHub Actions com três jobs (web, banco/restore/PostgREST, Deno/Edge HTTP).
+- CI GitHub Actions com quatro jobs (web, banco/restore/PostgREST, Deno/Edge HTTP e E2E full).
 - Scripts de teste reproduzíveis e logs em `evidence/logs/`.
 - Screenshots em `evidence/screenshots/`.
 - Source Pack conciso em `docs/`.
@@ -78,11 +78,13 @@ Logs completos em `evidence/logs/`.
 | `npm run test:edge-http` | 17 PASS / 0 FAIL (handlers Deno reais + PostgREST) | 0 | `ci-edge.log` |
 | `npm run smoke:preview` | landing/demo/legal/404 + axe WCAG 2 A/AA (0 serious/critical) + screenshots | 0 | `smoke.log` |
 | `supabase start` | 4 migrations aplicadas no stack local | 0 | `local-supabase-start.log` |
-| `npm run test:local` | NÃO EXECUTADO — Edge Runtime local bloqueado | — | `local-edge-runtime-blocked.txt` |
-| `npm run test:full-local` | 7 PASS / 0 FAIL no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` |
+| `npm run test:local` | NÃO EXECUTADO — Edge Runtime local não é gate; coberto por `test:edge-http` + `test:full-local` | — | — |
+| `npm run test:full-local` | 7 PASS / 0 FAIL local e no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` + execução local |
 | `node scripts/prod-smoke.mjs` | PASS signup, organização, produto, pedido, vínculo, recompra | 0 | `prod-smoke.log` |
 | Asaas Sandbox real | checkout + cartão de teste + webhook + assinatura `active` | 0 | `asaas-webhook-real.txt` |
-| GitHub Actions (PR #12) | 4 jobs verdes: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43326733690](https://github.com/KayzenRoot/pedeoutra/actions/runs/43326733690) |
+| Cloudflare Pages Git | build `npm run build` + deploy do commit `564bc2d`; URL limpa e variáveis de build | 0 | `cloudflare-pages-git.txt` |
+| Limpeza staging | 4 usuários sintéticos, 4 orgs, produtos/pedidos, 7 billing events, rate limits e assinatura/cliente sandbox removidos | 0 | `staging-cleanup-2026-11-13.txt` |
+| GitHub Actions (PR #12) | 4 jobs verdes: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43331325741](https://github.com/KayzenRoot/pedeoutra/actions/runs/43331325741) |
 
 ### Harness E2E completo (GoTrue real + Asaas mock)
 
@@ -98,17 +100,19 @@ O job de CI `Full local E2E` executou 7 grupos, 0 FAIL (`ci-full-e2e.log`):
   expirado e reconciliação.
 
 Isso valida o caminho HTTP/real de Auth e billing contra um provedor mock. O
-Asaas Sandbox real continua **PROD BLOCKED** por falta de credenciais.
+Asaas Sandbox real foi validado separadamente com checkout/pagamento de teste;
+somente dinheiro real/Asaas produção permanece **BLOCKED**.
 
-### Bloqueio de infraestrutura local
+### Infraestrutura local (resolvida)
 
 A imagem `public.ecr.aws/supabase/edge-runtime:v1.74.3` publicada nesta máquina
-tinha binário de 0 byte e falhava com `exec format error`. A tag anterior
-`v1.69.4` executava, mas o stack local foi encerrado com exit 137 sob pressão de
-recursos. Para não deixar a WO sem prova dos handlers, os módulos Deno reais
-foram executados por `scripts/local-edge-router.ts` contra PostgREST + Postgres
-reais (`test:edge-http`). O caminho de Auth Cloud/GoTrue real permanece não
-validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
+tinha binário de 0 byte e falhava com `exec format error`; por isso o caminho
+dos handlers é exercitado por `scripts/local-edge-router.ts` contra PostgREST +
+Postgres reais (`test:edge-http`). O Docker foi reparado com `wsl --update` e
+reinício do backend do Docker Desktop: `test:db` 30/30, `test:postgrest` 13/13,
+`test:edge-http` 17/17, `test:full-local` 7/7 e `test:restore` PASS também
+localmente. O comando `test:local` (Edge Runtime) não é gate; o E2E full usa
+GoTrue real em container.
 
 ## 5. Matriz HIGH_ASSURANCE
 
@@ -119,7 +123,7 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 | Nada desbloqueia sem pagamento confirmado | gate SQL por trial/assinatura + máquina de billing | `test-db`: trial/reembolso/bloqueio; `billing.test`: 22 testes |
 | Callback de sucesso não ativa | nenhum caminho de `successUrl` no estado; ativação exige evento + verificação | `billing.test` + revisão de `create-checkout` |
 | Webhook duplicado é inofensivo | `provider_event_id UNIQUE` + `register_billing_event` | `test-db` evento duplicado; `billing.test` |
-| Webhook inválido/valor/tenant divergente | token constante + validação de valor/tenant/estado | `billing.test`; handler typechecked; webhook HTTP real não executado (sem Asaas) |
+| Webhook inválido/valor/tenant divergente | token constante + validação de valor/tenant/estado | `billing.test`; handler typechecked; webhook HTTP real executado no Asaas Sandbox |
 | Evento fora de ordem não reativa/refund revoga | `last_provider_event_at` + estado terminal | `billing.test` 22 testes |
 | Token de recompra não vaza | hash SHA-256, TTL, revogação, rate limit, view sem token | `tokens.test`, `test-db`, `test-edge-http` (sem PII) |
 | Preço/total não são do cliente | RPC calcula com produto atual e snapshots | `test-db`, `test-postgrest`, `test-edge-http` |
@@ -153,6 +157,11 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
   webhook `CHECKOUT_CREATED`/`SUBSCRIPTION_CREATED`/`CHECKOUT_PAID`/`PAYMENT_CREATED`
   recebido, eventos correlacionados por `checkoutSession`, assinatura ativada
   (`active`, período até 13/12/2026) e tela de assinatura confirmada.
+- **Limpeza pós-validação (13/11/2026):** assinatura `sub_idaryje3c0ty1g1p`,
+  cliente `cus_000009950428`, usuários/organizações sintéticas, pedidos,
+  produtos, billing events e rate limits foram removidos; o staging inicia
+  vazio. A evidência histórica permanece em `asaas-webhook-real.txt` e
+  `staging-cleanup-2026-11-13.txt`.
 - Correções feitas no caminho real: CORS permite `apikey`; `customerData`
   obrigatório foi removido para o checkout hospedado coletar CPF/endereço;
   correlação usa `checkoutSession`; `GET /checkouts/{id}` não é usado (404).
@@ -160,15 +169,24 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 
 ## 8. Deploy
 
-- **Staging PASS:** `https://pedeoutra.pages.dev` no Cloudflare Pages.
+- **Staging PASS:** `https://pedeoutra.pages.dev` no Cloudflare Pages, agora
+  projeto Git conectado a `KayzenRoot/pedeoutra`; branch de produção temporária
+  `feat/PDA-MVP-WO-001-pedeoutra-mvp`; build `npm run build`, output `dist`,
+  Node 22 e auto-deploy por push.
+- **Build Git validado:** deployment `8bf03fa3-316b-481b-ab8d-6b6a79a43d4d`,
+  commit `564bc2d`, stages initialize → clone_repo → build → deploy, success;
+  bundle em produção contém a URL do Supabase configurada.
 - **Supabase Cloud:** projeto `waygtbclkxklexnabwvj`, 4 migrations aplicadas,
   11 Edge Functions publicadas, secrets configurados (somente nomes no repo).
 - **Auth:** Site URL/redirects do Pages e autoconfirmação de e-mail no MVP.
-- **Asaas Sandbox:** API key e webhook configurados; smoke real de pagamento.
+- **Asaas Sandbox:** API key e webhook configurados; smoke real de pagamento;
+  assinatura/cliente de teste removidos na limpeza de 13/11.
 - **Smoke de produção:** signup, organização, produto, catálogo, pedido,
   vínculo de cliente e recompra passaram (`evidence/logs/prod-smoke.log`).
 - **Screenshots:** `evidence/prod-smoke/` (catálogo, pedido, recompra, checkout,
   assinatura ativa).
+- **Dados sintéticos:** removidos; staging com 0 usuários, 0 organizações e 0
+  assinaturas (`staging-cleanup-2026-11-13.txt`).
 - **Produção monetizada BLOCKED:** Asaas produção (KYC/credenciais), domínio
   próprio, auditoria independente e autorização de merge pendentes.
 - Runbook, variáveis e rollback em `docs/deployment.md`.
@@ -181,7 +199,12 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 - Docker local corrigido via `wsl --update` + reinício do backend do Docker
   Desktop; `test:db` 30/30, `test:postgrest` 13/13 e `test:restore` PASS
   executados localmente.
-- O E2E full continua rodando no GitHub Actions, onde o ambiente é limpo.
+- O E2E full roda no GitHub Actions e também localmente após o reparo do
+  Docker; o staging foi limpo depois dos smokes.
+- Cloudflare Pages: projeto Direct Upload não pode ser convertido em Git
+  (`source` imutável). O projeto foi recriado como Git mantendo a URL
+  `pedeoutra.pages.dev`; a troca de branch de produção para `main` fica
+  pendente do merge.
 - Sem WAF dedicado, pentest externo ou teste de carga.
 - Supabase Free pode pausar; revisar plano antes de pagantes.
 - Região East US (Ohio) foi a recomendada pelo painel; migrar para São Paulo
@@ -200,19 +223,22 @@ validado; o teste usa stub de GoTrue apenas para o contrato de sessão.
 - ADR-004: CSS moderno em vez de Tailwind — PROPOSED.
 - ADR-005: máquina de estados de pedido no banco — PROPOSED.
 - ADR-006: recompra com token opaco/hash — PROPOSED.
-- Billing e deploy permanecem bloqueados até credenciais e auditoria.
+- Billing e deploy staging foram executados e validados; produção monetizada
+  segue bloqueada por KYC/credenciais Asaas, domínio e auditoria.
 - Nenhuma promoção canônica automática; nenhum merge.
 
 ## 11. Veredito
 
 - **Implementação local/staging:** PASS (app, schema, RLS, pedido, recompra, 70
   testes unitários, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe,
-  build, smoke de produção e assinatura ativa no sandbox).
+  build, smoke de produção e assinatura ativa validada no sandbox).
 - **Segurança testada:** PASS no escopo de tenant, pedido, recompra, rate limit e
   restore; sem defeito HIGH/CRITICAL conhecido.
-- **Billing Sandbox:** PASS (checkout, pagamento de teste, webhook e ativação).
+- **Billing Sandbox:** PASS (checkout, pagamento de teste, webhook e ativação);
+  dados de teste removidos após a validação.
 - **Billing produção:** BLOCKED (dinheiro real/Asaas produção).
-- **Deploy staging:** PASS (`https://pedeoutra.pages.dev`).
+- **Deploy staging:** PASS (`https://pedeoutra.pages.dev`) com Git conectado e
+  auto-deploy por push; staging limpo para novos testes.
 - **Produção comercial:** BLOCKED (domínio, Asaas produção, auditoria e merge).
 - **Veredito final:** **APPROVED para staging/sandbox**, com **PROD BLOCKED**
   para go-live monetizado. PR permanece Draft; não houve merge.

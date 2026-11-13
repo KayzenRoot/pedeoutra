@@ -1,0 +1,40 @@
+Cloudflare Pages — Git integration
+Data: 2026-11-13 (UTC)
+Projeto: pedeoutra
+URL pública: https://pedeoutra.pages.dev
+Repositório: KayzenRoot/pedeoutra (GitHub)
+Branch de produção: feat/PDA-MVP-WO-001-pedeoutra-mvp (temporária até o merge)
+Build command: npm run build
+Build output directory: dist
+Node: 22 (NODE_VERSION)
+Variáveis Production/Preview: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY,
+  VITE_APP_URL, NODE_VERSION (somente nomes; valores não versionados)
+
+Histórico da migração:
+- O projeto original havia sido criado por Direct Upload. A API do Cloudflare
+  rejeitou anexar Git source (erro 8000069: "You cannot update the `source`
+  object in a Direct Uploads project").
+- O projeto antigo foi renomeado para backup e um novo projeto Git foi criado
+  com o mesmo nome. O subdomínio antigo permaneceu preso ao projeto renomeado
+  (pedeoutra.pages.dev), então backup e projeto novo foram removidos e o
+  projeto `pedeoutra` foi recriado como Git, recuperando o subdomínio limpo.
+- Nenhum dado de aplicação vive no Pages; o banco permanece no Supabase.
+
+Build inicial validado:
+- Deployment ID: 8bf03fa3-316b-481b-ab8d-6b6a79a43d4d
+- Commit: 564bc2d6fc9f3969bca0055e03524506af73a604
+- Branch: feat/PDA-MVP-WO-001-pedeoutra-mvp
+- Etapas: initialize -> clone_repo -> build -> deploy
+- Resultado: success
+- URL do deployment: https://8bf03fa3.pedeoutra.pages.dev
+- URL de produção: https://pedeoutra.pages.dev
+- Bundle publicado contém https://waygtbclkxklexnabwvj.supabase.co
+
+Verificação HTTP:
+- GET https://pedeoutra.pages.dev/ -> 200
+- Shell SPA com asset /assets/index-DXFN1pMS.js
+- Asset contém a URL do Supabase configurada nas variáveis de build
+
+Auto-deploy:
+- O push de documentação posterior a este log dispara um novo build na branch
+  de produção; o ID/SHA do build final é registrado no Evidence Bundle.

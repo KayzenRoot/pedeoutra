@@ -60,7 +60,8 @@ Tabelas: `organizations`, `products`, `customers`, `orders`, `order_items`,
 
 ## Limites conhecidos
 
-- Sem Supabase Cloud/Asaas/Cloudflare configurados, billing e deploy ficam
-  bloqueados; testes usam Postgres real local e mocks do provedor.
+- Staging usa Supabase Cloud, Cloudflare Pages Git e Asaas Sandbox; sem
+  credenciais/KYC de produção e domínio próprio, o go-live monetizado fica
+  bloqueado. Testes locais usam Postgres real e mocks do provedor.
 - Sem WhatsApp API: apenas links `wa.me` acionados por humano.
 - Sem upload de arquivos, estoque, nota fiscal ou pagamento dos pedidos.
