@@ -20,7 +20,8 @@ um link de recompra. O comprador não baixa app e não cria conta.
 | Recuperação de senha | fluxo implementado; envio real depende de SMTP próprio |
 | Produção monetizada | `CONFIGURADA` — primeira cobrança real, backup/continuidade, SMTP e revisão jurídica pendentes |
 
-O bundle de evidências fica em [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md).
+O bundle de evidências do MVP é [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md);
+o estado de release está em [`evidence/PDA-REL-WO-001.md`](evidence/PDA-REL-WO-001.md).
 O ambiente de staging usa Supabase Cloud (`waygtbclkxklexnabwvj`) e Asaas
 produção configurado; a primeira cobrança real ainda não foi executada.
 

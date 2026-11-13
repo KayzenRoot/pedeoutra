@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-REL-WO-001-release-readiness`
 - Base SHA: `203f91b64ad661cb4c707fa782c950e213701ec4`
-- HEAD no momento da geração: `203f91b64ad661cb4c707fa782c950e213701ec4`
+- HEAD no momento da geração: `fdc57e571a912e67b9196cd44b38e45b9fadd022`
 - Work Order: `PDA-REL-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -21,9 +21,11 @@ Issues #17 a #23 estavam abertas na base. Nenhuma issue foi criada ou duplicada.
 | `.github/workflows/billing-reconcile.yml` | `8659f39309351494d1d4f25187bbf1e380807ded9871ab767e00b7b46c9d95e1` |
 | `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
 | `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
-| `README.md` | `f30528128cc927463bbf74ea1a55dc74ab38c5f229c45d663b08f044944b1263` |
+| `.github/workflows/release-health.yml` | `0640f0a5c6f8a1229633b584c852fe98af3b8eab4e221d7727059494a63631e1` |
+| `README.md` | `a72be5493db2dc2403083f60ef8b8b328363b03e792dbecb23a20af4eb8080cb` |
 | `docs/architecture.md` | `dd1f82b6f2e8b1d89ba8346db0181b7cc251e6044114fe77bd603cf2262e8130` |
 | `docs/backlog.md` | `9dddbc084637deb8764a818fcf1e112b02ad8b3434d7054b1e81beff02d6482d` |
+| `docs/backup-restore.md` | `2d9b660d1916ef6c05042487f5654477e9b24fba7eedd5c0d0111473368ccf17` |
 | `docs/checkpoint.md` | `f0327228f30c771ff525067b9cc000b946162b428cae61747a839d982c371d98` |
 | `docs/decisions-ledger.md` | `6f90d9028454e535b2abf33a20423d7cee17a5032081f94635abbda35a517101` |
 | `docs/definition-of-done.md` | `3e278f66cf608c0a52daff110977504b04a45d117fd781ff2f25b7bf0f2e79ec` |
@@ -32,6 +34,7 @@ Issues #17 a #23 estavam abertas na base. Nenhuma issue foi criada ou duplicada.
 | `docs/requirements.md` | `0f456ae240278d69f2a1f02dbb6c1a215e9ac6a58b3023145011acc4fa531a45` |
 | `docs/scope.md` | `f6c890b298092c479776d8a1f26f0ac0db48cf74a896ef796b724f04f9922cd7` |
 | `docs/security.md` | `a6aff8c42f12656289a00a84043f1d4b74caedfb8364639458e1118dd5df46ac` |
+| `docs/support-runbook.md` | `2097bb62a891617c976416dd04152d45869a42d651354504f1f539f029365473` |
 | `docs/test-plan.md` | `0d4305e5e43b8a912b28752d174327640c6557225e4ec69d28890fdb161fc81d` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `7d05d97afb19077db3e4445fdee174346672b0ba0a2d4ec1075d4ea903d097d7` |
@@ -64,6 +67,8 @@ Issues #17 a #23 estavam abertas na base. Nenhuma issue foi criada ou duplicada.
 | `src/lib/edge.ts` | `1f1bc5c8eab9925cf9439089baf041e96088c8857f54488f781fd77e5a0f0782` |
 | `src/lib/format.test.ts` | `9130efa8c5714456a28fb5c2cc2e3c5207d53f7ca8ef817eff98b9618f1526c3` |
 | `src/lib/format.ts` | `67419a037fda19fe19c88f8232dd0239290162faa9b150d2f4dd6bcdef454a5c` |
+| `src/lib/navigation.test.ts` | `58bc49b3b29e711aa00ef70889cb9ea8ec88e9ac79bf1675f29c90a2251d3a4b` |
+| `src/lib/navigation.ts` | `be1306a86d35a13813472c6b5949da883bdb0c6a0902a5d6ff1e62ac32fbb2be` |
 | `src/lib/supabase.ts` | `f900ffc9786b00d1493cb481d28c19dbe5d130ac4b872b0f4aaac40004d0525b` |
 | `src/lib/types.ts` | `8a6b49d7540fa9a74c8ae448602cefa693ae43da5bd359219e9224af3b79151b` |
 | `src/main.tsx` | `b3f023da133154adff448b24c256c554072536939e52291490a6128a9cfc82f7` |
