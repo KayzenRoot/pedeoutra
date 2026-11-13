@@ -115,7 +115,9 @@ async function runAxe(page, label) {
   await page.evaluate(async () => {
     await Promise.race([
       Promise.all(
-        document.getAnimations().map((animation) => animation.finished.catch(() => undefined)),
+        globalThis.document
+          .getAnimations()
+          .map((animation) => animation.finished.catch(() => undefined)),
       ),
       new Promise((resolve) => setTimeout(resolve, 1500)),
     ])
