@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `328fa6a98ffa96478ab8a75356acb5f041d0305b`
+- HEAD no momento da geração: `1df89b9b36a7c273639baa40832250894b7fd89c`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -30,6 +30,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `docs/decisions-ledger.md` | `f8a49ab27df7691a1c7eb2cbfe60ae9adc4872caed4290eb09d01fc23831341e` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `57724d845a994b1c91f3e8372f921b415f0625bee4d01f1b19e6ff7474cf6947` |
+| `docs/part1-activation.md` | `d8904c91be801d62e424e678273f8ebada0b5f0e1386ba9198f49d05c5df4924` |
 | `docs/plan-matrix.md` | `10f2fe3e721eb22dfde5c804a4f8c1f8fcac3db8e2faf4db35eed91e75a5fe6d` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
 | `docs/requirements.md` | `1e869a2f0b91ee7f5791846dbedcafd959764d634a49c7a03199c67f7376aabc` |
@@ -54,7 +55,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `scripts/test-full-local.mjs` | `f8dd3d8bf744ebe71556874128800568e0e3f8c24531a6b9aa0ca2feabd1afb4` |
 | `scripts/test-postgrest.mjs` | `6831366b2c6338d566a67fba44a6978bae77de9314d8fea9a87165409142ac1a` |
 | `scripts/verify-restore.mjs` | `537d045c5514b043224f0b360ebd54e2111d9ace24d47af6d2801028310b2d77` |
-| `src/App.tsx` | `966049c4c6c9c4e8d47b24fffe80f3e26ad506a41141c7c689e6e6ddc4426192` |
+| `src/App.tsx` | `7a795faceffbeb5a154dd3b8aac22d9ad5628ce1bf34f6c6a6261f4ef2f5a7eb` |
 | `src/components/AppShell.tsx` | `eefef899cc3552fbe89d32ce4e866218d87f9e99d5b2a48774bd5846d34780c6` |
 | `src/components/AuthLayout.tsx` | `2d793e1cef445d3d9a2caf96289ed792cbeb5ba75d458048411a1bbd71f32ea2` |
 | `src/components/Brand.tsx` | `270b850ed4b611f0ea950c253ca422dba36d1c78056f65ed2a56897600934d82` |

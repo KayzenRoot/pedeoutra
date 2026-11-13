@@ -30,9 +30,7 @@ const Settings = lazy(() =>
 
 function RouteFallback({ label = 'Carregando…' }: { readonly label?: string }) {
   return (
-    <div className="route-loading" role="status">
-      {label}
-    </div>
+    <output className="route-loading">{label}</output>
   )
 }
 
