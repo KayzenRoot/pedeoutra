@@ -113,6 +113,9 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
   (`evidence/logs/staging-cleanup-2026-11-13.txt`).
 - Keepalive diário do Supabase (`supabase-keepalive`) valida `/auth/v1/health`;
   falha por dois dias exige verificação manual do projeto.
+- Reconciliação diária (`billing-reconcile`) chama a Edge Function com
+  `x-reconcile-token`; validação manual: 401 com token errado e 200 com
+  `events_checked=0`/`checked=0` no staging limpo.
 - Primeira cobrança real, domínio próprio, Supabase Pro/migração e auditoria
   permanecem fora do escopo até autorização explícita.
 

@@ -1,0 +1,35 @@
+name: Billing reconcile
+
+# Reconciliação diária de eventos pendentes/falhos e assinaturas ativas.
+# Usa o token exclusivo BILLING_RECONCILE_TOKEN; não executa cobranças.
+on:
+  schedule:
+    - cron: '23 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: billing-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call billing-reconcile
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          BILLING_RECONCILE_TOKEN: ${{ secrets.BILLING_RECONCILE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$BILLING_RECONCILE_TOKEN"
+          curl --fail --silent --show-error \
+            --retry 3 --retry-delay 5 --max-time 30 \
+            -X POST "$SUPABASE_URL/functions/v1/billing-reconcile" \
+            -H "content-type: application/json" \
+            -H "x-reconcile-token: $BILLING_RECONCILE_TOKEN" \
+            --data '{}'

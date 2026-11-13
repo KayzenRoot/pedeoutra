@@ -4,9 +4,9 @@
 
 - Data do lock: 2026-11-13
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
-- Branch: `chore/asaas-production-ready`
-- Base SHA: `0c6aa6e4d8896a20a2b15e5363c1511128c6a466`
-- HEAD no momento da geração: `0c6aa6e4d8896a20a2b15e5363c1511128c6a466`
+- Branch: `chore/billing-reconcile-cron`
+- Base SHA: `c23de39bef0f4f36a0ca9a59bf67a55a910ebd39`
+- HEAD no momento da geração: `c23de39bef0f4f36a0ca9a59bf67a55a910ebd39`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -26,12 +26,12 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `docs/checkpoint.md` | `ba5e854cc8950037ec602b62cdf8815252785167f02f868ff7586ef7c9c47e7d` |
 | `docs/decisions-ledger.md` | `11c53959ffef1a39c3cb0844b9772a9a842e5882bbf137f629aca024887db7df` |
 | `docs/definition-of-done.md` | `3e278f66cf608c0a52daff110977504b04a45d117fd781ff2f25b7bf0f2e79ec` |
-| `docs/deployment.md` | `f567f7929765006521caa7e2eb016cef03f18308a83b7c9414de9e0ed268b35b` |
+| `docs/deployment.md` | `4a553f59d308622fe62d3fe05ed10aeb8e1a8e2bd4c803b35e98479c275d0076` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
 | `docs/requirements.md` | `0f456ae240278d69f2a1f02dbb6c1a215e9ac6a58b3023145011acc4fa531a45` |
 | `docs/scope.md` | `f6c890b298092c479776d8a1f26f0ac0db48cf74a896ef796b724f04f9922cd7` |
 | `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `f82916ec073062837179151409ad3ac43df96e34a0efa8d5b1b54d2ed61ef829` |
+| `docs/test-plan.md` | `bec227ae86f3dcec8a3cff307ef7faf21a3578d9e967da87c99ffd0a957bf449` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `7d05d97afb19077db3e4445fdee174346672b0ba0a2d4ec1075d4ea903d097d7` |
 | `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |
