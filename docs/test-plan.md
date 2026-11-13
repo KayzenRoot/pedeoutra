@@ -131,6 +131,27 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
   suporte/legal e auditoria permanecem fora do escopo até autorização explícita;
   `pedeoutra.pages.dev` é a URL aprovada.
 
+## 8. Parte 1/5 — planos, admin e trial
+
+- **Unitários:** catálogo de planos (exatamente 2, preços 2990/6990, moeda,
+  versão), decisão de transição por plano, entitlement/quota puros, resolução e
+  persistência de tema.
+- **Banco/RLS:** matriz 2 planos × estados (`trial`, `active`, `past_due`,
+  `canceled`, `expired`, `refunded`, `blocked`) × papel; `assert_entitlement`
+  para recurso Pro em trial/essencial; quota atômica e isolada por tenant;
+  `trial_grants` idempotente na corrida e por usuário; singleton
+  `platform_admins`; legado 2990 → `essential` sem perda.
+- **Edge HTTP:** `admin-api` 401 anônimo/expirado, 403 AAL1/fornecedor, 200
+  AAL2 admin; `admin-bootstrap` 503 sem `ADMIN_EMAIL`; `create-checkout`
+  Essencial 2990 e Profissional bloqueado 409/503; `admin-api` ações auditadas.
+- **E2E local:** signup/organização com trial único; catálogo/pedido legado;
+  planos no banco; webhook 2990 não ativa Profissional; 6990 de outro tenant não
+  ativa; repeated event; reconcile.
+- **UI:** smoke light/dark/system em desktop/mobile 320–1440, axe, screenshots
+  datados, sem flash; contraste funcional; `/admin` fail-closed sem bootstrap.
+- **Restore:** migrations aditivas restauram contagens/checksums; nenhum dado
+  real é usado.
+
 ## Riscos não cobertos
 
 - Primeira cobrança real no cartão (checkout de produção não foi pago).

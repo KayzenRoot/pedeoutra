@@ -34,3 +34,27 @@ logística e gateway de pagamento dos pedidos B2B.
 
 Se o prazo apertar, reduzir apenas escopo periférico. Nunca reduzir isolamento
 tenant, integridade de pedidos ou segurança da cobrança.
+
+## Delta V2 — Parte 1/5 (PROPOSED, 2026-11-13)
+
+Esta seção não substitui o MVP aprovado; registra o delta em planejamento.
+
+- **Dentro da Parte 1:** tema claro/escuro/system; superadmin único por UUID
+  com MFA AAL2 e console `/admin` fail-closed; trial de 7 dias idempotente por
+  identidade e revisão proporcional; catálogo comercial com exatamente dois
+  planos (`essential` 2990 centavos e `professional` 6990 centavos); motor de
+  entitlements/quotas no servidor; configurações de conta; contratos de
+  cobrança por plano sem cobrança real.
+- **Contratos preparados, funcionalidade não entregue:** API Profissional
+  (#64–#67), Meta Ads (#68–#71), WhatsApp oficial (#29–#31), preços privados e
+  orçamentos (#48/#51), equipe (#58), Central de Crescimento (#34–#42),
+  dashboard 360° (#78–#80) e SEO/landing final (#73–#76/#82–#83). Essas partes
+  apenas consomem as feature keys; não são ativadas nesta fase.
+- **Fora da Parte 1:** cobrança real, upgrade/downgrade automático no Asaas sem
+  caminho comprovado, contratação de serviço pago, envio de e-mail real,
+  publicação de anúncio, segundo administrador e qualquer recurso Pro vendido
+  como disponível antes de implementação/teste/deploy.
+- **Estado comercial:** Profissional permanece com checkout desativado e
+  comunicação de "em preparação"; Essencial mantém o preço legado de R$ 29,90.
+  Nada nesta seção autoriza go-live comercial, que segue bloqueado por SMTP,
+  backup, suporte/legal e primeira cobrança.

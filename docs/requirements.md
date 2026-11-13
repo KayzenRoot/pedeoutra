@@ -66,10 +66,55 @@
 - Evidence Bundle com SHA, comandos, exit codes, riscos e veredito.
 - PR #12 mesclado após autorização explícita; merges futuros exigem auditoria.
 
+## Delta V2 — Parte 1/5 (PROPOSED)
+
+### RF-09 Administração da plataforma (PDA-V10-004)
+
+- `/admin` acessível somente pelo UUID em `platform_admins` e sessão AAL2
+  verificada no servidor em cada endpoint.
+- Bootstrap one-time exige `ADMIN_EMAIL`, token dedicado e AAL2; sem
+  `ADMIN_EMAIL`, responde `ADMIN_BOOTSTRAP_BLOCKED` e mantém o console fechado.
+- Visão consolidada de organizações, trial/assinatura, plano, uso e risco, com
+  paginação/filtros; ações de suspender, reativar e revisar trial exigem motivo
+  e geram auditoria de plataforma.
+- Nenhuma ação admin altera pagamento, cartão ou crédito sem prova do Asaas.
+
+### RF-10 Dois planos e entitlements (PDA-PLN-001/002)
+
+- Exatamente dois planos: `essential` (2990 centavos BRL/mês, trial 7 dias) e
+  `professional` (6990 centavos BRL/mês, sem trial).
+- Preço, moeda, versão e limites vêm do servidor; pagamento de 2990 nunca
+  libera Profissional.
+- `app.assert_entitlement`/quotas no banco e nas Edge Functions; UI não é
+  autorização.
+- Contas legadas viram Essencial preservando dados, período e assinatura;
+  downgrade/expiração bloqueia novas ações premium sem apagar histórico.
+- Profissional não é vendido nesta fase: checkout desativado por flag até a
+  funcionalidade real da Parte 2/4.
+
+### RF-11 Trial idempotente e revisão (PDA-V10-005)
+
+- Trial concedido uma vez por usuário/organização no servidor, imutável e
+  resistente a recriação de conta.
+- Sinais repetidos de e-mail/telefone/CNPJ elevam risco e podem suspender o
+  trial para revisão manual; IP/dispositivo são sinais fracos, nunca veto.
+- Identificadores são guardados como HMAC com retenção mínima; suspensão,
+  reativação e contestação são auditadas.
+
+### RF-12 Configurações e tema (PDA-V10-002/009)
+
+- Preferência de tema `light|dark|system` persistida no navegador, sem flash,
+  com `color-scheme` e contraste verificável em todas as telas existentes.
+- Configurações reais de conta/empresa, status de plano/trial/limites, canais
+  desabilitados com mensagem honesta e ajuda/FAQ, sem fingir integração ativa.
+- Textos de versão/estado refletem o release real; "MVP" não é renomeado por
+  marketing antes dos gates.
+
 ## Não funcionais
 
 - PT-BR, BRL, exibição em `America/Sao_Paulo`, persistência em UTC.
 - Mobile-first, acessível por teclado, contraste e foco visível.
+- Tema claro/escuro/system com contraste funcional e respeito a `prefers-color-scheme`.
 - Validação server-side de toda entrada; queries parametrizadas.
 - Sem segredo no Git, no bundle ou em logs.
 - Migrations reproduzíveis; backup/restore documentado e testado com dados sintéticos.

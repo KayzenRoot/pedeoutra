@@ -58,6 +58,27 @@ Tabelas: `organizations`, `products`, `customers`, `orders`, `order_items`,
 `audit_events`, `rate_limits`. Todas usam UUID; instantes em UTC. A view
 `reorder_links_safe` omite `token_hash`.
 
+## Delta V2 — Parte 1/5 (PROPOSED)
+
+- **Planos:** `plan_catalog` versionado + `plan_feature_entitlements`; a
+  assinatura referencia `plan_code`/`plan_version`. `app.assert_entitlement` e
+  `app.consume_quota` são chamados por Edge/RPC; `plan_changes` registra
+  intenções de troca sem efetivar cobrança.
+- **Admin:** tabela privada singleton `platform_admins` (UUID de
+  `auth.users`), Edge `admin-api` com `service_role` somente no servidor,
+  revalidação de `aal=aal2` em cada request, auditoria em
+  `platform_audit_events`. `admin-bootstrap` é one-time e fail-closed sem
+  `ADMIN_EMAIL`.
+- **Trial:** `trial_grants` imutável por usuário/organização; sinais
+  normalizados em HMAC (`trial_signals`) geram revisão, não bloqueio automático
+  por sinal fraco.
+- **Tema:** tokens semânticos em `[data-theme=light|dark]`, resolução de
+  `system` antes do primeiro paint e persistência em `localStorage`; nenhuma
+  regra de negócio no cliente.
+- **Fora do escopo:** API pública, Meta Ads, WhatsApp automatizado, equipe,
+  preços privados e dashboard 360° permanecem nas Partes 2–4; aqui existem
+  apenas feature keys e contratos.
+
 ## Limites conhecidos
 
 - Staging usa Supabase Cloud, Cloudflare Pages Git e Asaas produção

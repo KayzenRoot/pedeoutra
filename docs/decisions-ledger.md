@@ -117,3 +117,84 @@ sem export off-site aceito formalmente, o lançamento pago permanece
 **Alternativas:** Free + export manual somente (RPO alto, não recomendado para
 pagantes); Pro + PITR (maior custo, menor RPO); Pro em `sa-east-1` (melhor
 latência, exige migração e reconfiguração).
+
+## ADR PDA-ADR-010 — Catálogo de dois planos e entitlements server-side (PROPOSED)
+
+**Status:** PROPOSED (Parte 1/5; não substitui a ADR-002, que permanece válida
+para a cobrança validada por evento)
+**Data:** 2026-11-13
+**Contexto:** o MVP tinha um plano único de R$ 29,90 fixado em constante de
+código. A V2 exige Essencial e Profissional, com preços, limites e recursos
+definidos no servidor, sem confiar em `plan_code`, preço ou callback do
+navegador.
+**Decisão proposta:** `plan_catalog` versionado (`plan_code`,
+`plan_version`, `price_cents`, `currency`, `trial_days`, `active`) e
+`plan_feature_entitlements` (`feature_key`, limite e janela). A assinatura
+guarda `plan_code`/`plan_version`; contas legadas de R$ 29,90 e trials viram
+`essential` sem perder período, dados ou histórico. `app.assert_entitlement`
+e `app.consume_quota` são a fonte de verdade server-side; flags de UI são apenas
+ergonomia. Downgrade/expiração revoga novas ações premium, mas preserva leitura
+do histórico e não apaga registros. Nenhum backfill cobra, cancela ou chama o
+Asaas.
+**Consequências:** toda feature premium precisa de feature key e teste negativo
+(Edge/PostgREST/DB); o Profissional só é liberado após pagamento de 6990
+confirmado e reconciliado; a matriz comercial fica em ADR/requirements e não no
+frontend.
+
+## ADR PDA-ADR-011 — Superadministrador singleton com UUID e AAL2 (PROPOSED)
+
+**Status:** PROPOSED
+**Data:** 2026-11-13
+**Contexto:** a operadora precisa de um console global, mas um admin extraído
+de e-mail, `user_metadata` ou JWT editável seria elevação de privilégio. Ainda
+não há e-mail de admin fornecido pelo proprietário.
+**Decisão proposta:** tabela privada `platform_admins` singleton com
+`user_id uuid references auth.users(id)` único; bootstrap server-side exige,
+cumulativamente, `ADMIN_EMAIL` configurado no ambiente, token de bootstrap
+dedicado, usuário autenticado com o UUID/e-mail correspondente e sessão AAL2
+(TOTP). Endpoints `/admin` revalidam UUID + `aal=aal2` no servidor em toda
+leitura/escrita, usam `service_role` apenas na Edge Function e registram
+auditoria com ator, ação, motivo e timestamp. Sem `ADMIN_EMAIL`, o bootstrap e o
+console falham fechados (`ADMIN_BOOTSTRAP_BLOCKED`).
+**Consequências:** não existe promoção por e-mail isolado nem segundo admin;
+revogação remove o acesso no próximo request; o console não compartilha token
+com fornecedores e não expõe PII de compradores.
+
+## ADR PDA-ADR-012 — Antifraude de trial proporcional (PROPOSED)
+
+**Status:** PROPOSED
+**Data:** 2026-11-13
+**Contexto:** o trial de 7 dias precisa ser idempotente e resistente a recriação
+de conta, sem transformar IP, aparelho ou telefone não verificado em veto
+permanente.
+**Decisão proposta:** `trial_grants` imutável por `organization_id` e
+`user_id`, concedido apenas no servidor dentro de `create_organization`; um
+mesmo usuário não reinicia o trial recriando organização. Sinais de contato
+(e-mail/telefone/CNPJ) são normalizados e guardados como HMAC-SHA-256 com
+segredo server-side e retenção mínima; repetição gera `review_required` e
+fila de revisão no admin, não bloqueio automático definitivo. Apenas
+identificador realmente verificado pode fundamentar bloqueio definitivo.
+IP/dispositivo são sinais fracos, não prova. Toda suspensão/reativação é
+auditada e o fornecedor pode contestar.
+**Consequências:** falsos positivos preservam o trial até revisão manual;
+nenhum fingerprint invasivo, CPF ou SMS pago é coletado; legado mantém o trial
+vigente.
+
+## ADR PDA-ADR-013 — Transição entre planos e limite do Asaas (PROPOSED)
+
+**Status:** PROPOSED
+**Data:** 2026-11-13
+**Contexto:** assinaturas de cartão do Asaas podem não permitir editar valor ou
+vencimento. Criar uma segunda recorrência sem encerrar a primeira pode gerar
+cobrança dupla.
+**Decisão proposta:** a troca de plano é registrada em `plan_changes` e só
+produz efeito após pagamento confirmado do novo valor, no próximo ciclo, sem
+prorrateamento automático. O acesso do período já pago é preservado. Enquanto
+não houver caminho comprovado no provedor para editar/substituir a assinatura
+sem sobreposição, a Edge Function bloqueia a troca automática
+(`409 plan_change_requires_support`) e orienta suporte humano; nunca cria duas
+recorrências. O checkout Profissional permanece desativado por flag até a
+funcionalidade real da Parte 2/4 estar pronta e auditada.
+**Consequências:** nenhuma cobrança real é feita nesta WO; upgrade/downgrade
+têm contrato e testes de decisão, mas a mutação no provedor fica explicitamente
+bloqueada até validação em sandbox/autorização específica.
