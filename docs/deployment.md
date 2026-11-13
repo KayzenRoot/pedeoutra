@@ -14,7 +14,8 @@ O PR #12 foi mesclado em `main` com autorização explícita (merge commit
 produção está aprovada; API key, checkout e webhook de produção foram
 configurados e validados com um checkout de teste **sem pagamento**. A primeira
 cobrança real ainda não foi executada e depende de autorização explícita,
-domínio próprio, Supabase Pro/região e auditoria.
+decisão de backup/continuidade (ADR-009 PROPOSED) e auditoria. `pedeoutra.pages.dev`
+é a URL aprovada para o lançamento inicial.
 
 ## Ambiente atual (staging)
 
@@ -59,7 +60,7 @@ primeiros clientes pagantes. A decisão está registrada na ADR-007.
   a primeira cobrança real exige autorização explícita.
 - Recuperação de senha implementada; confirmação de e-mail e envio de links
   dependem de SMTP próprio. `mailer_autoconfirm=true` permanece até a
-  configuração do SMTP.
+  configuração do SMTP. Estado: **SMTP_BLOCKED** (sem credenciais).
 
 ### SMTP (credenciais pendentes)
 
@@ -75,6 +76,8 @@ ao `.env.production.local` (gitignored) e configurar no Supabase Auth:
 
 Depois: desligar `mailer_autoconfirm`, testar cadastro/confirmação e
 recuperação com um e-mail real e manter o token/segredo apenas no ambiente.
+Continuidade e suporte estão detalhados em `docs/backup-restore.md` e
+`docs/support-runbook.md`.
 
 ## Deploy automático do frontend
 
@@ -166,22 +169,42 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 - [ ] Plano de rollback e contato de suporte definidos.
 - [ ] Domínio próprio + Supabase Pro/migração para `sa-east-1`.
 
+## Operação e alertas
+
+- `Release health` executa a cada 6h: Pages, Auth health, webhook com token
+  inválido (deve retornar 401) e reconciliador. Falha deixa o workflow vermelho
+  e notifica os watchers do repositório; o proprietário deve manter as
+  notificações do GitHub habilitadas.
+- `supabase-keepalive` diário e `billing-reconcile` diário são os jobs de
+  continuidade; falhas exigem verificação manual.
+- Logs: execuções do GitHub Actions, deploy do Cloudflare Pages e logs das Edge
+  Functions no Supabase. Não há monitoramento pago nem SLA nesta fase.
+- Responsável operacional: proprietário do repositório (`KayzenRoot`); canal
+  público de suporte ainda `BLOCKED` (ver `docs/support-runbook.md`).
+
 ## Rollback
 
-1. Frontend: promover o deployment anterior no Cloudflare Pages ou reverter o
-   commit na branch de produção; o push seguinte reconstrói automaticamente.
+1. Frontend: promover o deployment anterior (`cf3b04be`, commit `203f91b`) no
+   Cloudflare Pages ou reverter o commit na branch de produção; o push seguinte
+   reconstrói automaticamente.
 2. Funções: redeploy da versão anterior; manter migrations compatíveis.
 3. Banco: migrations são aditivas nesta versão; restaurar backup verificado se
-   houver mudança destrutiva.
+   houver mudança destrutiva. O restore de produção ainda não foi executado.
 4. Billing: pausar webhook no Asaas antes de reverter funções; reconciliar
    eventos pendentes após o rollback.
+5. Ensaio de rollback/roll-forward em produção não foi executado nesta WO para
+   evitar alteração de estado; procedimento e deployment anterior estão
+   registrados.
 
 ## Limites e riscos
 
-- Supabase Free pode pausar; o keepalive diário mitiga, mas o Pro é obrigatório
-  antes de usuários pagantes. O staging segue em East US/Ohio por decisão
-  registrada (ADR-007); a migração para `sa-east-1` é pré-requisito do go-live.
+- Supabase Free pode pausar e não possui backup automático/PITR. O keepalive
+  diário mitiga a pausa, mas não é backup. A ADR-007 aceita Free/Ohio no
+  lançamento; a ADR-009 PROPOSED recomenda Pro antes do primeiro pagante.
+  Enquanto a ADR-009 não for aceita, backup de produção permanece `BLOCKED`.
 - Cloudflare Pages deve ser verificado para uso comercial no momento do deploy.
 - A produção Asaas está configurada e validada sem cobrança. A primeira cobrança
-  real, o domínio próprio, o Supabase Pro/migração e a auditoria independente
-  continuam pendentes; nada disso deve ser tratado como go-live automático.
+  real, o backup/continuidade e a revisão jurídica continuam pendentes; nada
+  disso deve ser tratado como go-live automático.
+- `pedeoutra.pages.dev` é a URL aprovada; domínio próprio não é requisito desta
+  fase.

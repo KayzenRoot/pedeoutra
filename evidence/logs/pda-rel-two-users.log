@@ -1,0 +1,14 @@
+PASS fornecedor: cadastro aleatório e sessão autenticada
+PASS fornecedor: onboarding e organização
+PASS fornecedor: dois produtos cadastrados
+PASS comprador: pedido público PD-6CF075D83A com dois produtos
+PASS fornecedor: pedido confirmado e concluído
+PASS fornecedor: comprador vinculado e link de recompra gerado
+PASS fornecedor: cliente aparece na carteira
+PASS comprador: recompra submetida pelo link
+PASS fornecedor: dois pedidos visíveis (PD-CE02FB88A7, PD-6CF075D83A)
+PASS fornecedor: tela de assinatura carregou; checkout NÃO foi iniciado
+PASS fornecedor: login em um segundo dispositivo/navegador
+E2E two-users: PASS
+cleanup: user 200, orgs remaining 0
+log: C:\Users\csn19\AppData\Local\Temp\pedeoutra-two-users\run.log

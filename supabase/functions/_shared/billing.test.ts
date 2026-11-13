@@ -116,6 +116,28 @@ describe('máquina de estados de billing', () => {
     expect(decision.reason).toBe('checkout_paid_verified')
   })
 
+  it('CHECKOUT_PAID não reativa assinatura reembolsada', () => {
+    expect(
+      decideBillingTransition(
+        snapshot({ state: 'refunded' }),
+        event({ type: 'CHECKOUT_PAID' }),
+        verified({ paymentStatus: null }),
+        NOW,
+      ),
+    ).toEqual({ kind: 'ignore', reason: 'refunded_is_terminal' })
+  })
+
+  it('CHECKOUT_PAID sem assinatura em nenhuma fonte pede verificação', () => {
+    expect(
+      decideBillingTransition(
+        snapshot({ providerSubscriptionId: null }),
+        event({ type: 'CHECKOUT_PAID', subscriptionId: null }),
+        verified({ paymentStatus: null, subscriptionId: null }),
+        NOW,
+      ),
+    ).toEqual({ kind: 'verify', reason: 'subscription_not_found' })
+  })
+
   it('CHECKOUT_PAID usa assinatura já correlacionada no snapshot', () => {
     const decision = decideBillingTransition(
       snapshot({

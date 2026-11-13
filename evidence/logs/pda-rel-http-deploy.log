@@ -1,0 +1,23 @@
+--- HTTP headers ---
+HTTP/1.1 200 OK
+Date: Fri, 13 Nov 2026 16:01:35 GMT
+Content-Type: text/html; charset=utf-8
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Cache-Control: public, max-age=0, must-revalidate
+ETag: "d45a12bad6f1cdd12227aeb4774e6893"
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: no-referrer
+x-content-type-options: nosniff
+x-frame-options: DENY
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=SY%2Fgnu1lL%2FDd%2FFPb%2BbUakwmf5DtnIhqugUmjzPaMpk42efjZN74dGoaLA0E%2BkdOzP6ayQHxArOpUKgEsJbTxbFEuO9PqsaoirRbx%2BOs7UuMthuNCRTS6T0%2FDxGKselXPKxbfJzkzYQD1f5hP1Y5EuUfG"}]}
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+Server: cloudflare
+CF-RAY: a59efef27bac9a7f-GRU
+alt-svc: h3=":443"; ma=86400
+
+--- HTML asset ---
+assets/index-CXL0XUvt.js
+--- baseline asset from 203f91b build log ---
+assets/index-CXL0XUvt.js

@@ -15,6 +15,8 @@ const base = git('rev-parse main')
 const head = git('rev-parse HEAD')
 const branch = git('branch --show-current')
 const date = new Date().toISOString().slice(0, 10)
+const workOrder = process.env.WORK_ORDER ?? 'PDA-MVP-WO-001 (PDF, 12/11/2026)'
+const issues = process.env.ISSUES ?? 'PDA-001 a PDA-011'
 
 const include = /^(README\.md|package\.json|package-lock\.json|index\.html|eslint\.config\.js|tsconfig(\.node)?\.json|vite\.config\.ts|public\/_(headers|redirects)|\.github\/workflows\/.*\.yml|docs\/.*\.md|supabase\/config\.toml|supabase\/migrations\/.*\.sql|supabase\/tests\/.*\.sql|supabase\/functions\/(_shared\/.*|[^/]+\/index)\.ts|src\/.*\.(ts|tsx|css)|scripts\/.*\.(mjs|ts))$/
 
@@ -39,12 +41,12 @@ const content = `# Context Lock
 - Branch: \`${branch}\`
 - Base SHA: \`${base}\`
 - HEAD no momento da geração: \`${head}\`
-- Work Order: \`PDA-MVP-WO-001\` (PDF, 12/11/2026)
+- Work Order: \`${workOrder}\`
 
 ## Issues verificadas (sem duplicatas)
 
-PDA-001 a PDA-011 estavam abertas na base. Nenhuma issue foi criada ou
-duplicada. Links: \`https://github.com/KayzenRoot/pedeoutra/issues/<n>\`.
+${issues}. Nenhuma issue foi criada ou duplicada. Links:
+\`https://github.com/KayzenRoot/pedeoutra/issues/<n>\`.
 
 ## Hashes SHA-256 dos arquivos críticos
 

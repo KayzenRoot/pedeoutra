@@ -114,7 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(async (email: string, password: string): Promise<SignUpResult> => {
     if (!supabase) throw new Error('Backend não configurado.')
-    const { data, error } = await supabase.auth.signUp({ email, password })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/entrar` },
+    })
     if (error) throw new Error(authErrorMessage(error.message))
     return { needsEmailConfirmation: !data.session }
   }, [])

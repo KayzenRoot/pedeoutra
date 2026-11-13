@@ -63,6 +63,19 @@
 - Analytics opcional envia apenas nome do evento e rota, sem PII, query string
   ou token; desativado por padrão.
 
+### Release e supply chain
+
+- `main` protegida por ruleset: PR obrigatório, checks de CI obrigatórios,
+  sem force-push/deleção e sem bypass.
+- `npm audit`: 0 HIGH/CRITICAL no runtime; 9 moderados transitivos/dev
+  documentados. O open redirect do React Router é mitigado por
+  `safeInternalPath` no parâmetro `next`; o advisory de SSR não se aplica ao SPA.
+- `vitest` atualizado para 5.1.0, removendo o critical de `tinypool` no
+  ambiente de testes.
+- Varredura de padrões de segredo/PII em arquivos versionados sem achados.
+- `release-health` (quando ativo na `main`) verifica Pages, Auth, webhook e
+  reconciliador a cada 6h.
+
 ### LGPD
 
 - Minimização: nome comercial/telefone apenas quando necessário; observação

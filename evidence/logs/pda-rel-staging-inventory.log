@@ -1,0 +1,14 @@
+organizations 1
+subscriptions 1
+billing_events 0
+products 1
+orders 1
+customers 0
+auth_users 1
+/v3/payments?limit=1 0
+/v3/subscriptions?limit=1 0
+/v3/customers?limit=1 0
+/v3/webhooks?limit=10 1
+# Inventário: 1 usuário/organização/produto/pedido real identificado fora dos testes.
+# Dados reais preservados; nenhum cleanup global foi executado.
+# Dados sintéticos dos smokes foram removidos por ID/e-mail de teste.

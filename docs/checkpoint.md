@@ -23,7 +23,7 @@
 
 ## Resultado final
 
-- 70 testes unitários/componente, 30 testes de banco/RLS, 13 testes HTTP via
+- 78 testes unitários/componente, 30 testes de banco/RLS, 13 testes HTTP via
   PostgREST, 17 testes HTTP dos handlers Deno, restore, typecheck das 11 Edge
   Functions, build e smoke de browser com axe WCAG 2 A/AA verdes.
 - Harness E2E completo com GoTrue real + Asaas mock: 7 grupos PASS no CI.
@@ -55,18 +55,22 @@
 ## Pendências
 
 - Primeira cobrança real controlada, com autorização explícita.
-- Domínio próprio e auditoria independente.
-- Supabase Pro e migração para `sa-east-1` antes de pagantes.
-- Monitorar o workflow `supabase-keepalive`; falha por dois dias exige
-  verificação manual do projeto.
+- Auditoria independente; domínio próprio não é requisito desta fase.
+- Decisão de backup/continuidade: ADR-009 PROPOSED recomenda Pro/Ohio antes do
+  primeiro pagante; enquanto não aceita, backup de produção é BLOCKED.
+- SMTP próprio pendente (SMTP_BLOCKED); canal oficial de suporte/privacidade e
+  revisão jurídica pendentes.
+- Monitorar `supabase-keepalive`, `billing-reconcile` e `release-health`; falha
+  exige verificação manual.
 
 ## Próxima ação autorizada
 
 PR #12 mesclado: https://github.com/KayzenRoot/pedeoutra/pull/12
 
-CI da `main`: run 43415994717 (merge `0c6aa6e`) — 4 jobs verdes.
+CI da `main`: run 43443234172 (merge `203f91b`) — 4 jobs verdes.
 
-O staging está encerrado e limpo; o Asaas produção está configurado e validado
-sem cobrança. O próximo passo é a primeira cobrança real controlada, domínio
-próprio, Supabase Pro/migração de região e auditoria, sem cobrança real sem nova
-autorização.
+O staging contém 1 usuário/organização/produto/pedido real identificado fora dos
+testes; esses dados foram preservados. Os smokes removem apenas os dados
+sintéticos que criam. O Asaas produção está configurado e validado sem cobrança;
+SMTP, backup/continuidade, suporte/legal e a primeira cobrança real seguem como
+gates de lançamento.

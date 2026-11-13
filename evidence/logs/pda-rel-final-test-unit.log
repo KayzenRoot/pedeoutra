@@ -1,0 +1,33 @@
+
+> pedeoutra@0.1.0 test:unit
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mD:/Projects/pedeoutra[39m
+
+ [32m✓[39m supabase/functions/_shared/validation.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 87[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/tokens.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 98[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/access.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/asaas.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+ [32m✓[39m src/lib/format.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 82[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/billing.test.ts [2m([22m[2m26 tests[22m[2m)[22m[32m 181[2mms[22m[39m
+ [32m✓[39m src/pages/PasswordReset.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 4265[2mms[22m[39m
+   [32m✓[39m recuperação de senha [2m(3)[22m
+     [33m[2m✓[22m[39m solicita o link e mostra mensagem genérica[33m 2998[2mms[22m[39m
+     [33m[2m✓[22m[39m bloqueia senhas diferentes antes de chamar o backend[33m 1064[2mms[22m[39m
+ [32m✓[39m src/lib/navigation.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/request-ip.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m src/pages/Demo.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 4946[2mms[22m[39m
+   [32m✓[39m demonstração pública [2m(2)[22m
+     [33m[2m✓[22m[39m mostra catálogo fictício e não chama backend[33m 1405[2mms[22m[39m
+     [33m[2m✓[22m[39m simula envio com sucesso e deixa claro que nada foi enviado[33m 3519[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m      Tests [22m [1m[32m78 passed[39m[22m[90m (78)[39m
+[2m   Start at [22m 13:17:00
+[2m   Duration [22m 22.89s[2m (environment 59%, transform 15%, tests 12%, setup 8%, import 5%, worker 1%)[22m
+
+[2mEnvironment [22m [33mjsdom was created 10 times[39m[2m · 47.58s total, 59% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
+

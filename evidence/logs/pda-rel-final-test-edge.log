@@ -1,0 +1,19 @@
+
+> pedeoutra@0.1.0 test:edge
+> node scripts/edge-typecheck.mjs
+
+Verificando 11 Edge Functions com npx.cmd…
+[0m[32mCheck[0m supabase/functions/asaas-webhook/index.ts
+[0m[32mCheck[0m supabase/functions/billing-reconcile/index.ts
+[0m[32mCheck[0m supabase/functions/cancel-subscription/index.ts
+[0m[32mCheck[0m supabase/functions/create-checkout/index.ts
+[0m[32mCheck[0m supabase/functions/link-order-customer/index.ts
+[0m[32mCheck[0m supabase/functions/public-catalog/index.ts
+[0m[32mCheck[0m supabase/functions/public-order/index.ts
+[0m[32mCheck[0m supabase/functions/reorder-create/index.ts
+[0m[32mCheck[0m supabase/functions/reorder-get/index.ts
+[0m[32mCheck[0m supabase/functions/reorder-revoke/index.ts
+[0m[32mCheck[0m supabase/functions/reorder-submit/index.ts
+PASS Edge Functions typecheck
+(node:4168) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)

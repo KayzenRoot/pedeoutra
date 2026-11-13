@@ -115,9 +115,11 @@ export function Privacy() {
 
       <h2>9. Contato e alterações</h2>
       <p>
-        O canal oficial de privacidade será publicado antes do lançamento comercial. Enquanto
-        isso, dúvidas podem ser registradas no repositório público do projeto. Este aviso pode
-        mudar; a data de atualização será revisada.
+        O canal oficial de privacidade e suporte será publicado antes do lançamento
+        comercial. Enquanto ele não estiver disponível e a revisão jurídica não for
+        concluída, o serviço não deve ser vendido ao público. Solicitações de titulares
+        serão tratadas pelo responsável indicado nesse canal. Este aviso pode mudar; a
+        data de atualização será revisada.
       </p>
     </LegalLayout>
   )
@@ -139,12 +141,13 @@ export function Terms() {
         informações que publica. No MVP, cada conta administra uma organização.
       </p>
 
-      <h2>3. Teste e assinatura</h2>
+      <h2>3. Teste, assinatura, cancelamento e reembolso</h2>
       <p>
         O teste é de 7 dias, sem cartão. Após o teste, o plano único custa R$ 29,90 por mês e é
         cobrado em cartão via Asaas Checkout recorrente. A cobrança é apenas da assinatura do
-        fornecedor. Cancelamentos e reembolsos seguem o fluxo do provedor e a legislação
-        aplicável.
+        fornecedor. O cancelamento interrompe a renovação e mantém o acesso até o fim do período
+        já pago. Reembolso, quando cabível, revoga o acesso pago; um trial ainda vigente não é
+        estendido. O PedeOutra não recebe nem armazena dados de cartão.
       </p>
 
       <h2>4. Pedidos dos compradores</h2>

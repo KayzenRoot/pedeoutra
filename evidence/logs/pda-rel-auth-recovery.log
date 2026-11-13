@@ -1,0 +1,6 @@
+PASS usuário sintético criado
+PASS link de recuperação emitido sem e-mail real
+PASS primeiro uso do link altera a senha
+PASS reuso do link é rejeitado de forma neutra
+PASS acesso direto sem sessão de recuperação é rejeitado
+cleanup user 200
