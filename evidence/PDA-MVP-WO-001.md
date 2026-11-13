@@ -15,7 +15,7 @@
 | Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.9.3, Supabase CLI 2.113, Chrome headless |
 | PR #12 | [#12](https://github.com/KayzenRoot/pedeoutra/pull/12) — **MERGED** em 2026-11-13 |
 | Deploy staging | **PASS** — https://pedeoutra.pages.dev (Cloudflare Pages Git em `main` + Supabase Cloud) |
-| Billing | **PASS Sandbox** — checkout, pagamento e webhook reais; PROD BLOCKED para dinheiro real |
+| Billing | **PASS Sandbox + PRODUÇÃO CONFIGURADA** — checkout de produção sem pagamento; primeira cobrança real pendente |
 
 A URL de staging é real e foi validada com dados sintéticos. Nenhum pagamento de dinheiro real foi executado.
 O merge do PR #12 foi autorizado explicitamente e preservou o histórico com merge commit.
@@ -32,10 +32,10 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
 | PDA-004 Catálogo e pedido público | DONE | `public-catalog`, `public-order`, 17 testes HTTP dos handlers, total server-side |
 | PDA-005 Recompra segura | DONE | tokens unitários, RPC/DB, `reorder-create/get/submit/revoke`, 17 testes HTTP |
 | PDA-006 Painel e WhatsApp manual | DONE (UI) | telas de pedidos/status/histórico, links `wa.me` manuais; sem API WhatsApp |
-| PDA-007 Trial, plano e Asaas | DONE sandbox / PROD BLOCKED | checkout e pagamento sandbox reais; webhook autenticado ativou assinatura; duplicata, valor, reembolso e reconcile testados; produção com dinheiro real bloqueada |
+| PDA-007 Trial, plano e Asaas | DONE sandbox + produção configurada | checkout e pagamento sandbox reais; produção com API key, checkout e webhook validados sem pagamento; duplicata, valor, reembolso e reconcile testados; primeira cobrança real pendente |
 | PDA-008 Testes críticos e restore | DONE | 70 unit, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, restore e smoke de produção PASS |
 | PDA-009 Landing e onboarding | DONE | landing, demo, privacidade/termos preliminares, smoke de browser |
-| PDA-010 Deploy e smoke comercial | DONE staging / PROD BLOCKED | Cloudflare Pages Git com auto-deploy + Supabase Cloud + Asaas Sandbox; smoke completo e assinatura ativa validada; dados sintéticos limpos; domínio/Asaas produção pendentes |
+| PDA-010 Deploy e smoke comercial | DONE staging / produção configurada | Cloudflare Pages Git com auto-deploy + Supabase Cloud + Asaas produção; smoke completo, checkout de produção e webhook validados; staging limpo |
 | PDA-011 Evidence Bundle e PR | DONE (mesclado) | este bundle + PR #12 merged |
 
 ## 3. Entregáveis
@@ -83,6 +83,7 @@ Logs completos em `evidence/logs/`.
 | `npm run test:full-local` | 7 PASS / 0 FAIL local e no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` + execução local |
 | `node scripts/prod-smoke.mjs` | PASS signup, organização, produto, pedido, vínculo, recompra | 0 | `prod-smoke.log` |
 | Asaas Sandbox real | checkout + cartão de teste + webhook + assinatura `active` | 0 | `asaas-webhook-real.txt` |
+| Asaas produção | API key validada, checkout `201` em `www.asaas.com`, webhook 13 eventos e evento recebido; sem pagamento | 0 | `asaas-production-config.txt` |
 | Cloudflare Pages Git | auto-deploy dos commits `cdbceaf` e `2993e67`; build final `1fae02ae` success | 0 | `cloudflare-pages-git.txt` |
 | Limpeza staging | 4 usuários sintéticos, 4 orgs, produtos/pedidos, 7 billing events, rate limits e assinatura/cliente sandbox removidos | 0 | `staging-cleanup-2026-11-13.txt` |
 | GitHub Actions (PR #12) | 4 jobs verdes no push `2993e67`: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43357841432](https://github.com/KayzenRoot/pedeoutra/actions/runs/43357841432) |
@@ -102,7 +103,8 @@ O job de CI `Full local E2E` executou 7 grupos, 0 FAIL (`ci-full-e2e.log`):
 
 Isso valida o caminho HTTP/real de Auth e billing contra um provedor mock. O
 Asaas Sandbox real foi validado separadamente com checkout/pagamento de teste;
-somente dinheiro real/Asaas produção permanece **BLOCKED**.
+a produção foi configurada e validada com checkout sem pagamento. A primeira
+cobrança real continua pendente de autorização explícita.
 
 ### Infraestrutura local (resolvida)
 
@@ -166,7 +168,12 @@ GoTrue real em container.
 - Correções feitas no caminho real: CORS permite `apikey`; `customerData`
   obrigatório foi removido para o checkout hospedado coletar CPF/endereço;
   correlação usa `checkoutSession`; `GET /checkouts/{id}` não é usado (404).
-- **PROD BLOCKED:** cobrança com dinheiro real/Asaas produção e domínio próprio.
+- **Produção configurada (13/11/2026):** conta aprovada, API key validada em
+  `api.asaas.com`, checkout criado (`201`, host `www.asaas.com`, R$ 29,90/mês)
+  e webhook `71177108-9a90-43be-92b3-a9cf91595169` com 13 eventos. O evento
+  `CHECKOUT_CREATED` foi recebido pelo webhook de produção. Usuário,
+  organização, assinatura e evento do teste foram removidos; **nenhum
+  pagamento real** foi executado. O webhook antigo do Sandbox foi removido.
 
 ## 8. Deploy
 
@@ -190,23 +197,25 @@ GoTrue real em container.
   11 Edge Functions publicadas, secrets configurados (somente nomes no repo);
   keepalive diário configurado e ADR-007 registra a decisão de região/plano.
 - **Auth:** Site URL/redirects do Pages e autoconfirmação de e-mail no MVP.
-- **Asaas Sandbox:** API key e webhook configurados; smoke real de pagamento;
-  assinatura/cliente de teste removidos na limpeza de 13/11.
+- **Asaas produção:** API key, checkout e webhook configurados; checkout `201`
+  sem pagamento e evento recebido; sandbox e dados de teste removidos.
 - **Smoke de produção:** signup, organização, produto, catálogo, pedido,
-  vínculo de cliente e recompra passaram (`evidence/logs/prod-smoke.log`).
+  vínculo de cliente, recompra e checkout de produção passaram
+  (`evidence/logs/prod-smoke.log` e `asaas-production-config.txt`).
 - **Screenshots:** `evidence/prod-smoke/` (catálogo, pedido, recompra, checkout,
   assinatura ativa).
-- **Dados sintéticos:** removidos; staging com 0 usuários, 0 organizações e 0
-  assinaturas (`staging-cleanup-2026-11-13.txt`).
-- **Produção monetizada BLOCKED:** Asaas produção (KYC/credenciais), domínio
-  próprio, auditoria independente, Supabase Pro e migração para `sa-east-1`.
+- **Dados sintéticos:** removidos; staging com 0 usuários, 0 organizações, 0
+  assinaturas e 0 billing events.
+- **Produção monetizada:** Asaas configurado; primeira cobrança real, domínio
+  próprio, auditoria, Supabase Pro e migração para `sa-east-1` pendentes.
 - Runbook, variáveis e rollback em `docs/deployment.md`.
 
 ## 9. Riscos, limites e correções
 
 - Auth Cloud/GoTrue real foi validado no harness E2E; Auth Cloud de produção
   usa o mesmo GoTrue e está configurado no staging.
-- Webhook Asaas foi executado de ponta a ponta no Sandbox (pagamento real de teste).
+- Webhook Asaas foi executado no Sandbox com pagamento de teste e na produção
+  com `CHECKOUT_CREATED`; a primeira cobrança real ainda não foi executada.
 - Docker local corrigido via `wsl --update` + reinício do backend do Docker
   Desktop; `test:db` 30/30, `test:postgrest` 13/13 e `test:restore` PASS
   executados localmente.
@@ -238,8 +247,9 @@ GoTrue real em container.
 - ADR-006: recompra com token opaco/hash — PROPOSED.
 - ADR-007: East US/Ohio no staging + Free com keepalive; Pro e `sa-east-1`
   antes do go-live — APPROVED (decisão de staging).
-- Billing e deploy staging foram executados, validados e mesclados; produção
-  monetizada segue bloqueada por KYC/credenciais Asaas, domínio e auditoria.
+- Billing e deploy staging foram executados, validados e mesclados; Asaas
+  produção está configurado; primeira cobrança real, domínio e auditoria
+  permanecem pendentes.
 - Nenhuma promoção canônica automática; o merge do PR #12 foi manual e
   autorizado.
 
@@ -252,13 +262,14 @@ GoTrue real em container.
   restore; sem defeito HIGH/CRITICAL conhecido.
 - **Billing Sandbox:** PASS (checkout, pagamento de teste, webhook e ativação);
   dados de teste removidos após a validação.
-- **Billing produção:** BLOCKED (dinheiro real/Asaas produção).
+- **Billing produção:** **CONFIGURADO** — API key, checkout e webhook de
+  produção validados sem pagamento; primeira cobrança real pendente.
 - **Deploy staging:** PASS (`https://pedeoutra.pages.dev`) com Git conectado,
   produção em `main` e auto-deploy por push validado (`cdbceaf` → `40e745f0`;
   build final `2993e67` → `1fae02ae`; merge `26d55e0` → `c26319e5`); staging
   limpo para novos testes.
-- **Produção comercial:** BLOCKED (domínio, Asaas produção, auditoria, Supabase
-  Pro e migração para `sa-east-1`).
-- **Veredito final:** **APPROVED para staging/sandbox**, com **PROD BLOCKED**
-  para go-live monetizado. PR #12 **MERGED** com autorização explícita; staging
+- **Produção comercial:** CONFIGURADA; primeira cobrança real, domínio,
+  auditoria, Supabase Pro e migração para `sa-east-1` pendentes.
+- **Veredito final:** **APPROVED para staging/sandbox e produção configurada**,
+  sem cobrança real. PR #12 **MERGED** com autorização explícita; staging
   limpo e com keepalive configurado.

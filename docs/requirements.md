@@ -50,7 +50,8 @@
 - Acesso liberado só após evidência de pagamento validada (valor, moeda, tenant,
   assinatura e estado no provedor).
 - Cancelamento, atraso, reembolso e eventos fora de ordem tratados.
-- Sem credenciais: integração compila/testa com mocks e fica `PROD BLOCKED`.
+- Asaas produção configurado; testes usam mocks/Sandbox e a primeira cobrança
+  real exige autorização explícita.
 
 ### RF-07 Landing e onboarding (PDA-009)
 

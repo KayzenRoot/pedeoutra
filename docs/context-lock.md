@@ -4,9 +4,9 @@
 
 - Data do lock: 2026-11-13
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
-- Branch: `chore/post-merge-hardening`
-- Base SHA: `26d55e0024ba47039b8e8a15d49d08c971964890`
-- HEAD no momento da geração: `26d55e0024ba47039b8e8a15d49d08c971964890`
+- Branch: `chore/asaas-production-ready`
+- Base SHA: `0c6aa6e4d8896a20a2b15e5363c1511128c6a466`
+- HEAD no momento da geração: `0c6aa6e4d8896a20a2b15e5363c1511128c6a466`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -19,19 +19,19 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | Arquivo | SHA-256 |
 | --- | --- |
 | `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
-| `.github/workflows/keepalive.yml` | `42511f3353abdc68e2df815ab74898c6d1bf757cd373da5ef8064ca7ba30d540` |
-| `README.md` | `29c53330a5b74a3c19a8cf696344ba79dfe0738d1396a37abcec9a63e2a0de2a` |
-| `docs/architecture.md` | `19a53bd3d47e5c4be86b1fcc407ae95563aa972feae29fe6e2e4e24585580705` |
+| `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
+| `README.md` | `0242c2c9c4bf7c87244b59c2592fdfc2ea811adff52e1220b2ffdd1b59ff47ab` |
+| `docs/architecture.md` | `370493984b49de7076bb271921064a5cd6e7351cb6ad84096dfaec5896cb8441` |
 | `docs/backlog.md` | `9dddbc084637deb8764a818fcf1e112b02ad8b3434d7054b1e81beff02d6482d` |
-| `docs/checkpoint.md` | `912e27c33cc66ed624ec76197b3038650f31faf0ee0860befc9f72a8562c7c21` |
-| `docs/decisions-ledger.md` | `4717497d9ec1ef8fd7203e0b8d5ccb4fcae438af89e472d0dda85511b372824a` |
+| `docs/checkpoint.md` | `ba5e854cc8950037ec602b62cdf8815252785167f02f868ff7586ef7c9c47e7d` |
+| `docs/decisions-ledger.md` | `11c53959ffef1a39c3cb0844b9772a9a842e5882bbf137f629aca024887db7df` |
 | `docs/definition-of-done.md` | `3e278f66cf608c0a52daff110977504b04a45d117fd781ff2f25b7bf0f2e79ec` |
-| `docs/deployment.md` | `28d575c1ae8f916e41dbaac3768ec1a0c9af8919e1e272d2c925e55fdef6d953` |
+| `docs/deployment.md` | `f567f7929765006521caa7e2eb016cef03f18308a83b7c9414de9e0ed268b35b` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
-| `docs/requirements.md` | `0281812814d55bc2829a9a4f94601f1f9bdefc93e8b3f10318c300180eef9ebe` |
-| `docs/scope.md` | `29cf370626bb2ba6d556b0a0ad6b35d6c258f45e1f43f6c6b7a87c04990a0311` |
+| `docs/requirements.md` | `0f456ae240278d69f2a1f02dbb6c1a215e9ac6a58b3023145011acc4fa531a45` |
+| `docs/scope.md` | `f6c890b298092c479776d8a1f26f0ac0db48cf74a896ef796b724f04f9922cd7` |
 | `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `c4e40c6d28684f9debab59447d866f3380a10622a904835ba85066468a201c82` |
+| `docs/test-plan.md` | `f82916ec073062837179151409ad3ac43df96e34a0efa8d5b1b54d2ed61ef829` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `7d05d97afb19077db3e4445fdee174346672b0ba0a2d4ec1075d4ea903d097d7` |
 | `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |

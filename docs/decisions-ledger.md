@@ -81,3 +81,15 @@ migração e o upgrade são pré-requisitos de produção, não tarefas silencio
 keepalive reduz o risco de pausa, mas não garante disponibilidade.
 **Alternativas rejeitadas:** migrar agora, sem usuários e com produção bloqueada;
 manter Free em produção com pagantes.
+
+## ADR PDA-ADR-008 — Asaas produção configurado
+
+**Status:** APPROVED (13/11/2026)
+**Contexto:** a conta de produção foi aprovada; o staging já validou checkout,
+webhook, idempotência e estados de billing no Sandbox.
+**Decisão:** usar API key/base URLs de produção, webhook exclusivo com 13 eventos
+e o mesmo código de Edge Functions. Validar com checkout de produção sem
+pagamento; a primeira cobrança real exige autorização explícita.
+**Consequências:** produção pronta para teste controlado, sem dinheiro real
+movimentado; Sandbox removido. Domínio, Supabase Pro/migração e auditoria
+continuam pré-requisitos do go-live comercial.

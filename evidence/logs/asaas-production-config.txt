@@ -1,0 +1,39 @@
+Asaas produção — configuração e validação
+Data: 2026-11-13 (UTC)
+Ambiente: produção (www.asaas.com / api.asaas.com)
+Conta: aprovada; dados pessoais não são registrados neste arquivo.
+
+Configuração aplicada:
+- ASAAS_API_KEY: chave de produção (valor não versionado)
+- ASAAS_API_BASE_URL: https://api.asaas.com
+- ASAAS_CHECKOUT_BASE_URL: https://www.asaas.com
+- ASAAS_WEBHOOK_TOKEN: novo token exclusivo (valor não versionado)
+- Webhook: 71177108-9a90-43be-92b3-a9cf91595169
+  URL: https://waygtbclkxklexnabwvj.supabase.co/functions/v1/asaas-webhook
+  enabled=true, apiVersion=3, sendType=SEQUENTIALLY, 13 eventos
+- Secrets do Supabase atualizados via CLI.
+
+Validação read-only:
+- GET https://api.asaas.com/v3/finance/balance -> 200 {"balance":0}
+- GET https://api.asaas.com/v3/webhooks -> 200, 1 webhook ativo
+- Token do webhook na Edge Function:
+  - token incorreto -> 401 unauthorized
+  - token correto + evento inválido -> 400 invalid_event (sem escrita no banco)
+
+Checkout de produção (sem pagamento):
+- POST /functions/v1/create-checkout -> 201
+- Host do link: www.asaas.com
+- price_cents=2990, cycle=MONTHLY
+- subscription local: pending, provider_subscription_id=null
+- evento CHECKOUT_CREATED recebido pelo webhook e marcado ignored
+- usuário/organização/assinatura/evento de teste removidos
+- DELETE do checkout na Asaas -> 404 (API não expõe remoção); o checkout
+  expira em 60 minutos e não foi pago
+- staging após limpeza: users=0, organizations=0, subscriptions=0,
+  billing_events=0, products=0, orders=0
+
+Sandbox:
+- webhook 59fac921-68c2-4912-826b-ab2dd4170153 removido
+- assinatura/cliente/dados sintéticos já removidos em 13/11/2026
+
+Nenhuma cobrança real foi executada.
