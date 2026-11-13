@@ -98,7 +98,14 @@ async function staticSmoke() {
     console.log(`  PASS ${route} (${response.status}, shell SPA)`)
   }
 
+  const themeInit = await fetch(`${BASE}/theme-init.js`)
+  if (!themeInit.ok) throw new Error(`theme-init.js retornou ${themeInit.status}`)
+  console.log(`  PASS /theme-init.js (${themeInit.status})`)
+
   const index = await (await fetch(`${BASE}/`)).text()
+  if (!index.includes('/theme-init.js')) {
+    throw new Error('index.html não inclui theme-init.js antes do app')
+  }
   const assetMatches = [...index.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map(
     (match) => match[1],
   )
@@ -169,6 +176,21 @@ async function runAxe(page, label) {
   )
 }
 
+async function assertTheme(page, expected) {
+  const actual = await page.evaluate(() => ({
+    theme: globalThis.document.documentElement.dataset.theme,
+    preference: globalThis.document.documentElement.dataset.themePreference,
+    colorScheme: globalThis.document.documentElement.style.colorScheme,
+  }))
+  if (actual.theme !== expected) {
+    throw new Error(`tema esperado ${expected}, recebido ${JSON.stringify(actual)}`)
+  }
+  if (actual.colorScheme !== expected) {
+    throw new Error(`color-scheme esperado ${expected}, recebido ${actual.colorScheme}`)
+  }
+  console.log(`  PASS tema ${expected} (${actual.preference})`)
+}
+
 async function browserSmoke(browserPath) {
   let chromium
   try {
@@ -231,6 +253,57 @@ async function browserSmoke(browserPath) {
 
     await context.close()
 
+    const dark = await browser.newContext({
+      viewport: { width: 1360, height: 900 },
+      locale: 'pt-BR',
+      deviceScaleFactor: 1,
+      colorScheme: 'dark',
+      forcedColors: 'none',
+    })
+    await dark.addInitScript(() => {
+      globalThis.localStorage.setItem('pedeoutra-theme', 'dark')
+    })
+    const darkPage = await dark.newPage()
+    darkPage.on('pageerror', (error) => errors.push(error.message))
+
+    await darkPage.goto(`${BASE}/`, { waitUntil: 'networkidle' })
+    await darkPage.getByRole('heading', { name: /Pediu uma vez/i }).waitFor()
+    await assertTheme(darkPage, 'dark')
+    await runAxe(darkPage, 'landing dark desktop')
+    await darkPage.screenshot({
+      path: join(SCREENSHOTS_DIR, 'landing-dark-desktop.png'),
+      fullPage: true,
+    })
+
+    await darkPage.goto(`${BASE}/demo`, { waitUntil: 'networkidle' })
+    await darkPage.getByRole('heading', { name: 'Bella Limpeza' }).waitFor()
+    await assertTheme(darkPage, 'dark')
+    await runAxe(darkPage, 'demo dark desktop')
+    await darkPage.screenshot({
+      path: join(SCREENSHOTS_DIR, 'demo-dark-desktop.png'),
+      fullPage: true,
+    })
+    await dark.close()
+
+    const system = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+      locale: 'pt-BR',
+      colorScheme: 'dark',
+      forcedColors: 'none',
+    })
+    const systemPage = await system.newPage()
+    systemPage.on('pageerror', (error) => errors.push(error.message))
+    await systemPage.goto(`${BASE}/`, { waitUntil: 'networkidle' })
+    await systemPage.getByRole('heading', { name: /Pediu uma vez/i }).waitFor()
+    await assertTheme(systemPage, 'dark')
+    const systemPreference = await systemPage.evaluate(
+      () => globalThis.document.documentElement.dataset.themePreference,
+    )
+    if (systemPreference !== 'system') {
+      throw new Error(`preferência system não preservada: ${systemPreference}`)
+    }
+    await system.close()
+
     const mobile = await browser.newContext({
       viewport: { width: 390, height: 844 },
       locale: 'pt-BR',
@@ -258,6 +331,31 @@ async function browserSmoke(browserPath) {
       path: join(SCREENSHOTS_DIR, 'demo-mobile.png'),
       fullPage: true,
     })
+
+    const darkMobile = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      locale: 'pt-BR',
+      deviceScaleFactor: 2,
+      colorScheme: 'dark',
+      forcedColors: 'none',
+      isMobile: true,
+      hasTouch: true,
+    })
+    await darkMobile.addInitScript(() => {
+      globalThis.localStorage.setItem('pedeoutra-theme', 'dark')
+    })
+    const darkMobilePage = await darkMobile.newPage()
+    darkMobilePage.on('pageerror', (error) => errors.push(error.message))
+    await darkMobilePage.goto(`${BASE}/`, { waitUntil: 'networkidle' })
+    await darkMobilePage.getByRole('heading', { name: /Pediu uma vez/i }).waitFor()
+    await assertTheme(darkMobilePage, 'dark')
+    await runAxe(darkMobilePage, 'landing dark mobile')
+    await darkMobilePage.screenshot({
+      path: join(SCREENSHOTS_DIR, 'landing-dark-mobile.png'),
+      fullPage: true,
+    })
+    await darkMobile.close()
+
     await mobile.close()
 
     if (errors.length > 0) {

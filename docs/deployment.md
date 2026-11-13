@@ -25,8 +25,8 @@ decisão de backup/continuidade (ADR-009 PROPOSED) e auditoria. `pedeoutra.pages
 | Repositório Pages | `KayzenRoot/pedeoutra`, branch de produção `main` |
 | Build Pages | `npm run build`; output `dist`; Node 22; auto-deploy a cada push em `main` |
 | Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
-| Migrations | 4 migrations aplicadas via `supabase db push` |
-| Edge Functions | 11 publicadas; públicas com `--no-verify-jwt`, autenticadas com JWT |
+| Migrations | 4 migrations aplicadas no staging; +2 migrations V2 no repositório, **não aplicadas** |
+| Edge Functions | 11 publicadas; 4 novas no repositório (`admin-api`, `admin-bootstrap`, `change-plan`, `plan-catalog`) **não publicadas**; total 15 |
 | Auth | Site URL/redirects do Pages; fluxo de recuperação de senha; `mailer_autoconfirm=true` até configurar SMTP próprio |
 | Asaas | Produção configurada (API key, checkout e webhook); Sandbox removido/limpo |
 | Webhook Asaas produção | id `71177108-9a90-43be-92b3-a9cf91595169`, 13 eventos, `enabled=true` |
@@ -195,6 +195,25 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 5. Ensaio de rollback/roll-forward em produção não foi executado nesta WO para
    evitar alteração de estado; procedimento e deployment anterior estão
    registrados.
+
+## Delta V2 — Parte 1/5 (PROPOSED, não implantado)
+
+Variáveis **novas** de Edge Function (nunca no frontend):
+
+- `ADMIN_EMAIL` — e-mail do único superadmin, fornecido pelo proprietário;
+  ausente mantém `ADMIN_BOOTSTRAP_BLOCKED`.
+- `ADMIN_BOOTSTRAP_TOKEN` — token one-time dedicado ao bootstrap; não versionar.
+- `TRIAL_HMAC_SECRET` — segredo ≥32 bytes para HMAC de sinais de trial; rotação
+  exige plano de migração dos hashes.
+- `PRO_PLAN_CHECKOUT_ENABLED` — `false` por padrão; só habilitar após a
+  funcionalidade Profissional estar implementada/testada e houver autorização.
+- `PLAN_CHANGE_MODE` — `disabled` por padrão; mudança automática só com caminho
+  Asaas validado em sandbox, sem duas recorrências.
+
+Migrations novas são aditivas; `supabase db push` só após dry-run local,
+restore sintético e autorização. O deploy do frontend desta PR é Draft e não
+produz cobrança; o merge continua proibido sem auditoria. O console `/admin`
+deve permanecer indisponível até o bootstrap autorizado com MFA.
 
 ## Limites e riscos
 

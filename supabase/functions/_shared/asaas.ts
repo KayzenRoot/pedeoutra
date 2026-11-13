@@ -2,11 +2,8 @@
  * Cliente mínimo do Asaas. Nunca roda no navegador.
  * Preço é sempre fixado aqui no servidor; o frontend não envia valor.
  */
-import {
-  PLAN_PRICE_CENTS,
-  SUBSCRIPTION_CYCLE,
-  type VerifiedProviderState,
-} from './billing.ts'
+import { SUBSCRIPTION_CYCLE, type VerifiedProviderState } from './billing.ts'
+import { planLabel, type PlanCode } from './plans.ts'
 
 export interface AsaasConfig {
   apiKey: string
@@ -113,9 +110,14 @@ export class AsaasClient {
 
   async createRecurringCheckout(input: {
     organizationId: string
+    planCode: PlanCode
+    priceCents: number
     now?: Date
   }): Promise<CheckoutResult> {
     const now = input.now ?? new Date()
+    if (!Number.isInteger(input.priceCents) || input.priceCents <= 0) {
+      throw new AsaasError(400, 'invalid_plan_price')
+    }
     const payload = await this.request('/v3/checkouts', {
       method: 'POST',
       body: JSON.stringify({
@@ -130,10 +132,12 @@ export class AsaasClient {
         },
         items: [
           {
-            name: 'PedeOutra mensal',
-            description: 'Plano único R$ 29,90/mês',
+            name: `PedeOutra ${planLabel(input.planCode)} mensal`,
+            description: `Plano ${planLabel(input.planCode)} — R$ ${(input.priceCents / 100)
+              .toFixed(2)
+              .replace('.', ',')}/mês`,
             quantity: 1,
-            value: PLAN_PRICE_CENTS / 100,
+            value: input.priceCents / 100,
           },
         ],
         subscription: {

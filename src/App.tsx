@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -20,6 +20,19 @@ import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
 import { Signup } from './pages/Signup'
+
+const Admin = lazy(() =>
+  import('./pages/Admin').then((module) => ({ default: module.Admin })),
+)
+const Settings = lazy(() =>
+  import('./pages/Settings').then((module) => ({ default: module.Settings })),
+)
+
+function RouteFallback({ label = 'Carregando…' }: { readonly label?: string }) {
+  return (
+    <output className="route-loading">{label}</output>
+  )
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -63,10 +76,26 @@ export default function App() {
             <Route path="produtos" element={<Products />} />
             <Route path="clientes" element={<Customers />} />
             <Route path="assinatura" element={<Billing />} />
+            <Route
+              path="configuracoes"
+              element={
+                <Suspense fallback={<RouteFallback />}>
+                  <Settings />
+                </Suspense>
+              }
+            />
           </Route>
 
           <Route path="/c/:slug" element={<Catalog />} />
           <Route path="/r/:token" element={<Reorder />} />
+          <Route
+            path="/admin"
+            element={
+              <Suspense fallback={<RouteFallback label="Carregando console…" />}>
+                <Admin />
+              </Suspense>
+            }
+          />
           <Route path="/demo" element={<Demo />} />
           <Route path="/privacidade" element={<Privacy />} />
           <Route path="/termos" element={<Terms />} />

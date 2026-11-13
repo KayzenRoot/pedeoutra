@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  PLAN_PRICE_CENTS,
   asaasDateToPeriodEnd,
   decideBillingTransition,
   toCents,
@@ -10,9 +9,24 @@ import {
   type VerifiedProviderState,
 } from './billing.ts'
 import { parseAsaasEvent, parseStoredEvent } from './billing-event.ts'
+import type { PlanPricing } from './plans.ts'
 
 const NOW = new Date('2026-11-12T12:00:00Z')
 const ORG = '44444444-4444-4444-8444-444444444444'
+const ESSENTIAL: PlanPricing = {
+  plan_code: 'essential',
+  plan_version: 1,
+  price_cents: 2990,
+  currency: 'BRL',
+  trial_days: 7,
+}
+const PROFESSIONAL: PlanPricing = {
+  plan_code: 'professional',
+  plan_version: 1,
+  price_cents: 6990,
+  currency: 'BRL',
+  trial_days: 0,
+}
 
 function snapshot(overrides: Partial<SubscriptionSnapshot> = {}): SubscriptionSnapshot {
   return {
@@ -36,7 +50,7 @@ function event(overrides: Partial<BillingEventData> = {}): BillingEventData {
     paymentId: 'pay_1',
     customerId: 'cus_1',
     externalReference: ORG,
-    valueCents: PLAN_PRICE_CENTS,
+    valueCents: ESSENTIAL.price_cents,
     status: 'RECEIVED',
     dueDate: '2026-11-12',
     nextDueDate: '2026-12-12',
@@ -52,39 +66,77 @@ function verified(overrides: Partial<VerifiedProviderState> = {}): VerifiedProvi
     paymentStatus: 'RECEIVED',
     nextDueDate: '2026-12-12',
     externalReference: ORG,
-    valueCents: PLAN_PRICE_CENTS,
+    valueCents: ESSENTIAL.price_cents,
     ...overrides,
   }
 }
 
 describe('validação de evento de billing', () => {
   it('aceita evento com valor e tenant corretos', () => {
-    expect(validateBillingEvent(event(), ORG, verified())).toEqual({ ok: true })
+    expect(validateBillingEvent(event(), ORG, verified(), ESSENTIAL)).toEqual({ ok: true })
   })
 
   it('rejeita tenant divergente no evento ou no provedor', () => {
-    expect(validateBillingEvent(event({ externalReference: 'outra-org' }), ORG, verified())).toEqual({
+    expect(validateBillingEvent(event({ externalReference: 'outra-org' }), ORG, verified(), ESSENTIAL)).toEqual({
       ok: false,
       reason: 'tenant_mismatch',
     })
     expect(
-      validateBillingEvent(event(), ORG, verified({ externalReference: 'outra-org' })),
+      validateBillingEvent(event(), ORG, verified({ externalReference: 'outra-org' }), ESSENTIAL),
     ).toEqual({ ok: false, reason: 'tenant_mismatch' })
   })
 
   it('rejeita valor adulterado', () => {
-    expect(validateBillingEvent(event({ valueCents: 2890 }), ORG, null)).toEqual({
+    expect(validateBillingEvent(event({ valueCents: 2890 }), ORG, null, ESSENTIAL)).toEqual({
       ok: false,
       reason: 'amount_mismatch',
     })
-    expect(validateBillingEvent(event({ valueCents: null }), ORG, verified({ valueCents: 1 }))).toEqual({
+    expect(validateBillingEvent(event({ valueCents: null }), ORG, verified({ valueCents: 1 }), ESSENTIAL)).toEqual({
       ok: false,
       reason: 'amount_mismatch',
     })
   })
 
+  it('valida o valor contra o plano da assinatura, não contra constante global', () => {
+    expect(
+      validateBillingEvent(
+        event({ valueCents: 6990 }),
+        ORG,
+        verified({ valueCents: 6990 }),
+        ESSENTIAL,
+      ),
+    ).toEqual({ ok: false, reason: 'amount_mismatch' })
+
+    expect(
+      validateBillingEvent(
+        event({ valueCents: 2990 }),
+        ORG,
+        verified({ valueCents: 2990 }),
+        PROFESSIONAL,
+      ),
+    ).toEqual({ ok: false, reason: 'amount_mismatch' })
+
+    expect(
+      validateBillingEvent(
+        event({ valueCents: 6990 }),
+        ORG,
+        verified({ valueCents: 6990 }),
+        PROFESSIONAL,
+      ),
+    ).toEqual({ ok: true })
+  })
+
+  it('rejeita catálogo de plano com moeda/preço inválido', () => {
+    expect(
+      validateBillingEvent(event(), ORG, verified(), {
+        ...ESSENTIAL,
+        currency: 'USD',
+      }),
+    ).toEqual({ ok: false, reason: 'plan_mismatch' })
+  })
+
   it('não ativa quando o valor não foi comprovado', () => {
-    expect(validateBillingEvent(event({ valueCents: null }), ORG, null)).toEqual({
+    expect(validateBillingEvent(event({ valueCents: null }), ORG, null, ESSENTIAL)).toEqual({
       ok: false,
       reason: 'amount_unverified',
     })
@@ -96,6 +148,7 @@ describe('validação de evento de billing', () => {
         event({ type: 'SUBSCRIPTION_DELETED', valueCents: null }),
         ORG,
         null,
+        ESSENTIAL,
       ),
     ).toEqual({ ok: true })
   })

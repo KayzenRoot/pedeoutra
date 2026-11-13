@@ -3,6 +3,7 @@ import { useAuth } from '../context/auth-context'
 import { ACCESS_TEXT, organizationAccess } from '../lib/access'
 import { catalogUrl } from '../lib/format'
 import { Brand } from './Brand'
+import { ThemeToggle } from './ThemeToggle'
 import { CopyButton, Icon } from './ui'
 
 const NAV_ITEMS = [
@@ -11,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/app/produtos', label: 'Produtos', icon: 'products' as const },
   { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const },
   { to: '/app/assinatura', label: 'Assinatura', icon: 'billing' as const },
+  { to: '/app/configuracoes', label: 'Configurações', icon: 'settings' as const },
 ]
 
 export function AppShell() {
@@ -38,6 +40,7 @@ export function AppShell() {
           ))}
         </nav>
         <div className="app-account">
+          <ThemeToggle compact />
           <span className="account-name">{organization.name}</span>
           <span className="account-email">{user?.email}</span>
           <button type="button" className="text-button" onClick={() => void signOut()}>

@@ -432,6 +432,12 @@ export type Database = {
           last_provider_event_at: string | null
           last_verified_at: string | null
           organization_id: string
+          pending_plan_code: string | null
+          pending_plan_effective_at: string | null
+          pending_plan_version: number | null
+          pending_provider_checkout_id: string | null
+          plan_code: string
+          plan_version: number
           provider: string
           provider_checkout_id: string | null
           provider_customer_id: string | null
@@ -446,6 +452,12 @@ export type Database = {
           last_provider_event_at?: string | null
           last_verified_at?: string | null
           organization_id: string
+          pending_plan_code?: string | null
+          pending_plan_effective_at?: string | null
+          pending_plan_version?: number | null
+          pending_provider_checkout_id?: string | null
+          plan_code?: string
+          plan_version?: number
           provider?: string
           provider_checkout_id?: string | null
           provider_customer_id?: string | null
@@ -460,6 +472,12 @@ export type Database = {
           last_provider_event_at?: string | null
           last_verified_at?: string | null
           organization_id?: string
+          pending_plan_code?: string | null
+          pending_plan_effective_at?: string | null
+          pending_plan_version?: number | null
+          pending_provider_checkout_id?: string | null
+          plan_code?: string
+          plan_version?: number
           provider?: string
           provider_checkout_id?: string | null
           provider_customer_id?: string | null
@@ -539,6 +557,19 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      api_effective_plan: {
+        Args: { p_organization_id: string }
+        Returns: {
+          plan_code: string
+          plan_version: number
+          access_kind: string
+          access_until: string | null
+        }[]
+      }
+      api_assert_entitlement: {
+        Args: { p_organization_id: string; p_feature_key: string }
+        Returns: boolean
       }
     }
     Enums: {

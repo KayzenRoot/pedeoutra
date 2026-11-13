@@ -55,6 +55,19 @@ export async function callPublicFunction<T>(
   return parseResponse<T>(response)
 }
 
+export async function getPlanCatalog<T>(): Promise<T> {
+  if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/plan-catalog`, {
+    headers: {
+      apikey: ANON_KEY,
+      Authorization: `Bearer ${ANON_KEY}`,
+    },
+  })
+
+  return parseResponse<T>(response)
+}
+
 export async function getPublicCatalog<T>(slug: string): Promise<T> {
   if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
 
@@ -67,6 +80,35 @@ export async function getPublicCatalog<T>(slug: string): Promise<T> {
       },
     },
   )
+
+  return parseResponse<T>(response)
+}
+
+/** Chamada autenticada GET (console admin). */
+export async function callAuthedGet<T>(
+  name: string,
+  query: Record<string, string | number | undefined> = {},
+): Promise<T> {
+  if (!supabase) throw new BackendNotConfiguredError()
+  if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
+
+  const { data: sessionData, error: sessionError } =
+    await supabase.auth.getSession()
+  if (sessionError || !sessionData.session) {
+    throw new EdgeFunctionError('unauthorized', 'Sessão expirada. Entre novamente.', 401)
+  }
+
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, String(value))
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : ''
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}${suffix}`, {
+    headers: {
+      apikey: ANON_KEY,
+      Authorization: `Bearer ${sessionData.session.access_token}`,
+    },
+  })
 
   return parseResponse<T>(response)
 }

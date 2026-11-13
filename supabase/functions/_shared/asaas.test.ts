@@ -60,6 +60,8 @@ describe('AsaasClient', () => {
     const client = new AsaasClient(config(), fetchMock as unknown as typeof fetch)
     const result = await client.createRecurringCheckout({
       organizationId: ORG,
+      planCode: 'essential',
+      priceCents: 2990,
       now: new Date('2026-11-12T12:00:00Z'),
     })
 
@@ -84,8 +86,8 @@ describe('AsaasClient', () => {
     expect(body.externalReference).toBe(ORG)
     expect(body.items).toEqual([
       {
-        name: 'PedeOutra mensal',
-        description: 'Plano único R$ 29,90/mês',
+        name: 'PedeOutra Essencial mensal',
+        description: 'Plano Essencial — R$ 29,90/mês',
         quantity: 1,
         value: 29.9,
       },
@@ -99,11 +101,35 @@ describe('AsaasClient', () => {
     })
   })
 
+  it('cria checkout Profissional com o valor do catálogo (6990)', async () => {
+    let body: Record<string, unknown> = {}
+    const fetchMock = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      body = JSON.parse(String(init?.body)) as Record<string, unknown>
+      return jsonResponse({ id: 'chk_pro', link: 'https://sandbox.asaas.com/pro' })
+    })
+    const client = new AsaasClient(config(), fetchMock as unknown as typeof fetch)
+    await client.createRecurringCheckout({
+      organizationId: ORG,
+      planCode: 'professional',
+      priceCents: 6990,
+    })
+    expect(body.items).toEqual([
+      {
+        name: 'PedeOutra Profissional mensal',
+        description: 'Plano Profissional — R$ 69,90/mês',
+        quantity: 1,
+        value: 69.9,
+      },
+    ])
+  })
+
   it('usa fallback de link quando a resposta não traz link', async () => {
     const fetchMock = vi.fn(async () => jsonResponse({ id: 'chk_2' }))
     const client = new AsaasClient(config(), fetchMock as unknown as typeof fetch)
     const result = await client.createRecurringCheckout({
       organizationId: ORG,
+      planCode: 'essential',
+      priceCents: 2990,
     })
     expect(result.link).toBe('https://sandbox.asaas.com/checkoutSession/show?id=chk_2')
   })
@@ -117,6 +143,8 @@ describe('AsaasClient', () => {
     await expect(
       client.createRecurringCheckout({
         organizationId: ORG,
+        planCode: 'essential',
+        priceCents: 2990,
       }),
     ).rejects.toMatchObject({ status: 400, safeDetail: 'Valor inválido' })
   })

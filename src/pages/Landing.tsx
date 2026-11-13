@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { Icon } from '../components/ui'
 import { track } from '../lib/analytics'
 
@@ -18,7 +19,7 @@ const FAQ = [
   {
     question: 'Como funciona o teste de 7 dias?',
     answer:
-      'Você cria a conta e usa o catálogo, os pedidos e os links de recompra por 7 dias sem cartão. Ao final, pode assinar o plano de R$ 29,90/mês ou parar.',
+      'Você cria a conta e usa o catálogo, os pedidos e os links de recompra por 7 dias sem cartão. Ao final, pode assinar o Essencial de R$ 29,90/mês ou parar.',
   },
   {
     question: 'O link de recompra mostra os dados do meu cliente?',
@@ -53,6 +54,7 @@ export function Landing() {
           <Link to="/demo">Demonstração</Link>
         </nav>
         <div className="site-actions">
+          <ThemeToggle compact />
           <Link to="/entrar" className="button button-ghost">
             Entrar
           </Link>
@@ -248,13 +250,16 @@ export function Landing() {
         <section id="preco" className="section pricing-section">
           <div className="section-heading">
             <span className="eyebrow">Preço simples</span>
-            <h2>Um plano. Sem letras miúdas.</h2>
-            <p>Comece grátis por 7 dias. Depois, R$ 29,90 por mês.</p>
+            <h2>Essencial agora. Profissional em preparação.</h2>
+            <p>
+              Comece grátis por 7 dias no Essencial. Depois, R$ 29,90 por mês. O
+              Profissional (R$ 69,90) será liberado após a Parte 2/4.
+            </p>
           </div>
           <div className="price-card">
             <div className="price-head">
               <span className="pill pill-lime">Teste sem cartão</span>
-              <h3>PedeOutra</h3>
+              <h3>PedeOutra Essencial</h3>
               <p>Para pequenos distribuidores e fornecedores de recompra.</p>
             </div>
             <div className="price-amount">
@@ -284,7 +289,8 @@ export function Landing() {
             </Link>
             <p className="price-note">
               Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do
-              fornecedor, em cartão, via Asaas.
+              fornecedor, em cartão, via Asaas. O Profissional está em preparação e não é
+              vendido nesta fase.
             </p>
           </div>
         </section>

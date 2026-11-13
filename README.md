@@ -12,7 +12,7 @@ um link de recompra. O comprador não baixa app e não cria conta.
 | --- | --- |
 | Aplicação web (landing, painel, catálogo, recompra) | implementada e publicada em staging |
 | Banco, migrations e RLS | aplicados no Supabase Cloud e testados |
-| Edge Functions (pedido, recompra, billing) | 11 funções publicadas |
+| Edge Functions (pedido, recompra, billing) | 11 publicadas; 4 novas V2 no repositório, não publicadas |
 | Asaas produção | **CONFIGURADO** — API key, checkout e webhook validados sem cobrança |
 | Deploy staging | **PASS** — https://pedeoutra.pages.dev, Git auto-deploy em `main` |
 | PR #12 / CI | **MERGED** em `main` (`26d55e0`); CI 4/4 verde |

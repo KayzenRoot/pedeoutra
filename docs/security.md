@@ -103,6 +103,45 @@
 | Abuso de pedidos | rate limit atômico | DB |
 | XSS | React + CSP | build/revisão |
 
+## Delta V2 — Parte 1/5 (PROPOSED)
+
+### Superadmin e console
+
+- Privilégio deriva exclusivamente de `platform_admins.user_id`; e-mail,
+  `user_metadata`, claim editável e URL nunca concedem acesso.
+- Cada endpoint admin revalida JWT, UUID e `aal=aal2` (TOTP) no servidor; 401
+  para anônimo/expirado, 403 para AAL1/fornecedor. `service_role` só na Edge.
+- Bootstrap exige `ADMIN_EMAIL` + token dedicado + AAL2; ausente o e-mail,
+  `ADMIN_BOOTSTRAP_BLOCKED` e console fechado. Não há segundo admin.
+- Ações admin exigem motivo, geram `platform_audit_events` (ator, ação, alvo,
+  status, timestamp) e nunca alteram pagamento/cartão/crédito sem prova do
+  Asaas.
+
+### Planos, entitlements e quotas
+
+- `plan_catalog` é a única fonte de preço/moeda/versão; webhook compara o valor
+  confirmado com o plano da assinatura, nunca com o navegador.
+- `assert_entitlement` e `consume_quota` rodam no banco/Edge e falham fechados;
+  flags de UI não autorizam. Quotas são atômicas por tenant e auditáveis.
+- Downgrade/expiração revoga novas escritas premium sem apagar histórico;
+  admin de plataforma não se mistura com plano de fornecedor.
+- Checkout Profissional fica desativado por flag até a Parte 2/4; nenhuma
+  transição automática cria segunda recorrência no Asaas.
+
+### Trial e minimização
+
+- `trial_grants` imutável por usuário/organização; recriar organização não
+  reinicia trial.
+- Sinais de contato/rede são HMAC-SHA-256 com segredo server-side e retenção
+  mínima; repetição gera revisão manual, não veto permanente automático.
+- IP/dispositivo são sinais fracos; nenhum fingerprint invasivo, CPF ou SMS
+  pago é coletado.
+
+### Tema
+
+- Preferência local sem PII; sem flash; contraste verificado em light/dark por
+  axe/smoke. Tokens não carregam segredo nem dados de sessão.
+
 ## Fora de escopo de segurança
 
 WAF dedicado, pentest externo, SOC2, gestão de dispositivos, antivírus de

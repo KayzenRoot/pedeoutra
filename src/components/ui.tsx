@@ -180,7 +180,15 @@ export function Icon({
   name,
   className = '',
 }: {
-  name: 'home' | 'orders' | 'products' | 'customers' | 'billing' | 'external' | 'check'
+  name:
+    | 'home'
+    | 'orders'
+    | 'products'
+    | 'customers'
+    | 'billing'
+    | 'settings'
+    | 'external'
+    | 'check'
   className?: string
 }) {
   const paths: Record<typeof name, ReactNode> = {
@@ -207,6 +215,12 @@ export function Icon({
       <>
         <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
         <path d="M2.5 10h19M6 15h4" />
+      </>
+    ),
+    settings: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.23.6.8 1 1.45 1H21a2 2 0 1 1 0 4h-.09c-.65 0-1.22.4-1.45 1z" />
       </>
     ),
     external: <path d="M14 3h7v7M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />,

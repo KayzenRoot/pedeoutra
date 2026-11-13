@@ -9,9 +9,8 @@
  * - evento ambíguo retorna "verify" e não altera o banco.
  */
 import type { SubscriptionState } from './access.ts'
+import type { PlanPricing } from './plans.ts'
 
-export const PLAN_PRICE_CENTS = 2990
-export const PLAN_CURRENCY = 'BRL'
 export const BILLING_PROVIDER = 'asaas'
 export const SUBSCRIPTION_CYCLE = 'MONTHLY'
 
@@ -71,7 +70,10 @@ export type BillingDecision =
 
 export type BillingValidation =
   | { ok: true }
-  | { ok: false; reason: 'tenant_mismatch' | 'amount_mismatch' | 'amount_unverified' }
+  | {
+      ok: false
+      reason: 'tenant_mismatch' | 'amount_mismatch' | 'amount_unverified' | 'plan_mismatch'
+    }
 
 export function toCents(value: unknown): number | null {
   if (value === null || value === undefined || value === '') return null
@@ -139,6 +141,7 @@ export function validateBillingEvent(
   event: BillingEventData,
   organizationId: string,
   verified: VerifiedProviderState | null,
+  plan: PlanPricing,
 ): BillingValidation {
   if (event.externalReference && event.externalReference !== organizationId) {
     return { ok: false, reason: 'tenant_mismatch' }
@@ -146,12 +149,18 @@ export function validateBillingEvent(
   if (verified?.externalReference && verified.externalReference !== organizationId) {
     return { ok: false, reason: 'tenant_mismatch' }
   }
+  if (plan.currency !== 'BRL' || plan.price_cents <= 0) {
+    return { ok: false, reason: 'plan_mismatch' }
+  }
 
+  // O valor confirmado é comparado ao plano da assinatura/checkout, nunca a
+  // uma constante global: 2990 não ativa Profissional e 6990 não ativa
+  // Essencial.
   if (isPaymentEvent(event.type) || event.type === 'CHECKOUT_PAID') {
     const amount = verified?.valueCents ?? event.valueCents
     if (amount === null) return { ok: false, reason: 'amount_unverified' }
-    if (amount !== PLAN_PRICE_CENTS) return { ok: false, reason: 'amount_mismatch' }
-  } else if (event.valueCents !== null && event.valueCents !== PLAN_PRICE_CENTS) {
+    if (amount !== plan.price_cents) return { ok: false, reason: 'amount_mismatch' }
+  } else if (event.valueCents !== null && event.valueCents !== plan.price_cents) {
     return { ok: false, reason: 'amount_mismatch' }
   }
 

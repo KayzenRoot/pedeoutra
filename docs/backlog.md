@@ -13,7 +13,8 @@
 - PWA offline e app nativo.
 - Descontos, cupons e relatórios avançados.
 - Portal do comprador com conta (hoje deliberadamente sem conta).
-- Splits, assinatura anual e múltiplos planos.
+- Splits, assinatura anual e planos adicionais além dos dois aprovados
+  (Essencial/Profissional).
 
 ## Critério para promover um item
 

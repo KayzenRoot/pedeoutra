@@ -12,12 +12,22 @@ export default defineConfig({
   build: {
     sourcemap: false,
     target: 'es2022',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
   },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
     css: false,
+    testTimeout: 30000,
+    hookTimeout: 30000,
     restoreMocks: true,
     include: ['src/**/*.test.{ts,tsx}', 'supabase/functions/_shared/**/*.test.ts'],
   },

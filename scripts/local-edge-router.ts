@@ -14,6 +14,10 @@ import { handler as createCheckout } from '../supabase/functions/create-checkout
 import { handler as cancelSubscription } from '../supabase/functions/cancel-subscription/index.ts'
 import { handler as asaasWebhook } from '../supabase/functions/asaas-webhook/index.ts'
 import { handler as billingReconcile } from '../supabase/functions/billing-reconcile/index.ts'
+import { handler as planCatalog } from '../supabase/functions/plan-catalog/index.ts'
+import { handler as changePlan } from '../supabase/functions/change-plan/index.ts'
+import { handler as adminApi } from '../supabase/functions/admin-api/index.ts'
+import { handler as adminBootstrap } from '../supabase/functions/admin-bootstrap/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -29,6 +33,10 @@ const routes: Record<string, Handler> = {
   'cancel-subscription': cancelSubscription,
   'asaas-webhook': asaasWebhook,
   'billing-reconcile': billingReconcile,
+  'plan-catalog': planCatalog,
+  'change-plan': changePlan,
+  'admin-api': adminApi,
+  'admin-bootstrap': adminBootstrap,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

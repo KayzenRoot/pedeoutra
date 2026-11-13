@@ -74,3 +74,30 @@ testes; esses dados foram preservados. Os smokes removem apenas os dados
 sintéticos que criam. O Asaas produção está configurado e validado sem cobrança;
 SMTP, backup/continuidade, suporte/legal e a primeira cobrança real seguem como
 gates de lançamento.
+
+## Checkpoint Delta — PDA-V2-P01-WO-001 (PROPOSED)
+
+- **Base:** PR #77 mesclada em `main` (`40b4224`, 2026-11-13) após Gate Zero
+  `APPROVED STAGING / COMMERCIAL_BLOCKED` e autorização explícita do
+  proprietário para baseline + deploy automático do Pages. Nenhuma cobrança,
+  envio ou mutação de dados reais nesta WO.
+- **Entregue neste delta (a auditar):** tema claro/escuro/system; superadmin
+  singleton UUID+AAL2 fail-closed; trial idempotente com revisão; catálogo dos
+  dois planos e feature keys; entitlements/quotas server-side; contratos de
+  cobrança por plano com Profissional desativado; console `/admin` e
+  configurações de conta.
+- **Evidência revalidada no HEAD de código:** 94 unit, 39 DB, 13 PostgREST,
+  15 Edge Functions typechecked, 25 Edge HTTP, 7 grupos full-local, restore
+  com as 8 tabelas V2 e smoke light/dark/system desktop/mobile. `npm audit`
+  mantém 0 HIGH/CRITICAL e 9 moderate.
+- **PR da Parte 1:** [#89](https://github.com/KayzenRoot/pedeoutra/pull/89), Draft, CI verde no HEAD de código `8e777de`; sem merge.
+- **Status proposto:** `PART 1 IMPLEMENTED — PENDING AUDIT`, mantendo
+  `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` (SMTP, backup, suporte/legal,
+  primeira cobrança e gates das Partes 2–5). Nenhum merge, deploy, migration
+  em produção, cobrança ou envio real foi executado.
+- **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (e-mail do superadmin não
+  fornecido), `PRO_PLAN_CHECKOUT_DISABLED` (funcionalidade da Parte 2/4 ainda
+  não pronta) e `PLAN_CHANGE_REQUIRES_SUPPORT` (limite do Asaas em assinatura
+  de cartão não validado para troca sem dupla cobrança).
+- **Não promovido:** ADR-010 a ADR-013 permanecem PROPOSED; ADR-007/009 e o
+  veredito comercial não foram alterados.

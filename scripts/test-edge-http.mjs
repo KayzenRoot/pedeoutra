@@ -24,6 +24,7 @@ const REST_IMAGE = 'public.ecr.aws/supabase/postgrest:v16.4'
 const DB_NAME = 'pedeoutra_edge'
 const JWT_SECRET = 'pedeoutra-edge-secret-with-at-least-32-characters'
 const USER_ID = 'eeeeeeee-1111-4111-8111-111111111111'
+const ADMIN_ID = 'eeeeeeee-9999-4999-8999-999999999999'
 const ORG_ID = 'eeeeeeee-2222-4222-8222-222222222222'
 const ORG_SLUG = 'distribuidora-edge-abc123'
 const PRODUCT_1 = 'eeeeeeee-3333-4333-8333-333333333333'
@@ -68,6 +69,14 @@ function docker(args, options = {}) {
   return result
 }
 
+function clientQuery(sql) {
+  const result = docker(
+    ['exec', '-i', PG_CONTAINER, 'psql', '-U', 'postgres', '-d', DB_NAME, '-v', 'ON_ERROR_STOP=1'],
+    { input: sql, encoding: 'utf8' },
+  )
+  return result.stdout
+}
+
 function findFreePort() {
   return new Promise((resolvePort, reject) => {
     const server = createServer()
@@ -88,10 +97,10 @@ function base64Url(value) {
   return Buffer.from(value).toString('base64url')
 }
 
-function signJwt(payload) {
+function signJwt(payload, expiresInSeconds = 3600) {
   const header = base64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
   const body = base64Url(
-    JSON.stringify({ ...payload, exp: Math.floor(Date.now() / 1000) + 3600 }),
+    JSON.stringify({ ...payload, exp: Math.floor(Date.now() / 1000) + expiresInSeconds }),
   )
   const signature = createHmac('sha256', JWT_SECRET)
     .update(`${header}.${body}`)
@@ -100,7 +109,7 @@ function signJwt(payload) {
 }
 
 async function waitForSql() {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
+  for (let attempt = 0; attempt < 180; attempt += 1) {
     const result = docker(
       ['exec', PG_CONTAINER, 'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c', 'select 1'],
       { allowFailure: true },
@@ -130,7 +139,7 @@ function applyFile(path) {
 }
 
 async function waitFor(url) {
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  for (let attempt = 0; attempt < 360; attempt += 1) {
     try {
       const response = await fetch(url)
       if (response.status < 500) return
@@ -154,7 +163,11 @@ function denoCommand() {
 }
 
 const SEED_SQL = `
-insert into auth.users (id, email) values ('${USER_ID}', 'edge@example.test');
+insert into auth.users (id, email) values
+  ('${USER_ID}', 'edge@example.test'),
+  ('${ADMIN_ID}', 'admin@example.test');
+
+insert into public.platform_admins (singleton, user_id) values (true, '${ADMIN_ID}');
 
 insert into public.organizations (id, owner_user_id, name, slug, whatsapp, city)
 values (
@@ -238,24 +251,59 @@ async function main() {
 
     // supabase-js chama /rest/v1; encaminha para o PostgREST, que serve na raiz.
     const userToken = signJwt({ role: 'authenticated', sub: USER_ID })
+    const adminToken = signJwt({
+      role: 'authenticated',
+      sub: ADMIN_ID,
+      aal: 'aal2',
+      amr: [{ method: 'totp', timestamp: Math.floor(Date.now() / 1000) }],
+    })
+    const adminAal1Token = signJwt({ role: 'authenticated', sub: ADMIN_ID })
+    const supplierAal2Token = signJwt({
+      role: 'authenticated',
+      sub: USER_ID,
+      aal: 'aal2',
+      amr: [{ method: 'totp', timestamp: Math.floor(Date.now() / 1000) }],
+    })
+    const expiredAdminToken = signJwt(
+      {
+        role: 'authenticated',
+        sub: ADMIN_ID,
+        aal: 'aal2',
+        amr: [{ method: 'totp' }],
+      },
+      -3600,
+    )
+    const authUsers = new Map([
+      [
+        `Bearer ${userToken}`,
+        { id: USER_ID, email: 'edge@example.test', role: 'authenticated', aud: 'authenticated' },
+      ],
+      [
+        `Bearer ${adminToken}`,
+        { id: ADMIN_ID, email: 'admin@example.test', role: 'authenticated', aud: 'authenticated' },
+      ],
+      [
+        `Bearer ${adminAal1Token}`,
+        { id: ADMIN_ID, email: 'admin@example.test', role: 'authenticated', aud: 'authenticated' },
+      ],
+      [
+        `Bearer ${supplierAal2Token}`,
+        { id: USER_ID, email: 'edge@example.test', role: 'authenticated', aud: 'authenticated' },
+      ],
+      [`Bearer ${expiredAdminToken}`, null],
+    ])
     proxy = createHttpServer((request, response) => {
       const url = request.url ?? '/'
       if (url.startsWith('/auth/v1/user')) {
         const authorization = request.headers.authorization ?? ''
-        if (authorization !== `Bearer ${userToken}`) {
+        const user = authUsers.get(authorization)
+        if (!user) {
           response.writeHead(401, { 'Content-Type': 'application/json' })
           response.end(JSON.stringify({ message: 'invalid jwt' }))
           return
         }
         response.writeHead(200, { 'Content-Type': 'application/json' })
-        response.end(
-          JSON.stringify({
-            id: USER_ID,
-            email: 'edge@example.test',
-            role: 'authenticated',
-            aud: 'authenticated',
-          }),
-        )
+        response.end(JSON.stringify(user))
         return
       }
       if (!url.startsWith('/rest/v1')) {
@@ -308,6 +356,8 @@ async function main() {
           SUPABASE_SERVICE_ROLE_KEY: serviceToken,
           APP_ORIGIN: 'http://127.0.0.1:5173',
           APP_URL: 'http://127.0.0.1:5173',
+          ADMIN_EMAIL: 'admin@example.test',
+          ADMIN_BOOTSTRAP_TOKEN: 'bootstrap-test-token',
           EDGE_PORT: String(edgePort),
         },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -575,6 +625,245 @@ async function main() {
       const response = await call('cancel-subscription', {}, { token: userToken })
       assert(response.status === 503, `HTTP ${response.status}`)
       assert(response.data.error === 'billing_not_configured', 'erro de billing')
+    })
+
+    console.log('[7/8] Planos, checkout e console admin')
+
+    await test('plan-catalog expõe dois planos e mantém Pro indisponível', async () => {
+      const response = await fetch(`${edgeBase}/plan-catalog`)
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status}`)
+      assert(data.plans.length === 2, `planos: ${data.plans.length}`)
+      const essential = data.plans.find((plan) => plan.plan_code === 'essential')
+      const professional = data.plans.find((plan) => plan.plan_code === 'professional')
+      assert(essential.price_cents === 2990, 'preço Essencial')
+      assert(essential.available === true, 'Essencial deveria estar disponível')
+      assert(professional.price_cents === 6990, 'preço Profissional')
+      assert(professional.available === false, 'Profissional não pode ser vendido nesta fase')
+      assert(
+        professional.unavailable_reason === 'PRO_PLAN_CHECKOUT_DISABLED',
+        professional.unavailable_reason,
+      )
+    })
+
+    await test('create-checkout recusa Profissional antes de chamar o Asaas', async () => {
+      const response = await call(
+        'create-checkout',
+        { plan_code: 'professional' },
+        { token: userToken },
+      )
+      assert(response.status === 409, `HTTP ${response.status}`)
+      assert(response.data.error === 'plan_not_available', 'erro de plano')
+    })
+
+    await test('admin-api rejeita anônimo, AAL1, fornecedor e token expirado', async () => {
+      const anonymous = await fetch(`${edgeBase}/admin-api?view=overview`)
+      assert(anonymous.status === 401, `anônimo HTTP ${anonymous.status}`)
+
+      const aal1 = await fetch(`${edgeBase}/admin-api?view=overview`, {
+        headers: { Authorization: `Bearer ${adminAal1Token}` },
+      })
+      assert(aal1.status === 403, `AAL1 HTTP ${aal1.status}`)
+
+      const supplier = await fetch(`${edgeBase}/admin-api?view=overview`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      assert(supplier.status === 403, `fornecedor HTTP ${supplier.status}`)
+
+      const expired = await fetch(`${edgeBase}/admin-api?view=overview`, {
+        headers: { Authorization: `Bearer ${expiredAdminToken}` },
+      })
+      assert(expired.status === 401, `expirado HTTP ${expired.status}`)
+    })
+
+    await test('admin-api AAL2 retorna overview, lista paginada e auditoria', async () => {
+      const overviewResponse = await fetch(`${edgeBase}/admin-api?view=overview`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const overview = await overviewResponse.json()
+      assert(overviewResponse.status === 200, `HTTP ${overviewResponse.status}`)
+      assert(overview.overview.organizations_total >= 1, 'total de organizações')
+
+      const listResponse = await fetch(
+        `${edgeBase}/admin-api?view=organizations&limit=1&offset=0`,
+        { headers: { Authorization: `Bearer ${adminToken}` } },
+      )
+      const list = await listResponse.json()
+      assert(listResponse.status === 200, `HTTP ${listResponse.status}`)
+      assert(list.organizations.length === 1, `lista ${list.organizations.length}`)
+      assert(list.total >= 1, 'total da paginação')
+      assert(!('owner_email' in list.organizations[0]), 'PII desnecessária no admin')
+
+      const auditResponse = await fetch(`${edgeBase}/admin-api?view=audit`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const audit = await auditResponse.json()
+      assert(auditResponse.status === 200, `HTTP ${auditResponse.status}`)
+      assert(Array.isArray(audit.audit), 'auditoria')
+    })
+
+    await test('admin-bootstrap exige token dedicado e e-mail do ambiente', async () => {
+      const okResponse = await call(
+        'admin-bootstrap',
+        {},
+        {
+          token: adminToken,
+          headers: { 'x-admin-bootstrap-token': 'bootstrap-test-token' },
+        },
+      )
+      assert(
+        okResponse.status === 201,
+        `HTTP ${okResponse.status} ${JSON.stringify(okResponse.data)}`,
+      )
+      assert(okResponse.data.bootstrapped === true, 'bootstrap')
+
+      const wrongEmail = await call(
+        'admin-bootstrap',
+        {},
+        {
+          token: supplierAal2Token,
+          headers: { 'x-admin-bootstrap-token': 'bootstrap-test-token' },
+        },
+      )
+      assert(wrongEmail.status === 403, `e-mail divergente HTTP ${wrongEmail.status}`)
+
+      const wrongToken = await call(
+        'admin-bootstrap',
+        {},
+        {
+          token: adminToken,
+          headers: { 'x-admin-bootstrap-token': 'token-errado' },
+        },
+      )
+      assert(wrongToken.status === 401, `token errado HTTP ${wrongToken.status}`)
+    })
+
+    await test('admin-bootstrap falha fechado sem ADMIN_EMAIL', async () => {
+      const noAdminPort = await findFreePort()
+      const noAdminBase = `http://127.0.0.1:${noAdminPort}`
+      const env = {
+        ...process.env,
+        SUPABASE_URL: proxyBase,
+        SUPABASE_ANON_KEY: signJwt({ role: 'anon', sub: USER_ID }),
+        SUPABASE_SERVICE_ROLE_KEY: serviceToken,
+        APP_ORIGIN: 'http://127.0.0.1:5173',
+        APP_URL: 'http://127.0.0.1:5173',
+        EDGE_PORT: String(noAdminPort),
+      }
+      delete env.ADMIN_EMAIL
+      delete env.ADMIN_BOOTSTRAP_TOKEN
+      const processNoAdmin = spawn(
+        deno.command,
+        [
+          ...deno.prefix,
+          'run',
+          '--allow-net',
+          '--allow-env',
+          '--allow-read',
+          'scripts/local-edge-router.ts',
+        ],
+        {
+          cwd: ROOT,
+          env,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          shell: process.platform === 'win32' && deno.command.endsWith('.cmd'),
+        },
+      )
+      try {
+        await waitFor(`${noAdminBase}/health`)
+        const response = await fetch(`${noAdminBase}/admin-bootstrap`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`,
+            'x-admin-bootstrap-token': 'bootstrap-test-token',
+          },
+          body: '{}',
+        })
+        const data = await response.json()
+        assert(response.status === 503, `HTTP ${response.status}`)
+        assert(
+          data.error === 'ADMIN_BOOTSTRAP_BLOCKED',
+          `erro ${JSON.stringify(data)}`,
+        )
+      } finally {
+        if (processNoAdmin.exitCode === null) {
+          if (process.platform === 'win32' && processNoAdmin.pid) {
+            // Caminho absoluto evita depender de PATH; /T encerra o shell e o
+            // processo Deno neto iniciado via npx.
+            spawnSync(
+              String.raw`C:\Windows\System32\taskkill.exe`,
+              ['/pid', String(processNoAdmin.pid), '/T', '/F'],
+              { stdio: 'ignore' },
+            )
+          } else {
+            processNoAdmin.kill('SIGTERM')
+          }
+        }
+      }
+    })
+
+    await test('change-plan bloqueia troca sem caminho seguro e registra intenção', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+      const response = await call(
+        'change-plan',
+        { plan_code: 'essential' },
+        { token: userToken },
+      )
+      assert(response.status === 409, `HTTP ${response.status}`)
+      assert(response.data.error === 'plan_change_requires_support', 'erro de troca')
+      assert(response.data.support_required === true, 'suporte')
+      const changes = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select status from public.plan_changes where organization_id = '${ORG_ID}' order by created_at desc limit 1`,
+      ]).stdout.trim()
+      assert(changes === 'blocked', `status da troca: ${changes}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+    await test('ações admin são auditadas e reativam o acesso', async () => {
+      const suspend = await call(
+        'admin-api',
+        {
+          action: 'org.suspend',
+          organization_id: ORG_ID,
+          reason: 'teste de suspensão administrativa',
+        },
+        { token: adminToken },
+      )
+      assert(suspend.status === 200, `suspender HTTP ${suspend.status}`)
+      assert(suspend.data.result === 'blocked', 'estado bloqueado')
+
+      const reactivate = await call(
+        'admin-api',
+        {
+          action: 'org.reactivate',
+          organization_id: ORG_ID,
+          reason: 'teste de reativação administrativa',
+        },
+        { token: adminToken },
+      )
+      assert(reactivate.status === 200, `reativar HTTP ${reactivate.status}`)
+      assert(reactivate.data.result === 'trial', 'estado trial')
+
+      const audit = await fetch(`${edgeBase}/admin-api?view=audit`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const data = await audit.json()
+      const actions = new Set(data.audit.map((event) => event.action))
+      assert(data.audit.length >= 3, `audit default limit: ${data.audit.length}`)
+      assert(actions.has('admin.org.suspend'), 'auditoria de suspensão')
+      assert(actions.has('admin.org.reactivate'), 'auditoria de reativação')
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

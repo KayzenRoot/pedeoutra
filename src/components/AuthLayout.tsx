@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from './Brand'
+import { ThemeToggle } from './ThemeToggle'
 import { Icon } from './ui'
 
 export function AuthLayout({
@@ -38,6 +39,9 @@ export function AuthLayout({
         </p>
       </aside>
       <main className="auth-main">
+        <div className="auth-theme">
+          <ThemeToggle compact />
+        </div>
         <div className="auth-card">
           <Link to="/" className="auth-back">
             ← Voltar ao site
