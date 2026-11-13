@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `05e69cb077e889f5c74767362a2a7bd66f465669`
+- HEAD no momento da geração: `bc2a948e6c0ffd6d7e4ecfd0a634b99ef37e0620`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -26,7 +26,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `2b2056f61fddb952e266b25b79f0e14031874159032844e7d8df025cda307a82` |
+| `docs/checkpoint.md` | `b1e86e70ab9c05106cc7847878700962501468cea9b91579f5b89068b6633c3b` |
 | `docs/decisions-ledger.md` | `f8a49ab27df7691a1c7eb2cbfe60ae9adc4872caed4290eb09d01fc23831341e` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `57724d845a994b1c91f3e8372f921b415f0625bee4d01f1b19e6ff7474cf6947` |

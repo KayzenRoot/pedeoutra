@@ -153,7 +153,7 @@ de execução; os dados sintéticos foram removidos pelos próprios harnesses.
 ## 11. Adendo — CI do PR #89
 
 - PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/89
-- Head de código com CI verde: `eccb59dc3b147665e7aa4a5b20369fdb5d0a663b`
+- Head de código com CI verde: `bc2a948e6c0ffd6d7e4ecfd0a634b99ef37e0620`
 - Checks verdes: Cloudflare Pages (preview), Edge Functions typecheck, Full
   local E2E, Postgres/RLS/restore, Web/unit/build, Socket Project Report,
   Socket PR Alerts e SonarCloud Code Analysis.
