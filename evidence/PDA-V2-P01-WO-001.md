@@ -153,7 +153,7 @@ de execução; os dados sintéticos foram removidos pelos próprios harnesses.
 ## 11. Adendo — CI do PR #89
 
 - PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/89
-- Head de código com CI verde: `bc2a948e6c0ffd6d7e4ecfd0a634b99ef37e0620`
+- Head de código com CI verde: `8e777ded3d54e6fb93c5e90ea1e912d4fb67c8b2`
 - Checks verdes: Cloudflare Pages (preview), Edge Functions typecheck, Full
   local E2E, Postgres/RLS/restore, Web/unit/build, Socket Project Report,
   Socket PR Alerts e SonarCloud Code Analysis.
@@ -181,7 +181,8 @@ smells (0 bugs, 0 vulnerabilities). A limpeza:
   cobertos por DB/restore.
 
 O SonarCloud final no PR #89 reporta **0 issues abertas, 0 bugs, 0
-vulnerabilities e 0 code smells**, com ratings 1.0. As supressões `NOSONAR`
+vulnerabilities e 0 code smells**, com ratings 1.0. A suíte unitária subiu
+para 94 testes com cobertura de Billing, Admin e Settings. As supressões `NOSONAR`
 ficaram restritas às migrations; nenhum código de produto foi suprimido.
 
 ## 13. Estado de ativação (não executado)

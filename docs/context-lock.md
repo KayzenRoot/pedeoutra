@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `bd4cd05ba8a5eaf6320860c4bff7858336687f35`
+- HEAD no momento da geração: `8e777ded3d54e6fb93c5e90ea1e912d4fb67c8b2`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -26,7 +26,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `e590794595c6d88ef41fab11e1acaee4dd97dcecf253af6cdf76456f8ddae5b7` |
+| `docs/checkpoint.md` | `29a456ed263c5ab820cb4dde1355e7fecc33c76090780e3303d76a09141d27b8` |
 | `docs/decisions-ledger.md` | `f8a49ab27df7691a1c7eb2cbfe60ae9adc4872caed4290eb09d01fc23831341e` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `57724d845a994b1c91f3e8372f921b415f0625bee4d01f1b19e6ff7474cf6947` |
@@ -79,7 +79,9 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `src/lib/theme.ts` | `0bcaf0c076b9fa54c592cd85c52f6ecefadfb571f4731b8ba0061e03c9bd8729` |
 | `src/lib/types.ts` | `7d84763a6bce7224910e3863fc62cdc8403780d0b17644e50d05650526a2b55e` |
 | `src/main.tsx` | `b3f023da133154adff448b24c256c554072536939e52291490a6128a9cfc82f7` |
+| `src/pages/Admin.test.tsx` | `5a3c3106c8b2bd05a59f8e748a66f5cf6b9440268011e05c4c7095bbad5e4140` |
 | `src/pages/Admin.tsx` | `f73162cec8e9e040d95a16901d0b4c8f21c17f83b570a8549c05cee59b90b69c` |
+| `src/pages/Billing.test.tsx` | `997591874ab224fc4547b34ec5d97733289aca6b3df468a94f88ff5dc6c0affc` |
 | `src/pages/Billing.tsx` | `f94ef73255b264fef8cd7220fe627313ad5b4e9f641720bbe2f1a97a08863020` |
 | `src/pages/Catalog.tsx` | `9ec0fa4d5fd8149b5980e04a34253b8404f40d5b62847490c8a870d584659160` |
 | `src/pages/Customers.tsx` | `edfea1cf42a2d69fc401d46ae61ed46e2ae1f9f5b6a3082f1665f0eaeab38331` |
@@ -98,6 +100,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `src/pages/Products.tsx` | `701acda68ecd6bac9b2890ce640b53c3b5bd834513ddd523f8364e575caed9da` |
 | `src/pages/Reorder.tsx` | `0ac605ee282354bc7a2f5391977cfa9a2ae16d618da762870cc6c51b8e5187e2` |
 | `src/pages/ResetPassword.tsx` | `07443cdbee5ba5d07f3955f6c58877c938301cd12f3bdca7d0bbcc2b86d82976` |
+| `src/pages/Settings.test.tsx` | `26a60827e610c9632885d932c9a37f5b6fc00c17288558948e025f54140218e0` |
 | `src/pages/Settings.tsx` | `4810648a80dc1428dd9a08228299cdd6bb83d4c6c9164134e02b04caf0ae7a1b` |
 | `src/pages/Signup.tsx` | `2d9a43738237c7135abd28d156643713b2c40c16b94a9b347e5e546f28841fe3` |
 | `src/styles.css` | `53dc0cd72d5144ce9a8823f4512366e7995247464419d65c2a8e52ade4dec875` |
