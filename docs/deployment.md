@@ -40,9 +40,10 @@ projeto antigo de upload direto não pode ser convertido (`source` imutável), e
 recriação manteve a URL pública `https://pedeoutra.pages.dev`. A branch de
 produção é a branch da WO até o merge; depois deve ser trocada para `main` em
 Settings → Build → Production branch. Builds são disparados por push; o build
-inicial foi `8bf03fa3-316b-481b-ab8d-6b6a79a43d4d` (commit `564bc2d`) e o
+inicial foi `8bf03fa3-316b-481b-ab8d-6b6a79a43d4d` (commit `564bc2d`), o
 auto-deploy foi validado com o push `cdbceaf` (deployment
-`40e745f0-60f8-4d43-a1de-76d82a513277`), ambos com sucesso.
+`40e745f0-60f8-4d43-a1de-76d82a513277`) e o build final de código/teste foi
+`1fae02ae-141b-4ba5-82aa-ea2db7860418` (commit `2993e67`), todos com sucesso.
 
 Variáveis configuradas em Production e Preview: `VITE_SUPABASE_URL`,
 `VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL` e `NODE_VERSION=22`. Nenhum segredo de

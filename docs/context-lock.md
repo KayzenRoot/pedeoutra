@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
-- HEAD no momento da geração: `00ac2077e742b89daf8e237f53fe6b41bef0e5f9`
+- HEAD no momento da geração: `2993e67528e416e2136e28925b14b7d3c9092179`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -22,15 +22,15 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `README.md` | `10fb86ceeca9046bf7272a9cdde05662a94e433696aa49b3b7af17e376341c80` |
 | `docs/architecture.md` | `19a53bd3d47e5c4be86b1fcc407ae95563aa972feae29fe6e2e4e24585580705` |
 | `docs/backlog.md` | `9f58ab2e6cf1e217e38083aa32be50783b4d9c3fe3cfdc76abeeceba217ea921` |
-| `docs/checkpoint.md` | `70bc94e993bbbca834907952c395f9d204124af6b5166b23599cb5ca3792561f` |
+| `docs/checkpoint.md` | `cadeea309fc14fe1a394f26402765da23a851d8cd0285d57c84197224b73a94c` |
 | `docs/decisions-ledger.md` | `54bde31b9f67b88687998ca93c9509b898dd8cd5a4497a2417fc6cde9f869fe9` |
 | `docs/definition-of-done.md` | `254be49cb375fdc5d1618be2c9292329038bf41161b596e6c44e9bae2a02cf86` |
-| `docs/deployment.md` | `892a6f17b922187dda414bfc65a509ea02b7f61fb8339ab62cadded485ae3648` |
+| `docs/deployment.md` | `42dbb6b28283ed010b5718b7c5bc4c928893486c4bdb6bfa478133f1ffb8693b` |
 | `docs/project-overview.md` | `c8942184a0aef2cd67a3533866f64d06c374b784eaef324e1d904ec04d353496` |
 | `docs/requirements.md` | `3afaa5ab2294d2169859f0db1f4c8ae8899759c5240470d1247440e23462c2c7` |
 | `docs/scope.md` | `c29249118df01f474514024e27703a9e938144f288767fac527d88dc22137db8` |
 | `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `37afd0810f15f5baffbb9b69f81e47a419dd66c93eb64bcf3d1f84b569227853` |
+| `docs/test-plan.md` | `1176b42b48c808b02703f5615aedeb90d2bb0f72c4ccee899d2cf1b06fde30c9` |
 | `eslint.config.js` | `f7cf4897dc619b3c7db13920430b8713a8536fbaee95528f200662ea3ecdff6d` |
 | `index.html` | `adb2161b3eca55dca479a11fa09696f3ef25bf2ddcc204b07237e8d0396c8a92` |
 | `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |

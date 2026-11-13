@@ -45,3 +45,10 @@ Auto-deploy validado:
 - URL de produção: https://pedeoutra.pages.dev
 - CI do mesmo commit: run 43357088095 (push) e 43357095327 (pull_request),
   4/4 jobs verdes em ambos.
+
+Build final de código/teste:
+- Commit: 2993e67528e416e2136e28925b14b7d3c9092179
+- Deployment ID: 1fae02ae-141b-4ba5-82aa-ea2db7860418
+- Resultado: success (deploy concluído em 2026-11-13T03:14:53Z)
+- URL do deployment: https://1fae02ae.pedeoutra.pages.dev
+- CI: run 43357841432 (push) e 43357847244 (pull_request), 4/4 jobs verdes.

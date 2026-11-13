@@ -60,7 +60,7 @@ Cobre signup/login, organização, produto, catálogo, pedido, vínculo de clien
 recompra, checkout, webhook idempotente, valor adulterado, cancelamento,
 reembolso e reconciliação.
 
-Status: PASS no GitHub Actions (run 43331325741) e localmente após o reparo do
+Status: PASS no GitHub Actions (run 43357841432) e localmente após o reparo do
 Docker, 7 grupos e 0 FAIL — inclui Auth real, pedido, recompra, checkout,
 webhook, duplicata, valor adulterado, cancelamento, reembolso e reconciliação.
 

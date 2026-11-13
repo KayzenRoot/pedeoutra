@@ -8,7 +8,7 @@
 | Work Order | `PDA-MVP-WO-001` (PDF, 12/11/2026) |
 | Branch | `feat/PDA-MVP-WO-001-pedeoutra-mvp` |
 | Base SHA | `40990e437a455f161fd8c60f35be983f29209794` |
-| Head de código | `564bc2d6fc9f3969bca0055e03524506af73a604` |
+| Head de código | `2993e67528e416e2136e28925b14b7d3c9092179` |
 | Head da branch na abertura do PR | `1e7898f7df098c50b1877349ce9885cfd75db23e` |
 | Data da execução | 2026-11-12/13 |
 | Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.9.3, Supabase CLI 2.113, Chrome headless |
@@ -82,9 +82,9 @@ Logs completos em `evidence/logs/`.
 | `npm run test:full-local` | 7 PASS / 0 FAIL local e no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` + execução local |
 | `node scripts/prod-smoke.mjs` | PASS signup, organização, produto, pedido, vínculo, recompra | 0 | `prod-smoke.log` |
 | Asaas Sandbox real | checkout + cartão de teste + webhook + assinatura `active` | 0 | `asaas-webhook-real.txt` |
-| Cloudflare Pages Git | build `npm run build` + deploy do commit `564bc2d`; auto-deploy do push `cdbceaf` (deployment `40e745f0`) | 0 | `cloudflare-pages-git.txt` |
+| Cloudflare Pages Git | auto-deploy dos commits `cdbceaf` e `2993e67`; build final `1fae02ae` success | 0 | `cloudflare-pages-git.txt` |
 | Limpeza staging | 4 usuários sintéticos, 4 orgs, produtos/pedidos, 7 billing events, rate limits e assinatura/cliente sandbox removidos | 0 | `staging-cleanup-2026-11-13.txt` |
-| GitHub Actions (PR #12) | 4 jobs verdes no push `cdbceaf`: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43357088095](https://github.com/KayzenRoot/pedeoutra/actions/runs/43357088095) |
+| GitHub Actions (PR #12) | 4 jobs verdes no push `2993e67`: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43357841432](https://github.com/KayzenRoot/pedeoutra/actions/runs/43357841432) |
 
 ### Harness E2E completo (GoTrue real + Asaas mock)
 
@@ -180,6 +180,9 @@ GoTrue real em container.
   automaticamente o deployment `40e745f0-60f8-4d43-a1de-76d82a513277`, também
   com stages initialize → clone_repo → build → deploy e resultado success; CI
   do mesmo commit 4/4 verde (run 43357088095).
+- **Build final:** commit `2993e67` (correção do smoke/axe) gerou o deployment
+  `1fae02ae-141b-4ba5-82aa-ea2db7860418`, success, com CI push 4/4 verde (run
+  43357841432) e PR run 43357847244 também 4/4.
 - **Supabase Cloud:** projeto `waygtbclkxklexnabwvj`, 4 migrations aplicadas,
   11 Edge Functions publicadas, secrets configurados (somente nomes no repo).
 - **Auth:** Site URL/redirects do Pages e autoconfirmação de e-mail no MVP.
@@ -218,7 +221,9 @@ GoTrue real em container.
 - Correções feitas durante a WO: grants de execução de triggers, view
   `security_invoker` com grants de coluna, `CHECKOUT_PAID` exige status `PAID`
   (não apenas assinatura `ACTIVE`), ajuste de sobreposição do hero e tabelas
-  responsivas no mobile.
+  responsivas no mobile. O smoke passou a aguardar `document.getAnimations()`
+  antes do axe, eliminando falso positivo de contraste durante a animação de
+  entrada (falha intermitente do run 43357299305).
 - Nenhum defeito HIGH/CRITICAL conhecido dentro do escopo testado.
 
 ## 10. Checkpoint Delta (PROPOSED)
@@ -242,8 +247,8 @@ GoTrue real em container.
   dados de teste removidos após a validação.
 - **Billing produção:** BLOCKED (dinheiro real/Asaas produção).
 - **Deploy staging:** PASS (`https://pedeoutra.pages.dev`) com Git conectado e
-  auto-deploy por push validado (`cdbceaf` → deployment `40e745f0`); staging
-  limpo para novos testes.
+  auto-deploy por push validado (`cdbceaf` → `40e745f0`; build final `2993e67` →
+  `1fae02ae`); staging limpo para novos testes.
 - **Produção comercial:** BLOCKED (domínio, Asaas produção, auditoria e merge).
 - **Veredito final:** **APPROVED para staging/sandbox**, com **PROD BLOCKED**
   para go-live monetizado. PR permanece Draft; não houve merge.

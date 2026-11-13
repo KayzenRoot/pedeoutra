@@ -50,7 +50,7 @@
 
 PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/12
 
-CI real: run 43357088095 (push `cdbceaf`) — 4 jobs verdes (web/axe,
+CI real: run 43357841432 (push `2993e67`) — 4 jobs verdes (web/axe,
 banco/PostgREST/restore, Deno/Edge HTTP, E2E full).
 
 Revisar o PR Draft, executar auditoria independente e, com autorização
