@@ -14,8 +14,10 @@ um link de recompra. O comprador não baixa app e não cria conta.
 | Banco, migrations e RLS | aplicados no Supabase Cloud e testados |
 | Edge Functions (pedido, recompra, billing) | 11 funções publicadas |
 | Asaas Sandbox | **PASS** — checkout, pagamento e webhook reais validados |
-| Deploy staging | **PASS** — https://pedeoutra.pages.dev |
-| Produção monetizada | `BLOCKED` — Asaas produção, domínio e auditoria pendentes |
+| Deploy staging | **PASS** — https://pedeoutra.pages.dev, Git auto-deploy em `main` |
+| PR #12 / CI | **MERGED** em `main` (`26d55e0`); CI 4/4 verde |
+| Supabase Free | keepalive diário configurado; Pro obrigatório antes de pagantes |
+| Produção monetizada | `BLOCKED` — Asaas produção, domínio, região/Pro e auditoria pendentes |
 
 O bundle de evidências fica em [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md).
 O ambiente de staging usa Supabase Cloud (`waygtbclkxklexnabwvj`) e Asaas Sandbox.

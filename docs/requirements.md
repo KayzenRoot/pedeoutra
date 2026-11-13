@@ -63,7 +63,7 @@
 - CI executa lint, typecheck, testes e build.
 - Deploy documentado para Cloudflare Pages, Supabase e Asaas.
 - Evidence Bundle com SHA, comandos, exit codes, riscos e veredito.
-- PR Draft; nenhum merge sem auditoria e autorização.
+- PR #12 mesclado após autorização explícita; merges futuros exigem auditoria.
 
 ## Não funcionais
 

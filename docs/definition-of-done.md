@@ -31,6 +31,6 @@ Uma issue só é `DONE` quando todos os itens aplicáveis forem verdadeiros.
 
 - [ ] Commit pequeno e legível na branch da WO.
 - [ ] CI verde.
-- [ ] PR Draft com resumo, testes, riscos e status real.
-- [ ] Nenhum merge sem auditoria e autorização.
+- [ ] PR revisável com resumo, testes, riscos e status real; Draft até autorização.
+- [ ] Merge somente após auditoria e autorização (PR #12 autorizado em 13/11/2026).
 - [ ] Nenhuma alegação de deploy/cobrança sem URL/teste reais.
