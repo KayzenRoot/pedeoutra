@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 import { ACCESS_TEXT, organizationAccess } from '../lib/access'
-import { callAuthedFunction, EdgeFunctionError } from '../lib/edge'
+import { callAuthedFunction, EdgeFunctionError, getPlanCatalog } from '../lib/edge'
 import { formatBRL, formatDateTime } from '../lib/format'
-import type { CheckoutResponse } from '../lib/types'
+import { featureLabel, PLAN_NAMES } from '../lib/plans'
+import type {
+  CheckoutResponse,
+  PlanCatalogResponse,
+  PlanCode,
+  PublicPlan,
+} from '../lib/types'
 import { FormMessage, PageHeader } from '../components/ui'
 
 const CHECKOUT_NOTICES: Record<string, { tone: 'info' | 'success' | 'error'; text: string }> = {
@@ -22,23 +28,55 @@ const CHECKOUT_NOTICES: Record<string, { tone: 'info' | 'success' | 'error'; tex
   },
 }
 
+function planBadge(plan: PublicPlan) {
+  if (plan.available) return { label: 'Disponível', className: 'pill pill-lime' }
+  return { label: 'Em preparação', className: 'pill pill-muted' }
+}
+
 export function Billing() {
   const { organization, subscription, refreshOrganization } = useAuth()
   const [searchParams] = useSearchParams()
-  const [busy, setBusy] = useState(false)
+  const [plans, setPlans] = useState<PublicPlan[]>([])
+  const [plansError, setPlansError] = useState<string | null>(null)
+  const [busyPlan, setBusyPlan] = useState<PlanCode | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
   const checkoutNotice = CHECKOUT_NOTICES[searchParams.get('checkout') ?? '']
   const access = organizationAccess(organization, subscription)
   const canCancel = ['active', 'past_due'].includes(subscription?.state ?? '')
+  const currentPlan: PlanCode =
+    subscription?.plan_code === 'professional' ? 'professional' : 'essential'
+  const active = subscription?.state === 'active'
 
-  async function startCheckout() {
-    setBusy(true)
+  useEffect(() => {
+    let mounted = true
+    getPlanCatalog<PlanCatalogResponse>()
+      .then((data) => {
+        if (!mounted) return
+        setPlans(
+          [...(data.plans ?? [])].sort((a, b) =>
+            a.plan_code === 'essential' ? -1 : b.plan_code === 'essential' ? 1 : 0,
+          ),
+        )
+        setPlansError(null)
+      })
+      .catch(() => {
+        if (mounted) setPlansError('Não foi possível carregar os planos agora.')
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  async function startCheckout(planCode: PlanCode) {
+    setBusyPlan(planCode)
     setError(null)
     setSuccess(null)
     try {
-      const result = await callAuthedFunction<CheckoutResponse>('create-checkout')
+      const result = await callAuthedFunction<CheckoutResponse>('create-checkout', {
+        plan_code: planCode,
+      })
       window.location.assign(result.checkout_url)
     } catch (checkoutError) {
       if (checkoutError instanceof EdgeFunctionError) {
@@ -46,7 +84,7 @@ export function Billing() {
       } else {
         setError('Não foi possível iniciar o checkout.')
       }
-      setBusy(false)
+      setBusyPlan(null)
     }
   }
 
@@ -54,7 +92,7 @@ export function Billing() {
     if (!window.confirm('Cancelar a renovação? O acesso continua até o fim do período já pago.')) {
       return
     }
-    setBusy(true)
+    setBusyPlan('essential')
     setError(null)
     setSuccess(null)
     try {
@@ -68,16 +106,16 @@ export function Billing() {
           : 'Não foi possível cancelar a assinatura.',
       )
     } finally {
-      setBusy(false)
+      setBusyPlan(null)
     }
   }
 
   return (
     <div>
       <PageHeader
-        eyebrow="Assinatura"
+        eyebrow="Planos e assinatura"
         title="Seu acesso ao PedeOutra"
-        description="Um plano único de R$ 29,90/mês. O teste de 7 dias não pede cartão."
+        description="O Essencial mantém o preço de R$ 29,90/mês. O Profissional está em preparação e ainda não pode ser contratado."
       />
 
       {checkoutNotice && (
@@ -85,6 +123,7 @@ export function Billing() {
       )}
       {error && <FormMessage>{error}</FormMessage>}
       {success && <FormMessage tone="success">{success}</FormMessage>}
+      {plansError && <FormMessage>{plansError}</FormMessage>}
 
       <div className="billing-grid">
         <section className="card billing-status">
@@ -102,6 +141,10 @@ export function Billing() {
             <div>
               <dt>Organização</dt>
               <dd>{organization?.name}</dd>
+            </div>
+            <div>
+              <dt>Plano atual</dt>
+              <dd>{PLAN_NAMES[currentPlan]}</dd>
             </div>
             <div>
               <dt>Teste termina</dt>
@@ -126,26 +169,22 @@ export function Billing() {
           </dl>
 
           <div className="billing-actions">
-            {subscription?.state === 'active' ? (
+            {active ? (
               <p className="muted">
                 Sua assinatura está ativa. O acesso é renovado conforme o pagamento confirmado.
               </p>
             ) : (
-              <button
-                type="button"
-                className="button button-primary"
-                onClick={() => void startCheckout()}
-                disabled={busy}
-              >
-                {busy ? 'Abrindo checkout…' : 'Assinar por R$ 29,90/mês'}
-              </button>
+              <p className="muted">
+                Escolha o Essencial abaixo. O Profissional só será liberado depois da
+                implementação e da auditoria da Parte 2/4.
+              </p>
             )}
             {canCancel && (
               <button
                 type="button"
                 className="button button-danger"
                 onClick={() => void cancelSubscription()}
-                disabled={busy}
+                disabled={busyPlan !== null}
               >
                 Cancelar renovação
               </button>
@@ -159,34 +198,75 @@ export function Billing() {
           </p>
         </section>
 
-        <section className="card plan-card">
-          <span className="pill pill-lime">Plano único</span>
-          <h2>PedeOutra</h2>
-          <p>Para pequenos distribuidores que vendem de novo com frequência.</p>
-          <div className="price-amount price-amount-small">
-            <span>R$</span>
-            <strong>29,90</strong>
-            <small>/mês</small>
-          </div>
-          <ul className="price-list">
-            <li>Catálogo público e pedidos ilimitados</li>
-            <li>Clientes e links de recompra</li>
-            <li>WhatsApp manual e histórico</li>
-            <li>Um fornecedor por conta</li>
-          </ul>
-          <div className="plan-total">
-            <span>Cobrança da assinatura</span>
-            <strong>{formatBRL(2990)}/mês</strong>
-          </div>
-          <p className="form-note">
-            O PedeOutra não cobra os pedidos B2B. Pedidos são solicitações comerciais sujeitas
-            à confirmação do fornecedor.
-          </p>
-          <Link className="text-link" to="/termos">
-            Ler termos preliminares →
-          </Link>
-        </section>
+        {plans.map((plan) => {
+          const badge = planBadge(plan)
+          const isCurrent = active && currentPlan === plan.plan_code
+          const enabledFeatures = plan.features.filter((feature) => feature.enabled)
+          const unavailable = !plan.available
+
+          return (
+            <section className="card plan-card" key={plan.plan_code}>
+              <span className={badge.className}>{badge.label}</span>
+              <h2>{PLAN_NAMES[plan.plan_code]}</h2>
+              <p>
+                {plan.plan_code === 'essential'
+                  ? 'Para pequenos distribuidores que vendem de novo com frequência.'
+                  : 'Recursos avançados de recompra, equipe limitada e API. Disponível após a Parte 2/4.'}
+              </p>
+              <div className="price-amount price-amount-small">
+                <span>R$</span>
+                <strong>{(plan.price_cents / 100).toFixed(2).replace('.', ',')}</strong>
+                <small>/mês</small>
+              </div>
+              <ul className="price-list">
+                {enabledFeatures.slice(0, 6).map((feature) => (
+                  <li key={feature.key}>{featureLabel(feature.key)}</li>
+                ))}
+                {plan.plan_code === 'professional' && (
+                  <li className="muted">Recursos previstos, ainda não contratáveis.</li>
+                )}
+              </ul>
+              <div className="plan-total">
+                <span>Cobrança da assinatura</span>
+                <strong>{formatBRL(plan.price_cents)}/mês</strong>
+              </div>
+              <div className="billing-actions">
+                {isCurrent ? (
+                  <button type="button" className="button button-secondary" disabled>
+                    Plano atual
+                  </button>
+                ) : unavailable ? (
+                  <button type="button" className="button button-secondary" disabled>
+                    Indisponível nesta fase
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    onClick={() => void startCheckout(plan.plan_code)}
+                    disabled={busyPlan !== null}
+                  >
+                    {busyPlan === plan.plan_code
+                      ? 'Abrindo checkout…'
+                      : `Assinar ${PLAN_NAMES[plan.plan_code]} por ${formatBRL(plan.price_cents)}/mês`}
+                  </button>
+                )}
+              </div>
+              <p className="form-note">
+                {plan.trial_days > 0
+                  ? `${plan.trial_days} dias de teste sem cartão neste plano.`
+                  : 'Sem teste gratuito no Profissional nesta versão.'}
+              </p>
+            </section>
+          )
+        })}
       </div>
+
+      <p className="form-note">
+        O PedeOutra não cobra os pedidos B2B. Pedidos são solicitações comerciais sujeitas à
+        confirmação do fornecedor. Veja os <Link to="/termos">termos</Link> e a{' '}
+        <Link to="/privacidade">privacidade</Link>.
+      </p>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import { Admin } from './pages/Admin'
 import { Billing } from './pages/Billing'
 import { Catalog } from './pages/Catalog'
 import { Customers } from './pages/Customers'
@@ -19,6 +20,7 @@ import { Orders } from './pages/Orders'
 import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
+import { Settings } from './pages/Settings'
 import { Signup } from './pages/Signup'
 
 function ScrollToTop() {
@@ -63,10 +65,12 @@ export default function App() {
             <Route path="produtos" element={<Products />} />
             <Route path="clientes" element={<Customers />} />
             <Route path="assinatura" element={<Billing />} />
+            <Route path="configuracoes" element={<Settings />} />
           </Route>
 
           <Route path="/c/:slug" element={<Catalog />} />
           <Route path="/r/:token" element={<Reorder />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/privacidade" element={<Privacy />} />
           <Route path="/termos" element={<Terms />} />

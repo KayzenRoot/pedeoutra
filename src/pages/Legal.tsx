@@ -143,9 +143,10 @@ export function Terms() {
 
       <h2>3. Teste, assinatura, cancelamento e reembolso</h2>
       <p>
-        O teste é de 7 dias, sem cartão. Após o teste, o plano único custa R$ 29,90 por mês e é
-        cobrado em cartão via Asaas Checkout recorrente. A cobrança é apenas da assinatura do
-        fornecedor. O cancelamento interrompe a renovação e mantém o acesso até o fim do período
+        O teste é de 7 dias, sem cartão. Após o teste, o plano Essencial custa R$ 29,90 por mês e
+        é cobrado em cartão via Asaas Checkout recorrente. O plano Profissional (R$ 69,90/mês)
+        está em preparação e não pode ser contratado nesta fase. A cobrança é apenas da
+        assinatura do fornecedor. O cancelamento interrompe a renovação e mantém o acesso até o fim do período
         já pago. Reembolso, quando cabível, revoga o acesso pago; um trial ainda vigente não é
         estendido. O PedeOutra não recebe nem armazena dados de cartão.
       </p>

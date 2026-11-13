@@ -62,8 +62,91 @@ export interface CreateReorderLinkResponse {
 export interface CheckoutResponse {
   checkout_url: string
   checkout_id: string
+  plan_code: string
+  plan_version: number
   price_cents: number
+  currency: string
   cycle: string
+}
+
+export type PlanCode = 'essential' | 'professional'
+
+export interface PlanFeature {
+  key: string
+  enabled: boolean
+  limit_value: number | null
+  limit_window: string | null
+}
+
+export interface PublicPlan {
+  plan_code: PlanCode
+  plan_version: number
+  price_cents: number
+  currency: string
+  trial_days: number
+  available: boolean
+  unavailable_reason: string | null
+  features: PlanFeature[]
+}
+
+export interface PlanCatalogResponse {
+  plans: PublicPlan[]
+}
+
+export interface EffectivePlan {
+  plan_code: string
+  plan_version: number
+  access_kind: string
+  access_until: string | null
+}
+
+export interface AdminOverview {
+  organizations_total: number
+  trials_active: number
+  trials_review: number
+  subscriptions_active: number
+  subscriptions_past_due: number
+  subscriptions_canceled: number
+  subscriptions_refunded: number
+  organizations_blocked: number
+  confirmed_revenue_cents: number
+}
+
+export interface AdminOrganization {
+  organization_id: string
+  name: string
+  slug: string
+  access_state: string
+  trial_ends_at: string
+  trial_status: string
+  risk_score: number
+  created_at: string
+  plan_code: string
+  plan_version: number
+  subscription_state: string | null
+  current_period_end: string | null
+  total_count: number
+}
+
+export interface AdminAuditEvent {
+  id: string
+  actor_user_id: string | null
+  action: string
+  target_organization_id: string | null
+  reason: string | null
+  status: string
+  created_at: string
+  total_count: number
+}
+
+export interface AdminOrganizationsResponse {
+  organizations: AdminOrganization[]
+  total: number
+}
+
+export interface AdminAuditResponse {
+  audit: AdminAuditEvent[]
+  total: number
 }
 
 export interface OrderWithCustomer extends Order {
