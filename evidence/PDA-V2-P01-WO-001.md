@@ -48,7 +48,7 @@ Duas migrations aditivas, aplicadas apenas em bancos sintéticos/isolados:
 | Migration | SHA-256 |
 | --- | --- |
 | `20261113000100_plans_entitlements.sql` | `2d09bee87b2005500ee0ab71096fc4f68a74eb3a90e0b7f1c4332522d155a93c` |
-| `20261113000200_admin_trial.sql` | `05b77b5781d520d6b72c9ca263d8f7aaf9332cabe0870da78a27fbc98add91a2` |
+| `20261113000200_admin_trial.sql` | `5e3270ff7eb5a7b3d94444e8517132b575d6414ac306c9fd01cb7036399f7fcf` |
 
 - `plan_catalog`/`plan_feature_entitlements` semeados com 2 planos e 48 linhas
   de matriz; preços 2990/6990 BRL.

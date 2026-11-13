@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `664d17e6978b323b5c233b0ab9bd4aad27941840`
+- HEAD no momento da geração: `47ca27814e79391f278cddde4ed618b7dc1c6813`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -44,7 +44,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `public/favicon.svg` | `b597e83a256649e1ee8cb7c4e6ac7495c523dd702463139175e8487ccfadced3` |
 | `public/theme-init.js` | `8929d2e6ea8d7fb695291c806d9093f715310d3b03afb8327e13c85cacab0554` |
 | `scripts/context-lock.mjs` | `9a4ef91e459e30851ea4c48654a58bb08cfbf8dbeaf9b02809a7e30e173e7ef1` |
-| `scripts/db-test.mjs` | `129edc69e7142ad788cb225298bfe6f9bfe21713ceeff519bf0549fd2b564327` |
+| `scripts/db-test.mjs` | `4001e22bb479539381723be1e13ee263c59eca8325c2ee852006e2cc6b2e607e` |
 | `scripts/edge-typecheck.mjs` | `a889d22856be6694413a71a6c8f8c004deb319b6a9ac16a043a256609d971a25` |
 | `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
 | `scripts/local-edge-router.ts` | `ec7067b7984d65d50eee88200b5333b78e0d9469ccbd7b048fc3b13dffd39765` |
@@ -148,7 +148,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `supabase/migrations/20261112000300_rpc.sql` | `5a3dcc6d420269a2e28d9c53f91169447b718881ab93736507fa1be92410d140` |
 | `supabase/migrations/20261112000400_api_wrappers.sql` | `6c9909ff0cb7d427daa19d7362509e840a7d8783c2e312923fc39e7ad930a158` |
 | `supabase/migrations/20261113000100_plans_entitlements.sql` | `2d09bee87b2005500ee0ab71096fc4f68a74eb3a90e0b7f1c4332522d155a93c` |
-| `supabase/migrations/20261113000200_admin_trial.sql` | `05b77b5781d520d6b72c9ca263d8f7aaf9332cabe0870da78a27fbc98add91a2` |
+| `supabase/migrations/20261113000200_admin_trial.sql` | `5e3270ff7eb5a7b3d94444e8517132b575d6414ac306c9fd01cb7036399f7fcf` |
 | `supabase/tests/00_bootstrap.sql` | `b30a6740c346abe5ef5f4198d443dfc1752d545ed272a763240acf78a1b0f2d3` |
 | `tsconfig.json` | `c262fbcbdeab927d2121cd18515ff7d01d3ca7261ba35bcdf0cdc561a268e768` |
 | `tsconfig.node.json` | `a95fd5db51e44d20a9f9087f480c9995fb922c72598bc5d0fdd16ff3a4e4fa9b` |

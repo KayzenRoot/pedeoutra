@@ -726,15 +726,18 @@ async function main() {
     })
 
     await test('quota é atômica, isolada por tenant e auditável', async () => {
-      const results = await [0, 1, 2, 3].reduce(async (chain) => {
-        const acc = await chain
+      async function consumeQuotaTimes(remaining, organizationId) {
+        if (remaining === 0) return []
         const row = await asService(() =>
           client.query(`select app.consume_quota($1, 'db_test_quota', 3, 60) as allowed`, [
-            orgB.id,
+            organizationId,
           ]),
         )
-        return [...acc, row.rows[0].allowed]
-      }, Promise.resolve([]))
+        const rest = await consumeQuotaTimes(remaining - 1, organizationId)
+        return [row.rows[0].allowed, ...rest]
+      }
+
+      const results = await consumeQuotaTimes(4, orgB.id)
       const allowedCount = results.filter(Boolean).length
       assert(
         JSON.stringify(results) === JSON.stringify([true, true, true, false]) &&

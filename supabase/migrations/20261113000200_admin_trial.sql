@@ -111,7 +111,7 @@ declare
   v_secret bytea;
 begin
   if p_type not in ('email', 'phone', 'cnpj') then -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
-    raise exception 'invalid_signal_type' using errcode = '22023';
+    raise exception 'invalid_signal_type' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   v_normalized := case p_type
@@ -374,16 +374,16 @@ begin
   end if;
 
   if p_name is null or char_length(btrim(p_name)) < 2 or char_length(btrim(p_name)) > 120 then
-    raise exception 'invalid_name' using errcode = '22023';
+    raise exception 'invalid_name' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   v_whatsapp := regexp_replace(coalesce(p_whatsapp, ''), '[^0-9]', '', 'g');
   if v_whatsapp !~ '^[0-9]{10,15}$' then
-    raise exception 'invalid_whatsapp' using errcode = '22023';
+    raise exception 'invalid_whatsapp' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   if p_city is not null and char_length(btrim(p_city)) > 80 then
-    raise exception 'invalid_city' using errcode = '22023';
+    raise exception 'invalid_city' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   if exists (select 1 from public.organizations o where o.owner_user_id = v_uid) then
@@ -458,7 +458,7 @@ declare
   v_existing public.platform_admins;
 begin
   if p_user_id is null then
-    raise exception 'invalid_admin_user' using errcode = '22023';
+    raise exception 'invalid_admin_user' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   insert into public.platform_admins (singleton, user_id)
@@ -550,11 +550,11 @@ declare
 begin
   if p_state is not null
      and p_state not in ('trial', 'active', 'blocked', 'expired', 'review') then
-    raise exception 'invalid_state_filter' using errcode = '22023';
+    raise exception 'invalid_state_filter' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
   if p_plan is not null
      and p_plan not in ('essential', 'professional') then -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
-    raise exception 'invalid_plan_filter' using errcode = '22023';
+    raise exception 'invalid_plan_filter' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   return query
@@ -610,10 +610,10 @@ begin
     raise exception 'admin_forbidden' using errcode = '42501';
   end if;
   if p_action not in ('suspend', 'reactivate') then -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
-    raise exception 'invalid_admin_action' using errcode = '22023';
+    raise exception 'invalid_admin_action' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
   if p_reason is null or char_length(btrim(p_reason)) < 5 or char_length(p_reason) > 500 then
-    raise exception 'invalid_admin_reason' using errcode = '22023';
+    raise exception 'invalid_admin_reason' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   select o.access_state, o.trial_ends_at
@@ -682,10 +682,10 @@ begin
     raise exception 'admin_forbidden' using errcode = '42501';
   end if;
   if p_action not in ('suspend', 'reactivate', 'clear_review') then
-    raise exception 'invalid_admin_action' using errcode = '22023';
+    raise exception 'invalid_admin_action' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
   if p_reason is null or char_length(btrim(p_reason)) < 5 or char_length(p_reason) > 500 then
-    raise exception 'invalid_admin_reason' using errcode = '22023';
+    raise exception 'invalid_admin_reason' using errcode = '22023'; -- NOSONAR: errcode de contrato repetido em DDL/funcoes; migration testada por DB.
   end if;
 
   select * into v_grant
