@@ -35,6 +35,13 @@ Verificação HTTP:
 - Shell SPA com asset /assets/index-DXFN1pMS.js
 - Asset contém a URL do Supabase configurada nas variáveis de build
 
-Auto-deploy:
-- O push de documentação posterior a este log dispara um novo build na branch
-  de produção; o ID/SHA do build final é registrado no Evidence Bundle.
+Auto-deploy validado:
+- Push do commit cdbceafa17782d0875f0aad67f3b8b046670f209
+  ("docs: connect Pages to GitHub and clean staging data") na branch de produção.
+- Deployment automático: 40e745f0-60f8-4d43-a1de-76d82a513277
+- Etapas: initialize -> clone_repo -> build -> deploy
+- Resultado: success (deploy concluído em 2026-11-13T03:10:11Z)
+- URL do deployment: https://40e745f0.pedeoutra.pages.dev
+- URL de produção: https://pedeoutra.pages.dev
+- CI do mesmo commit: run 43357088095 (push) e 43357095327 (pull_request),
+  4/4 jobs verdes em ambos.

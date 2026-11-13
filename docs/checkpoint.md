@@ -50,8 +50,8 @@
 
 PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/12
 
-CI real: run 43331325741 — 4 jobs verdes (web/axe, banco/PostgREST/restore,
-Deno/Edge HTTP, E2E full).
+CI real: run 43357088095 (push `cdbceaf`) — 4 jobs verdes (web/axe,
+banco/PostgREST/restore, Deno/Edge HTTP, E2E full).
 
 Revisar o PR Draft, executar auditoria independente e, com autorização
 explícita, fazer o merge. Não há merge automático.

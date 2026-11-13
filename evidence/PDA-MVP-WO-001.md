@@ -82,9 +82,9 @@ Logs completos em `evidence/logs/`.
 | `npm run test:full-local` | 7 PASS / 0 FAIL local e no CI: GoTrue real + Asaas mock + Edge handlers | 0 | `ci-full-e2e.log` + execução local |
 | `node scripts/prod-smoke.mjs` | PASS signup, organização, produto, pedido, vínculo, recompra | 0 | `prod-smoke.log` |
 | Asaas Sandbox real | checkout + cartão de teste + webhook + assinatura `active` | 0 | `asaas-webhook-real.txt` |
-| Cloudflare Pages Git | build `npm run build` + deploy do commit `564bc2d`; URL limpa e variáveis de build | 0 | `cloudflare-pages-git.txt` |
+| Cloudflare Pages Git | build `npm run build` + deploy do commit `564bc2d`; auto-deploy do push `cdbceaf` (deployment `40e745f0`) | 0 | `cloudflare-pages-git.txt` |
 | Limpeza staging | 4 usuários sintéticos, 4 orgs, produtos/pedidos, 7 billing events, rate limits e assinatura/cliente sandbox removidos | 0 | `staging-cleanup-2026-11-13.txt` |
-| GitHub Actions (PR #12) | 4 jobs verdes: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43331325741](https://github.com/KayzenRoot/pedeoutra/actions/runs/43331325741) |
+| GitHub Actions (PR #12) | 4 jobs verdes no push `cdbceaf`: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43357088095](https://github.com/KayzenRoot/pedeoutra/actions/runs/43357088095) |
 
 ### Harness E2E completo (GoTrue real + Asaas mock)
 
@@ -176,6 +176,10 @@ GoTrue real em container.
 - **Build Git validado:** deployment `8bf03fa3-316b-481b-ab8d-6b6a79a43d4d`,
   commit `564bc2d`, stages initialize → clone_repo → build → deploy, success;
   bundle em produção contém a URL do Supabase configurada.
+- **Auto-deploy validado:** o push do commit `cdbceaf` (documentação) gerou
+  automaticamente o deployment `40e745f0-60f8-4d43-a1de-76d82a513277`, também
+  com stages initialize → clone_repo → build → deploy e resultado success; CI
+  do mesmo commit 4/4 verde (run 43357088095).
 - **Supabase Cloud:** projeto `waygtbclkxklexnabwvj`, 4 migrations aplicadas,
   11 Edge Functions publicadas, secrets configurados (somente nomes no repo).
 - **Auth:** Site URL/redirects do Pages e autoconfirmação de e-mail no MVP.
@@ -238,7 +242,8 @@ GoTrue real em container.
   dados de teste removidos após a validação.
 - **Billing produção:** BLOCKED (dinheiro real/Asaas produção).
 - **Deploy staging:** PASS (`https://pedeoutra.pages.dev`) com Git conectado e
-  auto-deploy por push; staging limpo para novos testes.
+  auto-deploy por push validado (`cdbceaf` → deployment `40e745f0`); staging
+  limpo para novos testes.
 - **Produção comercial:** BLOCKED (domínio, Asaas produção, auditoria e merge).
 - **Veredito final:** **APPROVED para staging/sandbox**, com **PROD BLOCKED**
   para go-live monetizado. PR permanece Draft; não houve merge.
