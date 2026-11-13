@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `47ca27814e79391f278cddde4ed618b7dc1c6813`
+- HEAD no momento da geração: `328fa6a98ffa96478ab8a75356acb5f041d0305b`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -54,7 +54,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `scripts/test-full-local.mjs` | `f8dd3d8bf744ebe71556874128800568e0e3f8c24531a6b9aa0ca2feabd1afb4` |
 | `scripts/test-postgrest.mjs` | `6831366b2c6338d566a67fba44a6978bae77de9314d8fea9a87165409142ac1a` |
 | `scripts/verify-restore.mjs` | `537d045c5514b043224f0b360ebd54e2111d9ace24d47af6d2801028310b2d77` |
-| `src/App.tsx` | `0b754034b8d5f1fd1368a55e56eae0b13378ee02d76999365943180606e0e49a` |
+| `src/App.tsx` | `966049c4c6c9c4e8d47b24fffe80f3e26ad506a41141c7c689e6e6ddc4426192` |
 | `src/components/AppShell.tsx` | `eefef899cc3552fbe89d32ce4e866218d87f9e99d5b2a48774bd5846d34780c6` |
 | `src/components/AuthLayout.tsx` | `2d793e1cef445d3d9a2caf96289ed792cbeb5ba75d458048411a1bbd71f32ea2` |
 | `src/components/Brand.tsx` | `270b850ed4b611f0ea950c253ca422dba36d1c78056f65ed2a56897600934d82` |
@@ -99,7 +99,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `src/pages/ResetPassword.tsx` | `07443cdbee5ba5d07f3955f6c58877c938301cd12f3bdca7d0bbcc2b86d82976` |
 | `src/pages/Settings.tsx` | `4810648a80dc1428dd9a08228299cdd6bb83d4c6c9164134e02b04caf0ae7a1b` |
 | `src/pages/Signup.tsx` | `2d9a43738237c7135abd28d156643713b2c40c16b94a9b347e5e546f28841fe3` |
-| `src/styles.css` | `c7efde256d1c6c55e5f00392cb17b8f1b035d1d3ab2e18e8071e769f64f81a14` |
+| `src/styles.css` | `53dc0cd72d5144ce9a8823f4512366e7995247464419d65c2a8e52ade4dec875` |
 | `src/test/setup.ts` | `31f9b0650fa5a1fc26d640fce75f0a6bda14af4e40dd624576c5a075ff8d14ed` |
 | `src/vite-env.d.ts` | `424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92` |
 | `supabase/config.toml` | `abc5001be1d6e91f19a45ea2d92d95e4c9a64a3737a1427e7d5d4f7270dbdb83` |
@@ -152,7 +152,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `supabase/tests/00_bootstrap.sql` | `b30a6740c346abe5ef5f4198d443dfc1752d545ed272a763240acf78a1b0f2d3` |
 | `tsconfig.json` | `c262fbcbdeab927d2121cd18515ff7d01d3ca7261ba35bcdf0cdc561a268e768` |
 | `tsconfig.node.json` | `a95fd5db51e44d20a9f9087f480c9995fb922c72598bc5d0fdd16ff3a4e4fa9b` |
-| `vite.config.ts` | `d3aac7824c111d2b3e34ef2748b7659c755ae917594cc0db983732b376a7b1c8` |
+| `vite.config.ts` | `e2b97c687de2a82d738f99db44c5221b6b97c22e361e52b605cce0bb018d69a6` |
 
 ## Fontes externas verificadas
 

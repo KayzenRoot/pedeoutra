@@ -12,6 +12,14 @@ export default defineConfig({
   build: {
     sourcemap: false,
     target: 'es2022',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
   },
   test: {
     environment: 'jsdom',

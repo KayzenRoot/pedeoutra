@@ -3332,3 +3332,10 @@ svg {
   white-space: nowrap;
   border: 0;
 }
+
+.route-loading {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+  color: var(--muted);
+}

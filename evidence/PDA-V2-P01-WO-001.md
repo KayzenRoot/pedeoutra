@@ -180,5 +180,19 @@ smells (0 bugs, 0 vulnerabilities). A limpeza:
   status/feature keys são contrato explícito de DDL imutável e continuam
   cobertos por DB/restore.
 
-O resultado final é verificado pelo SonarCloud no HEAD do PR; nenhuma
-supressão foi aplicada a código de produto fora das migrations.
+O SonarCloud final no PR #89 reporta **0 issues abertas, 0 bugs, 0
+vulnerabilities e 0 code smells**, com ratings 1.0. As supressões `NOSONAR`
+ficaram restritas às migrations; nenhum código de produto foi suprimido.
+
+## 13. Estado de ativação (não executado)
+
+`supabase migration list --linked` em 2026-11-13 confirmou 4 migrations
+aplicadas no projeto de produção e **2 pendentes** (`plans_entitlements` e
+`admin_trial`). `supabase db push --linked --dry-run` listou exatamente essas
+duas, sem erro. Nenhum push, deploy de Edge Function, merge ou alteração de
+produção foi executado.
+
+O bundle foi dividido (`react`, `supabase`, `Admin`, `Settings`, `MfaPanel`);
+o maior chunk caiu de ~518 kB para 225 kB. O runbook completo, com backup
+manual obrigatório, ordem de deploy, secrets, bootstrap e rollback, está em
+`docs/part1-activation.md`.
