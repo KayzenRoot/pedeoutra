@@ -32,6 +32,7 @@ const PRODUCT_2 = 'eeeeeeee-4444-4444-8444-444444444444'
 const PRODUCT_INACTIVE = 'eeeeeeee-5555-4555-8555-555555555555'
 const CUSTOMER_ID = 'eeeeeeee-6666-4666-8666-666666666666'
 const LINK_ID = 'eeeeeeee-7777-4777-8777-777777777777'
+const CATEGORY_ID = 'eeeeeeee-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const REORDER_TOKEN = Buffer.from(
   Array.from({ length: 32 }, (_, index) => (index * 37 + 11) % 256),
 ).toString('base64url')
@@ -175,11 +176,14 @@ values (
   '11999998888', 'São Paulo'
 );
 
-insert into public.products (id, organization_id, name, unit, price_cents, active)
+insert into public.product_categories (id, organization_id, name, slug, position)
+values ('${CATEGORY_ID}', '${ORG_ID}', 'Bebidas', 'bebidas', 1);
+
+insert into public.products (id, organization_id, name, unit, price_cents, active, category_id)
 values
-  ('${PRODUCT_1}', '${ORG_ID}', 'Copo 200ml', 'cento', 1250, true),
-  ('${PRODUCT_2}', '${ORG_ID}', 'Água 5L', 'galão', 899, true),
-  ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false);
+  ('${PRODUCT_1}', '${ORG_ID}', 'Copo 200ml', 'cento', 1250, true, '${CATEGORY_ID}'),
+  ('${PRODUCT_2}', '${ORG_ID}', 'Água 5L', 'galão', 899, true, null),
+  ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false, null);
 
 insert into public.customers (id, organization_id, display_name, contact_phone)
 values ('${CUSTOMER_ID}', '${ORG_ID}', 'Padaria Edge', '11977776666');
@@ -415,6 +419,11 @@ async function main() {
         'produto inativo exposto',
       )
       assert(data.accepting_orders === true, 'deveria aceitar pedidos')
+      assert(data.categories.length === 1, 'categoria pública ausente')
+      assert(data.categories[0].name === 'Bebidas', 'nome da categoria')
+      const categorized = data.products.find((item) => item.id === PRODUCT_1)
+      assert(categorized.category_id === CATEGORY_ID, 'produto sem categoria')
+      assert(Array.isArray(categorized.images), 'images ausente')
       assert(
         response.headers.get('access-control-allow-origin') === 'http://127.0.0.1:5173',
         'CORS',
@@ -864,6 +873,59 @@ async function main() {
       assert(data.audit.length >= 3, `audit default limit: ${data.audit.length}`)
       assert(actions.has('admin.org.suspend'), 'auditoria de suspensão')
       assert(actions.has('admin.org.reactivate'), 'auditoria de reativação')
+    })
+
+
+    console.log('[8/8] Categorias e mídia')
+
+    await test('product-image-list exige sessão e retorna lista vazia', async () => {
+      const anonymous = await fetch(`${edgeBase}/product-image-list`)
+      assert(anonymous.status === 401 || anonymous.status === 403, `anônimo ${anonymous.status}`)
+      const response = await fetch(`${edgeBase}/product-image-list`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status}`)
+      assert(Array.isArray(data.images) && data.images.length === 0, 'lista deveria estar vazia')
+    })
+
+    await test('upload de mídia rejeita formulário inválido e SVG', async () => {
+      const invalidForm = await call('product-image-upload', {}, { token: userToken })
+      assert(invalidForm.status === 400, `form HTTP ${invalidForm.status}`)
+
+      const form = new FormData()
+      form.append('product_id', PRODUCT_1)
+      form.append('alt_text', 'Copo de teste')
+      form.append(
+        'image',
+        new Blob([new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"></svg>')], {
+          type: 'image/svg+xml',
+        }),
+        'malicioso.svg',
+      )
+      const response = await fetch(`${edgeBase}/product-image-upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${userToken}` },
+        body: form,
+      })
+      const data = await response.json()
+      assert(response.status === 400, `SVG HTTP ${response.status}`)
+      assert(data.error === 'invalid_image', `erro ${JSON.stringify(data)}`)
+    })
+
+    await test('delete e capa de mídia validam o id', async () => {
+      const deleteResponse = await call(
+        'product-image-delete',
+        { image_id: 'inválido' },
+        { token: userToken },
+      )
+      assert(deleteResponse.status === 400, `delete HTTP ${deleteResponse.status}`)
+      const coverResponse = await call(
+        'product-image-cover',
+        { image_id: 'inválido' },
+        { token: userToken },
+      )
+      assert(coverResponse.status === 400, `cover HTTP ${coverResponse.status}`)
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

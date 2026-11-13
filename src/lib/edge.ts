@@ -113,6 +113,28 @@ export async function callAuthedGet<T>(
   return parseResponse<T>(response)
 }
 
+/** Chamada autenticada multipart (upload de imagem). */
+export async function callAuthedForm<T>(name: string, form: FormData): Promise<T> {
+  if (!supabase) throw new BackendNotConfiguredError()
+  if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+  if (sessionError || !sessionData.session) {
+    throw new EdgeFunctionError('unauthorized', 'Sessão expirada. Entre novamente.', 401)
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+    method: 'POST',
+    headers: {
+      apikey: ANON_KEY,
+      Authorization: `Bearer ${sessionData.session.access_token}`,
+    },
+    body: form,
+  })
+
+  return parseResponse<T>(response)
+}
+
 /** Chamada autenticada: inclui o JWT do fornecedor. */
 export async function callAuthedFunction<T>(
   name: string,

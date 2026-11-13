@@ -13,6 +13,7 @@ export function Catalog() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [cart, setCart] = useState<Record<string, number>>({})
+  const [activeCategory, setActiveCategory] = useState<string>('all')
   const [buyerName, setBuyerName] = useState('')
   const [buyerPhone, setBuyerPhone] = useState('')
   const [note, setNote] = useState('')
@@ -229,6 +230,12 @@ export function Catalog() {
     )
   }
 
+  const categories = catalog.categories ?? []
+  const visibleProducts =
+    activeCategory === 'all'
+      ? catalog.products
+      : catalog.products.filter((product) => product.category_id === activeCategory)
+
   return (
     <div className="public-shell">
       <header className="public-header">
@@ -264,21 +271,63 @@ export function Catalog() {
           </FormMessage>
         )}
 
-        {catalog.products.length === 0 ? (
+        {categories.length > 0 && (
+          <div className="category-filter" role="group" aria-label="Filtrar por categoria">
+            <button
+              type="button"
+              className="category-chip"
+              aria-pressed={activeCategory === 'all'}
+              onClick={() => setActiveCategory('all')}
+            >
+              Todos
+            </button>
+            {categories.map((category) => (
+              <button
+                type="button"
+                className="category-chip"
+                aria-pressed={activeCategory === category.id}
+                onClick={() => setActiveCategory(category.id)}
+                key={category.id}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {visibleProducts.length === 0 ? (
           <div className="card centered-card">
             <h2>Nenhum produto publicado</h2>
-            <p>O fornecedor ainda não ativou itens neste catálogo.</p>
+            <p>
+              {catalog.products.length === 0
+                ? 'O fornecedor ainda não ativou itens neste catálogo.'
+                : 'Nenhum item nesta categoria.'}
+            </p>
           </div>
         ) : (
           <div className="catalog-layout">
             <section className="product-grid" aria-label="Produtos">
-              {catalog.products.map((product) => {
+              {visibleProducts.map((product) => {
                 const quantity = cart[product.id] ?? 0
+                const cover = product.images?.[0]
+                const imageUrl = cover?.thumb_url ?? cover?.url ?? null
                 return (
                   <article
                     className={quantity > 0 ? 'product-card selected' : 'product-card'}
                     key={product.id}
                   >
+                    {imageUrl ? (
+                      <img
+                        className="product-photo"
+                        src={imageUrl}
+                        alt={cover?.alt_text ?? product.name}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="product-photo product-photo-placeholder" aria-hidden="true">
+                        {product.name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
                     <div className="product-card-body">
                       <span className="product-unit">{product.unit}</span>
                       <h2>{product.name}</h2>

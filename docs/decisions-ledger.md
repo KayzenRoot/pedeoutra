@@ -198,3 +198,24 @@ funcionalidade real da Parte 2/4 estar pronta e auditada.
 **Consequências:** nenhuma cobrança real é feita nesta WO; upgrade/downgrade
 têm contrato e testes de decisão, mas a mutação no provedor fica explicitamente
 bloqueada até validação em sandbox/autorização específica.
+
+## ADR PDA-ADR-014 — Categorias e mídia de produto com Storage privado (PROPOSED)
+
+**Status:** PROPOSED (Parte 2/5; depende da Parte 1 ativa)
+**Data:** 2026-11-13
+**Contexto:** o catálogo precisa de categorias ordenáveis e fotos sem expor
+objetos privados entre tenants, sem depender de transformação paga e sem
+aceitar SVG/arquivo ativo.
+**Decisão proposta:** categorias são linhas por organização, opcionais e
+ordenáveis; produtos antigos permanecem sem categoria. Fotos ficam em bucket
+privado `product-images`, acessado apenas por Edge Function com `service_role`;
+o upload valida tenant, produto, tamanho, MIME real por magic bytes
+(JPEG/PNG/WebP) e rejeita SVG. O navegador gera uma miniatura local; a Edge
+grava imagem + thumb e o metadado em `product_images`. O catálogo público
+recebe apenas URLs assinadas e de curta duração para imagens de produtos
+ativos; produto inativo ou imagem órfã não é servido. Limites iniciais: 5 MB
+por imagem, 1 MB por thumb, até 8 imagens por produto.
+**Consequências:** não há policy de Storage para `anon/authenticated`; todo
+acesso passa pela Edge. Excluir imagem remove metadado e objetos; órfãos são
+tratados por rotina administrativa. Custo de Storage Free é monitorado e não
+há transformação paga.

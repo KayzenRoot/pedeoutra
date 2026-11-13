@@ -58,3 +58,16 @@ Esta seção não substitui o MVP aprovado; registra o delta em planejamento.
   comunicação de "em preparação"; Essencial mantém o preço legado de R$ 29,90.
   Nada nesta seção autoriza go-live comercial, que segue bloqueado por SMTP,
   backup, suporte/legal e primeira cobrança.
+
+## Delta V2 — Parte 2/5 (PROPOSED)
+
+- **Dentro:** categorias e fotos de produto (#52), SKU/pedido rápido (#47),
+  mínimos/múltiplos (#49), importação CSV/XLSX (#46), templates (#57), QR
+  (#53), acompanhamento por token (#50), preços por comprador (#48),
+  orçamentos (#51), PDF não fiscal (#55), equipe/RBAC (#58), contrato de
+  conexão WhatsApp (#29–#31) e páginas comerciais (#63).
+- **Bloqueado por dependência externa:** WhatsApp oficial só com WABA,
+  templates e consentimento aprovados; convites de equipe dependem de SMTP;
+  envio automático permanece desligado por padrão.
+- **Fora:** API Profissional/Meta Ads/finanças (Parte 4), SEO/landing final
+  (Parte 5), ERP, estoque, nota fiscal e cobrança de pedidos B2B.

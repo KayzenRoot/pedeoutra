@@ -81,3 +81,15 @@ verify_jwt = true
 
 [functions.change-plan]
 verify_jwt = true
+
+[functions.product-image-upload]
+verify_jwt = true
+
+[functions.product-image-delete]
+verify_jwt = true
+
+[functions.product-image-cover]
+verify_jwt = true
+
+[functions.product-image-list]
+verify_jwt = true

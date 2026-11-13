@@ -174,7 +174,7 @@ async function main() {
       )
     }
 
-    console.log('\n[1/7] Bootstrap e migrations')
+    console.log('\n[1/8] Bootstrap e migrations')
     await client.query(BOOTSTRAP_SQL)
     const migrations = readdirSync(MIGRATIONS_DIR)
       .filter((file) => file.endsWith('.sql'))
@@ -235,7 +235,7 @@ async function main() {
       return result.rows[0]
     }
 
-    console.log('\n[2/7] Seed sintético e criação de organizações')
+    console.log('\n[2/8] Seed sintético e criação de organizações')
     await client.query('insert into auth.users (id, email) values ($1, $2), ($3, $4)', [
       USER_A, 'a@example.test', USER_B, 'b@example.test',
     ])
@@ -251,7 +251,7 @@ async function main() {
     const customerA = await asUser(USER_A, () => insertCustomer(orgA.id, 'Padaria Pão Bom', '11977776666'))
     const customerB = await asUser(USER_B, () => insertCustomer(orgB.id, 'Mercado Boreal', '21966665555'))
 
-    console.log('\n[3/7] RLS A/B')
+    console.log('\n[3/8] RLS A/B')
     await test('A lê apenas a própria organização', async () => {
       const rows = await asUser(USER_A, async () => (await client.query('select id from public.organizations')).rows)
       assert(rows.length === 1 && rows[0].id === orgA.id, 'A deveria ver só org A')
@@ -325,7 +325,7 @@ async function main() {
       )
     })
 
-    console.log('\n[4/7] Trial, assinatura e escrita')
+    console.log('\n[4/8] Trial, assinatura e escrita')
     await test('trial expirado bloqueia escrita', async () => {
       await client.query(`update public.organizations set trial_ends_at = now() - interval '1 day' where id = $1`, [orgA.id])
       await expectError(
@@ -415,7 +415,7 @@ async function main() {
       [orgA.id],
     )
 
-    console.log('\n[5/7] Pedido público, recompra, rate limit e idempotência')
+    console.log('\n[5/8] Pedido público, recompra, rate limit e idempotência')
     const requestId = '33333333-3333-4333-8333-333333333333'
     let publicOrder
 
@@ -590,7 +590,7 @@ async function main() {
       )
     })
 
-    console.log('\n[6/7] Status do pedido e billing')
+    console.log('\n[6/8] Status do pedido e billing')
     await test('transição válida grava evento com autor', async () => {
       await asUser(USER_A, () => client.query(
         `update public.orders set status = 'confirmed' where id = $1`,
@@ -655,7 +655,7 @@ async function main() {
       )
     })
 
-    console.log('\n[7/7] Planos, entitlements, trial e admin')
+    console.log('\n[7/8] Planos, entitlements, trial e admin')
 
     await test('catálogo contém exatamente os dois planos com preços aprovados', async () => {
       const plans = await client.query(
@@ -905,6 +905,192 @@ async function main() {
       )
       assert(list.rows.length === 2, `paginação retornou ${list.rows.length}`)
       assert(Number(list.rows[0].total_count) >= 2, 'total_count')
+    })
+
+
+    console.log('\n[8/8] Categorias e mídia de produto')
+
+    await test('categoria é isolada por tenant e gera slug', async () => {
+      const category = await asUser(USER_A, () =>
+        client.query(
+          `insert into public.product_categories (organization_id, name)
+           values ($1, 'Bebidas') returning *`,
+          [orgA.id],
+        ),
+      )
+      assert(category.rows[0].slug === 'bebidas', `slug ${category.rows[0].slug}`)
+      const seenByB = await asUser(USER_B, () =>
+        client.query('select id from public.product_categories'),
+      )
+      assert(seenByB.rows.length === 0, 'B viu categoria de A')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(
+              `insert into public.product_categories (organization_id, name)
+               values ($1, 'Invasão')`,
+              [orgA.id],
+            ),
+          ),
+        'row-level security',
+        'B inserindo categoria em A',
+      )
+    })
+
+    await test('produto aceita categoria do próprio tenant e rejeita de outro', async () => {
+      const category = await client.query(
+        `select id from public.product_categories where organization_id = $1 limit 1`,
+        [orgA.id],
+      )
+      await asUser(USER_A, () =>
+        client.query(`update public.products set category_id = $1 where id = $2`, [
+          category.rows[0].id,
+          productA1.id,
+        ]),
+      )
+      const updated = await client.query('select category_id from public.products where id = $1', [
+        productA1.id,
+      ])
+      assert(updated.rows[0].category_id === category.rows[0].id, 'categoria não vinculada')
+      const crossTenant = await asUser(USER_A, () =>
+        client.query(`update public.products set category_id = $1 where id = $2`, [
+          category.rows[0].id,
+          productB.id,
+        ]),
+      )
+      assert(crossTenant.rowCount === 0, 'A alterou produto B')
+    })
+
+    await test('metadados de imagem são isolados e exigem path do tenant', async () => {
+      const imageId = crypto.randomUUID()
+      const path = `${orgA.id}/${productA1.id}/${imageId}.jpg`
+      await asUser(USER_A, () =>
+        client.query(
+          `insert into public.product_images
+             (id, organization_id, product_id, storage_path, alt_text, is_cover)
+           values ($1, $2, $3, $4, 'Copo de água', true)`,
+          [imageId, orgA.id, productA1.id, path],
+        ),
+      )
+      const seenByB = await asUser(USER_B, () =>
+        client.query('select id from public.product_images'),
+      )
+      assert(seenByB.rows.length === 0, 'B viu imagem de A')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(
+              `insert into public.product_images
+                 (organization_id, product_id, storage_path, alt_text)
+               values ($1, $2, $3, 'Invasão')`,
+              [orgA.id, productA1.id, `${orgA.id}/${productA1.id}/${crypto.randomUUID()}.jpg`],
+            ),
+          ),
+        'row-level security',
+        'B inserindo imagem em A',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.product_images
+                 (organization_id, product_id, storage_path, alt_text)
+               values ($1, $2, $3, 'Path cruzado')`,
+              [orgA.id, productA1.id, `${orgB.id}/${productA1.id}/${crypto.randomUUID()}.jpg`],
+            ),
+          ),
+        'product_images_path_tenant',
+        'path de outro tenant',
+      )
+    })
+
+    await test('capa é única e o RPC de capa troca atomicamente', async () => {
+      const first = await client.query(
+        'select id from public.product_images where product_id = $1 and is_cover = true',
+        [productA1.id],
+      )
+      const secondId = crypto.randomUUID()
+      await client
+        .query(
+          `insert into public.product_images
+             (id, organization_id, product_id, storage_path, alt_text, is_cover)
+           values ($1, $2, $3, $4, 'Segunda foto', true)`,
+          [secondId, orgA.id, productA1.id, `${orgA.id}/${productA1.id}/${secondId}.jpg`],
+        )
+        .then(
+          () => {
+            throw new Error('capa duplicada foi aceita')
+          },
+          (error) => {
+            assert(
+              String(error.message).includes('product_images_one_cover_idx'),
+              `erro inesperado: ${error.message}`,
+            )
+          },
+        )
+      // A tentativa acima não cria a segunda imagem; insere sem capa para o RPC.
+      await client.query(
+        `insert into public.product_images
+           (id, organization_id, product_id, storage_path, alt_text, is_cover)
+         values ($1, $2, $3, $4, 'Segunda foto', false)`,
+        [secondId, orgA.id, productA1.id, `${orgA.id}/${productA1.id}/${secondId}.jpg`],
+      )
+
+      await asService(() =>
+        client.query('select public.api_set_product_image_cover($1, $2)', [
+          orgA.id,
+          secondId,
+        ]),
+      )
+      const covers = await client.query(
+        `select id, is_cover from public.product_images
+          where product_id = $1 order by created_at`,
+        [productA1.id],
+      )
+      assert(
+        covers.rows.filter((row) => row.is_cover).length === 1 &&
+          covers.rows.find((row) => row.is_cover).id === secondId,
+        'capa não trocou',
+      )
+      assert(
+        covers.rows.find((row) => row.id === first.rows[0].id).is_cover === false,
+        'capa antiga permaneceu',
+      )
+    })
+
+    await test('RPC de mídia valida path e remove metadado', async () => {
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select public.api_add_product_image($1, $2, $3, null, 'Path errado', 0, false, $4)`,
+              [orgA.id, productA1.id, `${orgB.id}/${productA1.id}/${crypto.randomUUID()}.jpg`, USER_A],
+            ),
+          ),
+        'invalid_storage_path',
+        'path inválido no RPC',
+      )
+
+      const imageId = crypto.randomUUID()
+      const path = `${orgA.id}/${productA1.id}/${imageId}.jpg`
+      const inserted = await asService(() =>
+        client.query(
+          `select * from public.api_add_product_image($1, $2, $3, null, 'Foto removível', 1, false, $4)`,
+          [orgA.id, productA1.id, path, USER_A],
+        ),
+      )
+      const rowId = inserted.rows[0].id
+      const deleted = await asService(() =>
+        client.query('select * from public.api_delete_product_image($1, $2)', [
+          orgA.id,
+          rowId,
+        ]),
+      )
+      assert(deleted.rows[0].storage_path === path, 'path de retorno')
+      const remaining = await client.query('select id from public.product_images where id = $1', [
+        rowId,
+      ])
+      assert(remaining.rows.length === 0, 'metadado não removido')
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

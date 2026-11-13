@@ -18,6 +18,10 @@ import { handler as planCatalog } from '../supabase/functions/plan-catalog/index
 import { handler as changePlan } from '../supabase/functions/change-plan/index.ts'
 import { handler as adminApi } from '../supabase/functions/admin-api/index.ts'
 import { handler as adminBootstrap } from '../supabase/functions/admin-bootstrap/index.ts'
+import { handler as productImageUpload } from '../supabase/functions/product-image-upload/index.ts'
+import { handler as productImageDelete } from '../supabase/functions/product-image-delete/index.ts'
+import { handler as productImageCover } from '../supabase/functions/product-image-cover/index.ts'
+import { handler as productImageList } from '../supabase/functions/product-image-list/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -37,6 +41,10 @@ const routes: Record<string, Handler> = {
   'change-plan': changePlan,
   'admin-api': adminApi,
   'admin-bootstrap': adminBootstrap,
+  'product-image-upload': productImageUpload,
+  'product-image-delete': productImageDelete,
+  'product-image-cover': productImageCover,
+  'product-image-list': productImageList,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

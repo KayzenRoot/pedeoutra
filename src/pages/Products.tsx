@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '../context/auth-context'
+import { callAuthedForm, callAuthedFunction, callAuthedGet } from '../lib/edge'
+import { prepareImage } from '../lib/images'
 import { supabase } from '../lib/supabase'
-import type { Product } from '../lib/types'
+import type { Product, ProductCategory } from '../lib/types'
 import { centsToInput, formatBRL, parsePriceToCents } from '../lib/format'
 import { EmptyState, FormMessage, PageHeader } from '../components/ui'
 
@@ -10,7 +12,18 @@ interface ProductForm {
   name: string
   unit: string
   price: string
+  categoryId: string
   active: boolean
+}
+
+interface ProductImageItem {
+  id: string
+  product_id: string
+  alt_text: string
+  position: number
+  is_cover: boolean
+  url: string | null
+  thumb_url: string | null
 }
 
 const EMPTY_FORM: ProductForm = {
@@ -18,6 +31,7 @@ const EMPTY_FORM: ProductForm = {
   name: '',
   unit: '',
   price: '',
+  categoryId: '',
   active: true,
 }
 
@@ -41,6 +55,18 @@ export function Products() {
   const [formError, setFormError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [categories, setCategories] = useState<ProductCategory[]>([])
+  const [categoryName, setCategoryName] = useState('')
+  const [categoryBusy, setCategoryBusy] = useState(false)
+  const [images, setImages] = useState<ProductImageItem[]>([])
+  const [imageProductId, setImageProductId] = useState('')
+  const [imageAlt, setImageAlt] = useState('')
+  const [imageCover, setImageCover] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imageBusy, setImageBusy] = useState(false)
+  const [imageError, setImageError] = useState<string | null>(null)
+  const [imageSuccess, setImageSuccess] = useState<string | null>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
 
   const organizationId = organization?.id
 
@@ -62,10 +88,38 @@ export function Products() {
     setLoading(false)
   }
 
+  async function loadCategories() {
+    if (!supabase || !organizationId) return
+    const { data, error } = await supabase
+      .from('product_categories')
+      .select('*')
+      .eq('organization_id', organizationId)
+      .order('position', { ascending: true })
+      .order('name', { ascending: true })
+    if (!error) setCategories(data ?? [])
+  }
+
+  async function loadImages() {
+    try {
+      const data = await callAuthedGet<{ images: ProductImageItem[] }>('product-image-list')
+      setImages(data.images ?? [])
+    } catch {
+      setImageError('Não foi possível carregar as imagens agora.')
+    }
+  }
+
   useEffect(() => {
     void loadProducts()
+    void loadCategories()
+    void loadImages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId])
+
+  useEffect(() => {
+    if (!imageProductId && products.length > 0) {
+      setImageProductId(products[0].id)
+    }
+  }, [imageProductId, products])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -85,6 +139,7 @@ export function Products() {
       name: product.name,
       unit: product.unit,
       price: centsToInput(product.price_cents),
+      categoryId: product.category_id ?? '',
       active: product.active,
     })
     setFormError(null)
@@ -128,6 +183,7 @@ export function Products() {
       name,
       unit,
       price_cents: priceCents,
+      category_id: form.categoryId || null,
       active: form.active,
     }
 
@@ -167,6 +223,123 @@ export function Products() {
     } else {
       setSuccess(product.active ? 'Produto pausado.' : 'Produto reativado.')
       await loadProducts()
+    }
+  }
+
+  async function addCategory(event: FormEvent) {
+    event.preventDefault()
+    if (!supabase || !organizationId) return
+    const name = categoryName.trim()
+    if (name.length < 1) return
+    setCategoryBusy(true)
+    setFormError(null)
+    const { error } = await supabase.from('product_categories').insert({
+      organization_id: organizationId,
+      name,
+    })
+    if (error) {
+      setFormError(databaseMessage(error.message))
+    } else {
+      setCategoryName('')
+      setSuccess('Categoria criada.')
+      await loadCategories()
+    }
+    setCategoryBusy(false)
+  }
+
+  async function toggleCategory(category: ProductCategory) {
+    if (!supabase || !organizationId) return
+    const { error } = await supabase
+      .from('product_categories')
+      .update({ active: !category.active })
+      .eq('id', category.id)
+      .eq('organization_id', organizationId)
+    if (error) setFormError(databaseMessage(error.message))
+    else await loadCategories()
+  }
+
+  async function deleteCategory(category: ProductCategory) {
+    if (!supabase || !organizationId) return
+    if (!window.confirm(`Excluir a categoria ${category.name}? Os produtos ficam sem categoria.`)) {
+      return
+    }
+    const { error } = await supabase
+      .from('product_categories')
+      .delete()
+      .eq('id', category.id)
+      .eq('organization_id', organizationId)
+    if (error) {
+      setFormError(databaseMessage(error.message))
+    } else {
+      setSuccess('Categoria removida.')
+      await loadCategories()
+      await loadProducts()
+    }
+  }
+
+  async function uploadImage(event: FormEvent) {
+    event.preventDefault()
+    if (!imageFile || !imageProductId) {
+      setImageError('Escolha um produto e uma imagem.')
+      return
+    }
+    if (imageAlt.trim().length < 3) {
+      setImageError('Descreva a imagem em pelo menos 3 caracteres.')
+      return
+    }
+    setImageBusy(true)
+    setImageError(null)
+    setImageSuccess(null)
+    try {
+      const prepared = await prepareImage(imageFile)
+      const data = new FormData()
+      data.append('product_id', imageProductId)
+      data.append('alt_text', imageAlt.trim())
+      data.append('is_cover', String(imageCover))
+      data.append('image', prepared.image, 'image.webp')
+      data.append('thumb', prepared.thumb, 'thumb.webp')
+      await callAuthedForm('product-image-upload', data)
+      setImageSuccess('Foto enviada.')
+      setImageAlt('')
+      setImageCover(false)
+      setImageFile(null)
+      if (imageInputRef.current) imageInputRef.current.value = ''
+      await loadImages()
+    } catch (error) {
+      setImageError(
+        error instanceof Error ? error.message : 'Não foi possível enviar a imagem.',
+      )
+    } finally {
+      setImageBusy(false)
+    }
+  }
+
+  async function removeImage(image: ProductImageItem) {
+    if (!window.confirm('Excluir esta foto? A ação remove o arquivo do catálogo.')) return
+    setImageBusy(true)
+    setImageError(null)
+    try {
+      await callAuthedFunction('product-image-delete', { image_id: image.id })
+      setImageSuccess('Foto removida.')
+      await loadImages()
+    } catch {
+      setImageError('Não foi possível remover a foto.')
+    } finally {
+      setImageBusy(false)
+    }
+  }
+
+  async function makeCover(image: ProductImageItem) {
+    setImageBusy(true)
+    setImageError(null)
+    try {
+      await callAuthedFunction('product-image-cover', { image_id: image.id })
+      setImageSuccess('Foto de capa atualizada.')
+      await loadImages()
+    } catch {
+      setImageError('Não foi possível definir a capa.')
+    } finally {
+      setImageBusy(false)
     }
   }
 
@@ -297,6 +470,21 @@ export function Products() {
                 />
               </label>
             </div>
+            <label className="field">
+              <span>Categoria (opcional)</span>
+              <select
+                value={form.categoryId}
+                onChange={(event) => setForm({ ...form, categoryId: event.target.value })}
+              >
+                <option value="">Sem categoria</option>
+                {categories.map((category) => (
+                  <option value={category.id} key={category.id}>
+                    {category.name}
+                    {category.active ? '' : ' (pausada)'}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="checkbox-field">
               <input
                 type="checkbox"
@@ -315,6 +503,171 @@ export function Products() {
           </form>
         </section>
       </div>
+
+      <section className="card media-card">
+        <div className="card-heading">
+          <div>
+            <span className="eyebrow">Organização do catálogo</span>
+            <h2>Categorias</h2>
+          </div>
+          <span className="muted">{categories.filter((category) => category.active).length} ativas</span>
+        </div>
+        <form className="inline-form" onSubmit={(event) => void addCategory(event)}>
+          <input
+            className="search-input"
+            placeholder="Nova categoria"
+            aria-label="Nome da nova categoria"
+            maxLength={80}
+            value={categoryName}
+            onChange={(event) => setCategoryName(event.target.value)}
+          />
+          <button type="submit" className="button button-primary" disabled={categoryBusy}>
+            {categoryBusy ? 'Criando…' : 'Adicionar categoria'}
+          </button>
+        </form>
+        <ul className="category-manager-list">
+          {categories.map((category) => (
+            <li key={category.id}>
+              <span>
+                <strong>{category.name}</strong>
+                {!category.active && <small> · pausada</small>}
+              </span>
+              <div className="table-actions">
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => void toggleCategory(category)}
+                >
+                  {category.active ? 'Pausar' : 'Ativar'}
+                </button>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => void deleteCategory(category)}
+                >
+                  Excluir
+                </button>
+              </div>
+            </li>
+          ))}
+          {categories.length === 0 && <li className="muted">Nenhuma categoria criada.</li>}
+        </ul>
+        <p className="form-note">
+          Categorias pausadas somem do catálogo público; os produtos continuam preservados e
+          podem ser reclassificados depois.
+        </p>
+      </section>
+
+      <section className="card media-card">
+        <div className="card-heading">
+          <div>
+            <span className="eyebrow">Fotos do produto</span>
+            <h2>Imagens do catálogo</h2>
+          </div>
+          <span className="muted">até 8 por produto</span>
+        </div>
+        {imageError && <FormMessage>{imageError}</FormMessage>}
+        {imageSuccess && <FormMessage tone="success">{imageSuccess}</FormMessage>}
+        <form className="form" onSubmit={(event) => void uploadImage(event)}>
+          <label className="field">
+            <span>Produto</span>
+            <select
+              value={imageProductId}
+              onChange={(event) => setImageProductId(event.target.value)}
+            >
+              {products.map((product) => (
+                <option value={product.id} key={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="form-row">
+            <label className="field">
+              <span>Arquivo (JPEG, PNG ou WebP)</span>
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => setImageFile(event.target.files?.[0] ?? null)}
+              />
+            </label>
+            <label className="field">
+              <span>Texto alternativo</span>
+              <input
+                maxLength={160}
+                value={imageAlt}
+                onChange={(event) => setImageAlt(event.target.value)}
+                placeholder="Copo de água sobre a mesa"
+              />
+            </label>
+          </div>
+          <label className="checkbox-field">
+            <input
+              type="checkbox"
+              checked={imageCover}
+              onChange={(event) => setImageCover(event.target.checked)}
+            />
+            <span>Usar como foto de capa</span>
+          </label>
+          <button
+            type="submit"
+            className="button button-primary"
+            disabled={imageBusy || !products.length}
+          >
+            {imageBusy ? 'Processando…' : 'Enviar foto'}
+          </button>
+        </form>
+
+        <div className="image-grid">
+          {images
+            .filter((image) => image.product_id === imageProductId)
+            .map((image) => (
+              <figure className="image-tile" key={image.id}>
+                {image.thumb_url || image.url ? (
+                  <img
+                    src={image.thumb_url ?? image.url ?? ''}
+                    alt={image.alt_text}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="image-missing">Sem preview</div>
+                )}
+                <figcaption>
+                  <span>{image.alt_text}</span>
+                  {image.is_cover && <span className="pill pill-lime">Capa</span>}
+                  <div className="image-actions">
+                    {!image.is_cover && (
+                      <button
+                        type="button"
+                        className="text-button"
+                        onClick={() => void makeCover(image)}
+                        disabled={imageBusy}
+                      >
+                        Usar como capa
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={() => void removeImage(image)}
+                      disabled={imageBusy}
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          {images.filter((image) => image.product_id === imageProductId).length === 0 && (
+            <p className="muted">Nenhuma foto para este produto.</p>
+          )}
+        </div>
+        <p className="form-note">
+          O arquivo é reencodado no navegador, validado por magic bytes na Edge Function e
+          guardado em bucket privado. SVG e arquivos acima de 5 MB são recusados.
+        </p>
+      </section>
     </div>
   )
 }

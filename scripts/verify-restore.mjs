@@ -104,6 +104,22 @@ values ('aaaaaaaa-2222-4222-8222-222222222222', 'restore.seeded', 'database');
 insert into public.rate_limits (bucket, window_started_at, counter)
 values ('restore:bucket:0000000000000000000000000000000000000000000000000000000000000000', now(), 1);
 
+insert into public.product_categories (id, organization_id, name, slug, position)
+values (
+  'aaaaaaaa-cccc-4ccc-8ccc-cccccccccccc',
+  'aaaaaaaa-2222-4222-8222-222222222222', 'Bebidas', 'bebidas', 1
+);
+
+insert into public.product_images (
+  id, organization_id, product_id, storage_path, alt_text, is_cover
+) values (
+  'aaaaaaaa-dddd-4ddd-8ddd-dddddddddddd',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-3333-4333-8333-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222/aaaaaaaa-3333-4333-8333-333333333333/aaaaaaaa-dddd-4ddd-8ddd-dddddddddddd.jpg',
+  'Copo de água', true
+);
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -219,12 +235,16 @@ select
   (select count(*) from public.platform_audit_events) as platform_audit_events,
   (select count(*) from public.plan_changes) as plan_changes,
   (select count(*) from public.quota_usage) as quota_usage,
+  (select count(*) from public.product_categories) as product_categories,
+  (select count(*) from public.product_images) as product_images,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status, ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
   (select md5(string_agg(plan_code || ':' || plan_version || ':' || state, ',' order by organization_id)) from public.subscriptions) as subscriptions_hash,
   (select md5(string_agg(user_id::text || ':' || status || ':' || risk_score, ',' order by user_id)) from public.trial_grants) as trials_hash,
-  (select md5(string_agg(actor_user_id::text || ':' || action, ',' order by id)) from public.platform_audit_events) as platform_audit_hash
+  (select md5(string_agg(actor_user_id::text || ':' || action, ',' order by id)) from public.platform_audit_events) as platform_audit_hash,
+  (select md5(string_agg(id::text || ':' || name || ':' || slug, ',' order by id)) from public.product_categories) as categories_hash,
+  (select md5(string_agg(id::text || ':' || alt_text || ':' || is_cover, ',' order by id)) from public.product_images) as images_hash
 `
 
 async function main() {
@@ -319,12 +339,16 @@ async function main() {
       'platform_audit_events',
       'plan_changes',
       'quota_usage',
+      'product_categories',
+      'product_images',
       'orders_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',
       'trials_hash',
       'platform_audit_hash',
+      'categories_hash',
+      'images_hash',
     ]
     const values = source.split('|')
     columns.forEach((name, index) => console.log(`  ${name}=${values[index]}`))

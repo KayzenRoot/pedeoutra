@@ -315,9 +315,85 @@ export type Database = {
         }
         Relationships: []
       }
+      product_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          organization_id: string
+          position: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          organization_id: string
+          position?: number
+          slug?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          position?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_images: {
+        Row: {
+          alt_text: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_cover: boolean
+          organization_id: string
+          position: number
+          product_id: string
+          storage_path: string
+          thumb_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          alt_text: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_cover?: boolean
+          organization_id: string
+          position?: number
+          product_id: string
+          storage_path: string
+          thumb_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_cover?: boolean
+          organization_id?: string
+          position?: number
+          product_id?: string
+          storage_path?: string
+          thumb_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           active: boolean
+          category_id: string | null
           created_at: string
           id: string
           name: string
@@ -328,6 +404,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          category_id?: string | null
           created_at?: string
           id?: string
           name: string
@@ -338,6 +415,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          category_id?: string | null
           created_at?: string
           id?: string
           name?: string

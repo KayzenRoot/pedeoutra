@@ -3339,3 +3339,126 @@ svg {
   min-height: 40vh;
   color: var(--muted);
 }
+
+/* Part 2 — catálogo com categorias e fotos */
+.category-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+}
+
+.category-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.category-chip[aria-pressed="true"] {
+  background: var(--brand-navy);
+  border-color: var(--brand-navy);
+  color: var(--on-brand);
+}
+
+.product-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+  background: var(--surface-2);
+}
+
+.product-photo-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--brand-navy);
+  background: var(--lime);
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+[data-theme="dark"] .category-chip[aria-pressed="true"] {
+  background: var(--lime);
+  border-color: var(--lime);
+  color: var(--brand-navy);
+}
+
+/* Part 2 — gerenciador de categorias e fotos */
+.media-card {
+  margin-top: 18px;
+}
+
+.inline-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.category-manager-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.category-manager-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.image-tile {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.image-tile img,
+.image-missing {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: var(--surface-2);
+}
+
+.image-missing {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.image-tile figcaption {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  font-size: 0.78rem;
+}
+
+.image-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

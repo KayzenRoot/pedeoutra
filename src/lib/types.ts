@@ -2,6 +2,8 @@ import type { Database } from './database.types'
 
 export type Organization = Database['public']['Tables']['organizations']['Row']
 export type Product = Database['public']['Tables']['products']['Row']
+export type ProductCategory = Database['public']['Tables']['product_categories']['Row']
+export type ProductImage = Database['public']['Tables']['product_images']['Row']
 export type Customer = Database['public']['Tables']['customers']['Row']
 export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
@@ -18,11 +20,25 @@ export interface PublicCatalogResponse {
     city: string | null
     whatsapp: string
   }
+  categories: Array<{
+    id: string
+    name: string
+    slug: string
+    position: number
+  }>
   products: Array<{
     id: string
     name: string
     unit: string
     price_cents: number | null
+    category_id: string | null
+    images: Array<{
+      id: string
+      alt_text: string
+      is_cover: boolean
+      url: string | null
+      thumb_url: string | null
+    }>
   }>
   accepting_orders: boolean
 }
