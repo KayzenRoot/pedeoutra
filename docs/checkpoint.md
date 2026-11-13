@@ -47,6 +47,10 @@
   teste removidos.
 - Primeira cobrança real ainda não executada; depende de autorização explícita,
   domínio, Supabase Pro/região e auditoria.
+- Decisão de lançamento (2026-11-13): manter `pedeoutra.pages.dev` e Supabase
+  Free/Ohio com keepalive, aceitando risco de pausa/backup; nenhuma cobrança
+  real de teste. Fluxo de recuperação de senha implementado; SMTP próprio
+  permanece pendente de credenciais.
 
 ## Pendências
 

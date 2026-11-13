@@ -111,6 +111,8 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
   ativa; evidência em `evidence/logs/asaas-webhook-real.txt`. Sandbox e dados
   sintéticos foram removidos em 13/11/2026
   (`evidence/logs/staging-cleanup-2026-11-13.txt`).
+- Recuperação de senha: `/recuperar-senha` e `/redefinir-senha` cobertos por 3
+  testes de componente; o envio real de e-mail depende do SMTP próprio.
 - Keepalive diário do Supabase (`supabase-keepalive`) valida `/auth/v1/health`;
   falha por dois dias exige verificação manual do projeto.
 - Reconciliação diária (`billing-reconcile`) chama a Edge Function com

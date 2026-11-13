@@ -126,6 +126,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSubscription(null)
   }, [])
 
+  const requestPasswordReset = useCallback(async (email: string) => {
+    if (!supabase) throw new Error('Backend não configurado.')
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/redefinir-senha`,
+    })
+    if (error) {
+      throw new Error('Não foi possível enviar o e-mail de recuperação. Tente novamente.')
+    }
+  }, [])
+
+  const updatePassword = useCallback(async (password: string) => {
+    if (!supabase) throw new Error('Backend não configurado.')
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) {
+      throw new Error('Não foi possível atualizar a senha. O link pode ter expirado.')
+    }
+  }, [])
+
   const createOrganization = useCallback(
     async (input: { name: string; whatsapp: string; city: string }) => {
       if (!supabase) throw new Error('Backend não configurado.')
@@ -166,6 +184,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
+      requestPasswordReset,
+      updatePassword,
       createOrganization,
       refreshOrganization,
     }),
@@ -178,6 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
+      requestPasswordReset,
+      updatePassword,
       createOrganization,
       refreshOrganization,
     ],

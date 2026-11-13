@@ -67,20 +67,21 @@ limit, template com IDs/quantidades; preço atual recalculado no servidor.
 **Consequências:** token só aparece uma vez; perda exige novo link; sem dados
 do cliente na página.
 
-## ADR PDA-ADR-007 — Região e plano do Supabase no staging
+## ADR PDA-ADR-007 — Região e plano do Supabase no lançamento
 
-**Status:** APPROVED (decisão de staging, 2026-11-13)
-**Contexto:** o projeto `waygtbclkxklexnabwvj` está em East US/Ohio; a produção
-monetizada está bloqueada, não há usuários reais e a migração para São Paulo
-exigiria recriar o projeto, chaves, Auth, secrets, Edge Functions e webhook.
-**Decisão:** manter East US/Ohio no staging/MVP, com Supabase Free e keepalive
-diário via GitHub Actions. Antes do go-live, migrar para `sa-east-1` e contratar
-o plano Pro.
-**Consequências:** latência maior para usuários brasileiros no staging; a
-migração e o upgrade são pré-requisitos de produção, não tarefas silenciosas. O
-keepalive reduz o risco de pausa, mas não garante disponibilidade.
-**Alternativas rejeitadas:** migrar agora, sem usuários e com produção bloqueada;
-manter Free em produção com pagantes.
+**Status:** APPROVED (decisão de lançamento, 2026-11-13)
+**Contexto:** o projeto `waygtbclkxklexnabwvj` está em East US/Ohio; o lançamento
+inicial usa `pedeoutra.pages.dev`, sem domínio próprio, e a migração para São
+Paulo/Pro exigiria custo recorrente e recriação de chaves, Auth, secrets, Edge
+Functions e webhook.
+**Decisão:** manter East US/Ohio e Supabase Free no lançamento, com keepalive
+diário via GitHub Actions e risco de pausa/backup aceito explicitamente.
+Reavaliar Pro e `sa-east-1` quando houver os primeiros clientes pagantes ou
+antes de aumentar o volume.
+**Consequências:** latência maior, risco de pausa por inatividade e ausência de
+backups de produção; o keepalive reduz o risco, mas não garante disponibilidade.
+**Alternativas rejeitadas:** migrar agora sem domínio/cobrança real; manter Free
+indefinidamente com crescimento e pagantes.
 
 ## ADR PDA-ADR-008 — Asaas produção configurado
 

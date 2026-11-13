@@ -17,6 +17,8 @@ export interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string) => Promise<SignUpResult>
   signOut: () => Promise<void>
+  requestPasswordReset: (email: string) => Promise<void>
+  updatePassword: (password: string) => Promise<void>
   createOrganization: (input: {
     name: string
     whatsapp: string
