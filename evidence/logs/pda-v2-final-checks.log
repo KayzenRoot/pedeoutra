@@ -1,0 +1,35 @@
+PDA-V2-P01-WO-001 — final local checks
+HEAD de código: 73b600effd83ca233c0e1604ee6a17c902ef5861
+Data: 2026-11-13
+
+npm ci                         exit=0
+npm run lint                   exit=0
+npm run typecheck              exit=0
+npm run test:unit              exit=0  (85 PASS / 0 FAIL, 11 arquivos)
+npm run build                  exit=0  (bundle gerado; aviso de chunk >500 kB)
+npm run test:db                exit=0  (39 PASS / 0 FAIL)
+npm run test:postgrest         exit=0  (13 PASS / 0 FAIL)
+npm run test:edge              exit=0  (15 Edge Functions typechecked)
+npm run test:edge-http         exit=0  (25 PASS / 0 FAIL)
+npm run test:full-local        exit=0  (7 grupos PASS / 0 FAIL)
+npm run test:restore           exit=0  (contagens/checksums idênticos; 8 tabelas V2)
+npm run smoke:preview          exit=0  (light/dark/system; axe 0 serious/critical)
+npm audit --json               exit=1  (9 moderate, 0 HIGH, 0 CRITICAL — esperado)
+
+Gate Zero:
+PR #77 checks no HEAD 4c2e190   todos PASS (12 entradas; 4 jobs obrigatórios)
+merge normal                    40b4224d61da23a53990bf91a6fadcbd52ff969c
+
+Restore (source == target):
+organizations=1 products=1 customers=1 orders=1 order_items=1
+reorder_links=1 subscriptions=1 billing_events=1 audit_events=1
+plan_catalog=2 plan_features=48 trial_grants=1 trial_signals=2
+platform_admins=1 platform_audit_events=1 plan_changes=1 quota_usage=1
+orders_hash=3fff98e55f8bfbcb12c3ea221b45c4e1
+items_hash=0a3f2e08dc731ef40ab56e2c2a72ac08
+plans_hash=3ecabd5970fbe753e2eb9cd4db2e3615
+subscriptions_hash=b8f5b5226d0f23a7437d27ff51c980f2
+trials_hash=a415d545b15dd3c5b41faad4dfe0802a
+platform_audit_hash=26230d3bd169ef172dea692f5d88d2b4
+
+Nenhuma cobrança, e-mail, migração em produção, deploy ou merge da Parte 1.

@@ -25,8 +25,8 @@ decisão de backup/continuidade (ADR-009 PROPOSED) e auditoria. `pedeoutra.pages
 | Repositório Pages | `KayzenRoot/pedeoutra`, branch de produção `main` |
 | Build Pages | `npm run build`; output `dist`; Node 22; auto-deploy a cada push em `main` |
 | Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
-| Migrations | 4 migrations aplicadas via `supabase db push` |
-| Edge Functions | 11 publicadas; públicas com `--no-verify-jwt`, autenticadas com JWT |
+| Migrations | 4 migrations aplicadas no staging; +2 migrations V2 no repositório, **não aplicadas** |
+| Edge Functions | 11 publicadas; 4 novas no repositório (`admin-api`, `admin-bootstrap`, `change-plan`, `plan-catalog`) **não publicadas**; total 15 |
 | Auth | Site URL/redirects do Pages; fluxo de recuperação de senha; `mailer_autoconfirm=true` até configurar SMTP próprio |
 | Asaas | Produção configurada (API key, checkout e webhook); Sandbox removido/limpo |
 | Webhook Asaas produção | id `71177108-9a90-43be-92b3-a9cf91595169`, 13 eventos, `enabled=true` |
