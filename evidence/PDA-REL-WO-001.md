@@ -64,6 +64,9 @@ CI do PR #77 no HEAD `fdc57e5`:
 
 - push run [43463201013](https://github.com/KayzenRoot/pedeoutra/actions/runs/43463201013) — 4/4 jobs verdes.
 - pull_request run [43463212812](https://github.com/KayzenRoot/pedeoutra/actions/runs/43463212812) — 4/4 jobs verdes.
+- commit de evidência `20f5e8d`: push run [43464324447](https://github.com/KayzenRoot/pedeoutra/actions/runs/43464324447)
+  e PR run [43464339392](https://github.com/KayzenRoot/pedeoutra/actions/runs/43464339392)
+  — 4/4 jobs verdes em ambos.
 - SonarCloud e Socket: pass.
 
 ## 5. Auth, SMTP e recuperação
@@ -134,6 +137,9 @@ CI do PR #77 no HEAD `fdc57e5`:
 - Inventário: há **1 usuário/organização/produto/pedido real** no ambiente,
   identificado fora dos testes e preservado; nenhum cleanup global foi feito.
 - Health: Pages 200, Auth 200, webhook com token inválido 401, reconcile 200.
+- `main` ruleset `main-release-protection` (id `27211431`) ativo: PR obrigatório,
+  4 checks, sem force-push/deleção/bypass; aprovação extra para commits não
+  atribuídos desabilitada para preservar o fluxo solo.
 - `release-health` foi adicionado ao PR para rodar a cada 6h; só fica ativo após
   merge. `keepalive` e `billing-reconcile` já existem na `main`.
 - Rollback: deployment anterior `01656b3f` (`6328c49`) inventariado; ensaio
