@@ -24,7 +24,7 @@ cobertura.
   redirect no parâmetro `next`.
 - Billing: 26 testes unitários cobrindo valor/tenant, duplicata, fora de ordem,
   reembolso, cancelamento, checkout e reconciliação.
-- Total atual: **85 testes unitários/componente em 11 arquivos** (inclui
+- Total atual: **94 testes unitários/componente em 14 arquivos** (inclui
   catálogo de planos, billing por plano e tema).
 
 ### 2. Banco real (Postgres em Docker)

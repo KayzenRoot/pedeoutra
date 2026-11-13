@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
 - Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `1df89b9b36a7c273639baa40832250894b7fd89c`
+- HEAD no momento da geração: `bd4cd05ba8a5eaf6320860c4bff7858336687f35`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
@@ -26,7 +26,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `b1e86e70ab9c05106cc7847878700962501468cea9b91579f5b89068b6633c3b` |
+| `docs/checkpoint.md` | `e590794595c6d88ef41fab11e1acaee4dd97dcecf253af6cdf76456f8ddae5b7` |
 | `docs/decisions-ledger.md` | `f8a49ab27df7691a1c7eb2cbfe60ae9adc4872caed4290eb09d01fc23831341e` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `57724d845a994b1c91f3e8372f921b415f0625bee4d01f1b19e6ff7474cf6947` |
@@ -37,7 +37,7 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `docs/scope.md` | `cb34d40b33678c5fe70ffd4aa8fd25830022b6e301d17eaa4afdac74353e7f5b` |
 | `docs/security.md` | `2e9fd6cf20d01ed764c80eb70b2fd1510ffff386ebdb75781b6d4ca8c96d4392` |
 | `docs/support-runbook.md` | `06660ed0dc083c665ea9421a9a18ae66261af1714ba36e6e72bf5875bf16dec0` |
-| `docs/test-plan.md` | `6541e1229504c7351efd634d283bf27cbd480afda94182756ae05168932276cc` |
+| `docs/test-plan.md` | `0b51cdbd572475f2ffe21639f5a6a22d3c0b2aa0b8fcb90cb9953dbeba032185` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `b7f4e080d59b64fdfdeb6b8069436ce47a40f8031b0a2215e9605b7a1a63fe23` |
 | `package-lock.json` | `9022bfabf83a2a0cd3cead128de9d58417b23ed9f80377200a7a7bd1b5dca530` |

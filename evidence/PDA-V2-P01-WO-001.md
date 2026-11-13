@@ -68,7 +68,7 @@ Duas migrations aditivas, aplicadas apenas em bancos sintéticos/isolados:
 | `npm ci` | instalação limpa | 0 |
 | `npm run lint` | ESLint sem erros | 0 |
 | `npm run typecheck` | app + config | 0 |
-| `npm run test:unit` | **85 PASS / 0 FAIL**, 11 arquivos | 0 |
+| `npm run test:unit` | **94 PASS / 0 FAIL**, 14 arquivos | 0 |
 | `npm run build` | bundle gerado (aviso de chunk >500 kB) | 0 |
 | `npm run test:db` | **39 PASS / 0 FAIL** | 0 |
 | `npm run test:postgrest` | **13 PASS / 0 FAIL** | 0 |

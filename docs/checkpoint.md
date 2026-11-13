@@ -86,7 +86,7 @@ gates de lançamento.
   dois planos e feature keys; entitlements/quotas server-side; contratos de
   cobrança por plano com Profissional desativado; console `/admin` e
   configurações de conta.
-- **Evidência revalidada no HEAD de código:** 85 unit, 39 DB, 13 PostgREST,
+- **Evidência revalidada no HEAD de código:** 94 unit, 39 DB, 13 PostgREST,
   15 Edge Functions typechecked, 25 Edge HTTP, 7 grupos full-local, restore
   com as 8 tabelas V2 e smoke light/dark/system desktop/mobile. `npm audit`
   mantém 0 HIGH/CRITICAL e 9 moderate.
