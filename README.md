@@ -16,7 +16,8 @@ um link de recompra. O comprador não baixa app e não cria conta.
 | Asaas produção | **CONFIGURADO** — API key, checkout e webhook validados sem cobrança |
 | Deploy staging | **PASS** — https://pedeoutra.pages.dev, Git auto-deploy em `main` |
 | PR #12 / CI | **MERGED** em `main` (`26d55e0`); CI 4/4 verde |
-| Supabase Free | keepalive diário configurado; Pro obrigatório antes de pagantes |
+| Supabase Free | Ohio/Free aceito no lançamento com keepalive diário; risco de pausa/backup |
+| Recuperação de senha | fluxo implementado; envio real depende de SMTP próprio |
 | Produção monetizada | `CONFIGURADA` — primeira cobrança real, domínio, Pro/região e auditoria pendentes |
 
 O bundle de evidências fica em [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md).

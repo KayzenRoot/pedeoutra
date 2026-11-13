@@ -4,9 +4,9 @@
 
 - Data do lock: 2026-11-13
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
-- Branch: `chore/billing-reconcile-cron`
-- Base SHA: `c23de39bef0f4f36a0ca9a59bf67a55a910ebd39`
-- HEAD no momento da geração: `c23de39bef0f4f36a0ca9a59bf67a55a910ebd39`
+- Branch: `feat/password-recovery`
+- Base SHA: `6328c490bd1e153859c1287e41534ce359fc77f8`
+- HEAD no momento da geração: `6328c490bd1e153859c1287e41534ce359fc77f8`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -18,20 +18,21 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 
 | Arquivo | SHA-256 |
 | --- | --- |
+| `.github/workflows/billing-reconcile.yml` | `8659f39309351494d1d4f25187bbf1e380807ded9871ab767e00b7b46c9d95e1` |
 | `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
 | `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
-| `README.md` | `0242c2c9c4bf7c87244b59c2592fdfc2ea811adff52e1220b2ffdd1b59ff47ab` |
+| `README.md` | `127fc8f38887477800589df1d0ac9aea424800671776a1f22e2123d6bd136080` |
 | `docs/architecture.md` | `370493984b49de7076bb271921064a5cd6e7351cb6ad84096dfaec5896cb8441` |
 | `docs/backlog.md` | `9dddbc084637deb8764a818fcf1e112b02ad8b3434d7054b1e81beff02d6482d` |
-| `docs/checkpoint.md` | `ba5e854cc8950037ec602b62cdf8815252785167f02f868ff7586ef7c9c47e7d` |
-| `docs/decisions-ledger.md` | `11c53959ffef1a39c3cb0844b9772a9a842e5882bbf137f629aca024887db7df` |
+| `docs/checkpoint.md` | `59d621840cb69353a4f49368ac77ed6f18513cc32bca9670ee7148d25e6f25ac` |
+| `docs/decisions-ledger.md` | `e78ac3ff2407369d2a0206a8ebe0c3ba45b920e1076db1e4b8d893dd66f69aa5` |
 | `docs/definition-of-done.md` | `3e278f66cf608c0a52daff110977504b04a45d117fd781ff2f25b7bf0f2e79ec` |
-| `docs/deployment.md` | `4a553f59d308622fe62d3fe05ed10aeb8e1a8e2bd4c803b35e98479c275d0076` |
+| `docs/deployment.md` | `6d6b147a0de92bbcac2151a2f524f994f11f159fb73249c9760bc24bd54241a8` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
 | `docs/requirements.md` | `0f456ae240278d69f2a1f02dbb6c1a215e9ac6a58b3023145011acc4fa531a45` |
 | `docs/scope.md` | `f6c890b298092c479776d8a1f26f0ac0db48cf74a896ef796b724f04f9922cd7` |
 | `docs/security.md` | `22bc04ec36176d2cdd7034c5d97f5e536dcca4a7885480d95549b88cf647823f` |
-| `docs/test-plan.md` | `bec227ae86f3dcec8a3cff307ef7faf21a3578d9e967da87c99ffd0a957bf449` |
+| `docs/test-plan.md` | `8e644f5d52722c9ab4e8b63df6a71e640110eca6a8f3cf892eb41c6213f6048f` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `7d05d97afb19077db3e4445fdee174346672b0ba0a2d4ec1075d4ea903d097d7` |
 | `package-lock.json` | `13fdb0f6a05ed7d1e26a689df8b891129e941f275f579fe3b2870dd91e1ad65d` |
@@ -49,14 +50,14 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `scripts/test-full-local.mjs` | `17711fc94fda1bcfe69e6e6ce29aa9bdc01507f73567e5246defe61df718fa3e` |
 | `scripts/test-postgrest.mjs` | `de7683e514f848f5622eab991d36050417f8f6b8920a12824bdfdb442dd44381` |
 | `scripts/verify-restore.mjs` | `974a876705cd69b6314b1f73d6a206c85345e2cd4f59d8312a2a68193e332d56` |
-| `src/App.tsx` | `5e89b784c8eb9e6a8581380feb65e4afffa1359d2697984d93b8d2f1299bf511` |
+| `src/App.tsx` | `059fd3c558932df4ea137485312f442283b5a4b7bafec111cab435b22148cffb` |
 | `src/components/AppShell.tsx` | `e3d304664de475c357104bbef2b68bc6720c61325dcf59447464c1743872e2ff` |
 | `src/components/AuthLayout.tsx` | `4c9cc6eec29478520057269ca62a40b9284d0262584ee22b12f713284b48dc45` |
 | `src/components/Brand.tsx` | `270b850ed4b611f0ea950c253ca422dba36d1c78056f65ed2a56897600934d82` |
 | `src/components/ProtectedRoute.tsx` | `6ed279f45f355dcaedf8709290cc0ae5ac620ad6d2a1aa9170aa8fe8b0de3916` |
 | `src/components/ui.tsx` | `eb9750af063357811242015f8ade53359c1da6e1187422afe245b5cb4f6a73e9` |
-| `src/context/AuthContext.tsx` | `47305a96b997a6deb365d03be11bc6a340fcabf02ac33552fdfc389e27203b9b` |
-| `src/context/auth-context.ts` | `55eafc38d9d10765ce6b2c430b47b63df4daaf3eebf493e7bed58a970137520f` |
+| `src/context/AuthContext.tsx` | `29cfdc94e72262310ae82e7074fc9ecde74b7dcc095e3321a6dd09dc7061c3bf` |
+| `src/context/auth-context.ts` | `92b7a64adfcb7c314f1ce96b44e98d2b3546f3a184afc9f14d724064067844b9` |
 | `src/lib/access.ts` | `193b810fc35452fecea93fcdf7eafbd902c1ba304f4fcfcdc01bfc622d13aa5b` |
 | `src/lib/analytics.ts` | `be8a9df62b15f005dcaba45361de77e78071cc4212a12087540f2d83f0a21cfe` |
 | `src/lib/database.types.ts` | `c9cc08cfbf4298d4898408ce4baf1667598d660c4b924afbd6006b0d5c0d7aa7` |
@@ -74,7 +75,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `src/pages/Demo.tsx` | `d3bf574f604782ac1d9410b5d1853064918657970493ddfe61c30e21a4439212` |
 | `src/pages/Landing.tsx` | `14d185ce222d9c36b7e01b1efe74df166b1821c53dc0d12be990aa2575fdedef` |
 | `src/pages/Legal.tsx` | `01174238a5e5a0313c7d0639f698d16ce8466db21d7432ecdfbcbdbe50961c4a` |
-| `src/pages/Login.tsx` | `f5b7cf93741f6470534bd3bf1073b1b0eadbdc4a47c37cdc5c5796452097d78e` |
+| `src/pages/Login.tsx` | `2d69c56b53c1fdd46768d702f0d9032702f631c29eab3b117dd03c1909d7b151` |
 | `src/pages/NotFound.tsx` | `c78ec47ea4c925ce52da2893d508a8d7c78de49d10c5f8f2d29a5de5fc308108` |
 | `src/pages/Onboarding.tsx` | `6e3720b9aec18e03d8b5246f7805783ed8b54e236cfbbaba4f7e0541120e78ee` |
 | `src/pages/OrderDetail.tsx` | `34338319858f603ed49a2e4de59e907161c3bc092b98348428ee9d0587dcce5e` |

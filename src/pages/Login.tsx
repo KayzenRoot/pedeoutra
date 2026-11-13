@@ -38,9 +38,14 @@ export function Login() {
       title="Entrar no PedeOutra"
       subtitle="Acesse o painel do seu catálogo e dos pedidos."
       footer={
-        <p>
-          Ainda não tem conta? <Link to="/criar-conta">Criar conta grátis</Link>
-        </p>
+        <>
+          <p>
+            <Link to="/recuperar-senha">Esqueci minha senha</Link>
+          </p>
+          <p>
+            Ainda não tem conta? <Link to="/criar-conta">Criar conta grátis</Link>
+          </p>
+        </>
       }
     >
       <form className="form" onSubmit={handleSubmit}>

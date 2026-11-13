@@ -8,6 +8,7 @@ import { Catalog } from './pages/Catalog'
 import { Customers } from './pages/Customers'
 import { Dashboard } from './pages/Dashboard'
 import { Demo } from './pages/Demo'
+import { ForgotPassword } from './pages/ForgotPassword'
 import { Landing } from './pages/Landing'
 import { Privacy, Terms } from './pages/Legal'
 import { Login } from './pages/Login'
@@ -17,6 +18,7 @@ import { OrderDetail } from './pages/OrderDetail'
 import { Orders } from './pages/Orders'
 import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
+import { ResetPassword } from './pages/ResetPassword'
 import { Signup } from './pages/Signup'
 
 function ScrollToTop() {
@@ -35,6 +37,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/entrar" element={<Login />} />
+          <Route path="/recuperar-senha" element={<ForgotPassword />} />
+          <Route path="/redefinir-senha" element={<ResetPassword />} />
           <Route path="/criar-conta" element={<Signup />} />
           <Route
             path="/onboarding"

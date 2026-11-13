@@ -26,7 +26,7 @@ domínio próprio, Supabase Pro/região e auditoria.
 | Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
 | Migrations | 4 migrations aplicadas via `supabase db push` |
 | Edge Functions | 11 publicadas; públicas com `--no-verify-jwt`, autenticadas com JWT |
-| Auth | Site URL/redirects do Pages; `mailer_autoconfirm=true` no MVP |
+| Auth | Site URL/redirects do Pages; fluxo de recuperação de senha; `mailer_autoconfirm=true` até configurar SMTP próprio |
 | Asaas | Produção configurada (API key, checkout e webhook); Sandbox removido/limpo |
 | Webhook Asaas produção | id `71177108-9a90-43be-92b3-a9cf91595169`, 13 eventos, `enabled=true` |
 | Smoke | cadastro, organização, produto, catálogo, pedido, recompra, checkout de produção sem pagamento |
@@ -43,12 +43,38 @@ substitui o plano Pro. Revisar plano/limites antes de usuários pagantes.
 
 ### Decisão de região e plano (staging)
 
-O staging permanece em **East US/Ohio** (`waygtbclkxklexnabwvj`) nesta fase:
-não há usuários reais, o go-live comercial ainda está bloqueado e recriar o projeto
-em São Paulo mudaria URL, chaves, secrets, Auth e webhook Asaas. A decisão está
-registrada na ADR-007. Antes do go-live, migrar para `sa-east-1` e contratar
-Supabase Pro são pré-requisitos, com janela, novo smoke e atualização de
-`VITE_SUPABASE_*`, secrets das funções e webhook.
+O staging permanece em **East US/Ohio** (`waygtbclkxklexnabwvj`) e no plano
+Free nesta fase. A decisão de lançamento é manter Ohio/Free com keepalive
+diário, aceitando o risco de pausa e a ausência de backups de produção; migrar
+para `sa-east-1` e contratar Pro deve ser reavaliado assim que houver os
+primeiros clientes pagantes. A decisão está registrada na ADR-007.
+
+### Decisões de lançamento (2026-11-13)
+
+- URL pública: `https://pedeoutra.pages.dev`; domínio próprio fica para uma
+  próxima etapa.
+- Supabase Free/Ohio mantido com keepalive; risco de pausa/backup aceito para o
+  lançamento inicial.
+- Asaas produção configurado, mas **nenhuma cobrança real de teste** foi feita;
+  a primeira cobrança real exige autorização explícita.
+- Recuperação de senha implementada; confirmação de e-mail e envio de links
+  dependem de SMTP próprio. `mailer_autoconfirm=true` permanece até a
+  configuração do SMTP.
+
+### SMTP (credenciais pendentes)
+
+Para ativar confirmação de e-mail e recuperação de senha em produção, adicionar
+ao `.env.production.local` (gitignored) e configurar no Supabase Auth:
+
+- `SMTP_HOST`
+- `SMTP_PORT` (465/587)
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_SENDER_EMAIL`
+- `SMTP_SENDER_NAME`
+
+Depois: desligar `mailer_autoconfirm`, testar cadastro/confirmação e
+recuperação com um e-mail real e manter o token/segredo apenas no ambiente.
 
 ## Deploy automático do frontend
 
