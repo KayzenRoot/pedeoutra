@@ -136,7 +136,7 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 - [x] Eventos duplicados/fora de ordem/reembolso testados em sandbox/mocks.
 - [x] Nenhum dado de cartão trafega pelo PedeOutra.
 - [ ] Primeira cobrança real controlada, com autorização explícita.
-- [ ] Reconciliador agendado (cron) com token próprio.
+- [x] Reconciliador agendado (cron) com token próprio — workflow `billing-reconcile` diário.
 - [ ] Plano de rollback e contato de suporte definidos.
 - [ ] Domínio próprio + Supabase Pro/migração para `sa-east-1`.
 

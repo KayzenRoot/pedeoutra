@@ -20,6 +20,13 @@ Validação read-only:
   - token incorreto -> 401 unauthorized
   - token correto + evento inválido -> 400 invalid_event (sem escrita no banco)
 
+Reconciliação:
+- POST /functions/v1/billing-reconcile com token errado -> 401
+- POST com token correto -> 200
+  {"events_checked":0,"processed":0,"ignored":0,"failed":0,"skipped":0,
+   "subscriptions":{"checked":0,"updated":0,"failed":0}}
+- Workflow diário `billing-reconcile` configurado no GitHub Actions.
+
 Checkout de produção (sem pagamento):
 - POST /functions/v1/create-checkout -> 201
 - Host do link: www.asaas.com

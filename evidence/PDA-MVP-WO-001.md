@@ -84,6 +84,7 @@ Logs completos em `evidence/logs/`.
 | `node scripts/prod-smoke.mjs` | PASS signup, organização, produto, pedido, vínculo, recompra | 0 | `prod-smoke.log` |
 | Asaas Sandbox real | checkout + cartão de teste + webhook + assinatura `active` | 0 | `asaas-webhook-real.txt` |
 | Asaas produção | API key validada, checkout `201` em `www.asaas.com`, webhook 13 eventos e evento recebido; sem pagamento | 0 | `asaas-production-config.txt` |
+| `billing-reconcile` | token errado 401; token correto 200 com 0 eventos/assinaturas | 0 | `asaas-production-config.txt` |
 | Cloudflare Pages Git | auto-deploy dos commits `cdbceaf` e `2993e67`; build final `1fae02ae` success | 0 | `cloudflare-pages-git.txt` |
 | Limpeza staging | 4 usuários sintéticos, 4 orgs, produtos/pedidos, 7 billing events, rate limits e assinatura/cliente sandbox removidos | 0 | `staging-cleanup-2026-11-13.txt` |
 | GitHub Actions (PR #12) | 4 jobs verdes no push `2993e67`: web/axe, banco/PostgREST/restore, Deno/Edge HTTP e E2E full | 0 | [run 43357841432](https://github.com/KayzenRoot/pedeoutra/actions/runs/43357841432) |
