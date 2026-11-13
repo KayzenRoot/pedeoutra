@@ -110,6 +110,17 @@ async function staticSmoke() {
 }
 
 async function runAxe(page, label) {
+  // A landing usa animações de entrada com opacity. Se o axe rodar no meio
+  // delas, as cores são misturadas e o contraste é calculado errado.
+  await page.evaluate(async () => {
+    await Promise.race([
+      Promise.all(
+        document.getAnimations().map((animation) => animation.finished.catch(() => undefined)),
+      ),
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+    ])
+  })
+
   await page.addScriptTag({ path: AXE_PATH })
   const result = await page.evaluate(async () => {
     return await globalThis.axe.run(globalThis.document, {

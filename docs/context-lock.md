@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-MVP-WO-001-pedeoutra-mvp`
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
-- HEAD no momento da geração: `cdbceafa17782d0875f0aad67f3b8b046670f209`
+- HEAD no momento da geração: `5e046b3a6ec7e6cd35f294d6df9f34ffcc8fadbb`
 - Work Order: `PDA-MVP-WO-001` (PDF, 12/11/2026)
 
 ## Issues verificadas (sem duplicatas)
@@ -43,7 +43,7 @@ duplicada. Links: `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 | `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
 | `scripts/local-edge-router.ts` | `1fe3947c688fb1d3b7b15f51ddef101619be4ce7ca3d74311d6e5a7f32f96e1e` |
 | `scripts/prod-smoke.mjs` | `04ed46feff5d299c22bea25639755f911624a73a2fd048055a09a31e307f2117` |
-| `scripts/smoke.mjs` | `7b51a2029fbbbbd6b368d414eb771b995d8beabc466e2b80d292e261137321da` |
+| `scripts/smoke.mjs` | `bed97826a1e311d3df47123522da18a14c8a96c38201fa2a362ab4224dbdac0e` |
 | `scripts/test-edge-http.mjs` | `eb798ab6a006034302298cfefeadcde93cf69d9127232be798bc91017009a827` |
 | `scripts/test-full-local.mjs` | `17711fc94fda1bcfe69e6e6ce29aa9bdc01507f73567e5246defe61df718fa3e` |
 | `scripts/test-postgrest.mjs` | `de7683e514f848f5622eab991d36050417f8f6b8920a12824bdfdb442dd44381` |
