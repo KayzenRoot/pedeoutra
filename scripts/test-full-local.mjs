@@ -81,7 +81,7 @@ function signJwt(payload) {
   return `${header}.${body}.${signature}`
 }
 
-async function waitForHttp(url, attempts = 100) {
+async function waitForHttp(url, attempts = 360) {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
       const response = await fetch(url)
@@ -95,7 +95,7 @@ async function waitForHttp(url, attempts = 100) {
 }
 
 async function waitForSql() {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
+  for (let attempt = 0; attempt < 180; attempt += 1) {
     const result = docker(
       ['exec', PG, 'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c', 'select 1'],
       { allowFailure: true },

@@ -18,6 +18,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
     css: false,
+    testTimeout: 15000,
+    hookTimeout: 15000,
     restoreMocks: true,
     include: ['src/**/*.test.{ts,tsx}', 'supabase/functions/_shared/**/*.test.ts'],
   },

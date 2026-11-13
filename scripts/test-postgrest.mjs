@@ -92,7 +92,7 @@ function signJwt(payload) {
 }
 
 async function waitForSql() {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
+  for (let attempt = 0; attempt < 180; attempt += 1) {
     const result = docker(
       ['exec', PG_CONTAINER, 'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c', 'select 1'],
       { allowFailure: true },

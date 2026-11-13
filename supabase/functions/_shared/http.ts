@@ -37,7 +37,7 @@ function corsHeaders(req: Request): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info, x-supabase-api-version, x-reconcile-token',
+    'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info, x-supabase-api-version, x-reconcile-token, x-admin-bootstrap-token',
     'Access-Control-Max-Age': '600',
     Vary: 'Origin',
   }
@@ -101,6 +101,27 @@ export async function readJson(req: Request): Promise<unknown> {
   try {
     return JSON.parse(text) as unknown
   } catch {
+    throw new HttpError(400, 'invalid_json')
+  }
+}
+
+/** Igual a readJson, mas aceita corpo vazio (defaults no servidor). */
+export async function readOptionalJson(req: Request): Promise<Record<string, unknown>> {
+  const contentLength = Number(req.headers.get('content-length') ?? '0')
+  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+    throw new HttpError(413, 'payload_too_large')
+  }
+  const text = await req.text()
+  if (text.length > MAX_BODY_BYTES) throw new HttpError(413, 'payload_too_large')
+  if (!text.trim()) return {}
+  try {
+    const parsed = JSON.parse(text) as unknown
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new HttpError(400, 'invalid_json')
+    }
+    return parsed as Record<string, unknown>
+  } catch (error) {
+    if (error instanceof HttpError) throw error
     throw new HttpError(400, 'invalid_json')
   }
 }

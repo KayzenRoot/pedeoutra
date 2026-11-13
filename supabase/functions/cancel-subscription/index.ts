@@ -60,6 +60,10 @@ export const handler = (req: Request) =>
       .update({
         state: 'canceled',
         last_verified_at: new Date().toISOString(),
+        pending_plan_code: null,
+        pending_plan_version: null,
+        pending_plan_effective_at: null,
+        pending_provider_checkout_id: null,
       })
       .eq('organization_id', organization.id)
 

@@ -21,6 +21,9 @@ const IMAGE = 'postgres:17-alpine'
 
 const USER_A = '11111111-1111-4111-8111-111111111111'
 const USER_B = '22222222-2222-4222-8222-222222222222'
+const USER_C = '33333333-3333-4333-8333-333333333333'
+const USER_D = '44444444-4444-4444-8444-444444444444'
+const USER_F = '66666666-6666-4666-8666-666666666666'
 const TOKEN_HASH = 'a'.repeat(64)
 
 let passed = 0
@@ -156,7 +159,7 @@ async function main() {
 
   let client
   try {
-    for (let attempt = 1; attempt <= 60; attempt += 1) {
+    for (let attempt = 1; attempt <= 180; attempt += 1) {
       try {
         client = await connect(port)
         break
@@ -164,9 +167,14 @@ async function main() {
         await sleep(500)
       }
     }
-    if (!client) throw new Error('Postgres não ficou pronto em 30s')
+    if (!client) {
+      const logs = docker(['logs', CONTAINER], { allowFailure: true })
+      throw new Error(
+        `Postgres não ficou pronto em 90s\n${logs.stdout || ''}\n${logs.stderr || ''}`,
+      )
+    }
 
-    console.log('\n[1/6] Bootstrap e migrations')
+    console.log('\n[1/7] Bootstrap e migrations')
     await client.query(BOOTSTRAP_SQL)
     const migrations = readdirSync(MIGRATIONS_DIR)
       .filter((file) => file.endsWith('.sql'))
@@ -227,7 +235,7 @@ async function main() {
       return result.rows[0]
     }
 
-    console.log('\n[2/6] Seed sintético e criação de organizações')
+    console.log('\n[2/7] Seed sintético e criação de organizações')
     await client.query('insert into auth.users (id, email) values ($1, $2), ($3, $4)', [
       USER_A, 'a@example.test', USER_B, 'b@example.test',
     ])
@@ -243,7 +251,7 @@ async function main() {
     const customerA = await asUser(USER_A, () => insertCustomer(orgA.id, 'Padaria Pão Bom', '11977776666'))
     const customerB = await asUser(USER_B, () => insertCustomer(orgB.id, 'Mercado Boreal', '21966665555'))
 
-    console.log('\n[3/6] RLS A/B')
+    console.log('\n[3/7] RLS A/B')
     await test('A lê apenas a própria organização', async () => {
       const rows = await asUser(USER_A, async () => (await client.query('select id from public.organizations')).rows)
       assert(rows.length === 1 && rows[0].id === orgA.id, 'A deveria ver só org A')
@@ -317,7 +325,7 @@ async function main() {
       )
     })
 
-    console.log('\n[4/6] Trial, assinatura e escrita')
+    console.log('\n[4/7] Trial, assinatura e escrita')
     await test('trial expirado bloqueia escrita', async () => {
       await client.query(`update public.organizations set trial_ends_at = now() - interval '1 day' where id = $1`, [orgA.id])
       await expectError(
@@ -407,7 +415,7 @@ async function main() {
       [orgA.id],
     )
 
-    console.log('\n[5/6] Pedido público, recompra, rate limit e idempotência')
+    console.log('\n[5/7] Pedido público, recompra, rate limit e idempotência')
     const requestId = '33333333-3333-4333-8333-333333333333'
     let publicOrder
 
@@ -582,7 +590,7 @@ async function main() {
       )
     })
 
-    console.log('\n[6/6] Status do pedido e billing')
+    console.log('\n[6/7] Status do pedido e billing')
     await test('transição válida grava evento com autor', async () => {
       await asUser(USER_A, () => client.query(
         `update public.orders set status = 'confirmed' where id = $1`,
@@ -645,6 +653,253 @@ async function main() {
         'invalid_billing_state',
         'mark state inválido',
       )
+    })
+
+    console.log('\n[7/7] Planos, entitlements, trial e admin')
+
+    await test('catálogo contém exatamente os dois planos com preços aprovados', async () => {
+      const plans = await client.query(
+        `select plan_code, plan_version, price_cents, currency
+           from public.plan_catalog
+          order by plan_code`,
+      )
+      assert(plans.rows.length === 2, `esperava 2 planos, veio ${plans.rows.length}`)
+      const byCode = Object.fromEntries(plans.rows.map((row) => [row.plan_code, row]))
+      assert(byCode.essential.price_cents === 2990, 'preço Essencial')
+      assert(byCode.professional.price_cents === 6990, 'preço Profissional')
+      assert(byCode.essential.currency === 'BRL', 'moeda Essencial')
+    })
+
+    await test('matriz de features separa Essencial de Profissional', async () => {
+      const essential = await client.query(
+        `select enabled from public.plan_feature_entitlements
+          where plan_code = 'essential' and plan_version = 1 and feature_key = 'private_prices'`,
+      )
+      const professional = await client.query(
+        `select enabled from public.plan_feature_entitlements
+          where plan_code = 'professional' and plan_version = 1 and feature_key = 'private_prices'`,
+      )
+      assert(essential.rows[0].enabled === false, 'Essencial não deve ter preço privado')
+      assert(professional.rows[0].enabled === true, 'Profissional deve ter preço privado')
+    })
+
+    await test('trial vigente concede apenas Essencial', async () => {
+      const plan = await asService(() =>
+        client.query('select * from app.effective_plan($1)', [orgB.id]),
+      )
+      assert(plan.rows[0].plan_code === 'essential', `plano ${plan.rows[0].plan_code}`)
+      assert(plan.rows[0].access_kind === 'trial', `kind ${plan.rows[0].access_kind}`)
+      const pro = await asService(() =>
+        client.query(`select app.has_entitlement($1, 'api_access') as allowed`, [orgB.id]),
+      )
+      assert(pro.rows[0].allowed === false, 'trial não pode ter API Profissional')
+    })
+
+    await test('assinatura Profissional ativa libera feature Pro; Essencial não', async () => {
+      const essential = await asService(() =>
+        client.query(`select app.has_entitlement($1, 'api_access') as allowed`, [orgA.id]),
+      )
+      assert(essential.rows[0].allowed === false, 'Essencial liberou API')
+
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      const professional = await asService(() =>
+        client.query(`select app.has_entitlement($1, 'api_access') as allowed`, [orgA.id]),
+      )
+      assert(professional.rows[0].allowed === true, 'Profissional não liberou API')
+
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'essential', plan_version = 1
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      const revoked = await asService(() =>
+        client.query(`select app.has_entitlement($1, 'api_access') as allowed`, [orgA.id]),
+      )
+      assert(revoked.rows[0].allowed === false, 'downgrade não revogou API')
+    })
+
+    await test('quota é atômica, isolada por tenant e auditável', async () => {
+      const results = []
+      for (let index = 0; index < 4; index += 1) {
+        const row = await asService(() =>
+          client.query(`select app.consume_quota($1, 'db_test_quota', 3, 60) as allowed`, [
+            orgB.id,
+          ]),
+        )
+        results.push(row.rows[0].allowed)
+      }
+      assert(
+        JSON.stringify(results) === JSON.stringify([true, true, true, false]),
+        `resultado inesperado: ${JSON.stringify(results)}`,
+      )
+      const otherTenant = await asService(() =>
+        client.query(`select app.consume_quota($1, 'db_test_quota', 3, 60) as allowed`, [
+          orgA.id,
+        ]),
+      )
+      assert(otherTenant.rows[0].allowed === true, 'quota vazou entre tenants')
+    })
+
+    await test('trial é único por usuário e sobrevive à recriação da organização', async () => {
+      await client.query('insert into auth.users (id, email) values ($1, $2)', [
+        USER_C,
+        'c@example.test',
+      ])
+      const firstOrg = await createOrg(USER_C, 'Recicla Trial', '11911112222')
+      const firstGrant = await client.query(
+        'select ends_at, status from public.trial_grants where user_id = $1',
+        [USER_C],
+      )
+      assert(firstGrant.rows[0].status === 'granted', 'primeiro trial deveria ser concedido')
+      const firstEnds = new Date(firstGrant.rows[0].ends_at)
+
+      await client.query('delete from public.organizations where id = $1', [firstOrg.id])
+      const surviving = await client.query(
+        'select organization_id, ends_at from public.trial_grants where user_id = $1',
+        [USER_C],
+      )
+      assert(surviving.rows[0].organization_id === null, 'grant deveria sobreviver sem org')
+
+      const secondOrg = await createOrg(USER_C, 'Recicla Trial Dois', '11911113333')
+      const second = await client.query(
+        'select organization_id, ends_at from public.trial_grants where user_id = $1',
+        [USER_C],
+      )
+      assert(second.rows[0].organization_id === secondOrg.id, 'grant não religado')
+      assert(
+        new Date(second.rows[0].ends_at).getTime() <= firstEnds.getTime(),
+        'trial foi reiniciado na recriação',
+      )
+    })
+
+    await test('telefone repetido é sinal de risco, não bloqueio automático', async () => {
+      await client.query('insert into auth.users (id, email) values ($1, $2)', [
+        USER_D,
+        'd@example.test',
+      ])
+      const orgD = await createOrg(USER_D, 'Telefone Repetido', '11999998888')
+      const grant = await client.query(
+        'select status, risk_score from public.trial_grants where user_id = $1',
+        [USER_D],
+      )
+      assert(grant.rows[0].risk_score >= 25, `risco ${grant.rows[0].risk_score}`)
+      assert(grant.rows[0].status === 'granted', 'telefone isolado não deve bloquear')
+      const access = await client.query(
+        'select access_state from public.organizations where id = $1',
+        [orgD.id],
+      )
+      assert(access.rows[0].access_state === 'trial', 'trial deveria continuar ativo')
+    })
+
+    await test('e-mail repetido abre revisão manual, e admin pode limpar/suspender', async () => {
+      await client.query('insert into auth.users (id, email) values ($1, $2)', [
+        USER_F,
+        'f@example.test',
+      ])
+      const orgF = await client.query(
+        `insert into public.organizations (owner_user_id, name, slug, whatsapp)
+         values ($1, 'Revisão Trial', 'revisao-trial-test', '11955554444')
+         returning id`,
+        [USER_F],
+      )
+      const grant = await asService(() =>
+        client.query(
+          `select * from app.record_trial_grant($1, $2, 'a@example.test', '11955554444')`,
+          [orgF.rows[0].id, USER_F],
+        ),
+      )
+      assert(grant.rows[0].status === 'review_required', `status ${grant.rows[0].status}`)
+      assert(grant.rows[0].risk_score >= 35, `risco ${grant.rows[0].risk_score}`)
+
+      const bootstrap = await asService(() =>
+        client.query('select * from public.api_admin_bootstrap($1)', [USER_A]),
+      )
+      assert(bootstrap.rows[0].user_id === USER_A, 'bootstrap do admin')
+      await expectError(
+        () =>
+          asService(() =>
+            client.query('select * from public.api_admin_bootstrap($1)', [USER_B]),
+          ),
+        'admin_exists',
+        'segundo admin',
+      )
+
+      const cleared = await asService(() =>
+        client.query(
+          `select public.api_admin_review_trial($1, $2, 'clear_review', 'revisão manual concluída')`,
+          [USER_A, orgF.rows[0].id],
+        ),
+      )
+      assert(cleared.rows[0].api_admin_review_trial === 'granted', 'clear review')
+
+      const suspended = await asService(() =>
+        client.query(
+          `select public.api_admin_set_org_access($1, $2, 'suspend', 'teste de suspensão')`,
+          [USER_A, orgF.rows[0].id],
+        ),
+      )
+      assert(suspended.rows[0].api_admin_set_org_access === 'blocked', 'suspensão')
+
+      const reactivated = await asService(() =>
+        client.query(
+          `select public.api_admin_set_org_access($1, $2, 'reactivate', 'teste de reativação')`,
+          [USER_A, orgF.rows[0].id],
+        ),
+      )
+      assert(reactivated.rows[0].api_admin_set_org_access === 'trial', 'reativação')
+
+      const audit = await client.query(
+        `select action, actor_user_id from public.platform_audit_events
+          where target_organization_id = $1 order by created_at`,
+        [orgF.rows[0].id],
+      )
+      assert(audit.rows.length >= 2, `auditoria insuficiente: ${audit.rows.length}`)
+      assert(audit.rows.every((row) => row.actor_user_id === USER_A), 'ator da auditoria')
+    })
+
+    await test('admin é singleton e funções globais são exclusivas de service_role', async () => {
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.platform_admins (singleton, user_id) values (true, $1)`,
+            [USER_B],
+          ),
+        'duplicate key',
+        'segundo superadmin',
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.trial_grants (organization_id, user_id, ends_at)
+             values ($1, $2, now() + interval '7 days')`,
+            [orgB.id, USER_C],
+          ),
+        'duplicate key',
+        'trial duplicado por usuário',
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select * from public.api_admin_overview()')),
+        'permission denied',
+        'authenticated chamando admin overview',
+      )
+      const overview = await asService(() =>
+        client.query('select * from public.api_admin_overview()'),
+      )
+      assert(overview.rows.length === 1, 'overview deveria retornar uma linha')
+      const list = await asService(() =>
+        client.query(
+          `select * from public.api_admin_list_organizations(null, null, null, 2, 0)`,
+        ),
+      )
+      assert(list.rows.length === 2, `paginação retornou ${list.rows.length}`)
+      assert(Number(list.rows[0].total_count) >= 2, 'total_count')
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

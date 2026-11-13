@@ -30,6 +30,35 @@ interface SubscriptionRow {
   state: SubscriptionState
   current_period_end: string | null
   last_provider_event_at: string | null
+  plan_code: string
+  plan_version: number
+  pending_plan_code: string | null
+  pending_plan_version: number | null
+  pending_provider_checkout_id: string | null
+}
+
+interface PlanCatalogRow {
+  plan_code: string
+  plan_version: number
+  price_cents: number
+  currency: string
+  trial_days: number
+}
+
+async function loadPlan(
+  supabase: SupabaseClient,
+  planCode: string,
+  planVersion: number,
+): Promise<PlanCatalogRow | null> {
+  const { data, error } = await supabase
+    .from('plan_catalog')
+    .select('plan_code, plan_version, price_cents, currency, trial_days, active')
+    .eq('plan_code', planCode)
+    .eq('plan_version', planVersion)
+    .maybeSingle()
+  if (error) throw new Error('plan_catalog_lookup_failed')
+  if (!data || data.active !== true) return null
+  return data as PlanCatalogRow
 }
 
 async function findSubscriptionRow(
@@ -51,10 +80,12 @@ async function findSubscriptionRow(
   const attempts: Array<[string, string | null]> = [
     ['provider_subscription_id', event.subscriptionId],
     ['provider_checkout_id', event.checkoutId],
+    ['pending_provider_checkout_id', event.checkoutId],
     ['provider_customer_id', event.customerId],
     ['organization_id', isUuid(event.externalReference) ? event.externalReference : null],
     ['provider_subscription_id', verified?.subscriptionId ?? null],
     ['provider_checkout_id', verified?.checkoutId ?? null],
+    ['pending_provider_checkout_id', verified?.checkoutId ?? null],
     ['provider_customer_id', verified?.customerId ?? null],
   ]
 
@@ -198,7 +229,64 @@ export async function processBillingEventById(
       return 'failed'
     }
 
-    const validation = validateBillingEvent(event, subscription.organization_id, verified)
+    const checkoutIds = [event.checkoutId, verified?.checkoutId].filter(Boolean)
+    const isPendingCheckout =
+      Boolean(subscription.pending_provider_checkout_id) &&
+      checkoutIds.includes(subscription.pending_provider_checkout_id as string)
+
+    if (
+      isPendingCheckout &&
+      (!subscription.pending_plan_code || !subscription.pending_plan_version)
+    ) {
+      await supabase.rpc('api_mark_billing_event', {
+        p_event_id: eventId,
+        p_state: 'failed',
+        p_error: 'pending_plan_invalid',
+      })
+      return 'failed'
+    }
+
+    const targetPlanCode = isPendingCheckout
+      ? subscription.pending_plan_code
+      : subscription.plan_code
+    const targetPlanVersion = isPendingCheckout
+      ? subscription.pending_plan_version
+      : subscription.plan_version
+
+    const plan =
+      targetPlanCode && targetPlanVersion
+        ? await loadPlan(supabase, targetPlanCode, targetPlanVersion)
+        : null
+    if (!plan) {
+      await supabase.rpc('api_mark_billing_event', {
+        p_event_id: eventId,
+        p_state: 'failed',
+        p_error: 'plan_catalog_missing',
+      })
+      return 'failed'
+    }
+
+    // Troca de plano em assinatura já ativa exige substituição segura no
+    // Asaas. Sem esse caminho comprovado, não ativamos o novo plano e não
+    // criamos segunda recorrência: o evento fica retido para suporte.
+    if (
+      isPendingCheckout &&
+      ['CHECKOUT_PAID', 'PAYMENT_RECEIVED', 'PAYMENT_CONFIRMED'].includes(event.type)
+    ) {
+      await supabase.rpc('api_mark_billing_event', {
+        p_event_id: eventId,
+        p_state: 'failed',
+        p_error: 'pending_plan_requires_support',
+      })
+      return 'failed'
+    }
+
+    const validation = validateBillingEvent(
+      event,
+      subscription.organization_id,
+      verified,
+      plan,
+    )
     if (!validation.ok) {
       await supabase.rpc('api_mark_billing_event', {
         p_event_id: eventId,
@@ -237,6 +325,7 @@ export async function processBillingEventById(
       return 'failed'
     }
 
+    const terminal = ['canceled', 'expired', 'refunded'].includes(decision.state)
     const { error: updateError } = await supabase
       .from('subscriptions')
       .update({
@@ -247,6 +336,14 @@ export async function processBillingEventById(
         provider_customer_id: decision.providerCustomerId,
         last_provider_event_at: decision.lastProviderEventAt,
         last_verified_at: new Date().toISOString(),
+        ...(terminal
+          ? {
+              pending_plan_code: null,
+              pending_plan_version: null,
+              pending_plan_effective_at: null,
+              pending_provider_checkout_id: null,
+            }
+          : {}),
       })
       .eq('id', subscription.id)
 

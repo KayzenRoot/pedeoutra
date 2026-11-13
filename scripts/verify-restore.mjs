@@ -103,6 +103,47 @@ values ('aaaaaaaa-2222-4222-8222-222222222222', 'restore.seeded', 'database');
 
 insert into public.rate_limits (bucket, window_started_at, counter)
 values ('restore:bucket:0000000000000000000000000000000000000000000000000000000000000000', now(), 1);
+
+insert into public.platform_admins (singleton, user_id)
+values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
+
+insert into public.trial_grants (
+  id, organization_id, user_id, granted_at, ends_at, status, risk_score
+) values (
+  'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-111111111111',
+  now() - interval '1 day', now() + interval '6 days', 'granted', 25
+);
+
+insert into public.trial_signals (signal_type, signal_hash, organization_id, user_id)
+values
+  ('email', app.hash_trial_signal('email', 'restore@example.test'),
+   'aaaaaaaa-2222-4222-8222-222222222222', 'aaaaaaaa-1111-4111-8111-111111111111'),
+  ('phone', app.hash_trial_signal('phone', '11999998888'),
+   'aaaaaaaa-2222-4222-8222-222222222222', 'aaaaaaaa-1111-4111-8111-111111111111');
+
+insert into public.plan_changes (
+  id, organization_id, from_plan_code, to_plan_code, status, requested_by, reason
+) values (
+  'aaaaaaaa-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'essential', 'professional', 'blocked',
+  'aaaaaaaa-1111-4111-8111-111111111111', 'restore seed'
+);
+
+insert into public.quota_usage (organization_id, quota_key, window_start, window_seconds, used)
+values (
+  'aaaaaaaa-2222-4222-8222-222222222222', 'restore_quota',
+  date_trunc('minute', now()), 60, 1
+);
+
+insert into public.platform_audit_events (
+  actor_user_id, action, target_organization_id, reason, status
+) values (
+  'aaaaaaaa-1111-4111-8111-111111111111', 'admin.restore',
+  'aaaaaaaa-2222-4222-8222-222222222222', 'restore seed', 'ok'
+);
 `
 
 function docker(args, options = {}) {
@@ -170,8 +211,20 @@ select
   (select count(*) from public.subscriptions) as subscriptions,
   (select count(*) from public.billing_events) as billing_events,
   (select count(*) from public.audit_events) as audit_events,
+  (select count(*) from public.plan_catalog) as plan_catalog,
+  (select count(*) from public.plan_feature_entitlements) as plan_features,
+  (select count(*) from public.trial_grants) as trial_grants,
+  (select count(*) from public.trial_signals) as trial_signals,
+  (select count(*) from public.platform_admins) as platform_admins,
+  (select count(*) from public.platform_audit_events) as platform_audit_events,
+  (select count(*) from public.plan_changes) as plan_changes,
+  (select count(*) from public.quota_usage) as quota_usage,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status, ',' order by id)) from public.orders) as orders_hash,
-  (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash
+  (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
+  (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
+  (select md5(string_agg(plan_code || ':' || plan_version || ':' || state, ',' order by organization_id)) from public.subscriptions) as subscriptions_hash,
+  (select md5(string_agg(user_id::text || ':' || status || ':' || risk_score, ',' order by user_id)) from public.trial_grants) as trials_hash,
+  (select md5(string_agg(actor_user_id::text || ':' || action, ',' order by id)) from public.platform_audit_events) as platform_audit_hash
 `
 
 async function main() {
@@ -189,7 +242,7 @@ async function main() {
 
   try {
     let ready = false
-    for (let attempt = 1; attempt <= 60; attempt += 1) {
+    for (let attempt = 1; attempt <= 180; attempt += 1) {
       const result = docker(
         ['exec', CONTAINER, 'pg_isready', '-U', 'postgres', '-d', SOURCE_DB],
         { allowFailure: true },
@@ -200,7 +253,7 @@ async function main() {
       }
       await sleep(500)
     }
-    if (!ready) throw new Error('Postgres não ficou pronto em 30s')
+    if (!ready) throw new Error('Postgres não ficou pronto em 90s')
 
     console.log('[1/5] Bootstrap e migrations')
     await applyFile(SOURCE_DB, BOOTSTRAP)
@@ -258,8 +311,20 @@ async function main() {
       'subscriptions',
       'billing_events',
       'audit_events',
+      'plan_catalog',
+      'plan_features',
+      'trial_grants',
+      'trial_signals',
+      'platform_admins',
+      'platform_audit_events',
+      'plan_changes',
+      'quota_usage',
       'orders_hash',
       'items_hash',
+      'plans_hash',
+      'subscriptions_hash',
+      'trials_hash',
+      'platform_audit_hash',
     ]
     const values = source.split('|')
     columns.forEach((name, index) => console.log(`  ${name}=${values[index]}`))
