@@ -31,6 +31,7 @@ export interface PublicCatalogResponse {
     name: string
     unit: string
     price_cents: number | null
+    sku: string | null
     category_id: string | null
     images: Array<{
       id: string

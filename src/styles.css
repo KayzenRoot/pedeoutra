@@ -3464,3 +3464,59 @@ svg {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* Part 2 — busca e pedido por SKU */
+.catalog-search-row {
+  margin-bottom: 12px;
+}
+
+.sku-panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.sku-panel summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.sku-textarea {
+  width: 100%;
+  margin: 10px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--field-bg);
+  color: var(--ink);
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.sku-feedback {
+  margin-top: 10px;
+  font-size: 0.82rem;
+}
+
+.sku-feedback ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--danger);
+}
+
+.product-sku {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}

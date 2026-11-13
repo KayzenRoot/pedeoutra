@@ -5,6 +5,7 @@ import { FormMessage, LoadingScreen, QuantityStepper } from '../components/ui'
 import { track } from '../lib/analytics'
 import { callPublicFunction, getPublicCatalog } from '../lib/edge'
 import { formatBRL, phoneDigits, whatsappLink } from '../lib/format'
+import { parseSkuList, resolveSkuLines } from '../lib/sku'
 import type { PublicCatalogResponse, SubmitOrderResponse } from '../lib/types'
 
 export function Catalog() {
@@ -14,6 +15,9 @@ export function Catalog() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [cart, setCart] = useState<Record<string, number>>({})
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [search, setSearch] = useState('')
+  const [skuInput, setSkuInput] = useState('')
+  const [skuFeedback, setSkuFeedback] = useState<{ added: number; errors: string[] } | null>(null)
   const [buyerName, setBuyerName] = useState('')
   const [buyerPhone, setBuyerPhone] = useState('')
   const [note, setNote] = useState('')
@@ -231,10 +235,34 @@ export function Catalog() {
   }
 
   const categories = catalog.categories ?? []
-  const visibleProducts =
-    activeCategory === 'all'
-      ? catalog.products
-      : catalog.products.filter((product) => product.category_id === activeCategory)
+  const term = search.trim().toLowerCase()
+  const visibleProducts = catalog.products.filter((product) => {
+    if (activeCategory !== 'all' && product.category_id !== activeCategory) return false
+    if (!term) return true
+    return (
+      product.name.toLowerCase().includes(term) ||
+      (product.sku ?? '').toLowerCase().includes(term)
+    )
+  })
+
+  function applySkuList() {
+    if (!catalog) return
+    const { matches, errors } = resolveSkuLines(parseSkuList(skuInput), catalog.products)
+    if (matches.length > 0) {
+      setCart((current) => {
+        const next = { ...current }
+        for (const match of matches) {
+          next[match.product.id] = Math.min(
+            999,
+            (next[match.product.id] ?? 0) + match.quantity,
+          )
+        }
+        return next
+      })
+    }
+    setSkuFeedback({ added: matches.length, errors })
+    if (matches.length > 0) setSkuInput('')
+  }
 
   return (
     <div className="public-shell">
@@ -270,6 +298,48 @@ export function Catalog() {
             fornecedor pelo WhatsApp.
           </FormMessage>
         )}
+
+        <div className="catalog-search-row">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar por nome ou SKU"
+            aria-label="Buscar por nome ou SKU"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+
+        <details className="sku-panel">
+          <summary>Pedir por lista de SKU</summary>
+          <p className="muted">
+            Cole uma linha por item no formato <code>SKU quantidade</code>. Os itens são
+            adicionados ao carrinho e o servidor recalcula preços e totais.
+          </p>
+          <textarea
+            className="sku-textarea"
+            rows={5}
+            value={skuInput}
+            onChange={(event) => setSkuInput(event.target.value)}
+            placeholder="Ex.: COPO-200 2"
+            aria-label="Lista de SKU e quantidade"
+          />
+          <button type="button" className="button button-secondary" onClick={applySkuList}>
+            Adicionar lista ao carrinho
+          </button>
+          {skuFeedback && (
+            <div className="sku-feedback" role="status">
+              <span>{skuFeedback.added} SKU(s) adicionado(s).</span>
+              {skuFeedback.errors.length > 0 && (
+                <ul>
+                  {skuFeedback.errors.slice(0, 8).map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </details>
 
         {categories.length > 0 && (
           <fieldset className="category-filter">
@@ -331,6 +401,7 @@ export function Catalog() {
                     )}
                     <div className="product-card-body">
                       <span className="product-unit">{product.unit}</span>
+                      {product.sku && <small className="product-sku">SKU {product.sku}</small>}
                       <h2>{product.name}</h2>
                       <strong className="product-price">{formatBRL(product.price_cents)}</strong>
                     </div>

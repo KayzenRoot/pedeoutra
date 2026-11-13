@@ -1093,6 +1093,49 @@ async function main() {
       assert(remaining.rows.length === 0, 'metadado não removido')
     })
 
+
+    await test('SKU é normalizado e único por tenant', async () => {
+      await asUser(USER_A, () =>
+        client.query(`update public.products set sku = 'copo-200' where id = $1`, [
+          productA2.id,
+        ]),
+      )
+      const normalized = await client.query('select sku from public.products where id = $1', [
+        productA2.id,
+      ])
+      assert(normalized.rows[0].sku === 'COPO-200', `sku ${normalized.rows[0].sku}`)
+
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(`update public.products set sku = 'COPO-200' where id = $1`, [
+              productA1.id,
+            ]),
+          ),
+        'products_org_sku_unique',
+        'SKU duplicado no mesmo tenant',
+      )
+
+      await asUser(USER_B, () =>
+        client.query(`update public.products set sku = 'COPO-200' where id = $1`, [
+          productB.id,
+        ]),
+      )
+      const crossTenant = await client.query('select sku from public.products where id = $1', [
+        productB.id,
+      ])
+      assert(crossTenant.rows[0].sku === 'COPO-200', 'SKU deveria ser permitido em outro tenant')
+
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(`update public.products set sku = 'a' where id = $1`, [productA1.id]),
+          ),
+        'products_sku_format',
+        'SKU curto',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

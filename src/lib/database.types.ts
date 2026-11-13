@@ -399,6 +399,7 @@ export type Database = {
           name: string
           organization_id: string
           price_cents: number | null
+          sku: string | null
           unit: string
           updated_at: string
         }
@@ -410,6 +411,7 @@ export type Database = {
           name: string
           organization_id: string
           price_cents?: number | null
+          sku?: string | null
           unit: string
           updated_at?: string
         }
@@ -421,6 +423,7 @@ export type Database = {
           name?: string
           organization_id?: string
           price_cents?: number | null
+          sku?: string | null
           unit?: string
           updated_at?: string
         }

@@ -9,6 +9,7 @@ import { EmptyState, FormMessage, PageHeader } from '../components/ui'
 interface ProductForm {
   id: string | null
   name: string
+  sku: string
   unit: string
   price: string
   categoryId: string
@@ -18,6 +19,7 @@ interface ProductForm {
 const EMPTY_FORM: ProductForm = {
   id: null,
   name: '',
+  sku: '',
   unit: '',
   price: '',
   categoryId: '',
@@ -31,6 +33,8 @@ function databaseMessage(message: string): string {
   if (message.includes('products_name_len')) return 'O nome deve ter entre 1 e 120 caracteres.'
   if (message.includes('products_unit_len')) return 'A unidade deve ter entre 1 e 20 caracteres.'
   if (message.includes('products_price_range')) return 'O preço máximo é R$ 10.000,00.'
+  if (message.includes('products_org_sku_unique')) return 'Este SKU já está em uso nesta organização.'
+  if (message.includes('products_sku_format')) return 'SKU inválido. Use letras, números, ponto, hífen ou sublinhado.'
   return 'Não foi possível salvar. Revise os dados e tente novamente.'
 }
 
@@ -101,6 +105,7 @@ export function Products() {
     setForm({
       id: product.id,
       name: product.name,
+      sku: product.sku ?? '',
       unit: product.unit,
       price: centsToInput(product.price_cents),
       categoryId: product.category_id ?? '',
@@ -145,6 +150,7 @@ export function Products() {
     setSaving(true)
     const payload = {
       name,
+      sku: form.sku.trim().toUpperCase() || null,
       unit,
       price_cents: priceCents,
       category_id: form.categoryId || null,
@@ -241,13 +247,51 @@ export function Products() {
     }
   }
 
+  function exportSkuList() {
+    const rows = [
+      ['sku', 'produto', 'unidade', 'preco_centavos'],
+      ...products.map((product) => [
+        product.sku ?? '',
+        product.name,
+        product.unit,
+        product.price_cents === null ? '' : String(product.price_cents),
+      ]),
+    ]
+    const csv = rows
+      .map((row) =>
+        row
+          .map((cell) => {
+            const value = String(cell)
+            const safe = /^[=+\-@]/.test(value) ? `'${value}` : value
+            return `"${safe.replace(/"/g, '""')}"`
+          })
+          .join(','),
+      )
+      .join('\r\n')
+
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = 'produtos-sku.csv'
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div>
       <PageHeader
         eyebrow="Catálogo"
         title="Produtos"
-        description="Nome, unidade e preço opcional. Produtos pausados não aparecem no catálogo, mas preservam o histórico."
-        action={<span className="muted">{activeCount} ativos de {products.length}</span>}
+        description="Nome, SKU, unidade e preço opcional. Produtos pausados não aparecem no catálogo, mas preservam o histórico."
+        action={
+          <div className="header-actions">
+            <span className="muted">{activeCount} ativos de {products.length}</span>
+            <button type="button" className="button button-secondary" onClick={exportSkuList}>
+              Baixar SKUs
+            </button>
+          </div>
+        }
       />
 
       {loadError && <FormMessage>{loadError}</FormMessage>}
@@ -286,6 +330,7 @@ export function Products() {
                 <thead>
                   <tr>
                     <th>Produto</th>
+                    <th>SKU</th>
                     <th>Unidade</th>
                     <th>Preço</th>
                     <th>Status</th>
@@ -298,6 +343,7 @@ export function Products() {
                       <td data-label="Produto">
                         <strong>{product.name}</strong>
                       </td>
+                      <td data-label="SKU">{product.sku ?? '—'}</td>
                       <td data-label="Unidade">{product.unit}</td>
                       <td data-label="Preço">{formatBRL(product.price_cents)}</td>
                       <td data-label="Status">
@@ -345,6 +391,15 @@ export function Products() {
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
                 placeholder="Copo descartável 200ml"
+              />
+            </label>
+            <label className="field">
+              <span>SKU (opcional)</span>
+              <input
+                maxLength={32}
+                value={form.sku}
+                onChange={(event) => setForm({ ...form, sku: event.target.value })}
+                placeholder="COPO-200"
               />
             </label>
             <div className="form-row">

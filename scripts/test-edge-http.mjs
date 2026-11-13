@@ -179,11 +179,11 @@ values (
 insert into public.product_categories (id, organization_id, name, slug, position)
 values ('${CATEGORY_ID}', '${ORG_ID}', 'Bebidas', 'bebidas', 1);
 
-insert into public.products (id, organization_id, name, unit, price_cents, active, category_id)
+insert into public.products (id, organization_id, name, unit, price_cents, active, category_id, sku)
 values
-  ('${PRODUCT_1}', '${ORG_ID}', 'Copo 200ml', 'cento', 1250, true, '${CATEGORY_ID}'),
-  ('${PRODUCT_2}', '${ORG_ID}', 'Água 5L', 'galão', 899, true, null),
-  ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false, null);
+  ('${PRODUCT_1}', '${ORG_ID}', 'Copo 200ml', 'cento', 1250, true, '${CATEGORY_ID}', 'COPO-200'),
+  ('${PRODUCT_2}', '${ORG_ID}', 'Água 5L', 'galão', 899, true, null, null),
+  ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false, null, null);
 
 insert into public.customers (id, organization_id, display_name, contact_phone)
 values ('${CUSTOMER_ID}', '${ORG_ID}', 'Padaria Edge', '11977776666');
@@ -423,6 +423,7 @@ async function main() {
       assert(data.categories[0].name === 'Bebidas', 'nome da categoria')
       const categorized = data.products.find((item) => item.id === PRODUCT_1)
       assert(categorized.category_id === CATEGORY_ID, 'produto sem categoria')
+      assert(categorized.sku === 'COPO-200', 'SKU público')
       assert(Array.isArray(categorized.images), 'images ausente')
       assert(
         response.headers.get('access-control-allow-origin') === 'http://127.0.0.1:5173',
