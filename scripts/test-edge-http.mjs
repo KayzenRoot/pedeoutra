@@ -70,12 +70,10 @@ function docker(args, options = {}) {
 }
 
 function clientQuery(sql) {
-  const result = spawnSync(
-    'docker',
+  const result = docker(
     ['exec', '-i', PG_CONTAINER, 'psql', '-U', 'postgres', '-d', DB_NAME, '-v', 'ON_ERROR_STOP=1'],
     { input: sql, encoding: 'utf8' },
   )
-  if (result.status !== 0) throw new Error(`SQL falhou: ${result.stderr || result.stdout}`)
   return result.stdout
 }
 
@@ -791,9 +789,13 @@ async function main() {
       } finally {
         if (processNoAdmin.exitCode === null) {
           if (process.platform === 'win32' && processNoAdmin.pid) {
-            spawnSync('taskkill', ['/pid', String(processNoAdmin.pid), '/T', '/F'], {
-              stdio: 'ignore',
-            })
+            // Caminho absoluto evita depender de PATH; /T encerra o shell e o
+            // processo Deno neto iniciado via npx.
+            spawnSync(
+              'C:\\Windows\\System32\\taskkill.exe',
+              ['/pid', String(processNoAdmin.pid), '/T', '/F'],
+              { stdio: 'ignore' },
+            )
           } else {
             processNoAdmin.kill('SIGTERM')
           }
