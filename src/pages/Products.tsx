@@ -263,7 +263,7 @@ export function Products() {
           .map((cell) => {
             const value = String(cell)
             const safe = /^[=+\-@]/.test(value) ? `'${value}` : value
-            return `"${safe.replace(/"/g, '""')}"`
+            return `"${safe.replaceAll('"', '""')}"`
           })
           .join(','),
       )

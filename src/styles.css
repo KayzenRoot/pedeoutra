@@ -3496,6 +3496,7 @@ svg {
 }
 
 .sku-feedback {
+  display: block;
   margin-top: 10px;
   font-size: 0.82rem;
 }

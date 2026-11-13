@@ -328,7 +328,7 @@ export function Catalog() {
             Adicionar lista ao carrinho
           </button>
           {skuFeedback && (
-            <div className="sku-feedback" role="status">
+            <output className="sku-feedback">
               <span>{skuFeedback.added} SKU(s) adicionado(s).</span>
               {skuFeedback.errors.length > 0 && (
                 <ul>
@@ -337,7 +337,7 @@ export function Catalog() {
                   ))}
                 </ul>
               )}
-            </div>
+            </output>
           )}
         </details>
 
