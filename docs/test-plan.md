@@ -100,13 +100,15 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
 ## 7. Staging/sandbox
 
 - URL: `https://pedeoutra.pages.dev`, projeto Cloudflare Pages Git conectado a
-  `KayzenRoot/pedeoutra`; push na branch de produção dispara build/deploy.
+  `KayzenRoot/pedeoutra`, produção em `main`; push em `main` dispara build/deploy.
 - `node scripts/prod-smoke.mjs` cria dados sintéticos e valida signup,
   organização, produto, catálogo, pedido, vínculo e recompra contra a URL real.
 - Asaas Sandbox: checkout + cartão de teste + webhook autenticado + assinatura
   ativa; evidência em `evidence/logs/asaas-webhook-real.txt`. Os dados
   sintéticos e a assinatura/cliente sandbox foram removidos em 13/11/2026
   (`evidence/logs/staging-cleanup-2026-11-13.txt`).
+- Keepalive diário do Supabase (`supabase-keepalive`) valida `/auth/v1/health`;
+  falha por dois dias exige verificação manual do projeto.
 - Produção monetizada (dinheiro real/domínio próprio) permanece fora do escopo
   até credenciais, KYC e auditoria.
 

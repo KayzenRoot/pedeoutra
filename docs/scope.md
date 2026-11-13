@@ -10,7 +10,7 @@
 - Painel de pedidos, transições de status e WhatsApp manual.
 - Assinatura única R$ 29,90/mês via Asaas Checkout (sandbox).
 - Webhook idempotente, reconciliação e estados de acesso.
-- RLS multi-tenant, testes críticos, CI, Evidence Bundle e PR Draft.
+- RLS multi-tenant, testes críticos, CI, Evidence Bundle e PR revisável.
 - Deploy documentado e executado apenas se houver credenciais autorizadas.
 
 ## Fora do MVP

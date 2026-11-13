@@ -66,3 +66,18 @@ cada transição grava `order_status_events` com autor e horário.
 limit, template com IDs/quantidades; preço atual recalculado no servidor.
 **Consequências:** token só aparece uma vez; perda exige novo link; sem dados
 do cliente na página.
+
+## ADR PDA-ADR-007 — Região e plano do Supabase no staging
+
+**Status:** APPROVED (decisão de staging, 2026-11-13)
+**Contexto:** o projeto `waygtbclkxklexnabwvj` está em East US/Ohio; a produção
+monetizada está bloqueada, não há usuários reais e a migração para São Paulo
+exigiria recriar o projeto, chaves, Auth, secrets, Edge Functions e webhook.
+**Decisão:** manter East US/Ohio no staging/MVP, com Supabase Free e keepalive
+diário via GitHub Actions. Antes do go-live, migrar para `sa-east-1` e contratar
+o plano Pro.
+**Consequências:** latência maior para usuários brasileiros no staging; a
+migração e o upgrade são pré-requisitos de produção, não tarefas silenciosas. O
+keepalive reduz o risco de pausa, mas não garante disponibilidade.
+**Alternativas rejeitadas:** migrar agora, sem usuários e com produção bloqueada;
+manter Free em produção com pagantes.

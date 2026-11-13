@@ -6,18 +6,19 @@
 | --- | --- |
 | Repositório | `https://github.com/KayzenRoot/pedeoutra` |
 | Work Order | `PDA-MVP-WO-001` (PDF, 12/11/2026) |
-| Branch | `feat/PDA-MVP-WO-001-pedeoutra-mvp` |
+| Branch | `feat/PDA-MVP-WO-001-pedeoutra-mvp` (mesclada em `main`) |
 | Base SHA | `40990e437a455f161fd8c60f35be983f29209794` |
 | Head de código | `2993e67528e416e2136e28925b14b7d3c9092179` |
+| Merge commit em `main` | `26d55e0024ba47039b8e8a15d49d08c971964890` |
 | Head da branch na abertura do PR | `1e7898f7df098c50b1877349ce9885cfd75db23e` |
 | Data da execução | 2026-11-12/13 |
 | Ambiente | Windows 11, Node 26.4, npm 11.17, Docker 29.9.3, Supabase CLI 2.113, Chrome headless |
-| PR Draft | [#12](https://github.com/KayzenRoot/pedeoutra/pull/12) — Draft, sem merge |
-| Deploy staging | **PASS** — https://pedeoutra.pages.dev (Cloudflare Pages Git + Supabase Cloud) |
+| PR #12 | [#12](https://github.com/KayzenRoot/pedeoutra/pull/12) — **MERGED** em 2026-11-13 |
+| Deploy staging | **PASS** — https://pedeoutra.pages.dev (Cloudflare Pages Git em `main` + Supabase Cloud) |
 | Billing | **PASS Sandbox** — checkout, pagamento e webhook reais; PROD BLOCKED para dinheiro real |
 
 A URL de staging é real e foi validada com dados sintéticos. Nenhum pagamento de dinheiro real foi executado.
-Nenhum merge foi feito.
+O merge do PR #12 foi autorizado explicitamente e preservou o histórico com merge commit.
 
 ## 2. Issues PDA-001..011
 
@@ -35,7 +36,7 @@ As 11 issues já existiam no GitHub. Nenhuma duplicata foi criada.
 | PDA-008 Testes críticos e restore | DONE | 70 unit, 30 DB, 13 PostgREST, 17 Edge HTTP, 7 grupos E2E full, axe, restore e smoke de produção PASS |
 | PDA-009 Landing e onboarding | DONE | landing, demo, privacidade/termos preliminares, smoke de browser |
 | PDA-010 Deploy e smoke comercial | DONE staging / PROD BLOCKED | Cloudflare Pages Git com auto-deploy + Supabase Cloud + Asaas Sandbox; smoke completo e assinatura ativa validada; dados sintéticos limpos; domínio/Asaas produção pendentes |
-| PDA-011 Evidence Bundle e PR | DONE (sem merge) | este bundle + PR Draft |
+| PDA-011 Evidence Bundle e PR | DONE (mesclado) | este bundle + PR #12 merged |
 
 ## 3. Entregáveis
 
@@ -170,9 +171,11 @@ GoTrue real em container.
 ## 8. Deploy
 
 - **Staging PASS:** `https://pedeoutra.pages.dev` no Cloudflare Pages, agora
-  projeto Git conectado a `KayzenRoot/pedeoutra`; branch de produção temporária
-  `feat/PDA-MVP-WO-001-pedeoutra-mvp`; build `npm run build`, output `dist`,
-  Node 22 e auto-deploy por push.
+  projeto Git conectado a `KayzenRoot/pedeoutra`; branch de produção `main`;
+  build `npm run build`, output `dist`, Node 22 e auto-deploy por push.
+- **Merge:** PR #12 mesclado em `main` pelo merge commit `26d55e0`, com
+  autorização explícita; CI da `main` 4/4 verde (run 43414698496). O build do
+  merge gerou o deployment `c26319e5-4fac-4e8c-9c0b-e99d5149507d`, success.
 - **Build Git validado:** deployment `8bf03fa3-316b-481b-ab8d-6b6a79a43d4d`,
   commit `564bc2d`, stages initialize → clone_repo → build → deploy, success;
   bundle em produção contém a URL do Supabase configurada.
@@ -180,11 +183,12 @@ GoTrue real em container.
   automaticamente o deployment `40e745f0-60f8-4d43-a1de-76d82a513277`, também
   com stages initialize → clone_repo → build → deploy e resultado success; CI
   do mesmo commit 4/4 verde (run 43357088095).
-- **Build final:** commit `2993e67` (correção do smoke/axe) gerou o deployment
-  `1fae02ae-141b-4ba5-82aa-ea2db7860418`, success, com CI push 4/4 verde (run
-  43357841432) e PR run 43357847244 também 4/4.
+- **Build final da branch:** commit `2993e67` (correção do smoke/axe) gerou o
+  deployment `1fae02ae-141b-4ba5-82aa-ea2db7860418`, success, com CI push 4/4
+  verde (run 43357841432) e PR run 43357847244 também 4/4.
 - **Supabase Cloud:** projeto `waygtbclkxklexnabwvj`, 4 migrations aplicadas,
-  11 Edge Functions publicadas, secrets configurados (somente nomes no repo).
+  11 Edge Functions publicadas, secrets configurados (somente nomes no repo);
+  keepalive diário configurado e ADR-007 registra a decisão de região/plano.
 - **Auth:** Site URL/redirects do Pages e autoconfirmação de e-mail no MVP.
 - **Asaas Sandbox:** API key e webhook configurados; smoke real de pagamento;
   assinatura/cliente de teste removidos na limpeza de 13/11.
@@ -195,7 +199,7 @@ GoTrue real em container.
 - **Dados sintéticos:** removidos; staging com 0 usuários, 0 organizações e 0
   assinaturas (`staging-cleanup-2026-11-13.txt`).
 - **Produção monetizada BLOCKED:** Asaas produção (KYC/credenciais), domínio
-  próprio, auditoria independente e autorização de merge pendentes.
+  próprio, auditoria independente, Supabase Pro e migração para `sa-east-1`.
 - Runbook, variáveis e rollback em `docs/deployment.md`.
 
 ## 9. Riscos, limites e correções
@@ -210,12 +214,12 @@ GoTrue real em container.
   Docker; o staging foi limpo depois dos smokes.
 - Cloudflare Pages: projeto Direct Upload não pode ser convertido em Git
   (`source` imutável). O projeto foi recriado como Git mantendo a URL
-  `pedeoutra.pages.dev`; a troca de branch de produção para `main` fica
-  pendente do merge.
+  `pedeoutra.pages.dev`; a produção foi apontada para `main` após o merge.
 - Sem WAF dedicado, pentest externo ou teste de carga.
-- Supabase Free pode pausar; revisar plano antes de pagantes.
-- Região East US (Ohio) foi a recomendada pelo painel; migrar para São Paulo
-  exigiria recriar o projeto.
+- Supabase Free pode pausar; há keepalive diário via GitHub Actions, mas o
+  plano Pro é obrigatório antes de pagantes.
+- Região East US (Ohio) mantida no staging por decisão registrada (ADR-007);
+  migrar para `sa-east-1` é pré-requisito do go-live.
 - `mailer_autoconfirm=true` no staging: e-mail não é verificado no MVP.
 - Bundle JS ~490 kB (139 kB gzip); aceitável para MVP, monitorar.
 - Correções feitas durante a WO: grants de execução de triggers, view
@@ -232,9 +236,12 @@ GoTrue real em container.
 - ADR-004: CSS moderno em vez de Tailwind — PROPOSED.
 - ADR-005: máquina de estados de pedido no banco — PROPOSED.
 - ADR-006: recompra com token opaco/hash — PROPOSED.
-- Billing e deploy staging foram executados e validados; produção monetizada
-  segue bloqueada por KYC/credenciais Asaas, domínio e auditoria.
-- Nenhuma promoção canônica automática; nenhum merge.
+- ADR-007: East US/Ohio no staging + Free com keepalive; Pro e `sa-east-1`
+  antes do go-live — APPROVED (decisão de staging).
+- Billing e deploy staging foram executados, validados e mesclados; produção
+  monetizada segue bloqueada por KYC/credenciais Asaas, domínio e auditoria.
+- Nenhuma promoção canônica automática; o merge do PR #12 foi manual e
+  autorizado.
 
 ## 11. Veredito
 
@@ -246,9 +253,12 @@ GoTrue real em container.
 - **Billing Sandbox:** PASS (checkout, pagamento de teste, webhook e ativação);
   dados de teste removidos após a validação.
 - **Billing produção:** BLOCKED (dinheiro real/Asaas produção).
-- **Deploy staging:** PASS (`https://pedeoutra.pages.dev`) com Git conectado e
-  auto-deploy por push validado (`cdbceaf` → `40e745f0`; build final `2993e67` →
-  `1fae02ae`); staging limpo para novos testes.
-- **Produção comercial:** BLOCKED (domínio, Asaas produção, auditoria e merge).
+- **Deploy staging:** PASS (`https://pedeoutra.pages.dev`) com Git conectado,
+  produção em `main` e auto-deploy por push validado (`cdbceaf` → `40e745f0`;
+  build final `2993e67` → `1fae02ae`; merge `26d55e0` → `c26319e5`); staging
+  limpo para novos testes.
+- **Produção comercial:** BLOCKED (domínio, Asaas produção, auditoria, Supabase
+  Pro e migração para `sa-east-1`).
 - **Veredito final:** **APPROVED para staging/sandbox**, com **PROD BLOCKED**
-  para go-live monetizado. PR permanece Draft; não houve merge.
+  para go-live monetizado. PR #12 **MERGED** com autorização explícita; staging
+  limpo e com keepalive configurado.
