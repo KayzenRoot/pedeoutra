@@ -103,18 +103,22 @@ outro banco e compara contagens/checksums. Nenhum dado real é usado.
   `KayzenRoot/pedeoutra`, produção em `main`; push em `main` dispara build/deploy.
 - `node scripts/prod-smoke.mjs` cria dados sintéticos e valida signup,
   organização, produto, catálogo, pedido, vínculo e recompra contra a URL real.
+- Asaas produção: conta aprovada, API key/checkout/webhook configurados;
+  checkout de produção criado (`201`, R$ 29,90/mês, host `www.asaas.com`) e
+  evento `CHECKOUT_CREATED` recebido pelo webhook, **sem pagamento**. Usuário,
+  organização, assinatura e eventos do teste foram removidos.
 - Asaas Sandbox: checkout + cartão de teste + webhook autenticado + assinatura
-  ativa; evidência em `evidence/logs/asaas-webhook-real.txt`. Os dados
-  sintéticos e a assinatura/cliente sandbox foram removidos em 13/11/2026
+  ativa; evidência em `evidence/logs/asaas-webhook-real.txt`. Sandbox e dados
+  sintéticos foram removidos em 13/11/2026
   (`evidence/logs/staging-cleanup-2026-11-13.txt`).
 - Keepalive diário do Supabase (`supabase-keepalive`) valida `/auth/v1/health`;
   falha por dois dias exige verificação manual do projeto.
-- Produção monetizada (dinheiro real/domínio próprio) permanece fora do escopo
-  até credenciais, KYC e auditoria.
+- Primeira cobrança real, domínio próprio, Supabase Pro/migração e auditoria
+  permanecem fora do escopo até autorização explícita.
 
 ## Riscos não cobertos
 
-- Fluxo real de cartão no Asaas (sem credenciais).
-- Produção monetizada (Asaas real, KYC e domínio próprio).
+- Primeira cobrança real no cartão (checkout de produção não foi pago).
+- Domínio próprio e go-live comercial com Supabase Pro/`sa-east-1`.
 - WhatsApp oficial (fora de escopo).
 - Carga/estresse além de rate limit funcional.

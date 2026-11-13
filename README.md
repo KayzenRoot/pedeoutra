@@ -13,14 +13,15 @@ um link de recompra. O comprador não baixa app e não cria conta.
 | Aplicação web (landing, painel, catálogo, recompra) | implementada e publicada em staging |
 | Banco, migrations e RLS | aplicados no Supabase Cloud e testados |
 | Edge Functions (pedido, recompra, billing) | 11 funções publicadas |
-| Asaas Sandbox | **PASS** — checkout, pagamento e webhook reais validados |
+| Asaas produção | **CONFIGURADO** — API key, checkout e webhook validados sem cobrança |
 | Deploy staging | **PASS** — https://pedeoutra.pages.dev, Git auto-deploy em `main` |
 | PR #12 / CI | **MERGED** em `main` (`26d55e0`); CI 4/4 verde |
 | Supabase Free | keepalive diário configurado; Pro obrigatório antes de pagantes |
-| Produção monetizada | `BLOCKED` — Asaas produção, domínio, região/Pro e auditoria pendentes |
+| Produção monetizada | `CONFIGURADA` — primeira cobrança real, domínio, Pro/região e auditoria pendentes |
 
 O bundle de evidências fica em [`evidence/PDA-MVP-WO-001.md`](evidence/PDA-MVP-WO-001.md).
-O ambiente de staging usa Supabase Cloud (`waygtbclkxklexnabwvj`) e Asaas Sandbox.
+O ambiente de staging usa Supabase Cloud (`waygtbclkxklexnabwvj`) e Asaas
+produção configurado; a primeira cobrança real ainda não foi executada.
 
 ## Source Hierarchy
 
@@ -40,7 +41,7 @@ O contexto de execução e os hashes estão em [`docs/context-lock.md`](docs/con
 - React + Vite + TypeScript, mobile-first, CSS moderno sem design system pesado.
 - Supabase PostgreSQL + Auth; RLS default-deny.
 - Supabase Edge Functions para operações privilegiadas e APIs públicas.
-- Asaas Checkout de assinatura recorrente (sandbox), via Edge Functions.
+- Asaas Checkout de assinatura recorrente (produção configurada; Sandbox para testes), via Edge Functions.
 - GitHub Actions para lint, typecheck, testes, build, RLS e Edge Functions.
 - Cloudflare Pages como alvo de hospedagem do frontend.
 

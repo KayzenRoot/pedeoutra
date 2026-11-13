@@ -60,8 +60,8 @@ Tabelas: `organizations`, `products`, `customers`, `orders`, `order_items`,
 
 ## Limites conhecidos
 
-- Staging usa Supabase Cloud, Cloudflare Pages Git e Asaas Sandbox; sem
-  credenciais/KYC de produção e domínio próprio, o go-live monetizado fica
-  bloqueado. Testes locais usam Postgres real e mocks do provedor.
+- Staging usa Supabase Cloud, Cloudflare Pages Git e Asaas produção
+  configurado (Sandbox para testes). Sem domínio próprio, Supabase Pro/região e
+  auditoria, o go-live comercial fica bloqueado.
 - Sem WhatsApp API: apenas links `wa.me` acionados por humano.
 - Sem upload de arquivos, estoque, nota fiscal ou pagamento dos pedidos.

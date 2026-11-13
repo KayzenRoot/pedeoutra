@@ -3,15 +3,18 @@
 ## Status desta WO
 
 **Staging/sandbox: PASS.** Frontend em Cloudflare Pages com deploy automático
-via GitHub, banco/funções em Supabase Cloud e cobrança em Asaas Sandbox foram
-configurados e validados com dados sintéticos. Os dados sintéticos de staging
-foram removidos em 13/11/2026; o ambiente começa vazio para novos testes.
+via GitHub, banco/funções em Supabase Cloud e cobrança em Asaas produção
+configurada (Sandbox usado para testes) foram validados com dados sintéticos.
+Os dados sintéticos de staging foram removidos em 13/11/2026; o ambiente começa
+vazio para novos testes.
 O PR #12 foi mesclado em `main` com autorização explícita (merge commit
 `26d55e0`) e a produção do Pages foi apontada para `main`.
 
-**Produção monetizada: BLOCKED.** Ainda faltam credenciais/checkout Asaas de
-produção, domínio próprio e auditoria independente. Nenhuma cobrança real foi
-executada.
+**Produção monetizada: CONFIGURADA, sem cobrança real.** A conta Asaas de
+produção está aprovada; API key, checkout e webhook de produção foram
+configurados e validados com um checkout de teste **sem pagamento**. A primeira
+cobrança real ainda não foi executada e depende de autorização explícita,
+domínio próprio, Supabase Pro/região e auditoria.
 
 ## Ambiente atual (staging)
 
@@ -24,12 +27,14 @@ executada.
 | Migrations | 4 migrations aplicadas via `supabase db push` |
 | Edge Functions | 11 publicadas; públicas com `--no-verify-jwt`, autenticadas com JWT |
 | Auth | Site URL/redirects do Pages; `mailer_autoconfirm=true` no MVP |
-| Asaas | Sandbox; checkout hospedado e webhook autenticado ativos |
-| Smoke | cadastro, organização, produto, catálogo, pedido, recompra e assinatura ativa |
+| Asaas | Produção configurada (API key, checkout e webhook); Sandbox removido/limpo |
+| Webhook Asaas produção | id `71177108-9a90-43be-92b3-a9cf91595169`, 13 eventos, `enabled=true` |
+| Smoke | cadastro, organização, produto, catálogo, pedido, recompra, checkout de produção sem pagamento |
 
-O webhook Asaas aponta para
+O webhook de produção aponta para
 `https://waygtbclkxklexnabwvj.supabase.co/functions/v1/asaas-webhook` e usa o
-header `asaas-access-token`. O token não é versionado.
+header `asaas-access-token`. O token não é versionado. O webhook antigo do
+Sandbox foi removido junto com a assinatura/cliente de teste.
 
 O Supabase Free pode pausar por inatividade. O workflow
 `.github/workflows/keepalive.yml` faz um ping diário em `/auth/v1/health` com a
@@ -39,7 +44,7 @@ substitui o plano Pro. Revisar plano/limites antes de usuários pagantes.
 ### Decisão de região e plano (staging)
 
 O staging permanece em **East US/Ohio** (`waygtbclkxklexnabwvj`) nesta fase:
-não há usuários reais, a produção monetizada está bloqueada e recriar o projeto
+não há usuários reais, o go-live comercial ainda está bloqueado e recriar o projeto
 em São Paulo mudaria URL, chaves, secrets, Auth e webhook Asaas. A decisão está
 registrada na ADR-007. Antes do go-live, migrar para `sa-east-1` e contratar
 Supabase Pro são pré-requisitos, com janela, novo smoke e atualização de
@@ -87,10 +92,11 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 ### Edge Functions (Supabase secrets)
 
 - `APP_ORIGIN` (lista separada por vírgula)
-- `ASAAS_API_KEY`
-- `ASAAS_API_BASE_URL` (`https://api-sandbox.asaas.com` ou produção)
-- `ASAAS_CHECKOUT_BASE_URL` (`https://sandbox.asaas.com` ou produção)
-- `ASAAS_WEBHOOK_TOKEN`
+- `ASAAS_API_KEY` (produção; nunca versionada)
+- `ASAAS_API_BASE_URL` (`https://api.asaas.com`)
+- `ASAAS_CHECKOUT_BASE_URL` (`https://www.asaas.com`)
+- `ASAAS_WEBHOOK_TOKEN` (token exclusivo do webhook de produção)
+- `ASAAS_WEBHOOK_ID` (`71177108-9a90-43be-92b3-a9cf91595169`, referência operacional)
 - `BILLING_RECONCILE_TOKEN`
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (injetadas pelo Supabase)
 
@@ -123,14 +129,16 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
 
 ## Checklist de produção Asaas
 
-- [ ] Conta sandbox validada; depois produção com aprovação explícita.
-- [ ] Webhook com token forte e exclusivo; header `asaas-access-token`.
-- [ ] Preço 2990 centavos conferido no servidor.
-- [ ] `successUrl` não ativa assinatura.
-- [ ] Eventos duplicados/fora de ordem/reembolso testados.
-- [ ] Nenhum dado de cartão trafega pelo PedeOutra.
+- [x] Conta Sandbox validada; conta de produção aprovada e configurada.
+- [x] Webhook de produção com token forte/exclusivo; header `asaas-access-token`.
+- [x] Preço 2990 centavos conferido no servidor (checkout de produção).
+- [x] `successUrl` não ativa assinatura (código e testes).
+- [x] Eventos duplicados/fora de ordem/reembolso testados em sandbox/mocks.
+- [x] Nenhum dado de cartão trafega pelo PedeOutra.
+- [ ] Primeira cobrança real controlada, com autorização explícita.
 - [ ] Reconciliador agendado (cron) com token próprio.
 - [ ] Plano de rollback e contato de suporte definidos.
+- [ ] Domínio próprio + Supabase Pro/migração para `sa-east-1`.
 
 ## Rollback
 
@@ -148,5 +156,6 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
   antes de usuários pagantes. O staging segue em East US/Ohio por decisão
   registrada (ADR-007); a migração para `sa-east-1` é pré-requisito do go-live.
 - Cloudflare Pages deve ser verificado para uso comercial no momento do deploy.
-- A produção monetizada permanece `BLOCKED` até Asaas produção (KYC), domínio
-  próprio e auditoria; o staging está `DONE`, não `BLOCKED`.
+- A produção Asaas está configurada e validada sem cobrança. A primeira cobrança
+  real, o domínio próprio, o Supabase Pro/migração e a auditoria independente
+  continuam pendentes; nada disso deve ser tratado como go-live automático.

@@ -8,7 +8,7 @@
   pelo PR #12 (merge commit `26d55e0024ba47039b8e8a15d49d08c971964890`).
 - Base SHA: `40990e437a455f161fd8c60f35be983f29209794`
 - Estado da base: somente `README.md` inicial; 11 issues abertas (PDA-001..011).
-- Credenciais usadas: GitHub, Supabase Cloud, Asaas Sandbox e Cloudflare Pages.
+- Credenciais usadas: GitHub, Supabase Cloud, Asaas produção/Sandbox e Cloudflare Pages.
 - Docker disponível: sim; reparado com `wsl --update` + reinício do backend.
 
 ## Incrementos desta WO
@@ -41,13 +41,18 @@
 - Keepalive diário do Supabase configurado em
   `.github/workflows/keepalive.yml`; ADR-007 registra East US/Ohio no staging e
   a migração para `sa-east-1` + Pro como pré-requisitos do go-live.
-- Produção monetizada permanece BLOCKED (Asaas produção, domínio e auditoria).
+- Asaas produção aprovado e configurado: API key, checkout e webhook de
+  produção validados com checkout de teste **sem pagamento**; webhook
+  `71177108-9a90-43be-92b3-a9cf91595169` com 13 eventos. Sandbox e dados de
+  teste removidos.
+- Primeira cobrança real ainda não executada; depende de autorização explícita,
+  domínio, Supabase Pro/região e auditoria.
 
 ## Pendências
 
-- Asaas produção (KYC/credenciais), domínio próprio e auditoria independente.
-- Antes de pagantes: Supabase Pro e migração para `sa-east-1`, com novo smoke,
-  atualização de chaves/secrets e webhook.
+- Primeira cobrança real controlada, com autorização explícita.
+- Domínio próprio e auditoria independente.
+- Supabase Pro e migração para `sa-east-1` antes de pagantes.
 - Monitorar o workflow `supabase-keepalive`; falha por dois dias exige
   verificação manual do projeto.
 
@@ -55,8 +60,9 @@
 
 PR #12 mesclado: https://github.com/KayzenRoot/pedeoutra/pull/12
 
-CI da `main`: run 43414698496 (merge `26d55e0`) — 4 jobs verdes.
+CI da `main`: run 43415994717 (merge `0c6aa6e`) — 4 jobs verdes.
 
-O staging está encerrado e limpo. O próximo passo é o checklist de produção
-monetizada (Asaas produção/KYC, domínio, Supabase Pro e migração de região),
-sem merge ou cobrança real sem nova autorização.
+O staging está encerrado e limpo; o Asaas produção está configurado e validado
+sem cobrança. O próximo passo é a primeira cobrança real controlada, domínio
+próprio, Supabase Pro/migração de região e auditoria, sem cobrança real sem nova
+autorização.
