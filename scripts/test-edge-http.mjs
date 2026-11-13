@@ -792,7 +792,7 @@ async function main() {
             // Caminho absoluto evita depender de PATH; /T encerra o shell e o
             // processo Deno neto iniciado via npx.
             spawnSync(
-              'C:\\Windows\\System32\\taskkill.exe',
+              String.raw`C:\Windows\System32\taskkill.exe`,
               ['/pid', String(processNoAdmin.pid), '/T', '/F'],
               { stdio: 'ignore' },
             )
@@ -860,10 +860,10 @@ async function main() {
         headers: { Authorization: `Bearer ${adminToken}` },
       })
       const data = await audit.json()
-      const actions = data.audit.map((event) => event.action)
+      const actions = new Set(data.audit.map((event) => event.action))
       assert(data.audit.length >= 3, `audit default limit: ${data.audit.length}`)
-      assert(actions.includes('admin.org.suspend'), 'auditoria de suspensão')
-      assert(actions.includes('admin.org.reactivate'), 'auditoria de reativação')
+      assert(actions.has('admin.org.suspend'), 'auditoria de suspensão')
+      assert(actions.has('admin.org.reactivate'), 'auditoria de reativação')
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

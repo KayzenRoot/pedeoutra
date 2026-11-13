@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 import { ACCESS_TEXT, organizationAccess } from '../lib/access'
@@ -12,6 +12,8 @@ import type {
   PublicPlan,
 } from '../lib/types'
 import { FormMessage, PageHeader } from '../components/ui'
+
+const PLAN_ORDER: Record<PlanCode, number> = { essential: 0, professional: 1 }
 
 const CHECKOUT_NOTICES: Record<string, { tone: 'info' | 'success' | 'error'; text: string }> = {
   success: {
@@ -54,11 +56,7 @@ export function Billing() {
     getPlanCatalog<PlanCatalogResponse>()
       .then((data) => {
         if (!mounted) return
-        setPlans(
-          [...(data.plans ?? [])].sort((a, b) =>
-            a.plan_code === 'essential' ? -1 : b.plan_code === 'essential' ? 1 : 0,
-          ),
-        )
+        setPlans([...(data.plans ?? [])].sort((a, b) => PLAN_ORDER[a.plan_code] - PLAN_ORDER[b.plan_code]))
         setPlansError(null)
       })
       .catch(() => {
@@ -203,6 +201,34 @@ export function Billing() {
           const isCurrent = active && currentPlan === plan.plan_code
           const enabledFeatures = plan.features.filter((feature) => feature.enabled)
           const unavailable = !plan.available
+          let action: ReactNode
+
+          if (isCurrent) {
+            action = (
+              <button type="button" className="button button-secondary" disabled>
+                Plano atual
+              </button>
+            )
+          } else if (unavailable) {
+            action = (
+              <button type="button" className="button button-secondary" disabled>
+                Indisponível nesta fase
+              </button>
+            )
+          } else {
+            action = (
+              <button
+                type="button"
+                className="button button-primary"
+                onClick={() => void startCheckout(plan.plan_code)}
+                disabled={busyPlan !== null}
+              >
+                {busyPlan === plan.plan_code
+                  ? 'Abrindo checkout…'
+                  : `Assinar ${PLAN_NAMES[plan.plan_code]} por ${formatBRL(plan.price_cents)}/mês`}
+              </button>
+            )
+          }
 
           return (
             <section className="card plan-card" key={plan.plan_code}>
@@ -230,28 +256,7 @@ export function Billing() {
                 <span>Cobrança da assinatura</span>
                 <strong>{formatBRL(plan.price_cents)}/mês</strong>
               </div>
-              <div className="billing-actions">
-                {isCurrent ? (
-                  <button type="button" className="button button-secondary" disabled>
-                    Plano atual
-                  </button>
-                ) : unavailable ? (
-                  <button type="button" className="button button-secondary" disabled>
-                    Indisponível nesta fase
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="button button-primary"
-                    onClick={() => void startCheckout(plan.plan_code)}
-                    disabled={busyPlan !== null}
-                  >
-                    {busyPlan === plan.plan_code
-                      ? 'Abrindo checkout…'
-                      : `Assinar ${PLAN_NAMES[plan.plan_code]} por ${formatBRL(plan.price_cents)}/mês`}
-                  </button>
-                )}
-              </div>
+              <div className="billing-actions">{action}</div>
               <p className="form-note">
                 {plan.trial_days > 0
                   ? `${plan.trial_days} dias de teste sem cartão neste plano.`

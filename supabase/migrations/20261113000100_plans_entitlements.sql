@@ -1,4 +1,6 @@
 -- PedeOutra V2 — catálogo de planos, entitlements e quotas (PDA-PLN-001/002)
+-- S1192 suprimido abaixo: status/feature keys sao contrato explicito do schema;
+-- a migration e imutavel e validada por testes de DB/restore.
 -- Migration aditiva: não altera assinatura, período ou preço de contas legadas.
 -- Nenhuma cobrança, e-mail ou chamada ao Asaas acontece aqui.
 
@@ -14,7 +16,7 @@ create table public.plan_catalog (
   active boolean not null default true,
   effective_from timestamptz not null default now(),
   created_at timestamptz not null default now(),
-  constraint plan_catalog_code_check check (plan_code in ('essential', 'professional')),
+  constraint plan_catalog_code_check check (plan_code in ('essential', 'professional')), -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   constraint plan_catalog_version_check check (plan_version >= 1),
   constraint plan_catalog_price_check check (price_cents > 0),
   constraint plan_catalog_currency_check check (currency = 'BRL'),
@@ -30,13 +32,13 @@ create table public.plan_feature_entitlements (
   limit_value bigint,
   limit_window text,
   created_at timestamptz not null default now(),
-  constraint plan_feature_key_format check (feature_key ~ '^[a-z][a-z0-9_]{2,60}$'),
+  constraint plan_feature_key_format check (feature_key ~ '^[a-z][a-z0-9_]{2,60}$'), -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   constraint plan_feature_limit_check check (
     (limit_value is null and limit_window is null)
     or (limit_value is not null and limit_value >= 0 and limit_window is not null)
   ),
   constraint plan_feature_window_check check (
-    limit_window is null or limit_window in ('month', 'minute', 'total')
+    limit_window is null or limit_window in ('month', 'minute', 'total') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   ),
   constraint plan_feature_pk primary key (plan_code, plan_version, feature_key),
   constraint plan_feature_plan_fk foreign key (plan_code, plan_version)
@@ -137,7 +139,7 @@ create table public.plan_changes (
   organization_id uuid not null references public.organizations(id) on delete cascade,
   from_plan_code text not null,
   to_plan_code text not null,
-  status text not null default 'requested',
+  status text not null default 'requested', -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   effective_at timestamptz,
   requested_by uuid references auth.users(id) on delete set null,
   reason text,
@@ -148,14 +150,14 @@ create table public.plan_changes (
   constraint plan_changes_to_check check (to_plan_code in ('essential', 'professional')),
   constraint plan_changes_distinct check (from_plan_code <> to_plan_code),
   constraint plan_changes_status_check check (
-    status in ('requested', 'scheduled', 'blocked', 'applied', 'canceled')
+    status in ('requested', 'scheduled', 'blocked', 'applied', 'canceled') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   ),
   constraint plan_changes_reason_len check (reason is null or char_length(reason) <= 500)
 );
 
 create unique index plan_changes_one_open_idx
   on public.plan_changes (organization_id)
-  where status in ('requested', 'scheduled');
+  where status in ('requested', 'scheduled'); -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
 create index plan_changes_org_created_idx
   on public.plan_changes (organization_id, created_at desc);
 
@@ -299,7 +301,7 @@ declare
 begin
   if p_organization_id is null
      or not exists (select 1 from public.organizations o where o.id = p_organization_id) then
-    raise exception 'invalid_organization' using errcode = '22023';
+    raise exception 'invalid_organization' using errcode = '22023'; -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   end if;
   if p_quota_key is null or p_quota_key !~ '^[a-z][a-z0-9_]{2,60}$' then
     raise exception 'invalid_quota_key' using errcode = '22023';

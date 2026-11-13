@@ -96,20 +96,9 @@ export function MfaPanel({ onVerified }: { onVerified?: () => void } = {}) {
     return <p className="muted">MFA disponível quando o backend estiver configurado.</p>
   }
 
-  return (
-    <div className="mfa-panel">
-      <p className="muted">
-        O console administrativo exige TOTP (AAL2). O nível atual desta sessão é{' '}
-        <strong>{level}</strong>.
-        {nextLevel === 'aal2' && level !== 'aal2'
-          ? ' Há um fator verificado aguardando confirmação.'
-          : null}
-      </p>
-
-      {error && <FormMessage>{error}</FormMessage>}
-      {success && <FormMessage tone="success">{success}</FormMessage>}
-
-      {qrCode ? (
+  function renderMfaAction() {
+    if (qrCode) {
+      return (
         <div className="mfa-enroll">
           <img src={qrCode} alt="QR code para configurar o aplicativo autenticador" />
           <p>
@@ -141,23 +130,45 @@ export function MfaPanel({ onVerified }: { onVerified?: () => void } = {}) {
             </button>
           </div>
         </div>
-      ) : factor?.status === 'verified' ? (
+      )
+    }
+
+    if (factor?.status === 'verified') {
+      return (
         <p>
           <span className="pill pill-lime">MFA ativo</span>{' '}
           {level === 'aal2'
             ? 'Esta sessão já está em AAL2.'
             : 'Confirme o código TOTP ao entrar no console administrativo.'}
         </p>
-      ) : (
-        <button
-          type="button"
-          className="button button-secondary"
-          onClick={() => void startEnrollment()}
-          disabled={busy}
-        >
-          {busy ? 'Preparando…' : 'Ativar MFA TOTP'}
-        </button>
-      )}
+      )
+    }
+
+    return (
+      <button
+        type="button"
+        className="button button-secondary"
+        onClick={() => void startEnrollment()}
+        disabled={busy}
+      >
+        {busy ? 'Preparando…' : 'Ativar MFA TOTP'}
+      </button>
+    )
+  }
+
+  return (
+    <div className="mfa-panel">
+      <p className="muted">
+        O console administrativo exige TOTP (AAL2). O nível atual desta sessão é{' '}
+        <strong>{level}</strong>.
+        {nextLevel === 'aal2' && level !== 'aal2'
+          ? ' Há um fator verificado aguardando confirmação.'
+          : null}
+      </p>
+
+      {error && <FormMessage>{error}</FormMessage>}
+      {success && <FormMessage tone="success">{success}</FormMessage>}
+      {renderMfaAction()}
     </div>
   )
 }

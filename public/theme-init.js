@@ -8,9 +8,11 @@
       preference = 'system'
     }
     var prefersDark =
-      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-    var resolved =
-      preference === 'system' ? (prefersDark ? 'dark' : 'light') : preference
+      window.matchMedia?.('(prefers-color-scheme: dark)')?.matches === true
+    var resolved = preference
+    if (preference === 'system') {
+      resolved = prefersDark ? 'dark' : 'light'
+    }
     var root = document.documentElement
     root.dataset.theme = resolved
     root.dataset.themePreference = preference

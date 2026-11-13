@@ -4,6 +4,7 @@ import {
   asaasDateToPeriodEnd,
   decideBillingTransition,
   validateBillingEvent,
+  type BillingDecision,
   type BillingEventData,
   type SubscriptionSnapshot,
   type VerifiedProviderState,
@@ -57,7 +58,7 @@ async function loadPlan(
     .eq('plan_version', planVersion)
     .maybeSingle()
   if (error) throw new Error('plan_catalog_lookup_failed')
-  if (!data || data.active !== true) return null
+  if (data?.active !== true) return null
   return data as PlanCatalogRow
 }
 
@@ -158,6 +159,114 @@ function safeFailureReason(error: unknown): string {
   return 'processing_error'
 }
 
+async function markEvent(
+  supabase: SupabaseClient,
+  eventId: string,
+  state: 'processed' | 'ignored' | 'failed',
+  reason: string | null,
+): Promise<void> {
+  await supabase.rpc('api_mark_billing_event', {
+    p_event_id: eventId,
+    p_state: state,
+    p_error: reason,
+  })
+}
+
+async function failEvent(
+  supabase: SupabaseClient,
+  eventId: string,
+  reason: string,
+): Promise<'failed'> {
+  await markEvent(supabase, eventId, 'failed', reason)
+  return 'failed'
+}
+
+function requiresPaymentVerification(eventType: string): boolean {
+  return eventType === 'PAYMENT_RECEIVED' || eventType === 'PAYMENT_CONFIRMED'
+}
+
+function activationEvent(eventType: string): boolean {
+  return (
+    eventType === 'CHECKOUT_PAID' ||
+    eventType === 'PAYMENT_RECEIVED' ||
+    eventType === 'PAYMENT_CONFIRMED'
+  )
+}
+
+interface ResolvedPlan {
+  plan: PlanCatalogRow
+  isPendingCheckout: boolean
+}
+
+async function resolvePlan(
+  supabase: SupabaseClient,
+  subscription: SubscriptionRow,
+  event: BillingEventData,
+  verified: VerifiedProviderState | null,
+): Promise<ResolvedPlan | { error: string }> {
+  const checkoutIds = [event.checkoutId, verified?.checkoutId].filter(Boolean)
+  const isPendingCheckout =
+    Boolean(subscription.pending_provider_checkout_id) &&
+    checkoutIds.includes(subscription.pending_provider_checkout_id as string)
+
+  if (
+    isPendingCheckout &&
+    (!subscription.pending_plan_code || !subscription.pending_plan_version)
+  ) {
+    return { error: 'pending_plan_invalid' }
+  }
+
+  const code = isPendingCheckout
+    ? subscription.pending_plan_code
+    : subscription.plan_code
+  const version = isPendingCheckout
+    ? subscription.pending_plan_version
+    : subscription.plan_version
+  if (!code || !version) return { error: 'plan_catalog_missing' }
+
+  const plan = await loadPlan(supabase, code, version)
+  if (!plan) return { error: 'plan_catalog_missing' }
+
+  // Troca de plano em assinatura já ativa exige substituição segura no Asaas.
+  // Sem esse caminho comprovado, não ativamos o novo plano nem criamos uma
+  // segunda recorrência: o evento fica retido para suporte.
+  if (isPendingCheckout && activationEvent(event.type)) {
+    return { error: 'pending_plan_requires_support' }
+  }
+
+  return { plan, isPendingCheckout }
+}
+
+async function persistDecision(
+  supabase: SupabaseClient,
+  subscription: SubscriptionRow,
+  decision: Extract<BillingDecision, { kind: 'apply' }>,
+): Promise<void> {
+  const terminal = ['canceled', 'expired', 'refunded'].includes(decision.state)
+  const { error } = await supabase
+    .from('subscriptions')
+    .update({
+      state: decision.state,
+      current_period_end: decision.currentPeriodEnd,
+      provider_subscription_id: decision.providerSubscriptionId,
+      provider_checkout_id: decision.providerCheckoutId,
+      provider_customer_id: decision.providerCustomerId,
+      last_provider_event_at: decision.lastProviderEventAt,
+      last_verified_at: new Date().toISOString(),
+      ...(terminal
+        ? {
+            pending_plan_code: null,
+            pending_plan_version: null,
+            pending_plan_effective_at: null,
+            pending_provider_checkout_id: null,
+          }
+        : {}),
+    })
+    .eq('id', subscription.id)
+
+  if (error) throw new Error('subscription_update_failed')
+}
+
 export async function processBillingEventById(
   supabase: SupabaseClient,
   eventId: string,
@@ -174,14 +283,7 @@ export async function processBillingEventById(
   if (rawEvent.state === 'processed' || rawEvent.state === 'ignored') return 'skipped'
 
   const event = parseStoredEvent(rawEvent.payload_minimal)
-  if (!event) {
-    await supabase.rpc('api_mark_billing_event', {
-      p_event_id: eventId,
-      p_state: 'failed',
-      p_error: 'invalid_stored_event',
-    })
-    return 'failed'
-  }
+  if (!event) return failEvent(supabase, eventId, 'invalid_stored_event')
 
   try {
     let verified = await verifyWithProvider(client, event)
@@ -199,14 +301,7 @@ export async function processBillingEventById(
     }
 
     const subscription = await findSubscriptionRow(supabase, event, verified)
-    if (!subscription) {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: 'unmapped_tenant',
-      })
-      return 'failed'
-    }
+    if (!subscription) return failEvent(supabase, eventId, 'unmapped_tenant')
 
     await correlateSubscription(supabase, subscription, event, verified)
 
@@ -217,84 +312,20 @@ export async function processBillingEventById(
       verified = mergeVerified(verified, providerSubscription)
     }
 
-    const requiresVerification = ['PAYMENT_RECEIVED', 'PAYMENT_CONFIRMED'].includes(
-      event.type,
-    )
-    if (requiresVerification && !verified) {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: 'provider_unavailable',
-      })
-      return 'failed'
+    if (requiresPaymentVerification(event.type) && !verified) {
+      return failEvent(supabase, eventId, 'provider_unavailable')
     }
 
-    const checkoutIds = [event.checkoutId, verified?.checkoutId].filter(Boolean)
-    const isPendingCheckout =
-      Boolean(subscription.pending_provider_checkout_id) &&
-      checkoutIds.includes(subscription.pending_provider_checkout_id as string)
-
-    if (
-      isPendingCheckout &&
-      (!subscription.pending_plan_code || !subscription.pending_plan_version)
-    ) {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: 'pending_plan_invalid',
-      })
-      return 'failed'
-    }
-
-    const targetPlanCode = isPendingCheckout
-      ? subscription.pending_plan_code
-      : subscription.plan_code
-    const targetPlanVersion = isPendingCheckout
-      ? subscription.pending_plan_version
-      : subscription.plan_version
-
-    const plan =
-      targetPlanCode && targetPlanVersion
-        ? await loadPlan(supabase, targetPlanCode, targetPlanVersion)
-        : null
-    if (!plan) {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: 'plan_catalog_missing',
-      })
-      return 'failed'
-    }
-
-    // Troca de plano em assinatura já ativa exige substituição segura no
-    // Asaas. Sem esse caminho comprovado, não ativamos o novo plano e não
-    // criamos segunda recorrência: o evento fica retido para suporte.
-    if (
-      isPendingCheckout &&
-      ['CHECKOUT_PAID', 'PAYMENT_RECEIVED', 'PAYMENT_CONFIRMED'].includes(event.type)
-    ) {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: 'pending_plan_requires_support',
-      })
-      return 'failed'
-    }
+    const resolved = await resolvePlan(supabase, subscription, event, verified)
+    if ('error' in resolved) return failEvent(supabase, eventId, resolved.error)
 
     const validation = validateBillingEvent(
       event,
       subscription.organization_id,
       verified,
-      plan,
+      resolved.plan,
     )
-    if (!validation.ok) {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: validation.reason,
-      })
-      return 'failed'
-    }
+    if (!validation.ok) return failEvent(supabase, eventId, validation.reason)
 
     const snapshot: SubscriptionSnapshot = {
       state: subscription.state,
@@ -308,46 +339,14 @@ export async function processBillingEventById(
     const decision = decideBillingTransition(snapshot, event, verified)
 
     if (decision.kind === 'ignore') {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'ignored',
-        p_error: decision.reason,
-      })
+      await markEvent(supabase, eventId, 'ignored', decision.reason)
       return 'ignored'
     }
-
-    if (decision.kind === 'reject' || decision.kind === 'verify') {
-      await supabase.rpc('api_mark_billing_event', {
-        p_event_id: eventId,
-        p_state: 'failed',
-        p_error: decision.reason,
-      })
-      return 'failed'
+    if (decision.kind !== 'apply') {
+      return failEvent(supabase, eventId, decision.reason)
     }
 
-    const terminal = ['canceled', 'expired', 'refunded'].includes(decision.state)
-    const { error: updateError } = await supabase
-      .from('subscriptions')
-      .update({
-        state: decision.state,
-        current_period_end: decision.currentPeriodEnd,
-        provider_subscription_id: decision.providerSubscriptionId,
-        provider_checkout_id: decision.providerCheckoutId,
-        provider_customer_id: decision.providerCustomerId,
-        last_provider_event_at: decision.lastProviderEventAt,
-        last_verified_at: new Date().toISOString(),
-        ...(terminal
-          ? {
-              pending_plan_code: null,
-              pending_plan_version: null,
-              pending_plan_effective_at: null,
-              pending_provider_checkout_id: null,
-            }
-          : {}),
-      })
-      .eq('id', subscription.id)
-
-    if (updateError) throw new Error('subscription_update_failed')
+    await persistDecision(supabase, subscription, decision)
 
     await auditEvent(supabase, {
       organizationId: subscription.organization_id,
@@ -362,19 +361,11 @@ export async function processBillingEventById(
       },
     })
 
-    await supabase.rpc('api_mark_billing_event', {
-      p_event_id: eventId,
-      p_state: 'processed',
-      p_error: null,
-    })
+    await markEvent(supabase, eventId, 'processed', null)
     return 'processed'
   } catch (error) {
     logError('billing_process', error, { event_type: event.type })
-    await supabase.rpc('api_mark_billing_event', {
-      p_event_id: eventId,
-      p_state: 'failed',
-      p_error: safeFailureReason(error),
-    })
+    await failEvent(supabase, eventId, safeFailureReason(error))
     return 'failed'
   }
 }

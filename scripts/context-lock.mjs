@@ -18,12 +18,28 @@ const date = new Date().toISOString().slice(0, 10)
 const workOrder = process.env.WORK_ORDER ?? 'PDA-MVP-WO-001 (PDF, 12/11/2026)'
 const issues = process.env.ISSUES ?? 'PDA-001 a PDA-011'
 
-const include = /^(README\.md|package\.json|package-lock\.json|index\.html|eslint\.config\.js|tsconfig(\.node)?\.json|vite\.config\.ts|public\/.*\.(js|css|svg)|\.github\/workflows\/.*\.yml|docs\/.*\.md|supabase\/config\.toml|supabase\/migrations\/.*\.sql|supabase\/tests\/.*\.sql|supabase\/functions\/(_shared\/.*|[^/]+\/index)\.ts|src\/.*\.(ts|tsx|css)|scripts\/.*\.(mjs|ts))$/
+const includePatterns = [
+  /^README\.md$/,
+  /^package(?:-lock)?\.json$/,
+  /^index\.html$/,
+  /^eslint\.config\.js$/,
+  /^tsconfig(?:\.node)?\.json$/,
+  /^vite\.config\.ts$/,
+  /^public\/.*\.(?:js|css|svg)$/,
+  /^\.github\/workflows\/.*\.yml$/,
+  /^docs\/.*\.md$/,
+  /^supabase\/config\.toml$/,
+  /^supabase\/migrations\/.*\.sql$/,
+  /^supabase\/tests\/.*\.sql$/,
+  /^supabase\/functions\/(?:shared\/.*|_shared\/.*|[^/]+\/index)\.ts$/,
+  /^src\/.*\.(?:ts|tsx|css)$/,
+  /^scripts\/.*\.(?:mjs|ts)$/,
+]
 
 const files = git('ls-files')
   .split(/\r?\n/)
   .filter(Boolean)
-  .filter((file) => include.test(file))
+  .filter((file) => includePatterns.some((pattern) => pattern.test(file)))
   .filter((file) => file !== 'docs/context-lock.md')
   .sort()
 

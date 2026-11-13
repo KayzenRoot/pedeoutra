@@ -119,7 +119,8 @@
 }
 
 [data-theme="dark"] .chat-link {
-  background: var(--glass-bg);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--brand-navy);
 }
 
 [data-theme="dark"] .mobile-nav {
@@ -1092,6 +1093,7 @@ svg {
 }
 
 .auth-main {
+  position: relative;
   display: grid;
   place-items: center;
   padding: 40px 20px;
@@ -3055,6 +3057,7 @@ svg {
 /* Theme preference control */
 .theme-toggle {
   display: inline-flex;
+  margin: 0;
   align-items: center;
   gap: 2px;
   padding: 3px;
@@ -3086,10 +3089,6 @@ svg {
 .theme-toggle-compact .theme-option {
   min-width: 26px;
   padding: 6px 0;
-}
-
-.auth-main {
-  position: relative;
 }
 
 .auth-theme {
@@ -3319,7 +3318,17 @@ svg {
   color: var(--brand-navy);
 }
 
-[data-theme="dark"] .chat-link {
-  background: rgba(255, 255, 255, 0.84);
-  color: var(--brand-navy);
+
+
+/* Visually hidden but available to assistive technology */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

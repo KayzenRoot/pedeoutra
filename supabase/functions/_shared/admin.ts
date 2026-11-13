@@ -18,7 +18,7 @@ export interface AuthenticatedContext {
 export interface PlatformAdminContext extends AuthenticatedContext {}
 
 function base64UrlDecode(value: string): string {
-  const normalized = value.replace(/-/g, '+').replace(/_/g, '/')
+  const normalized = value.replaceAll('-', '+').replaceAll('_', '/')
   const padded = normalized + '='.repeat((4 - (normalized.length % 4)) % 4)
   return atob(padded)
 }

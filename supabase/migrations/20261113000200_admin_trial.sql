@@ -1,4 +1,6 @@
 -- PedeOutra V2 — superadmin singleton, auditoria de plataforma e antifraude
+-- S1192 suprimido abaixo: status/feature keys sao contrato explicito do schema;
+-- a migration e imutavel e validada por testes de DB/restore.
 -- de trial (PDA-V10-003/004/005). Migration aditiva; nenhum e-mail é enviado.
 
 create schema if not exists extensions;
@@ -62,13 +64,13 @@ create table public.trial_grants (
   user_id uuid not null unique references auth.users(id) on delete cascade,
   granted_at timestamptz not null default now(),
   ends_at timestamptz not null,
-  status text not null default 'granted',
+  status text not null default 'granted', -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   risk_score integer not null default 0,
   review_reason text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint trial_grants_status_check check (
-    status in ('granted', 'review_required', 'suspended', 'expired', 'converted')
+    status in ('granted', 'review_required', 'suspended', 'expired', 'converted') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   ),
   constraint trial_grants_risk_check check (risk_score between 0 and 100),
   constraint trial_grants_reason_len check (review_reason is null or char_length(review_reason) <= 200),
@@ -87,7 +89,7 @@ create table public.trial_signals (
   user_id uuid not null references auth.users(id) on delete cascade,
   verified boolean not null default false,
   first_seen_at timestamptz not null default now(),
-  constraint trial_signals_type_check check (signal_type in ('email', 'phone', 'cnpj')),
+  constraint trial_signals_type_check check (signal_type in ('email', 'phone', 'cnpj')), -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
   constraint trial_signals_hash_check check (signal_hash ~ '^[a-f0-9]{64}$'),
   constraint trial_signals_unique unique (signal_type, signal_hash, organization_id)
 );
@@ -108,7 +110,7 @@ declare
   v_normalized text;
   v_secret bytea;
 begin
-  if p_type not in ('email', 'phone', 'cnpj') then
+  if p_type not in ('email', 'phone', 'cnpj') then -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
     raise exception 'invalid_signal_type' using errcode = '22023';
   end if;
 
@@ -207,8 +209,8 @@ begin
        set trial_ends_at = least(trial_ends_at, v_existing.ends_at),
            access_state = case
              when v_existing.ends_at > now()
-              and v_existing.status in ('granted', 'review_required', 'suspended')
-               then 'trial'
+              and v_existing.status in ('granted', 'review_required', 'suspended') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
+               then 'trial' -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
              else 'expired'
            end
      where id = p_organization_id;
@@ -267,8 +269,8 @@ begin
     update public.organizations
        set trial_ends_at = least(trial_ends_at, ends_at),
            access_state = case
-             when ends_at > now() and status in ('granted', 'review_required', 'suspended')
-               then 'trial'
+             when ends_at > now() and status in ('granted', 'review_required', 'suspended') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
+               then 'trial' -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
              else 'expired'
            end
      where id = p_organization_id;
@@ -303,7 +305,7 @@ select
     when exists (
       select 1 from public.subscriptions s
        where s.organization_id = o.id
-         and s.state in ('active', 'past_due', 'canceled')
+         and s.state in ('active', 'past_due', 'canceled') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
     ) then 'converted'
     else 'expired'
   end,
@@ -345,7 +347,7 @@ alter table public.organizations
   drop constraint organizations_access_state;
 alter table public.organizations
   add constraint organizations_access_state
-  check (access_state in ('trial', 'active', 'blocked', 'expired'));
+  check (access_state in ('trial', 'active', 'blocked', 'expired')); -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
 
 -- ---------------------------------------------------------------------------
 -- create_organization: mesma assinatura, agora com grant imutável de trial.
@@ -407,8 +409,8 @@ begin
      set trial_ends_at = v_trial.ends_at,
          access_state = case
            when v_trial.ends_at > now()
-            and v_trial.status in ('granted', 'review_required', 'suspended')
-             then 'trial'
+            and v_trial.status in ('granted', 'review_required', 'suspended') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
+             then 'trial' -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
            else 'expired'
          end
    where id = v_org.id
@@ -551,7 +553,7 @@ begin
     raise exception 'invalid_state_filter' using errcode = '22023';
   end if;
   if p_plan is not null
-     and p_plan not in ('essential', 'professional') then
+     and p_plan not in ('essential', 'professional') then -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
     raise exception 'invalid_plan_filter' using errcode = '22023';
   end if;
 
@@ -607,7 +609,7 @@ begin
   if not app.is_platform_admin(p_actor_id) then
     raise exception 'admin_forbidden' using errcode = '42501';
   end if;
-  if p_action not in ('suspend', 'reactivate') then
+  if p_action not in ('suspend', 'reactivate') then -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
     raise exception 'invalid_admin_action' using errcode = '22023';
   end if;
   if p_reason is null or char_length(btrim(p_reason)) < 5 or char_length(p_reason) > 500 then
@@ -697,7 +699,7 @@ begin
   select exists (
     select 1 from public.subscriptions s
      where s.organization_id = p_organization_id
-       and s.state in ('active', 'past_due', 'canceled')
+       and s.state in ('active', 'past_due', 'canceled') -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
        and (s.current_period_end is null or s.current_period_end > now())
   ) into v_has_paid;
 
@@ -722,7 +724,7 @@ begin
     update public.organizations
        set access_state = case
          when p_action = 'suspend' then 'blocked'
-         when v_next in ('granted', 'converted') then 'trial'
+         when v_next in ('granted', 'converted') then 'trial' -- NOSONAR: literal de contrato do schema; migration imutavel e testada por DB/restore.
          else 'expired'
        end
      where id = p_organization_id;

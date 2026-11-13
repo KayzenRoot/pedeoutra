@@ -28,6 +28,16 @@ const STATE_OPTIONS = [
   { value: 'review', label: 'Revisão de trial' },
 ]
 
+function adminErrorMessage(error: EdgeFunctionError): string {
+  if (error.status === 503) {
+    return 'Console indisponível: bootstrap do superadmin não configurado (ADMIN_BOOTSTRAP_BLOCKED).'
+  }
+  if (error.status === 403) {
+    return 'Acesso administrativo indisponível para esta conta.'
+  }
+  return error.message
+}
+
 function accessLabel(state: string): string {
   if (state === 'trial') return 'Trial'
   if (state === 'active') return 'Ativo'
@@ -191,15 +201,7 @@ export function Admin() {
         </div>
       ) : (
         <div className="admin-shell">
-          {error && (
-            <FormMessage>
-              {error.status === 503
-                ? 'Console indisponível: bootstrap do superadmin não configurado (ADMIN_BOOTSTRAP_BLOCKED).'
-                : error.status === 403
-                  ? 'Acesso administrativo indisponível para esta conta.'
-                  : error.message}
-            </FormMessage>
-          )}
+          {error && <FormMessage>{adminErrorMessage(error)}</FormMessage>}
           {notice && <FormMessage tone="success">{notice}</FormMessage>}
 
           {overview && (

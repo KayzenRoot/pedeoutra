@@ -13,7 +13,7 @@ const OPTIONS: Array<{ value: ThemePreference; label: string; short: string }> =
   { value: 'system', label: 'Tema do sistema', short: 'Sistema' },
 ]
 
-export function ThemeToggle({ compact = false }: { compact?: boolean }) {
+export function ThemeToggle({ compact = false }: { readonly compact?: boolean }) {
   const [preference, setPreference] = useState<ThemePreference>(() =>
     readThemePreference(typeof window === 'undefined' ? null : window.localStorage),
   )
@@ -30,11 +30,10 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <div
+    <fieldset
       className={compact ? 'theme-toggle theme-toggle-compact' : 'theme-toggle'}
-      role="group"
-      aria-label="Preferência de tema"
     >
+      <legend className="sr-only">Preferência de tema</legend>
       {OPTIONS.map((option) => (
         <button
           key={option.value}
@@ -47,6 +46,6 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
           {compact ? option.short[0] : option.short}
         </button>
       ))}
-    </div>
+    </fieldset>
   )
 }

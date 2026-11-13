@@ -10,6 +10,12 @@ import { featureLabel } from '../lib/plans'
 import { supabase } from '../lib/supabase'
 import type { PlanCatalogResponse, PlanCode, PublicPlan } from '../lib/types'
 
+function limitWindowLabel(window: string | null): string {
+  if (window === 'month') return 'por mês'
+  if (window === 'minute') return 'por minuto'
+  return 'no total'
+}
+
 const PLAN_LABEL: Record<PlanCode, string> = {
   essential: 'Essencial',
   professional: 'Profissional',
@@ -59,7 +65,7 @@ export function Settings() {
       setError('Informe o nome da empresa com pelo menos 2 caracteres.')
       return
     }
-    if (!/^[0-9]{10,15}$/.test(digits)) {
+    if (!/^\d{10,15}$/.test(digits)) {
       setError('Informe um WhatsApp válido com DDD.')
       return
     }
@@ -159,11 +165,7 @@ export function Settings() {
                 <dt>{featureLabel(feature.key)}</dt>
                 <dd>
                   {feature.limit_value?.toLocaleString('pt-BR')}{' '}
-                  {feature.limit_window === 'month'
-                    ? 'por mês'
-                    : feature.limit_window === 'minute'
-                      ? 'por minuto'
-                      : 'no total'}
+                  {limitWindowLabel(feature.limit_window)}
                 </dd>
               </div>
             ))}

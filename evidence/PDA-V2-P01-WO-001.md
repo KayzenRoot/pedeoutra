@@ -47,8 +47,8 @@ Duas migrations aditivas, aplicadas apenas em bancos sintéticos/isolados:
 
 | Migration | SHA-256 |
 | --- | --- |
-| `20261113000100_plans_entitlements.sql` | `67e47cdf1db42d70b963a380bcf90a61f4a0fa7cb199acaabd99a271544d7e02` |
-| `20261113000200_admin_trial.sql` | `e4a82425c7b7edd869d361db6c3f308e201b5f06b24a8f4fb70e8319aabb0e00` |
+| `20261113000100_plans_entitlements.sql` | `2d09bee87b2005500ee0ab71096fc4f68a74eb3a90e0b7f1c4332522d155a93c` |
+| `20261113000200_admin_trial.sql` | `05b77b5781d520d6b72c9ca263d8f7aaf9332cabe0870da78a27fbc98add91a2` |
 
 - `plan_catalog`/`plan_feature_entitlements` semeados com 2 planos e 48 linhas
   de matriz; preços 2990/6990 BRL.
@@ -163,3 +163,22 @@ de execução; os dados sintéticos foram removidos pelos próprios harnesses.
   o gate final passou.
 - O PR permanece **Draft**; `mergeStateStatus` não é aprovação. Nenhum merge,
   deploy de produção ou migração foi executado.
+
+## 12. Limpeza SonarCloud
+
+O PR #89 passou o quality gate, mas o SonarCloud ainda listava 45 code
+smells (0 bugs, 0 vulnerabilities). A limpeza:
+
+- refatorou complexidade cognitiva de `billing-processor`, `admin-api` e
+  `create-checkout`;
+- removeu ternários aninhados em MFA, admin, billing, settings e theme-init;
+- trocou `role="group"` por `fieldset`/`legend` no seletor de tema;
+- corrigiu regex, optional chaining, `replaceAll`, `String.raw`, `Set` e
+  `await` em loop nos testes;
+- removeu seletores CSS duplicados;
+- suprimiu S1192 linha a linha nas migrations com `NOSONAR` justificado, pois
+  status/feature keys são contrato explícito de DDL imutável e continuam
+  cobertos por DB/restore.
+
+O resultado final é verificado pelo SonarCloud no HEAD do PR; nenhuma
+supressão foi aplicada a código de produto fora das migrations.
