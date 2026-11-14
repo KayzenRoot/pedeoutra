@@ -14,7 +14,9 @@ export interface ApiKeyContext {
 function base64UrlEncode(bytes: Uint8Array): string {
   let binary = ''
   for (const byte of bytes) binary += String.fromCodePoint(byte)
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+  let encoded = btoa(binary).replaceAll('+', '-').replaceAll('/', '_')
+  while (encoded.endsWith('=')) encoded = encoded.slice(0, -1)
+  return encoded
 }
 
 export function generateApiKey(): string {
@@ -51,7 +53,7 @@ export async function requireApiKey(
     .eq('key_hash', hash)
     .maybeSingle()
   if (error) throw new HttpError(503, 'api_key_lookup_failed')
-  if (!key || key.status !== 'active') {
+  if (key?.status !== 'active') {
     throw new HttpError(401, 'invalid_api_key', 'Chave de API inválida.')
   }
   if (key.expires_at && new Date(key.expires_at).getTime() <= Date.now()) {

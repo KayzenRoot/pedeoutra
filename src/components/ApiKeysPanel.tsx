@@ -113,6 +113,12 @@ export function ApiKeysPanel() {
     }
   }
 
+  function keysState() {
+    if (loading) return <p className="muted">Carregando chaves…</p>
+    if (keys.length === 0) return <p className="muted">Nenhuma chave criada.</p>
+    return null
+  }
+
   if (!isProfessional) {
     return (
       <section className="card">
@@ -188,11 +194,7 @@ export function ApiKeysPanel() {
         </button>
       </form>
 
-      {loading ? (
-        <p className="muted">Carregando chaves…</p>
-      ) : keys.length === 0 ? (
-        <p className="muted">Nenhuma chave criada.</p>
-      ) : (
+      {keysState() ?? (
         <ul className="link-list">
           {keys.map((key) => (
             <li key={key.id}>
