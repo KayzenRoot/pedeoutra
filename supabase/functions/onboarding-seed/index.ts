@@ -14,7 +14,6 @@ import {
   CATALOG_TEMPLATES,
   findCatalogTemplate,
   type CatalogTemplate,
-  type CatalogTemplateItem,
 } from '../_shared/onboarding-templates.ts'
 
 interface SeedItemInput {
@@ -89,7 +88,7 @@ function normalizeItems(
 }
 
 function templateConflict(code: string, version: number): HttpError {
-  const sameCode = CATALOG_TEMPLATES.find((template) => template.code === code)
+  const sameCode = CATALOG_TEMPLATES.some((template) => template.code === code)
   if (sameCode) {
     return new HttpError(
       409,
@@ -147,11 +146,12 @@ export const handler = (req: Request) =>
         mode,
         template: { code: template.code, name: template.name, version: template.version },
         items: items.map((item) => {
-          const reason = seeded.has(item.item_key)
-            ? 'Já importado por este template'
-            : names.has(item.name.toLowerCase())
-              ? 'Já existe um produto com este nome'
-              : null
+          let reason: string | null = null
+          if (seeded.has(item.item_key)) {
+            reason = 'Já importado por este template'
+          } else if (names.has(item.name.toLowerCase())) {
+            reason = 'Já existe um produto com este nome'
+          }
           return { ...item, conflict: Boolean(reason), conflict_reason: reason }
         }),
         summary: {

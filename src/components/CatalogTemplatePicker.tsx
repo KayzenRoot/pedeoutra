@@ -90,6 +90,10 @@ export function CatalogTemplatePicker({
 
   const template = templates.find((item) => item.code === selectedCode) ?? null
   const selectedItems = Object.entries(draft).filter(([, item]) => item.selected)
+  const confirmLabel =
+    mode === 'onboarding'
+      ? `Criar catálogo com ${selectedItems.length} item(ns)`
+      : `Importar ${selectedItems.length} item(ns)`
 
   function itemsPayload() {
     return selectedItems.map(([key, item]) => ({
@@ -347,17 +351,13 @@ export function CatalogTemplatePicker({
               onClick={() => void confirm()}
               disabled={busy || selectedItems.length === 0 || result !== null}
             >
-              {busy
-                ? 'Criando…'
-                : mode === 'onboarding'
-                  ? `Criar catálogo com ${selectedItems.length} item(ns)`
-                  : `Importar ${selectedItems.length} item(ns)`}
+              {busy ? 'Criando…' : confirmLabel}
             </button>
           </div>
         </>
       )}
 
-      {template && template.items.length === 0 && (
+      {template?.items.length === 0 && (
         <div className="template-empty">
           <p>Este modelo não cria produtos. Você pode cadastrar manualmente depois.</p>
           <button
