@@ -23,6 +23,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #44 | Radar de recompra por cadência real | implementado neste branch |
 | #45 | Lembretes manuais com consentimento e histórico | implementado; envio automático desligado |
 | #78 | Analytics first-party do funil, consentimento e fontes | implementado |
+| #79 | Métricas financeiras administrativas (MRR, recebimentos, churn) | implementado |
+| #80 | Dashboard executivo 360° | parcial: overview, organizações, auditoria, funil e financeiro |
 
 ## #48 — preços por comprador
 
@@ -178,6 +180,22 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   de dados distinta de zero.
 - RLS nega acesso direto a `authenticated`; ingestão é pública, rate-limited e
   sem PII.
+
+## #79/#80 — financeiro e dashboard administrativo
+
+- `api_admin_financial` agrega no servidor MRR Essencial/Profissional/total,
+  recebimentos confirmados/reconciliados, reembolsos, líquido após reembolsos,
+  assinaturas ativas/past_due/canceladas/reembolsadas, trials, novos pagantes e
+  churn do período, com definições explícitas e `last_sync`.
+- MRR projetado, recebimento e lucro são apresentados separadamente; custos
+  Meta/DeepSeek/Resend aparecem como `observed=false` (“indisponível”) enquanto
+  as fontes não estiverem conectadas. Pedidos B2B não entram como receita SaaS.
+- O console `/admin` (UUID+AAL2) ganhou cartões de funil/analytics e tabela
+  financeira; visão geral, organizações, auditoria, filtros e ações seguem no
+  mesmo console. Fornecedor/equipe/AAL1 continuam negados nas rotas globais.
+- #80 permanece parcial: faltam seções de Meta/DeepSeek/Resend/API e saúde de
+  integrações, que dependem de fontes externas/Parte 4; o painel atual não
+  inventa valores ausentes.
 
 ## Evidência local (HEAD de trabalho)
 

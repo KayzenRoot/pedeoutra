@@ -97,6 +97,24 @@ async function getAudit(
   })
 }
 
+async function getFinance(
+  supabase: SupabaseClient,
+  req: Request,
+  url: URL,
+  adminId: string,
+): Promise<Response> {
+  const days = intParam(url.searchParams.get('days'), 30, 1, 365)
+  const { data, error } = await supabase.rpc('api_admin_financial', {
+    p_actor_id: adminId,
+    p_days: days,
+  })
+  if (error) {
+    logError('admin_finance', new Error(error.message), { code: error.code })
+    throw rpcError(error)
+  }
+  return jsonResponse(req, { days, metrics: data ?? [] })
+}
+
 async function getAnalytics(
   supabase: SupabaseClient,
   req: Request,
@@ -129,6 +147,7 @@ async function handleGet(
   if (view === 'organizations') return getOrganizations(supabase, req, url)
   if (view === 'audit') return getAudit(supabase, req, url)
   if (view === 'analytics') return getAnalytics(supabase, req, url, adminId)
+  if (view === 'finance') return getFinance(supabase, req, url, adminId)
   throw new HttpError(400, 'invalid_view', 'Visão administrativa inválida.')
 }
 

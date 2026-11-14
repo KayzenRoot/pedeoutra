@@ -2130,6 +2130,23 @@ async function main() {
       assert(data.events.some((event) => event.event === 'landing_view'), 'landing_view')
       assert(Array.isArray(data.sources), 'fontes')
 
+      const finance = await fetch(`${edgeBase}/admin-api?view=finance&days=30`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const financeData = await finance.json()
+      assert(finance.status === 200, `finance HTTP ${finance.status}`)
+      assert(Array.isArray(financeData.metrics), 'métricas financeiras')
+      assert(
+        financeData.metrics.some((metric) => metric.metric === 'mrr_total'),
+        'MRR ausente',
+      )
+      assert(
+        financeData.metrics.some(
+          (metric) => metric.metric === 'cost_meta_ads' && metric.observed === false,
+        ),
+        'custo ausente deveria ser indisponível',
+      )
+
       const supplier = await fetch(`${edgeBase}/admin-api?view=analytics`, {
         headers: { Authorization: `Bearer ${supplierAal2Token}` },
       })

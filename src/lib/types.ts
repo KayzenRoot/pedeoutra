@@ -253,6 +253,20 @@ export interface AdminAnalyticsSource {
   events: number
 }
 
+export interface AdminFinancialMetric {
+  metric: string
+  value_cents: number | null
+  value_count: number | null
+  definition: string
+  observed: boolean
+  last_sync: string | null
+}
+
+export interface AdminFinancialResponse {
+  days: number
+  metrics: AdminFinancialMetric[]
+}
+
 export interface AdminAnalyticsResponse {
   days: number
   events: AdminAnalyticsEvent[]
