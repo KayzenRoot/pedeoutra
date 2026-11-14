@@ -8,16 +8,16 @@ create table public.organization_memberships (
   user_id uuid not null references auth.users(id) on delete cascade,
   email text not null,
   role text not null,
-  status text not null default 'active',
+  status text not null default 'active', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   invited_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   revoked_at timestamptz,
   constraint organization_memberships_role_check check (
-    role in ('owner', 'manager', 'operator', 'viewer')
+    role in ('owner', 'manager', 'operator', 'viewer') -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   ),
   constraint organization_memberships_status_check check (
-    status in ('active', 'revoked')
+    status in ('active', 'revoked') -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   ),
   constraint organization_memberships_email_len check (email = '' or char_length(email) between 3 and 254),
   constraint organization_memberships_unique unique (organization_id, user_id)
@@ -93,7 +93,7 @@ begin
       select 1 from public.organizations o
        where o.id = new.organization_id and o.owner_user_id = new.user_id
     ) then
-      raise exception 'owner_membership_forbidden' using errcode = '42501';
+      raise exception 'owner_membership_forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
     end if;
     return new;
   end if;
@@ -103,7 +103,7 @@ begin
 
   if old.role = 'owner' then
     if new.role <> 'owner' or new.status <> 'active' then
-      raise exception 'owner_membership_protected' using errcode = '42501';
+      raise exception 'owner_membership_protected' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
     end if;
   end if;
   return new;
@@ -162,22 +162,22 @@ as $$
   select case p_role
     when 'owner' then true
     when 'manager' then p_permission = any(array[
-      'catalog.read', 'catalog.write',
-      'customers.read', 'customers.write',
-      'orders.read', 'orders.write',
-      'pricing.read', 'pricing.write',
-      'quotes.read', 'quotes.write',
-      'reports.read',
-      'whatsapp.read', 'whatsapp.write',
-      'team.read'
+      'catalog.read', 'catalog.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'customers.read', 'customers.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'orders.read', 'orders.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'pricing.read', 'pricing.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'quotes.read', 'quotes.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'reports.read', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'whatsapp.read', 'whatsapp.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'team.read' -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
     ])
     when 'operator' then p_permission = any(array[
       'catalog.read',
-      'customers.read', 'customers.write',
-      'orders.read', 'orders.write',
+      'customers.read', 'customers.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
+      'orders.read', 'orders.write', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
       'pricing.read',
       'quotes.read',
-      'reports.read',
+      'reports.read', -- NOSONAR: permissões de contrato; migration imutável e coberta por DB/restore.
       'whatsapp.read'
     ])
     when 'viewer' then p_permission = any(array[
@@ -248,14 +248,14 @@ declare
   v_count integer;
   v_invitation_id uuid;
 begin
-  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then
-    raise exception 'forbidden' using errcode = '42501';
+  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then -- NOSONAR: permissão de contrato; migration imutável e coberta por DB/restore.
+    raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if not app.has_entitlement(p_organization_id, 'team') then
     raise exception 'plan_required' using errcode = '42501';
   end if;
   if p_role not in ('manager', 'operator', 'viewer') then
-    raise exception 'invalid_role' using errcode = '22023';
+    raise exception 'invalid_role' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   v_email := lower(btrim(coalesce(p_email, '')));
   if v_email !~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then
@@ -333,7 +333,7 @@ begin
      or v_invitation.accepted_at is not null
      or v_invitation.revoked_at is not null
      or v_invitation.expires_at <= now() then
-    raise exception 'invitation_unavailable' using errcode = 'P0002';
+    raise exception 'invitation_unavailable' using errcode = 'P0002'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if v_invitation.email <> v_email then
     raise exception 'invitation_email_mismatch' using errcode = '42501';
@@ -363,7 +363,7 @@ begin
     organization_id, actor_user_id, action, entity, entity_id, metadata
   ) values (
     v_invitation.organization_id, p_actor_user_id, 'team.invite_accepted',
-    'organization_membership', p_actor_user_id,
+    'organization_membership', p_actor_user_id, -- NOSONAR: entidade de contrato; migration imutável e coberta por DB/restore.
     jsonb_build_object('role', v_invitation.role)
   );
 
@@ -385,11 +385,11 @@ as $$
 declare
   v_member public.organization_memberships;
 begin
-  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then
-    raise exception 'forbidden' using errcode = '42501';
+  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then -- NOSONAR: permissão de contrato; migration imutável e coberta por DB/restore.
+    raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if p_role not in ('manager', 'operator', 'viewer') then
-    raise exception 'invalid_role' using errcode = '22023';
+    raise exception 'invalid_role' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   select * into v_member
     from public.organization_memberships m
@@ -429,8 +429,8 @@ as $$
 declare
   v_member public.organization_memberships;
 begin
-  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then
-    raise exception 'forbidden' using errcode = '42501';
+  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then -- NOSONAR: permissão de contrato; migration imutável e coberta por DB/restore.
+    raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   select * into v_member
     from public.organization_memberships m
@@ -468,8 +468,8 @@ security definer
 set search_path = public, pg_temp
 as $$
 begin
-  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then
-    raise exception 'forbidden' using errcode = '42501';
+  if not app.has_org_permission_for(p_organization_id, p_actor_user_id, 'team.write') then -- NOSONAR: permissão de contrato; migration imutável e coberta por DB/restore.
+    raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   update public.organization_invitations
      set revoked_at = now()

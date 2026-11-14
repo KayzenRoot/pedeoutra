@@ -277,10 +277,21 @@ export interface TeamRevokeInput {
 
 const TEAM_ROLES = new Set(['manager', 'operator', 'viewer'])
 
+function isValidTeamEmail(email: string): boolean {
+  if (email.length < 3 || email.length > 254) return false
+  const at = email.indexOf('@')
+  if (at <= 0 || at !== email.lastIndexOf('@')) return false
+  const local = email.slice(0, at)
+  const domain = email.slice(at + 1)
+  if (!local || /\s/.test(local)) return false
+  const labels = domain.split('.')
+  return labels.length >= 2 && labels.every((label) => label.length > 0 && !/\s/.test(label))
+}
+
 export function parseTeamInviteInput(input: unknown): ValidationResult<TeamInviteInput> {
   if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
   const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : ''
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 254) {
+  if (!isValidTeamEmail(email)) {
     return { ok: false, error: 'invalid_email' }
   }
   if (typeof input.role !== 'string' || !TEAM_ROLES.has(input.role)) {

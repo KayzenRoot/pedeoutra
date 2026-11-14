@@ -167,6 +167,14 @@ export function Team() {
     }
   }
 
+  function membersState() {
+    if (loading) return <p className="muted">Carregando equipe…</p>
+    if ((team?.members.length ?? 0) === 0) {
+      return <p className="muted">Nenhum membro encontrado.</p>
+    }
+    return null
+  }
+
   if (!isOwner) {
     return (
       <div>
@@ -255,11 +263,7 @@ export function Team() {
               Atualizar
             </button>
           </div>
-          {loading ? (
-            <p className="muted">Carregando equipe…</p>
-          ) : (team?.members.length ?? 0) === 0 ? (
-            <p className="muted">Nenhum membro encontrado.</p>
-          ) : (
+          {membersState() ?? (
             <div className="table-wrap">
               <table className="data-table">
                 <thead>

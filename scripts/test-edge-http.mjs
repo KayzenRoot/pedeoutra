@@ -1935,7 +1935,7 @@ async function main() {
       assert(noMfa.status === 403, `convite sem AAL2 HTTP ${noMfa.status}`)
 
       for (const email of ['pending-a@example.test', 'pending-b@example.test']) {
-        const response = await call(
+        const response = await call( // NOSONAR: dois convites sequenciais para testar o limite.
           'team-invite',
           { email, role: 'viewer' },
           { token: supplierAal2Token },
