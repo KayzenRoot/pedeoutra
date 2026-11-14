@@ -5,6 +5,9 @@ import {
   MAX_QUANTITY,
   normalizePhone,
   parsePublicOrderInput,
+  parseQuoteAcceptInput,
+  parseQuoteCreateInput,
+  parseQuoteUpdateInput,
   parseReorderInput,
 } from './validation.ts'
 
@@ -188,5 +191,77 @@ describe('normalizePhone', () => {
     expect(normalizePhone('+55 11 99999-8888')).toBe('5511999998888')
     expect(normalizePhone('123')).toBeNull()
     expect(normalizePhone('1'.repeat(16))).toBeNull()
+  })
+})
+
+describe('validação de orçamento', () => {
+  const quoteInput = {
+    customer_id: '44444444-4444-4444-8444-444444444444',
+    items: [{ product_id: PRODUCT_A, quantity: 2 }],
+    valid_until: '2026-11-21T23:59:59.000Z',
+    notes: 'Entrega em 3 dias',
+  }
+
+  it('aceita criação e atualização válidas', () => {
+    const created = parseQuoteCreateInput(quoteInput)
+    expect(created.ok).toBe(true)
+    if (!created.ok) return
+    expect(created.value.customerId).toBe(quoteInput.customer_id)
+    expect(created.value.items).toHaveLength(1)
+
+    const updated = parseQuoteUpdateInput({
+      ...quoteInput,
+      quote_id: '55555555-5555-4555-8555-555555555555',
+      expected_version: 3,
+    })
+    expect(updated.ok).toBe(true)
+    if (!updated.ok) return
+    expect(updated.value.expectedVersion).toBe(3)
+  })
+
+  it('rejeita cliente, validade, notas e versão inválidos', () => {
+    expect(parseQuoteCreateInput({ ...quoteInput, customer_id: 'x' })).toEqual({
+      ok: false,
+      error: 'invalid_customer',
+    })
+    expect(parseQuoteCreateInput({ ...quoteInput, valid_until: 'ontem' })).toEqual({
+      ok: false,
+      error: 'invalid_quote_validity',
+    })
+    expect(parseQuoteCreateInput({ ...quoteInput, notes: 'a'.repeat(1001) })).toEqual({
+      ok: false,
+      error: 'invalid_quote_notes',
+    })
+    expect(
+      parseQuoteUpdateInput({
+        ...quoteInput,
+        quote_id: '55555555-5555-4555-8555-555555555555',
+        expected_version: 0,
+      }),
+    ).toEqual({ ok: false, error: 'invalid_version' })
+  })
+
+  it('aceite exige confirmação, token e anti-spam', () => {
+    const token = 'A'.repeat(43)
+    const base = {
+      token,
+      confirm: true,
+      request_id: REQUEST_ID,
+      company_website: '',
+      elapsed_ms: 2000,
+    }
+    expect(parseQuoteAcceptInput(base).ok).toBe(true)
+    expect(parseQuoteAcceptInput({ ...base, confirm: false })).toEqual({
+      ok: false,
+      error: 'confirm_required',
+    })
+    expect(parseQuoteAcceptInput({ ...base, token: 'curto' })).toEqual({
+      ok: false,
+      error: 'invalid_quote_token',
+    })
+    expect(parseQuoteAcceptInput({ ...base, elapsed_ms: 10 })).toEqual({
+      ok: false,
+      error: 'spam_detected',
+    })
   })
 })

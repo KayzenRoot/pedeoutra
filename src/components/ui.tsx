@@ -191,6 +191,7 @@ export function Icon({
     | 'products'
     | 'customers'
     | 'prices'
+    | 'quotes'
     | 'billing'
     | 'settings'
     | 'external'
@@ -221,6 +222,12 @@ export function Icon({
       <>
         <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
         <circle cx="7.5" cy="7.5" r="1.2" />
+      </>
+    ),
+    quotes: (
+      <>
+        <path d="M6 3h9l4 4v14H6z" />
+        <path d="M15 3v5h4M9 12h6M9 16h4" />
       </>
     ),
     billing: (

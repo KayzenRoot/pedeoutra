@@ -1422,6 +1422,265 @@ async function main() {
       await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 
+
+    console.log('[10/10] Orçamentos B2B')
+
+    await test('orçamento HTTP cria, envia, aceita e repete sem duplicar', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+
+      const created = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [
+            { product_id: PRODUCT_1, quantity: 1 },
+            { product_id: PRODUCT_2, quantity: 1 },
+          ],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: 'Proposta HTTP',
+        },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.total_cents === 1899, `total ${created.data.total_cents}`)
+      assert(created.data.public_reference.startsWith('OR-'), 'referência')
+      const quoteId = created.data.quote_id
+
+      const updated = await call(
+        'quote-update',
+        {
+          quote_id: quoteId,
+          expected_version: 1,
+          items: [{ product_id: PRODUCT_1, quantity: 2 }],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: 'Proposta revisada',
+        },
+        { token: userToken },
+      )
+      assert(updated.status === 200, `update HTTP ${updated.status}`)
+      assert(updated.data.total_cents === 2000, `update total ${updated.data.total_cents}`)
+      assert(updated.data.version === 2, 'versão')
+
+      const sent = await call(
+        'quote-send',
+        { quote_id: quoteId, expected_version: 2 },
+        { token: userToken },
+      )
+      assert(sent.status === 201, `send HTTP ${sent.status} ${JSON.stringify(sent.data)}`)
+      assert(sent.data.url.includes('/o/'), 'url pública')
+      const token = sent.data.url.split('/').pop()
+
+      const publicQuote = await fetch(
+        `${edgeBase}/quote-get?token=${encodeURIComponent(token)}`,
+      )
+      const publicData = await publicQuote.json()
+      assert(publicQuote.status === 200, `get HTTP ${publicQuote.status}`)
+      assert(publicData.status === 'sent', 'status enviado')
+      assert(publicData.customer.name === 'Padaria Edge', 'cliente')
+      assert(publicData.items.length === 1, 'itens')
+      assert(publicData.can_accept === true, 'aceite disponível')
+      assert(!JSON.stringify(publicData).includes('11977776666'), 'telefone vazou')
+      assert(publicQuote.headers.get('x-robots-tag')?.includes('noindex'), 'noindex')
+
+      const requestId = crypto.randomUUID()
+      const accepted = await call(
+        'quote-accept',
+        {
+          token,
+          confirm: true,
+          request_id: requestId,
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.20' } },
+      )
+      assert(accepted.status === 201, `accept HTTP ${accepted.status} ${JSON.stringify(accepted.data)}`)
+      assert(accepted.data.total_cents === 2000, 'total aceito')
+      assert(accepted.data.order_reference, 'referência do pedido')
+
+      const replay = await call(
+        'quote-accept',
+        {
+          token,
+          confirm: true,
+          request_id: requestId,
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.20' } },
+      )
+      assert(replay.status === 200, `replay HTTP ${replay.status}`)
+      assert(replay.data.already_accepted === true, 'replay')
+      assert(
+        replay.data.order_reference === accepted.data.order_reference,
+        'pedido diferente',
+      )
+
+      const order = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select source, quote_id, buyer_name from public.orders where quote_id = '${quoteId}'`,
+      ]).stdout.trim()
+      assert(order.startsWith('quote|'), `origem ${order}`)
+      assert(order.endsWith('|'), `PII ${order}`)
+      const count = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.orders where quote_id = '${quoteId}'`,
+      ]).stdout.trim()
+      assert(count === '1', `pedidos ${count}`)
+
+      const after = await fetch(
+        `${edgeBase}/quote-get?token=${encodeURIComponent(token)}`,
+      )
+      const afterData = await after.json()
+      assert(after.status === 200, `get aceito HTTP ${after.status}`)
+      assert(afterData.status === 'accepted', 'status aceito')
+      assert(afterData.order_reference === accepted.data.order_reference, 'recibo')
+    })
+
+    await test('orçamento HTTP recusa, cancela e bloqueia token inválido', async () => {
+      const validUntil = new Date(Date.now() + 7 * 86400000).toISOString()
+      const created = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          valid_until: validUntil,
+          notes: null,
+        },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status}`)
+      const quoteId = created.data.quote_id
+      const sent = await call(
+        'quote-send',
+        { quote_id: quoteId, expected_version: 1 },
+        { token: userToken },
+      )
+      const token = sent.data.url.split('/').pop()
+
+      const declined = await call(
+        'quote-decline',
+        { token, confirm: true },
+        { headers: { 'x-forwarded-for': '203.0.113.21' } },
+      )
+      assert(declined.status === 200, `decline HTTP ${declined.status}`)
+      assert(declined.data.status === 'declined', 'status recusado')
+      const declinedGet = await fetch(
+        `${edgeBase}/quote-get?token=${encodeURIComponent(token)}`,
+      )
+      const declinedData = await declinedGet.json()
+      assert(declinedGet.status === 200, `get recusado HTTP ${declinedGet.status}`)
+      assert(declinedData.status === 'declined', 'status público recusado')
+
+      const canceledQuote = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          valid_until: validUntil,
+          notes: null,
+        },
+        { token: userToken },
+      )
+      const canceled = await call(
+        'quote-cancel',
+        { quote_id: canceledQuote.data.quote_id, expected_version: 1 },
+        { token: userToken },
+      )
+      assert(canceled.status === 200, `cancel HTTP ${canceled.status}`)
+      assert(canceled.data.status === 'canceled', 'status cancelado')
+
+      const invalid = await fetch(`${edgeBase}/quote-get?token=${'x'.repeat(43)}`)
+      assert(invalid.status === 404, `inválido HTTP ${invalid.status}`)
+      const invalidAccept = await call(
+        'quote-accept',
+        {
+          token: 'x'.repeat(43),
+          confirm: true,
+          request_id: crypto.randomUUID(),
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.22' } },
+      )
+      assert(invalidAccept.status === 404, `aceite inválido HTTP ${invalidAccept.status}`)
+    })
+
+    await test('preço alterado no orçamento HTTP exige revisão', async () => {
+      const created = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_1, quantity: 1 }],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: null,
+        },
+        { token: userToken },
+      )
+      const sent = await call(
+        'quote-send',
+        { quote_id: created.data.quote_id, expected_version: 1 },
+        { token: userToken },
+      )
+      const token = sent.data.url.split('/').pop()
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.price_list_items set price_cents = 1100 where price_list_id = '${PRICE_LIST_ID}' and product_id = '${PRODUCT_1}'`,
+      ])
+      const stale = await call(
+        'quote-accept',
+        {
+          token,
+          confirm: true,
+          request_id: crypto.randomUUID(),
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.23' } },
+      )
+      assert(stale.status === 409, `stale HTTP ${stale.status}`)
+      assert(stale.data.error === 'quote_stale', `erro ${JSON.stringify(stale.data)}`)
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.price_list_items set price_cents = 1000 where price_list_id = '${PRICE_LIST_ID}' and product_id = '${PRODUCT_1}'`,
+      ])
+    })
+
+    await test('orçamento exige Profissional', async () => {
+      await clientQuery(`
+        update public.subscriptions
+           set plan_code = 'essential', plan_version = 1, state = 'active',
+               current_period_end = now() + interval '20 days'
+         where organization_id = '${ORG_ID}'
+      `)
+      const denied = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: null,
+        },
+        { token: userToken },
+      )
+      assert(denied.status === 403, `plano HTTP ${denied.status}`)
+      assert(denied.data.error === 'plan_required', 'erro de plano')
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)

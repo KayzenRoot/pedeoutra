@@ -3863,3 +3863,109 @@ svg {
   border-bottom: 1px dashed var(--line);
   padding-bottom: 6px;
 }
+
+/* Orçamentos */
+.quote-add-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quote-add-row .field {
+  flex: 1;
+  min-width: 180px;
+}
+
+.quote-quantity-field {
+  flex: 0 0 86px;
+  min-width: 86px;
+}
+
+.quote-draft-list,
+.quote-detail-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.quote-draft-list li,
+.quote-detail-items li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.quote-draft-list li span,
+.quote-detail-items li span {
+  display: grid;
+  gap: 2px;
+}
+
+.quote-draft-list small,
+.quote-detail-items small {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.quote-preview {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-subtle, transparent);
+}
+
+.quote-preview span,
+.quote-preview small {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.quote-preview strong {
+  font-size: 1.1rem;
+}
+
+.quote-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.quote-total strong {
+  font-size: 1.35rem;
+}
+
+.quote-link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.quote-public-notes {
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface-subtle, transparent);
+  border-radius: 0 12px 12px 0;
+  white-space: pre-wrap;
+}

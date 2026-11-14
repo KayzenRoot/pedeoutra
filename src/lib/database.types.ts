@@ -225,6 +225,7 @@ export type Database = {
           price_list_id: string | null
           price_source: string
           public_reference: string
+          quote_id: string | null
           request_id: string | null
           source: string
           status: string
@@ -242,6 +243,7 @@ export type Database = {
           price_list_id?: string | null
           price_source?: string
           public_reference: string
+          quote_id?: string | null
           request_id?: string | null
           source?: string
           status?: string
@@ -259,6 +261,7 @@ export type Database = {
           price_list_id?: string | null
           price_source?: string
           public_reference?: string
+          quote_id?: string | null
           request_id?: string | null
           source?: string
           status?: string
@@ -399,6 +402,186 @@ export type Database = {
           name?: string
           organization_id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      quote_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event: string
+          from_status: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          quote_id: string
+          to_status: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event: string
+          from_status?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          quote_id: string
+          to_status?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event?: string
+          from_status?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          quote_id?: string
+          to_status?: string | null
+        }
+        Relationships: []
+      }
+      quote_items: {
+        Row: {
+          created_at: string
+          id: string
+          name_snapshot: string
+          organization_id: string
+          price_list_id: string | null
+          price_source: string
+          product_id: string | null
+          quantity: number
+          quote_id: string
+          subtotal_cents: number
+          unit_price_cents: number
+          unit_snapshot: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name_snapshot: string
+          organization_id: string
+          price_list_id?: string | null
+          price_source?: string
+          product_id?: string | null
+          quantity: number
+          quote_id: string
+          subtotal_cents: number
+          unit_price_cents: number
+          unit_snapshot: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name_snapshot?: string
+          organization_id?: string
+          price_list_id?: string | null
+          price_source?: string
+          product_id?: string | null
+          quantity?: number
+          quote_id?: string
+          subtotal_cents?: number
+          unit_price_cents?: number
+          unit_snapshot?: string
+        }
+        Relationships: []
+      }
+      quote_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          organization_id: string
+          quote_id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at: string
+          id?: string
+          organization_id: string
+          quote_id: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          quote_id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          accepted_at: string | null
+          canceled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          declined_at: string | null
+          id: string
+          notes: string | null
+          order_id: string | null
+          organization_id: string
+          price_list_id: string | null
+          price_source: string
+          public_reference: string
+          sent_at: string | null
+          status: string
+          total_cents: number
+          updated_at: string
+          valid_until: string
+          version: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          declined_at?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          organization_id: string
+          price_list_id?: string | null
+          price_source?: string
+          public_reference: string
+          sent_at?: string | null
+          status?: string
+          total_cents: number
+          updated_at?: string
+          valid_until: string
+          version?: number
+        }
+        Update: {
+          accepted_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          declined_at?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          organization_id?: string
+          price_list_id?: string | null
+          price_source?: string
+          public_reference?: string
+          sent_at?: string | null
+          status?: string
+          total_cents?: number
+          updated_at?: string
+          valid_until?: string
+          version?: number
         }
         Relationships: []
       }

@@ -1,5 +1,11 @@
 import qrcode from 'qrcode-generator'
 
+function stripTrailingSlashes(value: string): string {
+  let end = value.length
+  while (end > 0 && value[end - 1] === '/') end -= 1
+  return value.slice(0, end)
+}
+
 function isValidSlug(slug: string): boolean {
   if (slug.length < 1 || slug.length > 120) return false
   return slug.split('-').every((part) => /^[a-z0-9]+$/.test(part))
@@ -9,8 +15,10 @@ export function catalogQrUrl(slug: string, origin?: string): string {
   if (!isValidSlug(slug)) throw new Error('Slug de catálogo inválido.')
 
   const base =
-    origin?.replace(/\/+$/, '') ||
-    (import.meta.env.VITE_APP_URL as string | undefined)?.replace(/\/+$/, '') ||
+    (origin ? stripTrailingSlashes(origin) : '') ||
+    (import.meta.env.VITE_APP_URL
+      ? stripTrailingSlashes(import.meta.env.VITE_APP_URL as string)
+      : '') ||
     window.location.origin
   const url = new URL(`${base}/c/${slug}`)
 

@@ -120,3 +120,24 @@ verify_jwt = true
 
 [functions.customer-price-link-revoke]
 verify_jwt = true
+
+[functions.quote-create]
+verify_jwt = true
+
+[functions.quote-update]
+verify_jwt = true
+
+[functions.quote-send]
+verify_jwt = true
+
+[functions.quote-cancel]
+verify_jwt = true
+
+[functions.quote-get]
+verify_jwt = false
+
+[functions.quote-accept]
+verify_jwt = false
+
+[functions.quote-decline]
+verify_jwt = false

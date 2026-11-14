@@ -9,6 +9,9 @@ export type PriceList = Database['public']['Tables']['price_lists']['Row']
 export type PriceListItem = Database['public']['Tables']['price_list_items']['Row']
 export type CustomerPriceListAssignment =
   Database['public']['Tables']['customer_price_list_assignments']['Row']
+export type Quote = Database['public']['Tables']['quotes']['Row']
+export type QuoteItem = Database['public']['Tables']['quote_items']['Row']
+export type QuoteEvent = Database['public']['Tables']['quote_events']['Row']
 export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
 export type OrderStatusEvent = Database['public']['Tables']['order_status_events']['Row']
@@ -57,6 +60,55 @@ export interface PrivateCatalogResponse extends PublicCatalogResponse {
   price_list: { id: string; name: string } | null
   products: Array<PublicCatalogResponse['products'][number] & { price_source: 'private' | 'public' }>
   expires_at: string
+}
+
+export interface QuoteCreateResponse {
+  quote_id: string
+  public_reference: string
+  total_cents: number
+  item_count: number
+}
+
+export interface QuoteUpdateResponse {
+  quote_id: string
+  total_cents: number
+  item_count: number
+  version: number
+}
+
+export interface QuoteSendResponse {
+  url: string
+  expires_at: string
+  version: number
+}
+
+export interface PublicQuoteResponse {
+  supplier: { name: string; slug: string; whatsapp: string }
+  customer: { name: string }
+  reference: string
+  status: string
+  valid_until: string
+  notes: string | null
+  items: Array<{
+    name: string
+    unit: string
+    quantity: number
+    unit_price_cents: number
+    subtotal_cents: number
+  }>
+  total_cents: number
+  created_at: string
+  order_reference: string | null
+  can_accept: boolean
+}
+
+export interface QuoteAcceptResponse {
+  status: 'accepted'
+  order_reference: string
+  quote_reference: string
+  total_cents: number
+  item_count: number
+  already_accepted: boolean
 }
 
 export interface CreatePriceLinkResponse {

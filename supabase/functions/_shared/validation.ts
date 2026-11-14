@@ -188,6 +188,120 @@ export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOr
   }
 }
 
+export interface QuoteSaveInput {
+  items: OrderItemInput[]
+  validUntil: string
+  notes: string | null
+}
+
+export interface QuoteCreateInput extends QuoteSaveInput {
+  customerId: string
+}
+
+export interface QuoteUpdateInput extends QuoteSaveInput {
+  quoteId: string
+  expectedVersion: number
+}
+
+export interface QuoteActionInput {
+  quoteId: string
+  expectedVersion: number
+}
+
+export interface QuoteAcceptInput {
+  token: string
+  requestId: string
+}
+
+export interface QuoteDeclineInput {
+  token: string
+}
+
+function parseQuoteBase(
+  input: Record<string, unknown>,
+): ValidationResult<QuoteSaveInput> {
+  const items = validateItems(input.items)
+  if (!items.ok) return items
+
+  const validUntil = input.valid_until
+  if (typeof validUntil !== 'string' || !Number.isFinite(Date.parse(validUntil))) {
+    return { ok: false, error: 'invalid_quote_validity' }
+  }
+
+  const notes = cleanText(input.notes, 1000)
+  if (typeof input.notes === 'string' && input.notes.length > 1000) {
+    return { ok: false, error: 'invalid_quote_notes' }
+  }
+
+  return { ok: true, value: { items: items.value, validUntil, notes } }
+}
+
+function parseQuoteId(value: unknown): string | null {
+  return isUuid(value) ? value : null
+}
+
+function parseExpectedVersion(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) return null
+  return value
+}
+
+export function parseQuoteCreateInput(input: unknown): ValidationResult<QuoteCreateInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  const customerId = parseQuoteId(input.customer_id)
+  if (!customerId) return { ok: false, error: 'invalid_customer' }
+  const base = parseQuoteBase(input)
+  if (!base.ok) return base
+  return { ok: true, value: { ...base.value, customerId } }
+}
+
+export function parseQuoteSaveInput(input: unknown): ValidationResult<QuoteSaveInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  return parseQuoteBase(input)
+}
+
+export function parseQuoteUpdateInput(input: unknown): ValidationResult<QuoteUpdateInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  const quoteId = parseQuoteId(input.quote_id)
+  if (!quoteId) return { ok: false, error: 'invalid_quote' }
+  const expectedVersion = parseExpectedVersion(input.expected_version)
+  if (expectedVersion === null) return { ok: false, error: 'invalid_version' }
+  const base = parseQuoteBase(input)
+  if (!base.ok) return base
+  return { ok: true, value: { ...base.value, quoteId, expectedVersion } }
+}
+
+export function parseQuoteActionInput(input: unknown): ValidationResult<QuoteActionInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  const quoteId = parseQuoteId(input.quote_id)
+  if (!quoteId) return { ok: false, error: 'invalid_quote' }
+  const expectedVersion = parseExpectedVersion(input.expected_version)
+  if (expectedVersion === null) return { ok: false, error: 'invalid_version' }
+  return { ok: true, value: { quoteId, expectedVersion } }
+}
+
+export function parseQuoteAcceptInput(input: unknown): ValidationResult<QuoteAcceptInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  const common = validateCommonFields(input)
+  if (!common.ok) return common
+  if (input.confirm !== true) return { ok: false, error: 'confirm_required' }
+  if (typeof input.token !== 'string' || !OPAQUE_TOKEN_PATTERN.test(input.token)) {
+    return { ok: false, error: 'invalid_quote_token' }
+  }
+  return {
+    ok: true,
+    value: { token: input.token, requestId: common.value.requestId },
+  }
+}
+
+export function parseQuoteDeclineInput(input: unknown): ValidationResult<QuoteDeclineInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  if (input.confirm !== true) return { ok: false, error: 'confirm_required' }
+  if (typeof input.token !== 'string' || !OPAQUE_TOKEN_PATTERN.test(input.token)) {
+    return { ok: false, error: 'invalid_quote_token' }
+  }
+  return { ok: true, value: { token: input.token } }
+}
+
 export function parseReorderInput(input: unknown): ValidationResult<ReorderOrderInput> {
   if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
 

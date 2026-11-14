@@ -14,7 +14,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #57 | Templates de catálogo versionados e idempotentes | implementado |
 | #53 | QR local do catálogo, sem serviço externo | implementado |
 | #50 | Acompanhamento público por token opaco, TTL e revogação | implementado |
-| #48 | Preços por comprador, tabela privada e link opaco | implementado neste branch |
+| #48 | Preços por comprador, tabela privada e link opaco | implementado |
+| #51 | Orçamentos B2B com aceite opaco e conversão única em pedido | implementado neste branch |
 
 ## #48 — preços por comprador
 
@@ -37,16 +38,39 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   catálogo com preços privados e sem pedir PII.
 - `analytics.ts` mascara `/p/:token` e `/r/:token` para nunca enviar o token.
 
+## #51 — orçamentos B2B
+
+- Tabelas `quotes`, `quote_items`, `quote_events` e `quote_links`; status
+  `draft|sent|accepted|declined|expired|canceled`, versão otimista, validade de
+  até 90 dias e trilha de eventos.
+- `app.build_quote_items` calcula o total no servidor com `app.quote_price`
+  (tabela privada quando o cliente tem assignment e o plano permite; fallback
+  público), congela snapshots e aplica mínimos/múltiplos.
+- `app.send_quote` revalida o snapshot, cria/rotaciona link opaco com SHA-256 e
+  TTL de até 30 dias, e registra o evento. Link anterior é revogado.
+- `app.accept_quote` bloqueia a quote com `for update`, verifica status,
+  validade, acesso do tenant, entitlement `quotes`, produtos ativos, preços e
+  mínimos; cria no máximo um pedido, grava `orders.quote_id` e eventos com
+  `request_id`/user agent. Replays retornam o mesmo pedido.
+- Preço alterado, produto inativo ou política mínima violada marcam a quote como
+  `expired` + `review_required`, sem pedido e sem alterar valores.
+- `app.decline_quote` e `app.cancel_quote` revogam o link e não criam pedido;
+  recusa é idempotente. RLS permite ao dono ler o histórico; escrita apenas por
+  RPC/Edge com `service_role`.
+- UI `/app/orcamentos` (Profissional) para montar, editar rascunho, enviar/rotacionar
+  link, cancelar, revisar e ver eventos. Página pública `/o/:token` com aceite e
+  recusa explícitos, sem login do comprador e sem PII de telefone.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **54 PASS, 0 FAIL** |
-| `npm run test:edge` | typecheck de **28 Edge Functions** |
-| `npm run test:edge-http` | **39 PASS, 0 FAIL** |
-| `npm run test:unit` | **133 PASS, 0 FAIL** (24 arquivos) |
+| `npm run test:db` | **60 PASS, 0 FAIL** |
+| `npm run test:edge` | typecheck de **35 Edge Functions** |
+| `npm run test:edge-http` | **43 PASS, 0 FAIL** |
+| `npm run test:unit` | **140 PASS, 0 FAIL** (26 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui `price_lists`, `price_list_items`, atribuições e tokens |
+| `npm run test:restore` | PASS; inclui tabelas de preço, quotes, itens, eventos e links |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |
@@ -63,8 +87,9 @@ Logs locais usados durante a implementação:
   o catálogo privado.
 - Pedido privado não persiste nome/telefone do comprador e usa o cliente do token.
 - Preço privado e fallback público são gravados no snapshot do pedido.
-- `app.submit_order`, `app.customer_price` e `api_submit_order` não são
-  executáveis por `authenticated`; somente `service_role`.
+- `app.submit_order`, `app.customer_price`, `api_submit_order`, `app.accept_quote`
+  e `api_create_quote` não são executáveis por `authenticated`; somente
+  `service_role`.
 - Nenhuma chave de serviço, Asaas, Meta ou SMTP é usada no browser.
 
 ## Limites e pendências
@@ -74,5 +99,5 @@ Logs locais usados durante a implementação:
 - SMTP próprio pendente (convites de equipe bloqueados).
 - WhatsApp oficial depende de WABA, templates e consentimento aprovados.
 - Admin bootstrap de produção segue pendente de TOTP/AAL2 do proprietário.
-- Itens seguintes da Parte 2: #51 orçamentos, #55 PDF não fiscal, #58 equipe/RBAC,
-  #29–#31 contrato WhatsApp e #63 páginas comerciais.
+- Itens seguintes da Parte 2: #55 PDF não fiscal, #58 equipe/RBAC, #29–#31
+  contrato WhatsApp e #63 páginas comerciais.

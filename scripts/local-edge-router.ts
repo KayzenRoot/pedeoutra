@@ -31,6 +31,13 @@ import { handler as orderTrackingRevoke } from '../supabase/functions/order-trac
 import { handler as privateCatalogGet } from '../supabase/functions/private-catalog-get/index.ts'
 import { handler as customerPriceLinkCreate } from '../supabase/functions/customer-price-link-create/index.ts'
 import { handler as customerPriceLinkRevoke } from '../supabase/functions/customer-price-link-revoke/index.ts'
+import { handler as quoteCreate } from '../supabase/functions/quote-create/index.ts'
+import { handler as quoteUpdate } from '../supabase/functions/quote-update/index.ts'
+import { handler as quoteSend } from '../supabase/functions/quote-send/index.ts'
+import { handler as quoteCancel } from '../supabase/functions/quote-cancel/index.ts'
+import { handler as quoteGet } from '../supabase/functions/quote-get/index.ts'
+import { handler as quoteAccept } from '../supabase/functions/quote-accept/index.ts'
+import { handler as quoteDecline } from '../supabase/functions/quote-decline/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -63,6 +70,13 @@ const routes: Record<string, Handler> = {
   'private-catalog-get': privateCatalogGet,
   'customer-price-link-create': customerPriceLinkCreate,
   'customer-price-link-revoke': customerPriceLinkRevoke,
+  'quote-create': quoteCreate,
+  'quote-update': quoteUpdate,
+  'quote-send': quoteSend,
+  'quote-cancel': quoteCancel,
+  'quote-get': quoteGet,
+  'quote-accept': quoteAccept,
+  'quote-decline': quoteDecline,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

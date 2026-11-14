@@ -1700,6 +1700,378 @@ async function main() {
       assert(result.rows[0].api_submit === false, 'api_submit_order exposto')
     })
 
+
+    console.log('[9/9] Orçamentos')
+
+    async function quoteHash(token) {
+      const result = await client.query(
+        `select encode(extensions.digest($1, 'sha256'), 'hex') as hash`,
+        [token],
+      )
+      return result.rows[0].hash
+    }
+
+    async function createQuote(items, notes = 'Condições de teste') {
+      const result = await asService(() =>
+        client.query(
+          `select * from public.api_create_quote($1, $2, $3, $4::jsonb, now() + interval '7 days', $5)`,
+          [orgA.id, USER_A, customerA.id, JSON.stringify(items), notes],
+        ),
+      )
+      return result.rows[0]
+    }
+
+    await test('orçamento congela preço privado, envia e aceita uma única vez', async () => {
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+
+      const created = await createQuote([
+        { product_id: productA1.id, quantity: 1 },
+        { product_id: productA2.id, quantity: 1 },
+      ])
+      assert(created.total_cents === 2300, `total ${created.total_cents}`)
+      assert(created.item_count === 2, `itens ${created.item_count}`)
+      const quoteId = created.quote_id
+      const items = await client.query(
+        `select product_id, unit_price_cents, price_source
+           from public.quote_items where quote_id = $1 order by product_id`,
+        [quoteId],
+      )
+      const itemByProduct = Object.fromEntries(
+        items.rows.map((row) => [row.product_id, row]),
+      )
+      assert(itemByProduct[productA1.id].unit_price_cents === 1000, 'preço privado no snapshot')
+      assert(itemByProduct[productA1.id].price_source === 'private', 'origem privada')
+      assert(itemByProduct[productA2.id].unit_price_cents === 1300, 'fallback público')
+      assert(itemByProduct[productA2.id].price_source === 'public', 'origem pública')
+
+      const updated = await asService(() =>
+        client.query(
+          `select * from public.api_update_quote($1, $2, $3, $4, $5::jsonb, now() + interval '7 days', $6)`,
+          [
+            orgA.id,
+            USER_A,
+            quoteId,
+            1,
+            JSON.stringify([{ product_id: productA1.id, quantity: 2 }]),
+            'Revisado',
+          ],
+        ),
+      )
+      assert(updated.rows[0].total_cents === 2000, `update total ${updated.rows[0].total_cents}`)
+      assert(updated.rows[0].version === 2, `versão ${updated.rows[0].version}`)
+
+      const token = 'quote-token-test-0123456789abcdefghijklmno'
+      const hash = await quoteHash(token)
+      const sent = await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, $4, $5, now() + interval '7 days')`,
+          [orgA.id, USER_A, quoteId, 2, hash],
+        ),
+      )
+      assert(sent.rows[0].version === 3, `envio versão ${sent.rows[0].version}`)
+      const quoteState = await client.query(
+        `select status, total_cents, version from public.quotes where id = $1`,
+        [quoteId],
+      )
+      assert(quoteState.rows[0].status === 'sent', 'status enviado')
+
+      const requestId = crypto.randomUUID()
+      const accepted = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'test-agent')`, [
+          hash,
+          requestId,
+        ]),
+      )
+      assert(accepted.rows[0].order_id, 'pedido não criado')
+      assert(accepted.rows[0].total_cents === 2000, 'total aceito')
+      assert(accepted.rows[0].already_accepted === false, 'primeiro aceite')
+
+      const order = await client.query(
+        `select source, quote_id, customer_id, buyer_name, buyer_phone,
+                price_source, price_list_id, total_cents
+           from public.orders where id = $1`,
+        [accepted.rows[0].order_id],
+      )
+      assert(order.rows[0].source === 'quote', 'origem quote')
+      assert(order.rows[0].quote_id === quoteId, 'correlação quote')
+      assert(order.rows[0].customer_id === customerA.id, 'cliente do orçamento')
+      assert(order.rows[0].buyer_name === null && order.rows[0].buyer_phone === null, 'PII')
+      assert(order.rows[0].price_source === 'private', 'preço privado no pedido')
+      assert(order.rows[0].total_cents === 2000, 'total do pedido')
+      const orderItems = await client.query(
+        `select count(*)::integer as total, min(unit_price_cents) as price
+           from public.order_items where order_id = $1`,
+        [accepted.rows[0].order_id],
+      )
+      assert(orderItems.rows[0].total === 1, 'itens do pedido')
+      assert(orderItems.rows[0].price === 1000, 'preço do item')
+
+      const after = await client.query(
+        `select status, order_id from public.quotes where id = $1`,
+        [quoteId],
+      )
+      assert(after.rows[0].status === 'accepted', 'status aceito')
+      assert(after.rows[0].order_id === accepted.rows[0].order_id, 'order_id na quote')
+      const link = await client.query(
+        `select revoked_at from public.quote_links where quote_id = $1`,
+        [quoteId],
+      )
+      assert(link.rows[0].revoked_at !== null, 'link não revogado')
+
+      const replay = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'test-agent')`, [
+          hash,
+          requestId,
+        ]),
+      )
+      assert(replay.rows[0].already_accepted === true, 'replay não idempotente')
+      assert(replay.rows[0].order_id === accepted.rows[0].order_id, 'pedido diferente')
+      const count = await client.query(
+        `select count(*)::integer as total from public.orders where quote_id = $1`,
+        [quoteId],
+      )
+      assert(count.rows[0].total === 1, 'pedido duplicado')
+    })
+
+    await test('reenvio rotaciona o link e invalida o anterior', async () => {
+      const created = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const firstToken = 'quote-rotate-first-0123456789abcdefghij'
+      const secondToken = 'quote-rotate-second-0123456789abcdefghij'
+      const firstHash = await quoteHash(firstToken)
+      const secondHash = await quoteHash(secondToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, created.quote_id, firstHash],
+        ),
+      )
+      const rotated = await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 2, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, created.quote_id, secondHash],
+        ),
+      )
+      assert(rotated.rows[0].version === 3, `rotação versão ${rotated.rows[0].version}`)
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_quote($1, $2, null)`, [
+              firstHash,
+              crypto.randomUUID(),
+            ]),
+          ),
+        'quote_link_unavailable',
+        'link antigo ainda válido',
+      )
+      const accepted = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, null)`, [
+          secondHash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(accepted.rows[0].order_id, 'link novo não aceitou')
+    })
+
+    await test('orçamento expirado não vira pedido', async () => {
+      const created = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const token = 'quote-expired-test-0123456789abcdefghijkl'
+      const hash = await quoteHash(token)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, created.quote_id, hash],
+        ),
+      )
+      await client.query(
+        `update public.quotes
+            set created_at = now() - interval '10 days',
+                valid_until = now() - interval '1 day'
+          where id = $1`,
+        [created.quote_id],
+      )
+      const expired = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'agent')`, [
+          hash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(expired.rows[0].error_code === 'quote_expired', 'aceite expirado')
+      assert(expired.rows[0].order_id === null, 'expirado criou pedido')
+      const state = await client.query(
+        `select status from public.quotes where id = $1`,
+        [created.quote_id],
+      )
+      assert(state.rows[0].status === 'expired', `status ${state.rows[0].status}`)
+    })
+
+    await test('preço alterado ou produto inativo exige revisão, sem pedido', async () => {
+      const assignment = await client.query(
+        `select price_list_id from public.customer_price_list_assignments
+          where organization_id = $1 and customer_id = $2`,
+        [orgA.id, customerA.id],
+      )
+      const priceListId = assignment.rows[0].price_list_id
+
+      const staleQuote = await createQuote([{ product_id: productA1.id, quantity: 1 }])
+      const staleToken = 'quote-stale-test-0123456789abcdefghijklm'
+      const staleHash = await quoteHash(staleToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, staleQuote.quote_id, staleHash],
+        ),
+      )
+      await client.query(
+        `update public.price_list_items set price_cents = 1100
+          where organization_id = $1 and price_list_id = $2 and product_id = $3`,
+        [orgA.id, priceListId, productA1.id],
+      )
+      const stale = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'agent')`, [
+          staleHash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(stale.rows[0].error_code === 'quote_stale', 'preço alterado')
+      assert(stale.rows[0].order_id === null, 'preço alterado criou pedido')
+      const staleState = await client.query(
+        `select status from public.quotes where id = $1`,
+        [staleQuote.quote_id],
+      )
+      assert(staleState.rows[0].status === 'expired', 'quote stale não expirou')
+      const review = await client.query(
+        `select event, metadata from public.quote_events
+          where quote_id = $1 and event = 'review_required'`,
+        [staleQuote.quote_id],
+      )
+      assert(review.rows.length === 1, 'evento de revisão ausente')
+      await client.query(
+        `update public.price_list_items set price_cents = 1000
+          where organization_id = $1 and price_list_id = $2 and product_id = $3`,
+        [orgA.id, priceListId, productA1.id],
+      )
+
+      const inactiveQuote = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const inactiveToken = 'quote-inactive-test-0123456789abcdefghij'
+      const inactiveHash = await quoteHash(inactiveToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, inactiveQuote.quote_id, inactiveHash],
+        ),
+      )
+      await client.query(`update public.products set active = false where id = $1`, [
+        productA2.id,
+      ])
+      const inactive = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'agent')`, [
+          inactiveHash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(inactive.rows[0].error_code === 'quote_product_inactive', 'produto inativo')
+      assert(inactive.rows[0].order_id === null, 'produto inativo criou pedido')
+      await client.query(`update public.products set active = true where id = $1`, [
+        productA2.id,
+      ])
+    })
+
+    await test('orçamento pode ser recusado ou cancelado sem criar pedido', async () => {
+      const declinedQuote = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const declineToken = 'quote-decline-test-0123456789abcdefghijk'
+      const declineHash = await quoteHash(declineToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, declinedQuote.quote_id, declineHash],
+        ),
+      )
+      const declined = await asService(() =>
+        client.query(`select * from public.api_decline_quote($1, 'agent')`, [declineHash]),
+      )
+      assert(declined.rows[0].status === 'declined', 'status recusado')
+      const replay = await asService(() =>
+        client.query(`select * from public.api_decline_quote($1, 'agent')`, [declineHash]),
+      )
+      assert(replay.rows[0].status === 'declined', 'recusa não idempotente')
+      const orders = await client.query(
+        `select count(*)::integer as total from public.orders where quote_id = $1`,
+        [declinedQuote.quote_id],
+      )
+      assert(orders.rows[0].total === 0, 'recusa criou pedido')
+
+      const canceledQuote = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const canceled = await asService(() =>
+        client.query(`select * from public.api_cancel_quote($1, $2, $3, 1)`, [
+          orgA.id,
+          USER_A,
+          canceledQuote.quote_id,
+        ]),
+      )
+      assert(canceled.rows[0].status === 'canceled', 'status cancelado')
+    })
+
+    await test('orçamento é Profissional, RLS isola e RPC não é exposta', async () => {
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.quotes where organization_id = $1', [orgA.id]),
+      )
+      assert(isolated.rows.length === 0, 'B não deveria ver orçamentos de A')
+      const own = await asUser(USER_A, () =>
+        client.query('select id from public.quotes where organization_id = $1 limit 1', [orgA.id]),
+      )
+      assert(own.rows.length === 1, 'A deveria ver o próprio orçamento')
+
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'essential', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_create_quote($1, $2, $3, $4::jsonb, now() + interval '7 days', null)`,
+              [
+                orgA.id,
+                USER_A,
+                customerA.id,
+                JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+              ],
+            ),
+          ),
+        'plan_required',
+        'Essencial criando orçamento',
+      )
+
+      const grant = await client.query(`
+        select
+          has_function_privilege('authenticated', 'app.accept_quote(text,uuid,text)', 'EXECUTE') as accept,
+          has_function_privilege('authenticated', 'public.api_create_quote(uuid,uuid,uuid,jsonb,timestamptz,text)', 'EXECUTE') as create
+      `)
+      assert(grant.rows[0].accept === false, 'app.accept_quote exposto')
+      assert(grant.rows[0].create === false, 'api_create_quote exposto')
+
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_quote($1, $2, null)`, [
+              'f'.repeat(64),
+              crypto.randomUUID(),
+            ]),
+          ),
+        'quote_link_unavailable',
+        'token inválido',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

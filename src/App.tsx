@@ -17,6 +17,8 @@ import { Onboarding } from './pages/Onboarding'
 import { OrderDetail } from './pages/OrderDetail'
 import { Orders } from './pages/Orders'
 import { PrivatePrices } from './pages/PrivatePrices'
+import { QuotePublic } from './pages/QuotePublic'
+import { Quotes } from './pages/Quotes'
 import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
@@ -78,6 +80,7 @@ export default function App() {
             <Route path="produtos" element={<Products />} />
             <Route path="clientes" element={<Customers />} />
             <Route path="precos" element={<PrivatePrices />} />
+            <Route path="orcamentos" element={<Quotes />} />
             <Route path="assinatura" element={<Billing />} />
             <Route
               path="configuracoes"
@@ -91,6 +94,7 @@ export default function App() {
 
           <Route path="/c/:slug" element={<Catalog />} />
           <Route path="/p/:token" element={<Catalog />} />
+          <Route path="/o/:token" element={<QuotePublic />} />
           <Route path="/r/:token" element={<Reorder />} />
           <Route path="/acompanhar/:token" element={<Tracking />} />
           <Route

@@ -380,7 +380,14 @@ export function PrivatePrices() {
         eyebrow="Relacionamento"
         title="Preços por comprador"
         description="Cada cliente vê apenas a tabela atribuída a ele. O servidor recalcula o pedido e preserva o preço no histórico."
-        action={<span className="muted">{assignments.length} cliente(s) com tabela</span>}
+        action={
+          <div className="header-actions">
+            <Link to="/app/orcamentos" className="button button-secondary">
+              Orçamentos
+            </Link>
+            <span className="muted">{assignments.length} cliente(s) com tabela</span>
+          </div>
+        }
       />
 
       {!canManage && (

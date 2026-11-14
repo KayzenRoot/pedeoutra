@@ -154,6 +154,49 @@ insert into public.customer_price_tokens (
   'aaaaaaaa-1111-4111-8111-111111111111'
 );
 
+insert into public.quotes (
+  id, organization_id, customer_id, public_reference, status, version,
+  valid_until, notes, price_source, total_cents, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  'OR-RESTORE1', 'sent', 2, now() + interval '7 days',
+  'Proposta de restore', 'public', 2500,
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.quote_items (
+  id, organization_id, quote_id, product_id, name_snapshot, unit_snapshot,
+  quantity, unit_price_cents, subtotal_cents, price_source
+) values (
+  'aaaaaaaa-1111-4111-8111-555555555555',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  'aaaaaaaa-3333-4333-8333-333333333333',
+  'Copo 200ml', 'cento', 2, 1250, 2500, 'public'
+);
+
+insert into public.quote_events (
+  id, organization_id, quote_id, actor_user_id, event, to_status, metadata
+) values (
+  'aaaaaaaa-1111-4111-8111-666666666666',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  'aaaaaaaa-1111-4111-8111-111111111111',
+  'sent', 'sent', '{"expires_at":"2026-12-01T00:00:00Z"}'::jsonb
+);
+
+insert into public.quote_links (
+  id, organization_id, quote_id, token_hash, expires_at, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-777777777777',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  repeat('c', 64), now() + interval '7 days',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -275,6 +318,10 @@ select
   (select count(*) from public.price_list_items) as price_list_items,
   (select count(*) from public.customer_price_list_assignments) as price_assignments,
   (select count(*) from public.customer_price_tokens) as price_tokens,
+  (select count(*) from public.quotes) as quotes,
+  (select count(*) from public.quote_items) as quote_items,
+  (select count(*) from public.quote_events) as quote_events,
+  (select count(*) from public.quote_links) as quote_links,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -284,7 +331,9 @@ select
   (select md5(string_agg(id::text || ':' || name || ':' || slug, ',' order by id)) from public.product_categories) as categories_hash,
   (select md5(string_agg(id::text || ':' || alt_text || ':' || is_cover, ',' order by id)) from public.product_images) as images_hash,
   (select md5(string_agg(id::text || ':' || name || ':' || active, ',' order by id)) from public.price_lists) as price_lists_hash,
-  (select md5(string_agg(id::text || ':' || product_id::text || ':' || price_cents, ',' order by id)) from public.price_list_items) as price_items_hash
+  (select md5(string_agg(id::text || ':' || product_id::text || ':' || price_cents, ',' order by id)) from public.price_list_items) as price_items_hash,
+  (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || total_cents, ',' order by id)) from public.quotes) as quotes_hash,
+  (select md5(string_agg(id::text || ':' || name_snapshot || ':' || subtotal_cents, ',' order by id)) from public.quote_items) as quote_items_hash
 `
 
 async function main() {
@@ -385,9 +434,15 @@ async function main() {
       'price_list_items',
       'price_assignments',
       'price_tokens',
+      'quotes',
+      'quote_items',
+      'quote_events',
+      'quote_links',
       'orders_hash',
       'price_lists_hash',
       'price_items_hash',
+      'quotes_hash',
+      'quote_items_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

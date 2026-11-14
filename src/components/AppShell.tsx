@@ -12,9 +12,12 @@ const NAV_ITEMS = [
   { to: '/app/produtos', label: 'Produtos', icon: 'products' as const },
   { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const },
   { to: '/app/precos', label: 'Preços', icon: 'prices' as const },
+  { to: '/app/orcamentos', label: 'Orçamentos', icon: 'quotes' as const },
   { to: '/app/assinatura', label: 'Assinatura', icon: 'billing' as const },
   { to: '/app/configuracoes', label: 'Configurações', icon: 'settings' as const },
 ]
+
+const MOBILE_NAV_ITEMS = NAV_ITEMS.filter((item) => item.to !== '/app/orcamentos')
 
 export function AppShell() {
   const { organization, subscription, user, signOut } = useAuth()
@@ -77,7 +80,7 @@ export function AppShell() {
       </main>
 
       <nav className="mobile-nav" aria-label="Navegação mobile">
-        {NAV_ITEMS.map((item) => (
+        {MOBILE_NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
