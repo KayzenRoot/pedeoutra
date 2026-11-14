@@ -110,6 +110,12 @@ export function ApiWebhooksPanel() {
     }
   }
 
+  function webhooksState() {
+    if (loading) return <p className="muted">Carregando webhooks…</p>
+    if (webhooks.length === 0) return <p className="muted">Nenhum webhook criado.</p>
+    return null
+  }
+
   if (!isProfessional) {
     return (
       <section className="card">
@@ -185,11 +191,7 @@ export function ApiWebhooksPanel() {
         </button>
       </form>
 
-      {loading ? (
-        <p className="muted">Carregando webhooks…</p>
-      ) : webhooks.length === 0 ? (
-        <p className="muted">Nenhum webhook criado.</p>
-      ) : (
+      {webhooksState() ?? (
         <ul className="link-list">
           {webhooks.map((webhook) => (
             <li key={webhook.id}>

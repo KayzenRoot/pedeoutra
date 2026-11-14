@@ -55,7 +55,7 @@ async function processDelivery(
     .eq('id', row.webhook_id)
     .eq('organization_id', row.organization_id)
     .maybeSingle()
-  if (!webhook || webhook.status !== 'active') {
+  if (webhook?.status !== 'active') {
     await supabase
       .from('api_webhook_deliveries')
       .update({ status: 'blocked', last_error: 'webhook_revoked' })

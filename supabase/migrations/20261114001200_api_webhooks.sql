@@ -7,7 +7,7 @@ create table public.api_webhooks (
   url text not null,
   secret_ciphertext text not null,
   events text[] not null,
-  status text not null default 'active',
+  status text not null default 'active', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   last_delivery_at timestamptz,
@@ -26,7 +26,7 @@ create table public.api_webhook_deliveries (
   webhook_id uuid not null references public.api_webhooks(id) on delete cascade,
   event text not null,
   payload jsonb not null,
-  status text not null default 'pending',
+  status text not null default 'pending', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   attempts integer not null default 0,
   next_attempt_at timestamptz,
   response_status integer,
