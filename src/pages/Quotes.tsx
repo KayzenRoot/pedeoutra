@@ -253,8 +253,7 @@ export function Quotes() {
       return
     }
     setDraftItems((current) => {
-      const existing = current.find((item) => item.productId === product.id)
-      if (existing) {
+      if (current.some((item) => item.productId === product.id)) {
         return current.map((item) =>
           item.productId === product.id ? { ...item, quantity } : item,
         )
@@ -414,6 +413,19 @@ export function Quotes() {
         Revisar
       </button>
     )
+  }
+
+  function quotesListState() {
+    if (loading) return <p className="muted">Carregando orçamentos…</p>
+    if (quotes.length === 0) {
+      return (
+        <EmptyState
+          title="Nenhum orçamento ainda"
+          description="Monte a primeira proposta ao lado e envie um link privado ao cliente."
+        />
+      )
+    }
+    return null
   }
 
   if (!isProfessional) {
@@ -604,14 +616,7 @@ export function Quotes() {
             <span className="muted">{quotes.filter((quote) => quote.status === 'sent').length} enviados</span>
           </div>
 
-          {loading ? (
-            <p className="muted">Carregando orçamentos…</p>
-          ) : quotes.length === 0 ? (
-            <EmptyState
-              title="Nenhum orçamento ainda"
-              description="Monte a primeira proposta ao lado e envie um link privado ao cliente."
-            />
-          ) : (
+          {quotesListState() ?? (
             <div className="table-wrap">
               <table className="data-table">
                 <thead>

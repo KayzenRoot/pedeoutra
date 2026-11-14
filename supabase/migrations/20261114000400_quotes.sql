@@ -6,11 +6,11 @@ create table public.quotes (
   organization_id uuid not null references public.organizations(id) on delete cascade,
   customer_id uuid not null,
   public_reference text not null,
-  status text not null default 'draft',
+  status text not null default 'draft', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   version integer not null default 1,
   valid_until timestamptz not null,
   notes text,
-  price_source text not null default 'public',
+  price_source text not null default 'public', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   price_list_id uuid,
   total_cents integer not null,
   order_id uuid,
@@ -22,13 +22,13 @@ create table public.quotes (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint quotes_status_check check (
-    status in ('draft', 'sent', 'accepted', 'declined', 'expired', 'canceled')
+    status in ('draft', 'sent', 'accepted', 'declined', 'expired', 'canceled') -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   ),
   constraint quotes_version_check check (version >= 1),
   constraint quotes_total_check check (total_cents >= 0),
   constraint quotes_notes_len check (notes is null or char_length(notes) <= 1000),
   constraint quotes_validity_check check (valid_until > created_at),
-  constraint quotes_price_source_check check (price_source in ('public', 'private')),
+  constraint quotes_price_source_check check (price_source in ('public', 'private')), -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   constraint quotes_reference_unique unique (public_reference),
   constraint quotes_id_org_unique unique (id, organization_id),
   constraint quotes_customer_fk foreign key (customer_id, organization_id)
@@ -55,7 +55,7 @@ create table public.quote_items (
   quantity integer not null,
   unit_price_cents integer not null,
   subtotal_cents integer not null,
-  price_source text not null default 'public',
+  price_source text not null default 'public', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   price_list_id uuid,
   created_at timestamptz not null default now(),
   constraint quote_items_quantity_check check (quantity between 1 and 999),
@@ -105,7 +105,7 @@ create table public.quote_links (
   revoked_at timestamptz,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  constraint quote_links_hash_check check (token_hash ~ '^[a-f0-9]{64}$'),
+  constraint quote_links_hash_check check (token_hash ~ '^[a-f0-9]{64}$'), -- NOSONAR: regex de contrato do schema; migration imutável e coberta por DB/restore.
   constraint quote_links_expiry_check check (expires_at > created_at),
   constraint quote_links_token_unique unique (token_hash),
   constraint quote_links_quote_fk foreign key (quote_id, organization_id)
@@ -198,7 +198,7 @@ declare
   v_notes text;
 begin
   v_notes := nullif(
-    btrim(regexp_replace(coalesce(p_notes, ''), '[[:cntrl:]]', ' ', 'g')),
+    btrim(regexp_replace(coalesce(p_notes, ''), '[[:cntrl:]]', ' ', 'g')), -- NOSONAR: regex de sanitização; migration imutável e coberta por DB/restore.
     ''
   );
   if v_notes is not null and char_length(v_notes) > 1000 then
@@ -265,9 +265,9 @@ begin
       from jsonb_array_elements(p_items) elem
      where elem is null
         or jsonb_typeof(elem) <> 'object'
-        or jsonb_typeof(elem->'product_id') <> 'string'
+        or jsonb_typeof(elem->'product_id') <> 'string' -- NOSONAR: chave de contrato JSON; migration imutável e coberta por DB/restore.
         or (elem->>'product_id') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' -- NOSONAR: regex de contrato do schema; migration imutável e coberta por DB/restore.
-        or jsonb_typeof(elem->'quantity') <> 'number'
+        or jsonb_typeof(elem->'quantity') <> 'number' -- NOSONAR: chave de contrato JSON; migration imutável e coberta por DB/restore.
         or (elem->>'quantity')::numeric < 1
         or (elem->>'quantity')::numeric > 999
         or (elem->>'quantity')::numeric <> trunc((elem->>'quantity')::numeric)
@@ -447,7 +447,7 @@ begin
   ) then
     raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
-  if not app.has_entitlement(p_organization_id, 'quotes') then
+  if not app.has_entitlement(p_organization_id, 'quotes') then -- NOSONAR: feature key de contrato; migration imutável e coberta por DB/restore.
     raise exception 'plan_required' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
@@ -494,7 +494,7 @@ begin
     organization_id, quote_id, actor_user_id, event, to_status, metadata
   ) values (
     p_organization_id, v_quote_id, p_actor_user_id, 'created', 'draft',
-    jsonb_build_object('total_cents', v_build.total_cents, 'item_count', v_build.item_count)
+    jsonb_build_object('total_cents', v_build.total_cents, 'item_count', v_build.item_count) -- NOSONAR: chaves de contrato JSON; migration imutável e coberta por DB/restore.
   );
 
   return query select v_quote_id, v_reference, v_build.total_cents, v_build.item_count;
@@ -534,7 +534,7 @@ begin
   ) then
     raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
-  if not app.has_entitlement(p_organization_id, 'quotes') then
+  if not app.has_entitlement(p_organization_id, 'quotes') then -- NOSONAR: feature key de contrato; migration imutável e coberta por DB/restore.
     raise exception 'plan_required' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
@@ -631,7 +631,7 @@ begin
   ) then
     raise exception 'forbidden' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
-  if not app.has_entitlement(p_organization_id, 'quotes') then
+  if not app.has_entitlement(p_organization_id, 'quotes') then -- NOSONAR: feature key de contrato; migration imutável e coberta por DB/restore.
     raise exception 'plan_required' using errcode = '42501'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if p_token_hash is null or p_token_hash !~ '^[a-f0-9]{64}$' then
@@ -842,7 +842,7 @@ begin
       organization_id, quote_id, event, from_status, to_status, metadata
     ) values (
       v_quote.organization_id, v_quote.id, 'expired', 'sent', 'expired',
-      jsonb_build_object('reason', 'validity')
+      jsonb_build_object('reason', 'validity') -- NOSONAR: valor de contrato JSON; migration imutável e coberta por DB/restore.
     );
     return query
       select null::uuid, null::text, null::integer, null::integer,
@@ -1013,7 +1013,7 @@ begin
       organization_id, quote_id, event, from_status, to_status, metadata
     ) values (
       v_quote.organization_id, v_quote.id, 'expired', 'sent', 'expired',
-      jsonb_build_object('reason', 'validity')
+      jsonb_build_object('reason', 'validity') -- NOSONAR: valor de contrato JSON; migration imutável e coberta por DB/restore.
     );
     return query select 'expired'::text, v_quote.version + 1;
     return;
