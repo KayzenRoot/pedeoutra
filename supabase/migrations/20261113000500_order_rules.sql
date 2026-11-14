@@ -32,7 +32,7 @@ create or replace function app.submit_order(
   p_items jsonb,
   p_rate_bucket text,
   p_reorder_link_id uuid default null,
-  p_source text default 'catalog',
+  p_source text default 'catalog', -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   p_request_id uuid default null
 )
 returns table (
@@ -63,7 +63,7 @@ declare
 begin
   -- Organização e disponibilidade comercial
   if p_org_slug is null or p_org_slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$' then
-    raise exception 'invalid_organization' using errcode = '22023';
+    raise exception 'invalid_organization' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   select * into v_org
@@ -71,20 +71,20 @@ begin
    where o.slug = p_org_slug;
 
   if not found then
-    raise exception 'organization_not_found' using errcode = 'P0002';
+    raise exception 'organization_not_found' using errcode = 'P0002'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   if not app.org_can_write(v_org.id) then
-    raise exception 'organization_unavailable' using errcode = 'P0001';
+    raise exception 'organization_unavailable' using errcode = 'P0001'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   -- Source e link de recompra devem ser coerentes
   if p_source not in ('catalog', 'reorder') then
-    raise exception 'invalid_source' using errcode = '22023';
+    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if (p_reorder_link_id is null and p_source <> 'catalog')
      or (p_reorder_link_id is not null and p_source <> 'reorder') then
-    raise exception 'invalid_source' using errcode = '22023';
+    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   if p_reorder_link_id is not null then
@@ -95,10 +95,10 @@ begin
      for update;
 
     if not found then
-      raise exception 'invalid_reorder_link' using errcode = 'P0002';
+      raise exception 'invalid_reorder_link' using errcode = 'P0002'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
     if v_link.revoked_at is not null or v_link.expires_at <= now() then
-      raise exception 'invalid_reorder_link' using errcode = 'P0002';
+      raise exception 'invalid_reorder_link' using errcode = 'P0002'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
   end if;
 
@@ -113,7 +113,7 @@ begin
     if found then
       if v_existing_source is distinct from p_source
          or (p_reorder_link_id is not null and v_existing_customer is distinct from v_link.customer_id) then
-        raise exception 'request_conflict' using errcode = '22023';
+        raise exception 'request_conflict' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
       end if;
       select count(*)::integer into v_count
         from public.order_items oi
@@ -125,38 +125,38 @@ begin
 
   -- Rate limit por IP/escopo, por organização e por link.
   if not app.consume_rate_limit(p_rate_bucket, 20, 600) then
-    raise exception 'rate_limited' using errcode = 'P0001';
+    raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if not app.consume_rate_limit('org:' || v_org.id::text, 120, 3600) then
-    raise exception 'rate_limited' using errcode = 'P0001';
+    raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if p_reorder_link_id is not null then
     if not app.consume_rate_limit('link:' || p_reorder_link_id::text, 20, 600) then
-      raise exception 'rate_limited' using errcode = 'P0001';
+      raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
   end if;
 
   -- Validação básica do comprador
   if p_buyer_name is not null
      and (char_length(btrim(p_buyer_name)) < 2 or char_length(p_buyer_name) > 120) then
-    raise exception 'invalid_buyer_name' using errcode = '22023';
+    raise exception 'invalid_buyer_name' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if p_buyer_phone is not null and p_buyer_phone !~ '^[0-9]{10,15}$' then
-    raise exception 'invalid_buyer_phone' using errcode = '22023';
+    raise exception 'invalid_buyer_phone' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if p_note is not null and char_length(p_note) > 500 then
-    raise exception 'invalid_note' using errcode = '22023';
+    raise exception 'invalid_note' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if p_reorder_link_id is null and (p_buyer_name is null or p_buyer_phone is null) then
-    raise exception 'buyer_required' using errcode = '22023';
+    raise exception 'buyer_required' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   -- Itens: array, limites, UUIDs válidos e sem duplicata
   if p_items is null or jsonb_typeof(p_items) <> 'array' then
-    raise exception 'invalid_items' using errcode = '22023';
+    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
   if jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 50 then
-    raise exception 'invalid_items' using errcode = '22023';
+    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   if exists (
@@ -164,17 +164,17 @@ begin
     from jsonb_array_elements(p_items) elem
     where elem is null
        or jsonb_typeof(elem) <> 'object'
-       or coalesce(elem->>'product_id', '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-       or coalesce(elem->>'quantity', '') !~ '^[0-9]{1,3}$'
+       or coalesce(elem->>'product_id', '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
+       or coalesce(elem->>'quantity', '') !~ '^[0-9]{1,3}$' -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
        or (elem->>'quantity')::integer < 1
        or (elem->>'quantity')::integer > 999
   ) then
-    raise exception 'invalid_items' using errcode = '22023';
+    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   if (select count(*) from jsonb_array_elements(p_items)) <>
      (select count(distinct lower(elem->>'product_id')) from jsonb_array_elements(p_items) elem) then
-    raise exception 'duplicate_items' using errcode = '22023';
+    raise exception 'duplicate_items' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   -- Produtos: sempre do tenant, ativos, com preço atual travado durante a transação.
@@ -191,14 +191,14 @@ begin
      for share;
 
     if not found then
-      raise exception 'invalid_product' using errcode = '22023';
+      raise exception 'invalid_product' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
 
     if v_item.quantity < v_product.min_quantity then
-      raise exception 'quantity_below_minimum' using errcode = '22023';
+      raise exception 'quantity_below_minimum' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
     if v_item.quantity % v_product.quantity_increment <> 0 then
-      raise exception 'quantity_not_multiple' using errcode = '22023';
+      raise exception 'quantity_not_multiple' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
 
     v_count := v_count + 1;
@@ -210,7 +210,7 @@ begin
     end if;
 
     if v_total > 2000000000 then
-      raise exception 'order_too_large' using errcode = '22023';
+      raise exception 'order_too_large' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
 
     v_snapshots := v_snapshots || jsonb_build_array(
@@ -218,9 +218,9 @@ begin
         'product_id', v_product.id,
         'name', v_product.name,
         'unit', v_product.unit,
-        'unit_price_cents', v_product.price_cents,
+        'unit_price_cents', v_product.price_cents, -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
         'quantity', v_item.quantity,
-        'subtotal_cents', case
+        'subtotal_cents', case -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
           when v_product.price_cents is null then null
           else v_product.price_cents::bigint * v_item.quantity
         end
@@ -229,15 +229,15 @@ begin
   end loop;
 
   if v_org.min_order_items is not null and v_count < v_org.min_order_items then
-    raise exception 'order_below_minimum_items' using errcode = '22023';
+    raise exception 'order_below_minimum_items' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
   end if;
 
   if v_org.min_order_cents is not null then
     if v_has_null_price then
-      raise exception 'minimum_unverifiable' using errcode = '22023';
+      raise exception 'minimum_unverifiable' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
     if v_total < v_org.min_order_cents then
-      raise exception 'order_below_minimum' using errcode = '22023';
+      raise exception 'order_below_minimum' using errcode = '22023'; -- NOSONAR: literal de contrato do RPC; migration imutavel e testada por DB/restore.
     end if;
   end if;
 

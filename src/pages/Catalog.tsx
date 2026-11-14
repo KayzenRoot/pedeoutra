@@ -5,7 +5,7 @@ import { FormMessage, LoadingScreen, QuantityStepper } from '../components/ui'
 import { track } from '../lib/analytics'
 import { callPublicFunction, getPublicCatalog } from '../lib/edge'
 import { formatBRL, phoneDigits, whatsappLink } from '../lib/format'
-import { parseSkuList, resolveSkuLines, type SkuMatch } from '../lib/sku'
+import { applySkuListToCart } from '../lib/sku'
 import type { PublicCatalogResponse, SubmitOrderResponse } from '../lib/types'
 
 export function Catalog() {
@@ -252,33 +252,11 @@ export function Catalog() {
 
   function applySkuList() {
     if (!catalog) return
-    const { matches, errors } = resolveSkuLines(parseSkuList(skuInput), catalog.products)
-    const valid: SkuMatch[] = []
-    for (const match of matches) {
-      const { min_quantity: min, quantity_increment: increment } = match.product
-      if (match.quantity < min || match.quantity % increment !== 0) {
-        errors.push(
-          `SKU ${match.product.sku}: mínimo ${min} e múltiplo de ${increment}`,
-        )
-        continue
-      }
-      valid.push(match)
-    }
-    if (valid.length > 0) {
-      setCart((current) => {
-        const next = { ...current }
-        for (const match of valid) {
-          next[match.product.id] = Math.min(
-            999,
-            (next[match.product.id] ?? 0) + match.quantity,
-          )
-        }
-        return next
-      })
-    }
-    setSkuFeedback({ added: valid.length, errors })
-    if (valid.length > 0) setSkuInput('')
-  }
+    const result = applySkuListToCart(catalog.products, skuInput, cart)
+    if (result.added > 0) setCart(result.cart)
+    setSkuFeedback({ added: result.added, errors: result.errors })
+    if (result.added > 0) setSkuInput('')
+}
 
   return (
     <div className="public-shell">

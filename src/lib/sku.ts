@@ -88,3 +88,29 @@ export function resolveSkuLines(
 
   return { matches: [...aggregated.values()], errors }
 }
+
+
+export function applySkuListToCart(
+  products: SkuProduct[],
+  input: string,
+  currentCart: Record<string, number>,
+): { cart: Record<string, number>; added: number; errors: string[] } {
+  const { matches, errors } = resolveSkuLines(parseSkuList(input), products)
+  const valid: SkuMatch[] = []
+
+  for (const match of matches) {
+    const { min_quantity: min, quantity_increment: increment } = match.product
+    if (match.quantity < min || match.quantity % increment !== 0) {
+      errors.push(`SKU ${match.product.sku}: mínimo ${min} e múltiplo de ${increment}`)
+      continue
+    }
+    valid.push(match)
+  }
+
+  const cart = { ...currentCart }
+  for (const match of valid) {
+    cart[match.product.id] = Math.min(999, (cart[match.product.id] ?? 0) + match.quantity)
+  }
+
+  return { cart, added: valid.length, errors }
+}
