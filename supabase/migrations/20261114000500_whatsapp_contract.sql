@@ -229,7 +229,6 @@ grant all on public.whatsapp_outbox to service_role;
 grant all on public.whatsapp_events to service_role;
 
 drop function if exists public.api_submit_order(text, text, text, text, jsonb, text, uuid, text);
-drop function if exists app.submit_order(text, text, text, text, jsonb, text, uuid, text, uuid, text);
 
 create or replace function app.submit_order(
   p_org_slug text,
@@ -238,11 +237,11 @@ create or replace function app.submit_order(
   p_note text,
   p_items jsonb,
   p_rate_bucket text,
-  p_reorder_link_id uuid default null,
-  p_source text default 'catalog', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
-  p_request_id uuid default null,
-  p_price_token text default null,
-  p_whatsapp_opt_in boolean default false
+  p_reorder_link_id uuid,
+  p_source text,
+  p_request_id uuid,
+  p_price_token text,
+  p_whatsapp_opt_in boolean
 )
 returns table (
   order_id uuid,
@@ -255,311 +254,29 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_org public.organizations;
-  v_link public.reorder_links;
-  v_item record;
-  v_product public.products;
-  v_price record;
-  v_total bigint := 0;
-  v_has_null_price boolean := false;
-  v_order_id uuid;
-  v_reference text;
-  v_count integer := 0;
-  v_attempt integer := 0;
-  v_snapshots jsonb := '[]'::jsonb;
-  v_existing_total integer;
-  v_existing_source text;
-  v_existing_customer uuid;
-  v_customer_id uuid;
-  v_price_list_id uuid;
-  v_order_price_list_id uuid;
-  v_token_hash text;
-  v_unit_price integer;
-  v_whatsapp_opt_in boolean;
+  v_order record;
+  v_org_id uuid;
 begin
-  if p_org_slug is null or p_org_slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$' then
-    raise exception 'invalid_organization' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-
-  select * into v_org from public.organizations o where o.slug = p_org_slug;
-  if not found then
-    raise exception 'organization_not_found' using errcode = 'P0002'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-  if not app.org_can_write(v_org.id) then
-    raise exception 'organization_unavailable' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-
-  if p_source not in ('catalog', 'reorder', 'private') then -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
-    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-  if (p_price_token is not null and p_source <> 'private')
-     or (p_price_token is null and p_source = 'private') then
-    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-  if (p_reorder_link_id is null and p_source = 'reorder')
-     or (p_reorder_link_id is not null and p_source <> 'reorder') then
-    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-  if p_reorder_link_id is not null and p_price_token is not null then
-    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-
-  if p_price_token is not null then
-    if not app.has_entitlement(v_org.id, 'private_prices') then
-      raise exception 'plan_required' using errcode = '42501';
-    end if;
-    v_token_hash := encode(extensions.digest(p_price_token, 'sha256'), 'hex');
-    select t.customer_id into v_customer_id
-      from public.customer_price_tokens t
-     where t.organization_id = v_org.id
-       and t.token_hash = v_token_hash
-       and t.revoked_at is null
-       and t.expires_at > now();
-    if not found then
-      raise exception 'invalid_price_token' using errcode = 'P0002';
-    end if;
-    if not app.consume_rate_limit('price-token:' || v_token_hash, 20, 600) then
-      raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-    end if;
-    select a.price_list_id into v_price_list_id
-      from public.customer_price_list_assignments a
-      join public.price_lists l
-        on l.id = a.price_list_id
-       and l.organization_id = v_org.id
-       and l.active = true
-     where a.customer_id = v_customer_id
-       and a.organization_id = v_org.id;
-    if v_price_list_id is null then
-      raise exception 'invalid_price_token' using errcode = 'P0002';
-    end if;
-  end if;
-
-  if p_reorder_link_id is not null then
-    select * into v_link
-      from public.reorder_links l
-     where l.id = p_reorder_link_id
-       and l.organization_id = v_org.id
-     for update;
-    if not found then
-      raise exception 'invalid_reorder_link' using errcode = 'P0002';
-    end if;
-    if v_link.revoked_at is not null or v_link.expires_at <= now() then
-      raise exception 'invalid_reorder_link' using errcode = 'P0002';
-    end if;
-    v_customer_id := v_link.customer_id;
-  end if;
-
-  if p_request_id is not null then
-    select o.id, o.public_reference, o.total_cents, o.source, o.customer_id
-      into v_order_id, v_reference, v_existing_total, v_existing_source, v_existing_customer
-      from public.orders o
-     where o.organization_id = v_org.id
-       and o.request_id = p_request_id;
-    if found then
-      if v_existing_source is distinct from p_source
-         or (v_customer_id is not null and v_existing_customer is distinct from v_customer_id) then
-        raise exception 'request_conflict' using errcode = '22023';
-      end if;
-      select count(*)::integer into v_count
-        from public.order_items oi
-       where oi.order_id = v_order_id;
-      return query select v_order_id, v_reference, v_existing_total, v_count;
-      return;
-    end if;
-  end if;
-
-  if not app.consume_rate_limit(p_rate_bucket, 20, 600) then
-    raise exception 'rate_limited' using errcode = 'P0001';
-  end if;
-  if not app.consume_rate_limit('org:' || v_org.id::text, 120, 3600) then
-    raise exception 'rate_limited' using errcode = 'P0001';
-  end if;
-  if p_reorder_link_id is not null then
-    if not app.consume_rate_limit('link:' || p_reorder_link_id::text, 20, 600) then
-      raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-    end if;
-  end if;
-
-  if p_buyer_name is not null
-     and (char_length(btrim(p_buyer_name)) < 2 or char_length(p_buyer_name) > 120) then
-    raise exception 'invalid_buyer_name' using errcode = '22023';
-  end if;
-  if p_buyer_phone is not null and p_buyer_phone !~ '^[0-9]{10,15}$' then
-    raise exception 'invalid_buyer_phone' using errcode = '22023';
-  end if;
-  if p_note is not null and char_length(p_note) > 500 then
-    raise exception 'invalid_note' using errcode = '22023';
-  end if;
-  if p_reorder_link_id is null and p_price_token is null
-     and (p_buyer_name is null or p_buyer_phone is null) then
-    raise exception 'buyer_required' using errcode = '22023';
-  end if;
-  v_whatsapp_opt_in := coalesce(p_whatsapp_opt_in, false) and p_buyer_phone is not null;
-
-  if p_items is null or jsonb_typeof(p_items) <> 'array' then
-    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-  if jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 50 then
-    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-
-  if exists (
-    select 1 from jsonb_array_elements(p_items) elem
-    where elem is null
-       or jsonb_typeof(elem) <> 'object'
-       or coalesce(elem->>'product_id', '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' -- NOSONAR: regex de contrato do schema; migration imutável e coberta por DB/restore.
-       or coalesce(elem->>'quantity', '') !~ '^[0-9]{1,3}$' -- NOSONAR: regex de contrato do schema; migration imutável e coberta por DB/restore.
-       or (elem->>'quantity')::integer < 1
-       or (elem->>'quantity')::integer > 999
-  ) then
-    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
-  end if;
-
-  if (select count(*) from jsonb_array_elements(p_items)) <>
-     (select count(distinct lower(elem->>'product_id')) from jsonb_array_elements(p_items) elem) then
-    raise exception 'duplicate_items' using errcode = '22023';
-  end if;
-
-  for v_item in
-    select lower(elem->>'product_id')::uuid as product_id,
-           (elem->>'quantity')::integer as quantity
-      from jsonb_array_elements(p_items) elem
-  loop
-    select * into v_product
-      from public.products p
-     where p.id = v_item.product_id
-       and p.organization_id = v_org.id
-       and p.active = true
-     for share;
-    if not found then
-      raise exception 'invalid_product' using errcode = '22023';
-    end if;
-    if v_item.quantity < v_product.min_quantity then
-      raise exception 'quantity_below_minimum' using errcode = '22023';
-    end if;
-    if v_item.quantity % v_product.quantity_increment <> 0 then
-      raise exception 'quantity_not_multiple' using errcode = '22023';
-    end if;
-
-    v_count := v_count + 1;
-    v_unit_price := v_product.price_cents;
-
-    if p_price_token is not null then
-      select * into v_price
-        from app.customer_price(v_org.id, v_customer_id, v_product.id, now());
-      v_unit_price := v_price.price_cents;
-      v_order_price_list_id := coalesce(v_order_price_list_id, v_price.price_list_id);
-    end if;
-
-    if v_unit_price is null then
-      v_has_null_price := true;
-    else
-      v_total := v_total + (v_unit_price::bigint * v_item.quantity);
-    end if;
-
-    if v_total > 2000000000 then
-      raise exception 'order_too_large' using errcode = '22023';
-    end if;
-
-    v_snapshots := v_snapshots || jsonb_build_array(
-      jsonb_build_object(
-        'product_id', v_product.id,
-        'name', v_product.name,
-        'unit', v_product.unit,
-        'unit_price_cents', v_unit_price, -- NOSONAR: chave de contrato do snapshot; migration imutável e coberta por DB/restore.
-        'quantity', v_item.quantity,
-        'subtotal_cents', case -- NOSONAR: chave de contrato do snapshot; migration imutável e coberta por DB/restore.
-          when v_unit_price is null then null
-          else v_unit_price::bigint * v_item.quantity
-        end
-      )
+  select * into v_order
+    from app.submit_order(
+      p_org_slug, p_buyer_name, p_buyer_phone, p_note, p_items,
+      p_rate_bucket, p_reorder_link_id, p_source, p_request_id, p_price_token
     );
-  end loop;
 
-  if v_org.min_order_items is not null and v_count < v_org.min_order_items then
-    raise exception 'order_below_minimum_items' using errcode = '22023';
+  if coalesce(p_whatsapp_opt_in, false) and p_buyer_phone is not null then
+    select o.id into v_org_id from public.organizations o where o.slug = p_org_slug;
+    update public.orders
+       set whatsapp_opt_in = true, whatsapp_opt_in_at = now()
+     where id = v_order.order_id
+       and organization_id = v_org_id;
+    perform app.enqueue_whatsapp_order_event(
+      v_order.order_id, v_org_id, 'new', p_buyer_phone, v_order.public_reference
+    );
   end if;
-  if v_org.min_order_cents is not null then
-    if v_has_null_price then
-      raise exception 'minimum_unverifiable' using errcode = '22023';
-    end if;
-    if v_total < v_org.min_order_cents then
-      raise exception 'order_below_minimum' using errcode = '22023';
-    end if;
-  end if;
-
-  loop
-    v_attempt := v_attempt + 1;
-    v_reference := 'PD-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10));
-    begin
-      insert into public.orders (
-        organization_id, customer_id, public_reference, status, total_cents,
-        buyer_name, buyer_phone, note, source, request_id, price_list_id, price_source,
-        whatsapp_opt_in, whatsapp_opt_in_at
-      ) values (
-        v_org.id,
-        v_customer_id,
-        v_reference,
-        'new',
-        case when v_has_null_price then null else v_total::integer end,
-        case when p_price_token is null and p_reorder_link_id is null then btrim(p_buyer_name) else null end,
-        case when p_price_token is null and p_reorder_link_id is null then p_buyer_phone else null end,
-        nullif(btrim(coalesce(p_note, '')), ''),
-        p_source,
-        p_request_id,
-        v_order_price_list_id,
-        case when p_price_token is not null then 'private' else 'public' end,
-        v_whatsapp_opt_in,
-        case when v_whatsapp_opt_in then now() else null end
-      )
-      returning id into v_order_id;
-      exit;
-    exception when unique_violation then
-      if p_request_id is not null then
-        select o.id, o.public_reference, o.total_cents
-          into v_order_id, v_reference, v_existing_total
-          from public.orders o
-         where o.organization_id = v_org.id
-           and o.request_id = p_request_id;
-        if found then
-          select count(*)::integer into v_count
-            from public.order_items oi
-           where oi.order_id = v_order_id;
-          return query select v_order_id, v_reference, v_existing_total, v_count;
-          return;
-        end if;
-      end if;
-      if v_attempt >= 5 then raise; end if;
-    end;
-  end loop;
-
-  insert into public.order_items (
-    organization_id, order_id, product_id, name_snapshot, unit_snapshot,
-    unit_price_cents, quantity, subtotal_cents
-  )
-  select
-    v_org.id, v_order_id, (s->>'product_id')::uuid, s->>'name', s->>'unit',
-    case when s->>'unit_price_cents' is null then null else (s->>'unit_price_cents')::integer end,
-    (s->>'quantity')::integer,
-    case when s->>'subtotal_cents' is null then null else (s->>'subtotal_cents')::integer end
-  from jsonb_array_elements(v_snapshots) s;
-
-  if p_reorder_link_id is not null then
-    update public.reorder_links set last_used_at = now() where id = p_reorder_link_id;
-  end if;
-
-  insert into public.audit_events (
-    organization_id, actor_user_id, action, entity, entity_id, metadata
-  ) values (
-    v_org.id, auth.uid(), 'order.created', 'order', v_order_id,
-    jsonb_build_object('source', p_source, 'reference', v_reference, 'price_source',
-      case when p_price_token is not null then 'private' else 'public' end)
-  );
 
   return query select
-    v_order_id, v_reference,
-    case when v_has_null_price then null else v_total::integer end,
-    v_count;
+    v_order.order_id, v_order.public_reference,
+    v_order.total_cents, v_order.item_count;
 end;
 $$;
 
