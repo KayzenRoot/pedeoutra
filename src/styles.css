@@ -3528,3 +3528,36 @@ svg {
   font-size: 0.72rem;
   font-weight: 700;
 }
+
+/* Part 2 — importação em lote */
+.import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.import-table td,
+.import-table th {
+  font-size: 0.78rem;
+}
+
+.row-error {
+  background: var(--danger-soft);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+
+.import-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}

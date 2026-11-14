@@ -929,6 +929,113 @@ async function main() {
       assert(coverResponse.status === 400, `cover HTTP ${coverResponse.status}`)
     })
 
+
+    await test('product-import faz dry-run, commit e retry idempotente', async () => {
+      const rows = [
+        {
+          line: 2,
+          name: 'Produto Import Edge',
+          sku: 'IMP-EDGE',
+          category: 'Nova Categoria',
+          unit: 'un',
+          price_cents: 500,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+          action: 'auto',
+        },
+        {
+          line: 3,
+          name: 'Copo Edge Atualizado',
+          sku: 'COPO-200',
+          category: 'Bebidas',
+          unit: 'cento',
+          price_cents: 1300,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+          action: 'auto',
+        },
+      ]
+      const dry = await call('product-import', { mode: 'dry_run', rows }, { token: userToken })
+      assert(dry.status === 200, `dry HTTP ${dry.status} ${JSON.stringify(dry.data)}`)
+      assert(dry.data.summary.creates === 1, `creates ${dry.data.summary.creates}`)
+      assert(dry.data.summary.updates === 1, `updates ${dry.data.summary.updates}`)
+      assert(dry.data.summary.errors === 0, `errors ${dry.data.summary.errors}`)
+
+      const jobId = crypto.randomUUID()
+      const commit = await call(
+        'product-import',
+        { mode: 'commit', job_id: jobId, rows },
+        { token: userToken },
+      )
+      assert(commit.status === 200, `commit HTTP ${commit.status} ${JSON.stringify(commit.data)}`)
+      assert(commit.data.summary.created_count === 1, 'created_count')
+      assert(commit.data.summary.updated_count === 1, 'updated_count')
+
+      const retry = await call(
+        'product-import',
+        { mode: 'commit', job_id: jobId, rows },
+        { token: userToken },
+      )
+      assert(retry.status === 200, `retry HTTP ${retry.status}`)
+      assert(retry.data.summary.created_count === 1, 'retry não idempotente')
+      const count = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.products where organization_id = '${ORG_ID}' and sku = 'IMP-EDGE'`,
+      ]).stdout.trim()
+      assert(count === '1', `produto duplicado: ${count}`)
+    })
+
+    await test('product-import bloqueia linha inválida antes do commit', async () => {
+      const invalid = await call(
+        'product-import',
+        {
+          mode: 'dry_run',
+          rows: [
+            {
+              line: 2,
+              name: '<script>alert(1)</script>',
+              sku: 'BAD-1',
+              unit: 'un',
+              price_cents: 100,
+              active: true,
+              min_quantity: 1,
+              quantity_increment: 1,
+              action: 'auto',
+            },
+          ],
+        },
+        { token: userToken },
+      )
+      assert(invalid.status === 200, `dry HTTP ${invalid.status}`)
+      assert(invalid.data.summary.errors === 1, 'erro não detectado')
+      const commit = await call(
+        'product-import',
+        {
+          mode: 'commit',
+          job_id: crypto.randomUUID(),
+          rows: [
+            {
+              line: 2,
+              name: '<script>alert(1)</script>',
+              sku: 'BAD-1',
+              unit: 'un',
+              price_cents: 100,
+              active: true,
+              min_quantity: 1,
+              quantity_increment: 1,
+              action: 'auto',
+            },
+          ],
+        },
+        { token: userToken },
+      )
+      assert(commit.status === 400, `commit HTTP ${commit.status}`)
+      assert(commit.data.error === 'import_validation_failed', 'erro de validação')
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)

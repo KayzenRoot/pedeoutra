@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useAuth } from '../context/auth-context'
+import { ProductImportPanel } from '../components/ProductImportPanel'
 import { ProductMediaManager } from '../components/ProductMediaManager'
 import { supabase } from '../lib/supabase'
 import type { Product, ProductCategory } from '../lib/types'
@@ -558,6 +559,13 @@ export function Products() {
       </section>
 
       <ProductMediaManager products={products} />
+
+      <ProductImportPanel
+        onImported={async () => {
+          await loadProducts()
+          await loadCategories()
+        }}
+      />
     </div>
   )
 }

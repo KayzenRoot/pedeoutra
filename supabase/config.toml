@@ -93,3 +93,6 @@ verify_jwt = true
 
 [functions.product-image-list]
 verify_jwt = true
+
+[functions.product-import]
+verify_jwt = true

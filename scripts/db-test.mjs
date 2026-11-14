@@ -1210,6 +1210,136 @@ async function main() {
       )
     })
 
+
+    await test('importação cria, atualiza e é idempotente por job', async () => {
+      const jobId = crypto.randomUUID()
+      const rows = [
+        {
+          line: 2,
+          action: 'create',
+          name: 'Produto Importado',
+          sku: 'IMP-1',
+          category: 'Importados',
+          unit: 'un',
+          price_cents: 1000,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+        {
+          line: 3,
+          action: 'update',
+          name: 'Copo Atualizado',
+          sku: 'COPO-200',
+          category: null,
+          unit: 'cento',
+          price_cents: 1300,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const first = await asService(() =>
+        client.query(
+          `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(rows)],
+        ),
+      )
+      assert(first.rows[0].created_count === 1, `created ${first.rows[0].created_count}`)
+      assert(first.rows[0].updated_count === 1, `updated ${first.rows[0].updated_count}`)
+      const imported = await client.query(
+        `select id, category_id from public.products where organization_id = $1 and sku = 'IMP-1'`,
+        [orgA.id],
+      )
+      assert(imported.rows.length === 1, 'produto importado ausente')
+      const category = await client.query(
+        `select id from public.product_categories where organization_id = $1 and name = 'Importados'`,
+        [orgA.id],
+      )
+      assert(category.rows.length === 1, 'categoria importada ausente')
+      assert(imported.rows[0].category_id === category.rows[0].id, 'categoria não vinculada')
+      const updated = await client.query('select name, price_cents from public.products where id = $1', [
+        productA2.id,
+      ])
+      assert(updated.rows[0].name === 'Copo Atualizado', 'update de nome')
+      assert(updated.rows[0].price_cents === 1300, 'update de preço')
+
+      const second = await asService(() =>
+        client.query(
+          `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(rows)],
+        ),
+      )
+      assert(second.rows[0].created_count === 1, 'job não foi idempotente')
+      const count = await client.query(
+        `select count(*)::integer as total from public.products where organization_id = $1 and sku = 'IMP-1'`,
+        [orgA.id],
+      )
+      assert(count.rows[0].total === 1, 'produto duplicado pelo job')
+    })
+
+    await test('importação rejeita SKU duplicado no arquivo e tenant divergente', async () => {
+      const jobId = crypto.randomUUID()
+      const duplicateRows = [
+        { line: 2, action: 'auto', name: 'Duplicado A', sku: 'DUP-1', unit: 'un' },
+        { line: 3, action: 'auto', name: 'Duplicado B', sku: 'DUP-1', unit: 'un' },
+      ]
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+              [jobId, orgA.id, USER_A, JSON.stringify(duplicateRows)],
+            ),
+          ),
+        'duplicate_import_sku',
+        'SKU duplicado na importação',
+      )
+      const notCreated = await client.query(
+        `select id from public.products where organization_id = $1 and sku = 'DUP-1'`,
+        [orgA.id],
+      )
+      assert(notCreated.rows.length === 0, 'importação parcial deixou produto')
+
+      const tenantJob = crypto.randomUUID()
+      await asService(() =>
+        client.query(
+          `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+          [
+            tenantJob,
+            orgA.id,
+            USER_A,
+            JSON.stringify([
+              { line: 2, action: 'create', name: 'Job Tenant', sku: 'JOB-T', unit: 'un' },
+            ]),
+          ],
+        ),
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+              [
+                tenantJob,
+                orgB.id,
+                USER_A,
+                JSON.stringify([
+                  { line: 2, action: 'create', name: 'Outro', sku: 'JOB-T2', unit: 'un' },
+                ]),
+              ],
+            ),
+          ),
+        'job_tenant_mismatch',
+        'job de outro tenant',
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select id from public.product_import_jobs')),
+        'permission denied',
+        'fornecedor lendo jobs de importação',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

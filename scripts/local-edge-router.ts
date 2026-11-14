@@ -22,6 +22,7 @@ import { handler as productImageUpload } from '../supabase/functions/product-ima
 import { handler as productImageDelete } from '../supabase/functions/product-image-delete/index.ts'
 import { handler as productImageCover } from '../supabase/functions/product-image-cover/index.ts'
 import { handler as productImageList } from '../supabase/functions/product-image-list/index.ts'
+import { handler as productImport } from '../supabase/functions/product-import/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -45,6 +46,7 @@ const routes: Record<string, Handler> = {
   'product-image-delete': productImageDelete,
   'product-image-cover': productImageCover,
   'product-image-list': productImageList,
+  'product-import': productImport,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')
