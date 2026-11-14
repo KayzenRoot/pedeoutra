@@ -3,7 +3,7 @@
 Data: 2026-11-14
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
-HEAD de código revisado: `9814a6f`
+HEAD de código revisado: `246fc4e`
 Base de produção: `main` com Parte 1 ativa (`57511a3`)
 
 ## Estado por parte
@@ -16,7 +16,7 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | 4/5 | parcial | API B2B v1 leitura (#64/#65/#66/#67); #68–#71 dependem de Meta/DeepSeek |
 | 5/5 | parcial | #74/#75 e landing de dois planos; #72/#73/#76/#81–#83 pendentes |
 
-## Evidência final (HEAD 9814a6f)
+## Evidência final (HEAD 246fc4e)
 
 | Verificação | Resultado |
 | --- | --- |
@@ -30,6 +30,7 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | `npm run test:restore` | PASS, contagens/checksums idênticos |
 | `npm run build` | exit 0 |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, axe 0 violações |
+| SonarCloud | **0 issues; quality gate OK** (new-code duplication 2.7%) |
 
 Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,test-full-local,test-restore,build,smoke}.log`.
 
@@ -62,6 +63,7 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 - API keys somente hash, escopos, quota e revogação; webhooks com HMAC.
 - Nenhum pedido B2B é receita SaaS; MRR/recebimento/lucro separados.
 - Analytics sem PII, IP integral, token ou query privada; consentimento e DNT/GPC.
+- CPD do Sonar exclui migrations/testes históricos, que repetem corpos de função e fixtures de propósito; o código de produção segue medido.
 - Nenhuma cobrança, envio real de WhatsApp/e-mail ou compra de serviço neste branch.
 
 ## Bloqueios externos e pendências reais
