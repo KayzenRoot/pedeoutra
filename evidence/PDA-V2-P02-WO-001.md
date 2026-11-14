@@ -25,6 +25,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #78 | Analytics first-party do funil, consentimento e fontes | implementado |
 | #79 | Métricas financeiras administrativas (MRR, recebimentos, churn) | implementado |
 | #80 | Dashboard executivo 360° | parcial: overview, organizações, auditoria, funil e financeiro |
+| #74 | SEO técnico: robots, sitemap, metadados e Schema.org | implementado (prerender/status HTTP fica para #73) |
 
 ## #48 — preços por comprador
 
@@ -196,6 +197,19 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 - #80 permanece parcial: faltam seções de Meta/DeepSeek/Resend/API e saúde de
   integrações, que dependem de fontes externas/Parte 4; o painel atual não
   inventa valores ausentes.
+
+## #74 — SEO técnico
+
+- `robots.txt` bloqueia app, onboarding, admin, convite, acompanhamento e links
+  opacos (`/r/`, `/p/`, `/o/`), mantendo landing, demo e documentos legais
+  indexáveis; sitemap XML aponta para as URLs públicas.
+- Metadados base no `index.html` incluem canonical, description, OG/Twitter e
+  `og:url`; `useSeo` atualiza título/description/canonical/robots por rota em
+  landing, demo, privacidade e termos.
+- Landing publica JSON-LD `SoftwareApplication` com oferta Essencial; dados são
+  estáticos e não incluem PII.
+- O prerender/HTTP status real de SPA e a landing final continuam pendentes em
+  #73/#82; esta entrega não declara HTML pré-renderizado.
 
 ## Evidência local (HEAD de trabalho)
 

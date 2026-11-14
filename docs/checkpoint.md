@@ -118,7 +118,7 @@ gates de lançamento.
   planos (#63), contrato WhatsApp oficial com envio desligado (#29–#31) e
   equipe/RBAC com convites manuais (#58), radar de recompra (#44), lembretes
   manuais (#45), analytics first-party do funil (#78), financeiro administrativo
-  (#79) e dashboard 360° parcial (#80).
+  (#79), dashboard 360° parcial (#80) e SEO técnico (#74).
 - **Evidência local no HEAD de trabalho:** 69 DB, 53 Edge HTTP, 150 unit,
   49 Edge Functions typechecked, 7 grupos full-local, restore com preço,
   orçamento, WhatsApp, equipe, lembretes e analytics, e smoke

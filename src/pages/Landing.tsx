@@ -4,6 +4,7 @@ import { Brand } from '../components/Brand'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Icon } from '../components/ui'
 import { track } from '../lib/analytics'
+import { useSeo } from '../lib/seo'
 import { getPlanCatalog } from '../lib/edge'
 import { featureLabel, PLAN_NAMES } from '../lib/plans'
 import type { PlanCatalogResponse, PublicPlan } from '../lib/types'
@@ -80,6 +81,27 @@ const FALLBACK_PLANS: PublicPlan[] = [
 ]
 
 export function Landing() {
+  useSeo({
+    title: 'PedeOutra — Pediu uma vez? Pede outra!',
+    description:
+      'Catálogo B2B, pedidos organizados e links de recompra para pequenos distribuidores. Teste o Essencial por 7 dias sem cartão.',
+    path: '/',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'PedeOutra',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description:
+        'Catálogo e pedidos recorrentes para pequenos distribuidores, com catálogo público e links de recompra.',
+      offers: {
+        '@type': 'Offer',
+        price: '29.90',
+        priceCurrency: 'BRL',
+      },
+    },
+  })
+
   const [plans, setPlans] = useState<PublicPlan[]>(FALLBACK_PLANS)
 
   useEffect(() => {
