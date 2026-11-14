@@ -290,6 +290,26 @@ insert into public.api_keys (
   'aaaaaaaa-1111-4111-8111-111111111111'
 );
 
+insert into public.api_webhooks (
+  id, organization_id, url, secret_ciphertext, events, status, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-121212121212',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'https://example.test/hook', 'cipher-webhook',
+  array['order.confirmed'], 'active',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.api_webhook_deliveries (
+  id, organization_id, webhook_id, event, payload, status, idempotency_key
+) values (
+  'aaaaaaaa-1111-4111-8111-131313131313',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-121212121212',
+  'order.confirmed', '{"event":"order.confirmed"}'::jsonb,
+  'pending', 'restore:confirmed'
+);
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -425,6 +445,8 @@ select
   (select count(*) from public.analytics_events) as analytics_events,
   (select count(*) from public.analytics_consents) as analytics_consents,
   (select count(*) from public.api_keys) as api_keys,
+  (select count(*) from public.api_webhooks) as api_webhooks,
+  (select count(*) from public.api_webhook_deliveries) as api_webhook_deliveries,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -444,7 +466,9 @@ select
   (select md5(string_agg(id::text || ':' || cycle_key || ':' || status, ',' order by id)) from public.reorder_reminders) as reorder_reminders_hash,
   (select md5(string_agg(id::text || ':' || event || ':' || path, ',' order by id)) from public.analytics_events) as analytics_events_hash,
   (select md5(string_agg(session_id || ':' || analytics || ':' || marketing, ',' order by session_id)) from public.analytics_consents) as analytics_consents_hash,
-  (select md5(string_agg(id::text || ':' || name || ':' || status, ',' order by id)) from public.api_keys) as api_keys_hash
+  (select md5(string_agg(id::text || ':' || name || ':' || status, ',' order by id)) from public.api_keys) as api_keys_hash,
+  (select md5(string_agg(id::text || ':' || url || ':' || status, ',' order by id)) from public.api_webhooks) as api_webhooks_hash,
+  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.api_webhook_deliveries) as api_deliveries_hash
 `
 
 async function main() {
@@ -559,6 +583,8 @@ async function main() {
       'analytics_events',
       'analytics_consents',
       'api_keys',
+      'api_webhooks',
+      'api_webhook_deliveries',
       'orders_hash',
       'price_lists_hash',
       'price_items_hash',
@@ -572,6 +598,8 @@ async function main() {
       'analytics_events_hash',
       'analytics_consents_hash',
       'api_keys_hash',
+      'api_webhooks_hash',
+      'api_deliveries_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

@@ -56,6 +56,10 @@ import { handler as apiKeyCreate } from '../supabase/functions/api-key-create/in
 import { handler as apiKeyList } from '../supabase/functions/api-key-list/index.ts'
 import { handler as apiKeyRevoke } from '../supabase/functions/api-key-revoke/index.ts'
 import { handler as apiV1 } from '../supabase/functions/api-v1/index.ts'
+import { handler as apiWebhookCreate } from '../supabase/functions/api-webhook-create/index.ts'
+import { handler as apiWebhookList } from '../supabase/functions/api-webhook-list/index.ts'
+import { handler as apiWebhookRevoke } from '../supabase/functions/api-webhook-revoke/index.ts'
+import { handler as apiWebhookWorker } from '../supabase/functions/api-webhook-worker/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -113,6 +117,10 @@ const routes: Record<string, Handler> = {
   'api-key-list': apiKeyList,
   'api-key-revoke': apiKeyRevoke,
   'api-v1': apiV1,
+  'api-webhook-create': apiWebhookCreate,
+  'api-webhook-list': apiWebhookList,
+  'api-webhook-revoke': apiWebhookRevoke,
+  'api-webhook-worker': apiWebhookWorker,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

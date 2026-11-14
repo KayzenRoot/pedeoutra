@@ -27,7 +27,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #80 | Dashboard executivo 360° | parcial: overview, organizações, auditoria, funil e financeiro |
 | #74 | SEO técnico: robots, sitemap, metadados e Schema.org | implementado (prerender/status HTTP fica para #73) |
 | #64/#65/#67 | API B2B v1: chaves, escopos, gateway, quota e OpenAPI | implementado (leitura) |
-| #66 | Webhooks B2B de eventos | contrato pendente; não implementado |
+| #66 | Webhooks B2B de eventos com HMAC e retry | implementado com entrega desligada |
 
 ## #48 — preços por comprador
 
@@ -213,7 +213,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 - O prerender/HTTP status real de SPA e a landing final continuam pendentes em
   #73/#82; esta entrega não declara HTML pré-renderizado.
 
-## #64/#65/#67 — API B2B v1
+## #64/#65/#66/#67 — API B2B v1
 
 - `api_keys` guarda SHA-256, prefixo, escopos (`catalog:read`, `orders:read`,
   `customers:read`), status, uso e revogação; o valor bruto `po_live_...` aparece
@@ -222,20 +222,23 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   aplica 60 req/min por chave e 10.000 req/mês por organização, e serve
   `/v1/me`, `/v1/products`, `/v1/customers` e `/v1/orders` com paginação e
   isolamento por organização. É somente leitura; não cria pedidos nem cobranças.
+- `api_webhooks`/`api_webhook_deliveries` enfileiram eventos de pedido
+  transacionalmente, com segredo cifrado, HMAC SHA-256, retry limitado e
+  idempotência; worker exige token e fica desligado por padrão
+  (`API_WEBHOOK_SEND_ENABLED`).
 - `public/openapi.json` e `docs/api.md` documentam contrato, autenticação,
-  escopos, limites e exemplos. #66 (webhooks B2B) permanece pendente e não é
-  apresentado como disponível.
+  escopos, limites e exemplos.
 
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **70 PASS, 0 FAIL** |
-| `npm run test:edge` | typecheck de **53 Edge Functions** |
-| `npm run test:edge-http` | **55 PASS, 0 FAIL** |
+| `npm run test:db` | **71 PASS, 0 FAIL** |
+| `npm run test:edge` | typecheck de **57 Edge Functions** |
+| `npm run test:edge-http` | **56 PASS, 0 FAIL** |
 | `npm run test:unit` | **150 PASS, 0 FAIL** (30 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe, lembretes, analytics e API keys |
+| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe, lembretes, analytics, API keys e webhooks |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |

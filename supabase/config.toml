@@ -195,3 +195,15 @@ verify_jwt = true
 
 [functions.api-v1]
 verify_jwt = false
+
+[functions.api-webhook-create]
+verify_jwt = true
+
+[functions.api-webhook-list]
+verify_jwt = true
+
+[functions.api-webhook-revoke]
+verify_jwt = true
+
+[functions.api-webhook-worker]
+verify_jwt = false

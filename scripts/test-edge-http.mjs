@@ -47,6 +47,7 @@ const PRICE_TOKEN_HASH = createHash('sha256').update(PRICE_TOKEN).digest('hex')
 const WHATSAPP_KEY = Buffer.from(Array.from({ length: 32 }, (_, index) => (index * 29 + 3) % 256)).toString('base64')
 const WHATSAPP_WEBHOOK_SECRET = 'whatsapp-webhook-test-secret'
 const WHATSAPP_WORKER_TOKEN = 'whatsapp-worker-test-token'
+const API_WEBHOOK_WORKER_TOKEN = 'api-webhook-worker-test-token'
 
 let passed = 0
 let failed = 0
@@ -401,6 +402,7 @@ async function main() {
           WHATSAPP_ENCRYPTION_KEY: WHATSAPP_KEY,
           WHATSAPP_WEBHOOK_SECRET,
           WHATSAPP_WORKER_TOKEN,
+          API_WEBHOOK_WORKER_TOKEN,
           EDGE_PORT: String(edgePort),
         },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -2235,6 +2237,91 @@ async function main() {
         headers: { Authorization: `Bearer ${userToken}` },
       })
       assert(denied.status === 403, `list sem AAL2 HTTP ${denied.status}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[16/16] Webhooks B2B')
+
+    await test('webhook assinado enfileira eventos de pedido e pode ser revogado', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+      const created = await call(
+        'api-webhook-create',
+        {
+          url: 'https://example.test/pedeoutra-webhook',
+          events: ['order.created', 'order.confirmed'],
+        },
+        { token: supplierAal2Token },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.secret.startsWith('whsec_'), 'segredo')
+      const webhookId = created.data.id
+      const secret = created.data.secret
+
+      const list = await fetch(`${edgeBase}/api-webhook-list`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      const listData = await list.json()
+      assert(list.status === 200, `list HTTP ${list.status}`)
+      assert(listData.webhooks.some((hook) => hook.id === webhookId), 'webhook não listado')
+      assert(!JSON.stringify(listData).includes(secret), 'list vazou segredo')
+
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select secret_ciphertext from public.api_webhooks where id = '${webhookId}'`,
+      ]).stdout.trim()
+      assert(stored && !stored.includes(secret), 'segredo em claro')
+
+      const orderId = crypto.randomUUID()
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `insert into public.orders
+           (id, organization_id, public_reference, status, total_cents, source)
+         values ('${orderId}', '${ORG_ID}', 'PD-WEBHOOK-${Date.now()}', 'new', 500, 'manual')`,
+      ])
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.orders set status = 'confirmed' where id = '${orderId}'`,
+      ])
+      const deliveries = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select event, count(*) from public.api_webhook_deliveries
+          where webhook_id = '${webhookId}' group by event order by event`,
+      ]).stdout.trim()
+      assert(deliveries.includes('order.created|1'), `created ${deliveries}`)
+      assert(deliveries.includes('order.confirmed|1'), `confirmed ${deliveries}`)
+
+      const workerWrong = await fetch(`${edgeBase}/api-webhook-worker`, {
+        method: 'POST',
+        headers: { 'x-api-webhook-worker-token': 'errado' },
+      })
+      assert(workerWrong.status === 401, `worker errado HTTP ${workerWrong.status}`)
+      const worker = await fetch(`${edgeBase}/api-webhook-worker`, {
+        method: 'POST',
+        headers: { 'x-api-webhook-worker-token': API_WEBHOOK_WORKER_TOKEN },
+      })
+      const workerData = await worker.json()
+      assert(worker.status === 200, `worker HTTP ${worker.status}`)
+      assert(workerData.disabled === true, 'worker deveria estar desligado')
+
+      const revoked = await call(
+        'api-webhook-revoke',
+        { webhook_id: webhookId },
+        { token: supplierAal2Token },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      assert(revoked.data.status === 'revoked', 'status revogado')
       await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 

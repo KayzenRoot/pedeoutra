@@ -2613,6 +2613,40 @@ async function main() {
       )
     })
 
+
+    await test('webhooks enfileiram eventos por pedido e são service_role', async () => {
+      const webhook = await client.query(
+        `insert into public.api_webhooks
+           (organization_id, url, secret_ciphertext, events)
+         values ($1, 'https://example.test/db-hook', 'cipher', array['order.created', 'order.confirmed'])
+         returning id`,
+        [orgA.id],
+      )
+      const orderId = crypto.randomUUID()
+      await client.query(
+        `insert into public.orders
+           (id, organization_id, public_reference, status, total_cents, source)
+         values ($1, $2, $3, 'new', 500, 'manual')`,
+        [orderId, orgA.id, `PD-WEBHOOK-DB-${crypto.randomUUID().slice(0, 8)}`],
+      )
+      await client.query(`update public.orders set status = 'confirmed' where id = $1`, [orderId])
+      const deliveries = await client.query(
+        `select event, count(*)::integer as total from public.api_webhook_deliveries
+          where webhook_id = $1 group by event order by event`,
+        [webhook.rows[0].id],
+      )
+      assert(deliveries.rows.length === 2, `eventos ${deliveries.rows.length}`)
+      assert(deliveries.rows.every((row) => row.total === 1), 'entrega duplicada')
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query('select id from public.api_webhooks limit 1'),
+          ),
+        'permission denied',
+        'browser lendo webhooks',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {
