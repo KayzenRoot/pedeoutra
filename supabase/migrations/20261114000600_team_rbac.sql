@@ -555,6 +555,9 @@ alter policy order_items_select_own on public.order_items
   using (app.has_org_permission(organization_id, 'orders.read'));
 alter policy order_status_events_select_own on public.order_status_events
   using (app.has_org_permission(organization_id, 'orders.read'));
+alter policy subscriptions_select_own on public.subscriptions
+  using (app.is_org_member(organization_id));
+
 alter policy reorder_links_select_own on public.reorder_links
   using (app.has_org_permission(organization_id, 'orders.read'));
 

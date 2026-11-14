@@ -71,6 +71,88 @@ async function sendTemplate(
   return { ok: true, status: response.status, messageId: payload.messages?.[0]?.id }
 }
 
+interface OutboxRow {
+  id: string
+  organization_id: string
+  recipient_phone: string
+  template_id: string | null
+  payload: { reference?: unknown } | null
+  attempts: number | null
+}
+
+async function processRow(
+  supabase: ReturnType<typeof adminClient>,
+  row: OutboxRow,
+  key: Uint8Array,
+): Promise<boolean> {
+  const { data: connection } = await supabase
+    .from('whatsapp_connections')
+    .select('phone_number_id, token_ciphertext, status')
+    .eq('organization_id', row.organization_id)
+    .maybeSingle()
+  const { data: template } = row.template_id
+    ? await supabase
+        .from('whatsapp_templates')
+        .select('template_name, language, status')
+        .eq('organization_id', row.organization_id)
+        .eq('id', row.template_id)
+        .maybeSingle()
+    : { data: null }
+
+  if (
+    connection?.status !== 'connected' ||
+    !connection.token_ciphertext ||
+    template?.status !== 'approved'
+  ) {
+    await supabase
+      .from('whatsapp_outbox')
+      .update({ status: 'blocked', blocked_reason: 'connection_or_template_unavailable' })
+      .eq('id', row.id)
+    return false
+  }
+
+  const token = await decryptSecret(connection.token_ciphertext, key)
+  const reference =
+    typeof row.payload?.reference === 'string' ? row.payload.reference : row.id
+  const result = await sendTemplate(
+    connection.phone_number_id,
+    token,
+    row.recipient_phone,
+    template.template_name,
+    template.language,
+    reference,
+  )
+  const attempts = (row.attempts ?? 0) + 1
+
+  if (result.ok) {
+    await supabase
+      .from('whatsapp_outbox')
+      .update({
+        status: 'sent',
+        attempts,
+        provider_message_id: result.messageId ?? null,
+        provider_status: 'sent',
+        next_attempt_at: null,
+        last_error: null,
+      })
+      .eq('id', row.id)
+    return true
+  }
+
+  const retryable = result.status === 429 || result.status >= 500
+  await supabase
+    .from('whatsapp_outbox')
+    .update({
+      status: retryable && attempts < MAX_ATTEMPTS ? 'pending' : 'failed',
+      attempts,
+      next_attempt_at:
+        retryable && attempts < MAX_ATTEMPTS ? retryAt(attempts) : null,
+      last_error: result.error ?? 'meta_send_failed',
+    })
+    .eq('id', row.id)
+  return false
+}
+
 export const handler = (req: Request) =>
   withHttpErrors(req, 'whatsapp-worker', async () => {
     if (req.method !== 'POST') return methodNotAllowed(req, ['POST', 'OPTIONS'])
@@ -98,77 +180,10 @@ export const handler = (req: Request) =>
       .limit(BATCH_SIZE)
     if (error) throw new HttpError(503, 'whatsapp_outbox_lookup_failed')
 
-    let processed = 0
-    for (const row of rows ?? []) {
-      const { data: connection } = await supabase
-        .from('whatsapp_connections')
-        .select('phone_number_id, token_ciphertext, status')
-        .eq('organization_id', row.organization_id)
-        .maybeSingle()
-      const { data: template } = row.template_id
-        ? await supabase
-            .from('whatsapp_templates')
-            .select('template_name, language, status')
-            .eq('organization_id', row.organization_id)
-            .eq('id', row.template_id)
-            .maybeSingle()
-        : { data: null }
-
-      if (
-        !connection ||
-        connection.status !== 'connected' ||
-        !connection.token_ciphertext ||
-        !template ||
-        template.status !== 'approved'
-      ) {
-        await supabase
-          .from('whatsapp_outbox')
-          .update({ status: 'blocked', blocked_reason: 'connection_or_template_unavailable' })
-          .eq('id', row.id)
-        continue
-      }
-
-      const token = await decryptSecret(connection.token_ciphertext, key)
-      const reference =
-        typeof row.payload?.reference === 'string' ? row.payload.reference : row.id
-      const result = await sendTemplate(
-        connection.phone_number_id,
-        token,
-        row.recipient_phone,
-        template.template_name,
-        template.language,
-        reference,
-      )
-      const attempts = (row.attempts ?? 0) + 1
-
-      if (result.ok) {
-        await supabase
-          .from('whatsapp_outbox')
-          .update({
-            status: 'sent',
-            attempts,
-            provider_message_id: result.messageId ?? null,
-            provider_status: 'sent',
-            next_attempt_at: null,
-            last_error: null,
-          })
-          .eq('id', row.id)
-        processed += 1
-        continue
-      }
-
-      const retryable = result.status === 429 || result.status >= 500
-      await supabase
-        .from('whatsapp_outbox')
-        .update({
-          status: retryable && attempts < MAX_ATTEMPTS ? 'pending' : 'failed',
-          attempts,
-          next_attempt_at:
-            retryable && attempts < MAX_ATTEMPTS ? retryAt(attempts) : null,
-          last_error: result.error ?? 'meta_send_failed',
-        })
-        .eq('id', row.id)
-    }
+    const results = await Promise.all(
+      (rows ?? []).map((row) => processRow(supabase, row as OutboxRow, key)),
+    )
+    const processed = results.filter(Boolean).length
 
     return jsonResponse(req, {
       processed,

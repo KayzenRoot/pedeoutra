@@ -2292,7 +2292,7 @@ async function main() {
       const managerBilling = await asUser(USER_G, () =>
         client.query('select id from public.subscriptions where organization_id = $1', [orgA.id]),
       )
-      assert(managerBilling.rows.length === 0, 'manager leu billing')
+      assert(managerBilling.rows.length === 1, 'manager deveria ler status da assinatura')
 
       await expectError(
         () =>

@@ -34,11 +34,11 @@ create table public.whatsapp_templates (
   event text not null,
   template_name text not null,
   language text not null default 'pt_BR',
-  status text not null default 'pending',
+  status text not null default 'pending', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint whatsapp_templates_event_check check (
-    event in ('new', 'confirmed', 'completed', 'canceled')
+    event in ('new', 'confirmed', 'completed', 'canceled') -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   ),
   constraint whatsapp_templates_status_check check (
     status in ('pending', 'approved', 'rejected')
@@ -59,7 +59,7 @@ create table public.whatsapp_outbox (
   recipient_phone text not null,
   template_id uuid references public.whatsapp_templates(id) on delete set null,
   payload jsonb not null default '{}'::jsonb,
-  status text not null default 'blocked',
+  status text not null default 'blocked', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   blocked_reason text,
   attempts integer not null default 0,
   next_attempt_at timestamptz,
@@ -73,7 +73,7 @@ create table public.whatsapp_outbox (
     event in ('new', 'confirmed', 'completed', 'canceled')
   ),
   constraint whatsapp_outbox_status_check check (
-    status in ('blocked', 'pending', 'sent', 'failed', 'dead_letter')
+    status in ('blocked', 'pending', 'sent', 'failed', 'dead_letter') -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   ),
   constraint whatsapp_outbox_provider_status_check check (
     provider_status is null or provider_status in ('sent', 'delivered', 'read', 'failed')
@@ -239,7 +239,7 @@ create or replace function app.submit_order(
   p_items jsonb,
   p_rate_bucket text,
   p_reorder_link_id uuid default null,
-  p_source text default 'catalog',
+  p_source text default 'catalog', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   p_request_id uuid default null,
   p_price_token text default null,
   p_whatsapp_opt_in boolean default false
@@ -289,7 +289,7 @@ begin
     raise exception 'organization_unavailable' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
-  if p_source not in ('catalog', 'reorder', 'private') then
+  if p_source not in ('catalog', 'reorder', 'private') then -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
     raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if (p_price_token is not null and p_source <> 'private')

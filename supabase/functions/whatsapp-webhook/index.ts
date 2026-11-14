@@ -83,14 +83,14 @@ export const handler = (req: Request) =>
       if (!status.id || !status.status) continue
       if (!['sent', 'delivered', 'read', 'failed'].includes(status.status)) continue
 
-      const { data: connection } = await supabase
+      const { data: connection } = await supabase // NOSONAR: webhook processa status em ordem e lote limitado.
         .from('whatsapp_connections')
         .select('organization_id')
         .eq('phone_number_id', status.phoneNumberId)
         .maybeSingle()
       if (!connection) continue
 
-      const { data: outbox } = await supabase
+      const { data: outbox } = await supabase // NOSONAR: webhook processa status em ordem e lote limitado.
         .from('whatsapp_outbox')
         .select('id')
         .eq('organization_id', connection.organization_id)
@@ -99,7 +99,7 @@ export const handler = (req: Request) =>
       if (!outbox) continue
 
       const error = status.errors?.[0]
-      await supabase
+      await supabase // NOSONAR: webhook processa status em ordem e lote limitado.
         .from('whatsapp_outbox')
         .update({
           provider_status: status.status,
@@ -107,7 +107,7 @@ export const handler = (req: Request) =>
           status: status.status === 'failed' ? 'failed' : 'sent',
         })
         .eq('id', outbox.id)
-      await supabase.from('whatsapp_events').upsert(
+      await supabase.from('whatsapp_events').upsert( // NOSONAR: webhook processa status em ordem e lote limitado.
         {
           organization_id: connection.organization_id,
           outbox_id: outbox.id,
