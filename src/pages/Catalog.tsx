@@ -8,6 +8,46 @@ import { formatBRL, phoneDigits, whatsappLink } from '../lib/format'
 import { applySkuListToCart } from '../lib/sku'
 import type { PublicCatalogResponse, SubmitOrderResponse } from '../lib/types'
 
+function filterCatalogProducts(
+  products: PublicCatalogResponse['products'],
+  category: string,
+  term: string,
+): PublicCatalogResponse['products'] {
+  return products.filter((product) => {
+    if (category !== 'all' && product.category_id !== category) return false
+    if (!term) return true
+    return (
+      product.name.toLowerCase().includes(term) ||
+      (product.sku ?? '').toLowerCase().includes(term)
+    )
+  })
+}
+
+interface OrderValidationInput {
+  accepting: boolean
+  itemCount: number
+  buyerName: string
+  buyerPhone: string
+  consent: boolean
+  belowMinimum: boolean
+  belowMinItems: boolean
+  minOrderCents: number | null
+  minOrderItems: number | null
+}
+
+function validateOrderInput(input: OrderValidationInput): string | null {
+  if (!input.accepting) return 'Este catálogo não está aceitando pedidos no momento.'
+  if (input.itemCount === 0) return 'Escolha pelo menos um produto e uma quantidade.'
+  if (input.buyerName.trim().length < 2) return 'Informe seu nome ou o nome da empresa.'
+  if (phoneDigits(input.buyerPhone).length < 10) return 'Informe um telefone válido com DDD.'
+  if (!input.consent) return 'É necessário aceitar o aviso de privacidade para enviar.'
+  if (input.belowMinItems) {
+    return `Este fornecedor pede pelo menos ${input.minOrderItems} item(ns) por pedido.`
+  }
+  if (input.belowMinimum) return `Pedido mínimo de ${formatBRL(input.minOrderCents)}.`
+  return null
+}
+
 export function Catalog() {
   const { slug } = useParams<{ slug: string }>()
   const [catalog, setCatalog] = useState<PublicCatalogResponse | null>(null)
@@ -101,24 +141,19 @@ export function Catalog() {
     setSubmitError(null)
 
     if (!catalog || !slug) return
-    if (!catalog.accepting_orders) {
-      setSubmitError('Este catálogo não está aceitando pedidos no momento.')
-      return
-    }
-    if (selectedItems.length === 0) {
-      setSubmitError('Escolha pelo menos um produto e uma quantidade.')
-      return
-    }
-    if (buyerName.trim().length < 2) {
-      setSubmitError('Informe seu nome ou o nome da empresa.')
-      return
-    }
-    if (phoneDigits(buyerPhone).length < 10) {
-      setSubmitError('Informe um telefone válido com DDD.')
-      return
-    }
-    if (!consent) {
-      setSubmitError('É necessário aceitar o aviso de privacidade para enviar.')
+    const validation = validateOrderInput({
+      accepting: catalog.accepting_orders,
+      itemCount: selectedItems.length,
+      buyerName,
+      buyerPhone,
+      consent,
+      belowMinimum,
+      belowMinItems,
+      minOrderCents,
+      minOrderItems,
+    })
+    if (validation) {
+      setSubmitError(validation)
       return
     }
 
@@ -240,15 +275,11 @@ export function Catalog() {
   }
 
   const categories = catalog.categories ?? []
-  const term = search.trim().toLowerCase()
-  const visibleProducts = catalog.products.filter((product) => {
-    if (activeCategory !== 'all' && product.category_id !== activeCategory) return false
-    if (!term) return true
-    return (
-      product.name.toLowerCase().includes(term) ||
-      (product.sku ?? '').toLowerCase().includes(term)
-    )
-  })
+  const visibleProducts = filterCatalogProducts(
+    catalog.products,
+    activeCategory,
+    search.trim().toLowerCase(),
+  )
 
   function applySkuList() {
     if (!catalog) return
