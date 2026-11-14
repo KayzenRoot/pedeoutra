@@ -171,3 +171,9 @@ verify_jwt = true
 
 [functions.team-revoke]
 verify_jwt = true
+
+[functions.reorder-reminder-create]
+verify_jwt = true
+
+[functions.reorder-reminder-open]
+verify_jwt = true

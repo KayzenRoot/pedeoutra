@@ -93,6 +93,9 @@ export type Database = {
           display_name: string
           id: string
           organization_id: string
+          reorder_snoozed_until: string | null
+          reorder_opt_in: boolean
+          reorder_opt_out_at: string | null
           updated_at: string
         }
         Insert: {
@@ -101,6 +104,9 @@ export type Database = {
           display_name: string
           id?: string
           organization_id: string
+          reorder_snoozed_until?: string | null
+          reorder_opt_in?: boolean
+          reorder_opt_out_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -109,6 +115,9 @@ export type Database = {
           display_name?: string
           id?: string
           organization_id?: string
+          reorder_snoozed_until?: string | null
+          reorder_opt_in?: boolean
+          reorder_opt_out_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -834,6 +843,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reorder_reminders: {
+        Row: {
+          channel: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          cycle_key: string
+          id: string
+          message: string
+          metadata: Json
+          opened_at: string | null
+          organization_id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          cycle_key: string
+          id?: string
+          message: string
+          metadata?: Json
+          opened_at?: string | null
+          organization_id: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          cycle_key?: string
+          id?: string
+          message?: string
+          metadata?: Json
+          opened_at?: string | null
+          organization_id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           access_state: string
@@ -842,6 +896,11 @@ export type Database = {
           id: string
           min_order_cents: number | null
           min_order_items: number | null
+          reorder_min_history: number
+          reorder_tolerance_days: number
+          reorder_reminder_enabled: boolean
+          reorder_reminder_channel: string
+          reorder_reminder_frequency_days: number
           name: string
           owner_user_id: string
           slug: string
@@ -856,6 +915,11 @@ export type Database = {
           id?: string
           min_order_cents?: number | null
           min_order_items?: number | null
+          reorder_min_history?: number
+          reorder_tolerance_days?: number
+          reorder_reminder_enabled?: boolean
+          reorder_reminder_channel?: string
+          reorder_reminder_frequency_days?: number
           name: string
           owner_user_id: string
           slug: string
@@ -870,6 +934,11 @@ export type Database = {
           id?: string
           min_order_cents?: number | null
           min_order_items?: number | null
+          reorder_min_history?: number
+          reorder_tolerance_days?: number
+          reorder_reminder_enabled?: boolean
+          reorder_reminder_channel?: string
+          reorder_reminder_frequency_days?: number
           name?: string
           owner_user_id?: string
           slug?: string
@@ -1197,6 +1266,11 @@ export type Database = {
           id: string
           min_order_cents: number | null
           min_order_items: number | null
+          reorder_min_history: number
+          reorder_tolerance_days: number
+          reorder_reminder_enabled: boolean
+          reorder_reminder_channel: string
+          reorder_reminder_frequency_days: number
           name: string
           owner_user_id: string
           slug: string
@@ -1223,6 +1297,28 @@ export type Database = {
       api_assert_entitlement: {
         Args: { p_organization_id: string; p_feature_key: string }
         Returns: boolean
+      }
+      api_reorder_radar: {
+        Args: {
+          p_organization_id: string
+          p_search?: string | null
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          customer_id: string
+          display_name: string
+          contact_phone: string
+          valid_order_count: number
+          last_order_at: string
+          median_interval_days: number | null
+          next_expected_at: string | null
+          days_since_last: number
+          overdue: boolean
+          insufficient: boolean
+          snoozed_until: string | null
+          total_count: number
+        }[]
       }
     }
     Enums: {

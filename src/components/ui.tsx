@@ -190,6 +190,7 @@ export function Icon({
     | 'orders'
     | 'products'
     | 'customers'
+    | 'radar'
     | 'prices'
     | 'quotes'
     | 'team'
@@ -217,6 +218,13 @@ export function Icon({
       <>
         <circle cx="9" cy="8" r="3.5" />
         <path d="M2.5 21a6.5 6.5 0 0 1 13 0M16 5.5a3 3 0 0 1 0 5.8M18 21a5.5 5.5 0 0 0-3-4.9" />
+      </>
+    ),
+    radar: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 3v4M21 12h-4M12 21v-4M3 12h4" />
       </>
     ),
     prices: (

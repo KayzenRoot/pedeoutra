@@ -1952,6 +1952,99 @@ async function main() {
       await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 
+
+    console.log('[13/13] Lembretes manuais de reposição')
+
+    await test('lembrete manual é idempotente, marca abertura e respeita opt-out', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+      await clientQuery(`
+        update public.organizations
+           set reorder_reminder_enabled = true, reorder_reminder_channel = 'manual'
+         where id = '${ORG_ID}'
+      `)
+      await clientQuery(`
+        update public.customers
+           set reorder_opt_in = true, reorder_opt_out_at = null
+         where id = '${CUSTOMER_ID}'
+      `)
+
+      const cycleKey = `manual-test-${Date.now()}`
+      const created = await call(
+        'reorder-reminder-create',
+        {
+          customer_id: CUSTOMER_ID,
+          cycle_key: cycleKey,
+          message: 'Olá! Já faz alguns dias desde o último pedido. Quer repetir?',
+        },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.status === 'suggested', 'status sugerido')
+
+      const repeated = await call(
+        'reorder-reminder-create',
+        {
+          customer_id: CUSTOMER_ID,
+          cycle_key: cycleKey,
+          message: 'Olá! Já faz alguns dias desde o último pedido. Quer repetir?',
+        },
+        { token: userToken },
+      )
+      assert(repeated.status === 201, `retry HTTP ${repeated.status}`)
+      assert(repeated.data.reminder_id === created.data.reminder_id, 'lembrete duplicado')
+      const count = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.reorder_reminders where cycle_key = '${cycleKey}'`,
+      ]).stdout.trim()
+      assert(count === '1', `lembretes ${count}`)
+
+      const opened = await call(
+        'reorder-reminder-open',
+        { reminder_id: created.data.reminder_id },
+        { token: userToken },
+      )
+      assert(opened.status === 200, `open HTTP ${opened.status}`)
+      assert(opened.data.status === 'manual_opened', 'status de abertura')
+      const sent = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select sent_at from public.reorder_reminders where id = '${created.data.reminder_id}'`,
+      ]).stdout.trim()
+      assert(sent === '', 'abertura manual não pode alegar envio')
+
+      await clientQuery(`
+        update public.customers set reorder_opt_out_at = now()
+         where id = '${CUSTOMER_ID}'
+      `)
+      const blocked = await call(
+        'reorder-reminder-create',
+        {
+          customer_id: CUSTOMER_ID,
+          cycle_key: `${cycleKey}-2`,
+          message: 'Mensagem que não deve ser criada',
+        },
+        { token: userToken },
+      )
+      assert(blocked.status === 409, `opt-out HTTP ${blocked.status}`)
+      assert(blocked.data.error === 'reminder_not_consented', 'erro de consentimento')
+
+      const isolated = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.reorder_reminders where organization_id = '${ORG_ID}'`,
+      ]).stdout.trim()
+      assert(isolated === '1', `histórico ${isolated}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)

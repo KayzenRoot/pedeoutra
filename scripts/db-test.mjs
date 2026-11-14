@@ -2438,6 +2438,110 @@ async function main() {
       )
     })
 
+
+    console.log('[12/12] Radar de recompra')
+
+    await test('radar calcula mediana, ignora cancelados e sinaliza atraso', async () => {
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      const radarCustomer = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Radar Cliente', '11944443333'),
+      )
+      const radarShort = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Radar Curto', '11944442222'),
+      )
+      const insertOrder = async (customerId, daysAgo, status, suffix) => {
+        await client.query(
+          `insert into public.orders
+             (organization_id, customer_id, public_reference, status, total_cents, source, created_at)
+           values ($1, $2, $3, $4, 1000, 'manual', now() - ($5 || ' days')::interval)`,
+          [orgA.id, customerId, `PD-RADAR-${suffix}-${crypto.randomUUID().slice(0, 8)}`, status, daysAgo],
+        )
+      }
+      await insertOrder(radarCustomer.id, 50, 'completed', 'a')
+      await insertOrder(radarCustomer.id, 40, 'completed', 'b')
+      await insertOrder(radarCustomer.id, 30, 'completed', 'c')
+      await insertOrder(radarCustomer.id, 20, 'completed', 'd')
+      await insertOrder(radarCustomer.id, 5, 'canceled', 'e')
+      await insertOrder(radarShort.id, 20, 'completed', 'f')
+      await insertOrder(radarShort.id, 10, 'completed', 'g')
+
+      const radar = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_reorder_radar($1, 'Radar', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      const late = radar.rows.find((row) => row.customer_id === radarCustomer.id)
+      const short = radar.rows.find((row) => row.customer_id === radarShort.id)
+      assert(late, 'cliente atrasado ausente')
+      assert(late.valid_order_count === 4, `pedidos ${late.valid_order_count}`)
+      assert(Number(late.median_interval_days) === 10, `mediana ${late.median_interval_days}`)
+      assert(late.overdue === true, 'deveria estar atrasado')
+      assert(short.insufficient === true, 'histórico curto deveria ser insuficiente')
+      assert(short.median_interval_days === null, 'não pode inventar mediana')
+      assert(radar.rows[0].total_count >= 2, 'total_count')
+
+      await asUser(USER_A, () =>
+        client.query(
+          `update public.customers set reorder_snoozed_until = now() + interval '30 days'
+            where id = $1`,
+          [radarCustomer.id],
+        ),
+      )
+      const snoozed = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_reorder_radar($1, 'Radar Cliente', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(snoozed.rows[0].overdue === false, 'soneca não silenciou')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(`select * from public.api_reorder_radar($1, null, 50, 0)`, [orgA.id]),
+          ),
+        'forbidden',
+        'B acessando radar de A',
+      )
+    })
+
+
+    await test('lembretes são isolados por tenant e exigem histórico válido', async () => {
+      const reminder = await client.query(
+        `insert into public.reorder_reminders
+           (organization_id, customer_id, cycle_key, message, status)
+         values ($1, $2, 'db-cycle-1', 'Lembrete de teste', 'suggested')
+         returning id`,
+        [orgA.id, customerA.id],
+      )
+      assert(reminder.rows[0].id, 'lembrete não criado')
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.reorder_reminders where organization_id = $1', [orgA.id]),
+      )
+      assert(isolated.rows.length === 0, 'B viu lembrete de A')
+      const own = await asUser(USER_A, () =>
+        client.query('select id from public.reorder_reminders where organization_id = $1', [orgA.id]),
+      )
+      assert(own.rows.length >= 1, 'A não viu o próprio lembrete')
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.reorder_reminders
+               (organization_id, customer_id, cycle_key, message)
+             values ($1, $2, 'db-cycle-1', 'Duplicado')`,
+            [orgA.id, customerA.id],
+          ),
+        'reorder_reminders_unique',
+        'lembrete duplicado',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

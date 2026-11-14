@@ -21,6 +21,7 @@ import { PrivatePrices } from './pages/PrivatePrices'
 import { QuotePublic } from './pages/QuotePublic'
 import { Quotes } from './pages/Quotes'
 import { Products } from './pages/Products'
+import { Radar } from './pages/Radar'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
 import { Signup } from './pages/Signup'
@@ -84,6 +85,7 @@ export default function App() {
             <Route path="precos" element={<PrivatePrices />} />
             <Route path="orcamentos" element={<Quotes />} />
             <Route path="equipe" element={<Team />} />
+            <Route path="radar" element={<Radar />} />
             <Route path="assinatura" element={<Billing />} />
             <Route
               path="configuracoes"

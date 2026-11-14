@@ -116,10 +116,11 @@ gates de lançamento.
   acompanhamento por token (#50), preços por comprador (#48), orçamentos com
   aceite opaco (#51), comprovante PDF não fiscal (#55), comparação comercial dos
   planos (#63), contrato WhatsApp oficial com envio desligado (#29–#31) e
-  equipe/RBAC com convites manuais (#58).
-- **Evidência local no HEAD de trabalho:** 66 DB, 50 Edge HTTP, 148 unit,
-  45 Edge Functions typechecked, 7 grupos full-local, restore com preço,
-  orçamento, WhatsApp e equipe, e smoke light/dark/system.
+  equipe/RBAC com convites manuais (#58), radar de recompra (#44) e
+  lembretes manuais (#45).
+- **Evidência local no HEAD de trabalho:** 68 DB, 51 Edge HTTP, 150 unit,
+  47 Edge Functions typechecked, 7 grupos full-local, restore com preço,
+  orçamento, WhatsApp, equipe e lembretes, e smoke light/dark/system.
 - **Segurança #48/#51:** RLS por tenant, entitlements `private_prices`/`quotes`,
   tokens opacos com SHA-256/TTL/revogação, snapshots de preço, aceite idempotente
   com lock e um pedido por quote, headers `noindex`/`no-referrer`/`no-store`;

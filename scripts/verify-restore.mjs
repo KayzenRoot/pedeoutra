@@ -259,6 +259,15 @@ insert into public.whatsapp_events (
   'delivered', '{"status":"delivered"}'::jsonb
 );
 
+insert into public.reorder_reminders (
+  id, organization_id, customer_id, cycle_key, message, status
+) values (
+  'aaaaaaaa-1111-4111-8111-dddddddddddd',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  'restore-cycle-1', 'Lembrete de restore', 'suggested'
+);
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -390,6 +399,7 @@ select
   (select count(*) from public.whatsapp_events) as whatsapp_events,
   (select count(*) from public.organization_memberships) as team_members,
   (select count(*) from public.organization_invitations) as team_invitations,
+  (select count(*) from public.reorder_reminders) as reorder_reminders,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -405,7 +415,8 @@ select
   (select md5(string_agg(id::text || ':' || status || ':' || waba_id, ',' order by id)) from public.whatsapp_connections) as whatsapp_connections_hash,
   (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.whatsapp_outbox) as whatsapp_outbox_hash,
   (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_memberships) as team_members_hash,
-  (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_invitations) as team_invitations_hash
+  (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_invitations) as team_invitations_hash,
+  (select md5(string_agg(id::text || ':' || cycle_key || ':' || status, ',' order by id)) from public.reorder_reminders) as reorder_reminders_hash
 `
 
 async function main() {
@@ -516,6 +527,7 @@ async function main() {
       'whatsapp_events',
       'team_members',
       'team_invitations',
+      'reorder_reminders',
       'orders_hash',
       'price_lists_hash',
       'price_items_hash',
@@ -525,6 +537,7 @@ async function main() {
       'whatsapp_outbox_hash',
       'team_members_hash',
       'team_invitations_hash',
+      'reorder_reminders_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

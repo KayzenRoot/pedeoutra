@@ -20,6 +20,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #63 | Comparação comercial dos dois planos na landing | implementado |
 | #29–#31 | Contrato WhatsApp oficial, opt-in, outbox e webhook | implementado com envio desligado; verificação Meta pendente |
 | #58 | Equipe, RBAC e convites manuais com AAL2 | implementado; envio de e-mail depende de SMTP |
+| #44 | Radar de recompra por cadência real | implementado neste branch |
+| #45 | Lembretes manuais com consentimento e histórico | implementado; envio automático desligado |
 
 ## #48 — preços por comprador
 
@@ -137,16 +139,35 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   `audit_events`.
 - UI `/app/equipe` (owner), página `/convite/:token` e navegação por papel.
 
+## #44/#45 — radar e lembretes manuais
+
+- `api_reorder_radar` calcula mediana dos intervalos entre pedidos
+  confirmados/concluídos, ignora cancelados/rascunhos, exige histórico mínimo
+  configurável (2–10), aplica tolerância (0–30 dias) e retorna dias desde o
+  último pedido, próxima estimativa e sinal `atrasado/em dia/sem dados`.
+- O cálculo é determinístico e explicável; histórico curto retorna mediana e
+  próxima estimativa nulas, sem inventar previsão. Fuso de apresentação
+  America/Sao_Paulo, timestamps UTC.
+- Cliente pode ser silenciado por 30 dias; pedidos novos, cancelados e histórico
+  insuficiente são tratados explicitamente. RLS/Edge impedem acesso A/B.
+- Lembretes são manuais: `reorder_reminders` registra sugestão/abertura, com
+  idempotency key por ciclo/canal e opt-in do cliente. O fornecedor abre o
+  `wa.me` com um clique; o sistema não alega envio/entrega. Envio automático
+  continua desligado e depende de WABA/templates/Meta.
+- UI `/app/radar` (Profissional) com busca, paginação, sinal, silenciar,
+  histórico recente e ação manual; Configurações permitem ativar lembretes,
+  frequência, histórico mínimo e tolerância; Clientes permite registrar opt-in.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **66 PASS, 0 FAIL** |
-| `npm run test:edge` | typecheck de **45 Edge Functions** |
-| `npm run test:edge-http` | **50 PASS, 0 FAIL** |
-| `npm run test:unit` | **148 PASS, 0 FAIL** (29 arquivos) |
+| `npm run test:db` | **68 PASS, 0 FAIL** |
+| `npm run test:edge` | typecheck de **47 Edge Functions** |
+| `npm run test:edge-http` | **51 PASS, 0 FAIL** |
+| `npm run test:unit` | **150 PASS, 0 FAIL** (30 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp e equipe |
+| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe e lembretes |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |

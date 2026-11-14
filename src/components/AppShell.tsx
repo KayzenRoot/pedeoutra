@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/app/pedidos', label: 'Pedidos', icon: 'orders' as const, roles: ALL_ROLES },
   { to: '/app/produtos', label: 'Produtos', icon: 'products' as const, roles: ALL_ROLES },
   { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const, roles: ALL_ROLES },
+  { to: '/app/radar', label: 'Radar', icon: 'radar' as const, roles: ALL_ROLES },
   { to: '/app/precos', label: 'Preços', icon: 'prices' as const, roles: ['owner', 'manager'] },
   { to: '/app/orcamentos', label: 'Orçamentos', icon: 'quotes' as const, roles: ['owner', 'manager'] },
   { to: '/app/equipe', label: 'Equipe', icon: 'team' as const, roles: ['owner'] },
