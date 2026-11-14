@@ -256,6 +256,69 @@ export function parseQuoteCreateInput(input: unknown): ValidationResult<QuoteCre
   return { ok: true, value: { ...base.value, customerId } }
 }
 
+export interface TeamInviteInput {
+  email: string
+  role: 'manager' | 'operator' | 'viewer'
+}
+
+export interface TeamAcceptInput {
+  token: string
+}
+
+export interface TeamRoleInput {
+  membershipId: string
+  role: 'manager' | 'operator' | 'viewer'
+}
+
+export interface TeamRevokeInput {
+  membershipId: string | null
+  invitationId: string | null
+}
+
+const TEAM_ROLES = new Set(['manager', 'operator', 'viewer'])
+
+export function parseTeamInviteInput(input: unknown): ValidationResult<TeamInviteInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : ''
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 254) {
+    return { ok: false, error: 'invalid_email' }
+  }
+  if (typeof input.role !== 'string' || !TEAM_ROLES.has(input.role)) {
+    return { ok: false, error: 'invalid_role' }
+  }
+  return { ok: true, value: { email, role: input.role as TeamInviteInput['role'] } }
+}
+
+export function parseTeamAcceptInput(input: unknown): ValidationResult<TeamAcceptInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  if (typeof input.token !== 'string' || !OPAQUE_TOKEN_PATTERN.test(input.token)) {
+    return { ok: false, error: 'invalid_invitation_token' }
+  }
+  return { ok: true, value: { token: input.token } }
+}
+
+export function parseTeamRoleInput(input: unknown): ValidationResult<TeamRoleInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  if (!isUuid(input.membership_id)) return { ok: false, error: 'invalid_member' }
+  if (typeof input.role !== 'string' || !TEAM_ROLES.has(input.role)) {
+    return { ok: false, error: 'invalid_role' }
+  }
+  return {
+    ok: true,
+    value: { membershipId: input.membership_id, role: input.role as TeamRoleInput['role'] },
+  }
+}
+
+export function parseTeamRevokeInput(input: unknown): ValidationResult<TeamRevokeInput> {
+  if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
+  const membershipId = isUuid(input.membership_id) ? input.membership_id : null
+  const invitationId = isUuid(input.invitation_id) ? input.invitation_id : null
+  if ((membershipId === null) === (invitationId === null)) {
+    return { ok: false, error: 'invalid_revoke_target' }
+  }
+  return { ok: true, value: { membershipId, invitationId } }
+}
+
 export function parseQuoteSaveInput(input: unknown): ValidationResult<QuoteSaveInput> {
   if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
   return parseQuoteBase(input)

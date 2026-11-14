@@ -43,6 +43,11 @@ import { handler as whatsappConnect } from '../supabase/functions/whatsapp-conne
 import { handler as whatsappDisconnect } from '../supabase/functions/whatsapp-disconnect/index.ts'
 import { handler as whatsappWorker } from '../supabase/functions/whatsapp-worker/index.ts'
 import { handler as whatsappWebhook } from '../supabase/functions/whatsapp-webhook/index.ts'
+import { handler as teamList } from '../supabase/functions/team-list/index.ts'
+import { handler as teamInvite } from '../supabase/functions/team-invite/index.ts'
+import { handler as teamAccept } from '../supabase/functions/team-accept/index.ts'
+import { handler as teamRole } from '../supabase/functions/team-role/index.ts'
+import { handler as teamRevoke } from '../supabase/functions/team-revoke/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -87,6 +92,11 @@ const routes: Record<string, Handler> = {
   'whatsapp-disconnect': whatsappDisconnect,
   'whatsapp-worker': whatsappWorker,
   'whatsapp-webhook': whatsappWebhook,
+  'team-list': teamList,
+  'team-invite': teamInvite,
+  'team-accept': teamAccept,
+  'team-role': teamRole,
+  'team-revoke': teamRevoke,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

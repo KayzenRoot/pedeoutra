@@ -9,6 +9,7 @@ import { Customers } from './pages/Customers'
 import { Dashboard } from './pages/Dashboard'
 import { Demo } from './pages/Demo'
 import { ForgotPassword } from './pages/ForgotPassword'
+import { InviteAccept } from './pages/InviteAccept'
 import { Landing } from './pages/Landing'
 import { Privacy, Terms } from './pages/Legal'
 import { Login } from './pages/Login'
@@ -23,6 +24,7 @@ import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
 import { Signup } from './pages/Signup'
+import { Team } from './pages/Team'
 import { Tracking } from './pages/Tracking'
 
 const Admin = lazy(() =>
@@ -81,6 +83,7 @@ export default function App() {
             <Route path="clientes" element={<Customers />} />
             <Route path="precos" element={<PrivatePrices />} />
             <Route path="orcamentos" element={<Quotes />} />
+            <Route path="equipe" element={<Team />} />
             <Route path="assinatura" element={<Billing />} />
             <Route
               path="configuracoes"
@@ -95,6 +98,14 @@ export default function App() {
           <Route path="/c/:slug" element={<Catalog />} />
           <Route path="/p/:token" element={<Catalog />} />
           <Route path="/o/:token" element={<QuotePublic />} />
+          <Route
+            path="/convite/:token"
+            element={
+              <ProtectedRoute requireOrganization={false}>
+                <InviteAccept />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/r/:token" element={<Reorder />} />
           <Route path="/acompanhar/:token" element={<Tracking />} />
           <Route

@@ -25,6 +25,7 @@ const DB_NAME = 'pedeoutra_edge'
 const JWT_SECRET = 'pedeoutra-edge-secret-with-at-least-32-characters'
 const USER_ID = 'eeeeeeee-1111-4111-8111-111111111111'
 const ADMIN_ID = 'eeeeeeee-9999-4999-8999-999999999999'
+const INVITEE_ID = 'eeeeeeee-aaaa-4aaa-8aaa-cccccccccccc'
 const ORG_ID = 'eeeeeeee-2222-4222-8222-222222222222'
 const ORG_SLUG = 'distribuidora-edge-abc123'
 const PRODUCT_1 = 'eeeeeeee-3333-4333-8333-333333333333'
@@ -173,9 +174,10 @@ function denoCommand() {
 }
 
 const SEED_SQL = `
-insert into auth.users (id, email) values
-  ('${USER_ID}', 'edge@example.test'),
-  ('${ADMIN_ID}', 'admin@example.test');
+insert into auth.users (id, email, email_confirmed_at) values
+  ('${USER_ID}', 'edge@example.test', now()),
+  ('${ADMIN_ID}', 'admin@example.test', now()),
+  ('${INVITEE_ID}', 'edge-invitee@example.test', now());
 
 insert into public.platform_admins (singleton, user_id) values (true, '${ADMIN_ID}');
 
@@ -284,6 +286,7 @@ async function main() {
 
     // supabase-js chama /rest/v1; encaminha para o PostgREST, que serve na raiz.
     const userToken = signJwt({ role: 'authenticated', sub: USER_ID })
+    const inviteeToken = signJwt({ role: 'authenticated', sub: INVITEE_ID })
     const adminToken = signJwt({
       role: 'authenticated',
       sub: ADMIN_ID,
@@ -310,6 +313,10 @@ async function main() {
       [
         `Bearer ${userToken}`,
         { id: USER_ID, email: 'edge@example.test', role: 'authenticated', aud: 'authenticated' },
+      ],
+      [
+        `Bearer ${inviteeToken}`,
+        { id: INVITEE_ID, email: 'edge-invitee@example.test', role: 'authenticated', aud: 'authenticated' },
       ],
       [
         `Bearer ${adminToken}`,
@@ -1849,6 +1856,99 @@ async function main() {
         `select status, token_ciphertext from public.whatsapp_connections where organization_id = '${ORG_ID}'`,
       ]).stdout.trim()
       assert(row === 'disabled|', `conexão ${row}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[12/12] Equipe e convites manuais')
+
+    await test('equipe exige AAL2, aceita convite e revoga acesso', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+
+      const withoutMfa = await fetch(`${edgeBase}/team-list`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      assert(withoutMfa.status === 403, `sem AAL2 HTTP ${withoutMfa.status}`)
+
+      const invited = await call(
+        'team-invite',
+        { email: 'edge-invitee@example.test', role: 'operator' },
+        { token: supplierAal2Token },
+      )
+      assert(invited.status === 201, `invite HTTP ${invited.status} ${JSON.stringify(invited.data)}`)
+      assert(invited.data.email_sent === false, 'não pode alegar envio')
+      assert(invited.data.url.includes('/convite/'), 'url do convite')
+      const inviteToken = invited.data.url.split('/').pop()
+
+      const accepted = await call(
+        'team-accept',
+        { token: inviteToken },
+        { token: inviteeToken },
+      )
+      assert(accepted.status === 200, `accept HTTP ${accepted.status} ${JSON.stringify(accepted.data)}`)
+      assert(accepted.data.role === 'operator', 'papel aceito')
+
+      const list = await fetch(`${edgeBase}/team-list`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      const data = await list.json()
+      assert(list.status === 200, `list HTTP ${list.status}`)
+      const member = data.members.find((item) => item.email === 'edge-invitee@example.test')
+      assert(member, 'membro não listado')
+
+      const role = await call(
+        'team-role',
+        { membership_id: member.id, role: 'viewer' },
+        { token: supplierAal2Token },
+      )
+      assert(role.status === 200, `role HTTP ${role.status}`)
+
+      const revoked = await call(
+        'team-revoke',
+        { membership_id: member.id },
+        { token: supplierAal2Token },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      assert(revoked.data.status === 'revoked', 'status revogado')
+
+      const replay = await call(
+        'team-accept',
+        { token: inviteToken },
+        { token: inviteeToken },
+      )
+      assert(replay.status === 404, `replay HTTP ${replay.status}`)
+    })
+
+    await test('limite de três usuários e AAL2 protegem convites', async () => {
+      const noMfa = await call(
+        'team-invite',
+        { email: 'blocked@example.test', role: 'viewer' },
+        { token: userToken },
+      )
+      assert(noMfa.status === 403, `convite sem AAL2 HTTP ${noMfa.status}`)
+
+      for (const email of ['pending-a@example.test', 'pending-b@example.test']) {
+        const response = await call(
+          'team-invite',
+          { email, role: 'viewer' },
+          { token: supplierAal2Token },
+        )
+        assert(response.status === 201, `convite ${email} HTTP ${response.status}`)
+      }
+      const overLimit = await call(
+        'team-invite',
+        { email: 'pending-c@example.test', role: 'viewer' },
+        { token: supplierAal2Token },
+      )
+      assert(overLimit.status === 409, `limite HTTP ${overLimit.status}`)
+      assert(overLimit.data.error === 'team_limit_reached', 'erro de limite')
       await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 

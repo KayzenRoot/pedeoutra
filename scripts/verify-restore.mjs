@@ -25,12 +25,35 @@ const SYNTHETIC_SQL = `
 insert into auth.users (id, email)
 values ('aaaaaaaa-1111-4111-8111-111111111111', 'restore@example.test');
 
+insert into auth.users (id, email, email_confirmed_at)
+values ('aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa', 'manager@restore.test', now());
+
 insert into public.organizations (id, owner_user_id, name, slug, whatsapp, city)
 values (
   'aaaaaaaa-2222-4222-8222-222222222222',
   'aaaaaaaa-1111-4111-8111-111111111111',
   'Distribuidora Restore', 'distribuidora-restore-abc123', '11999998888', 'São Paulo'
 );
+
+insert into public.organization_memberships (
+  id, organization_id, user_id, email, role, status, invited_by
+) values (
+  'aaaaaaaa-1111-4111-8111-bbbbbbbbbbbb',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa',
+  'manager@restore.test', 'manager', 'active',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.organization_invitations (
+  id, organization_id, email, role, token_hash, expires_at, invited_by
+) values (
+  'aaaaaaaa-1111-4111-8111-cccccccccccc',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'invite@restore.test', 'operator', repeat('d', 64), now() + interval '7 days',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
 
 insert into public.products (id, organization_id, name, unit, price_cents)
 values (
@@ -365,6 +388,8 @@ select
   (select count(*) from public.whatsapp_templates) as whatsapp_templates,
   (select count(*) from public.whatsapp_outbox) as whatsapp_outbox,
   (select count(*) from public.whatsapp_events) as whatsapp_events,
+  (select count(*) from public.organization_memberships) as team_members,
+  (select count(*) from public.organization_invitations) as team_invitations,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -378,7 +403,9 @@ select
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || total_cents, ',' order by id)) from public.quotes) as quotes_hash,
   (select md5(string_agg(id::text || ':' || name_snapshot || ':' || subtotal_cents, ',' order by id)) from public.quote_items) as quote_items_hash,
   (select md5(string_agg(id::text || ':' || status || ':' || waba_id, ',' order by id)) from public.whatsapp_connections) as whatsapp_connections_hash,
-  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.whatsapp_outbox) as whatsapp_outbox_hash
+  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.whatsapp_outbox) as whatsapp_outbox_hash,
+  (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_memberships) as team_members_hash,
+  (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_invitations) as team_invitations_hash
 `
 
 async function main() {
@@ -487,6 +514,8 @@ async function main() {
       'whatsapp_templates',
       'whatsapp_outbox',
       'whatsapp_events',
+      'team_members',
+      'team_invitations',
       'orders_hash',
       'price_lists_hash',
       'price_items_hash',
@@ -494,6 +523,8 @@ async function main() {
       'quote_items_hash',
       'whatsapp_connections_hash',
       'whatsapp_outbox_hash',
+      'team_members_hash',
+      'team_invitations_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

@@ -1,5 +1,5 @@
 import { adminClient } from '../_shared/supabase.ts'
-import { requireSupplier, assertWriteAccess } from '../_shared/auth.ts'
+import { requireSupplier, assertWriteAccess , assertRole} from '../_shared/auth.ts'
 import { enforceRateLimit } from '../_shared/rate-limit.ts'
 import { auditEvent } from '../_shared/audit.ts'
 import {
@@ -16,7 +16,8 @@ export const handler = (req: Request) =>
     if (req.method !== 'POST') return methodNotAllowed(req, ['POST', 'OPTIONS'])
 
     const supabase = adminClient()
-    const { user, organization } = await requireSupplier(req, supabase)
+    const { user, organization, role } = await requireSupplier(req, supabase)
+    assertRole(role, ['owner', 'manager', 'operator'])
     await assertWriteAccess(supabase, organization.id)
     await enforceRateLimit(supabase, `tracking-revoke:${organization.id}`, 30, 3600)
 

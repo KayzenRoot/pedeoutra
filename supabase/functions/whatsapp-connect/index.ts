@@ -1,5 +1,5 @@
 import { adminClient } from '../_shared/supabase.ts'
-import { assertWriteAccess, requireSupplier } from '../_shared/auth.ts'
+import { assertWriteAccess, requireSupplier , assertRole} from '../_shared/auth.ts'
 import { assertEntitlement } from '../_shared/entitlements.ts'
 import { enforceRateLimit } from '../_shared/rate-limit.ts'
 import { auditEvent } from '../_shared/audit.ts'
@@ -25,7 +25,8 @@ export const handler = (req: Request) =>
     if (req.method !== 'POST') return methodNotAllowed(req, ['POST', 'OPTIONS'])
 
     const supabase = adminClient()
-    const { user, organization } = await requireSupplier(req, supabase)
+    const { user, organization, role } = await requireSupplier(req, supabase)
+    assertRole(role, ['owner'])
     await assertWriteAccess(supabase, organization.id)
     await assertEntitlement(supabase, organization.id, 'whatsapp_automation')
     await enforceRateLimit(supabase, `whatsapp-connect:${organization.id}`, 10, 3600)

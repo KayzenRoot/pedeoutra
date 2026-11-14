@@ -192,6 +192,7 @@ export function Icon({
     | 'customers'
     | 'prices'
     | 'quotes'
+    | 'team'
     | 'billing'
     | 'settings'
     | 'external'
@@ -228,6 +229,12 @@ export function Icon({
       <>
         <path d="M6 3h9l4 4v14H6z" />
         <path d="M15 3v5h4M9 12h6M9 16h4" />
+      </>
+    ),
+    team: (
+      <>
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3 21a6 6 0 0 1 12 0M16 5.5a3 3 0 0 1 0 5.8M18 21a5.5 5.5 0 0 0-3-4.9" />
       </>
     ),
     billing: (

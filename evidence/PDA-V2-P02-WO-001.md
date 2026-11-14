@@ -19,6 +19,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #55 | Comprovante de pedido em PDF A4, sem natureza fiscal | implementado |
 | #63 | Comparação comercial dos dois planos na landing | implementado |
 | #29–#31 | Contrato WhatsApp oficial, opt-in, outbox e webhook | implementado com envio desligado; verificação Meta pendente |
+| #58 | Equipe, RBAC e convites manuais com AAL2 | implementado; envio de e-mail depende de SMTP |
 
 ## #48 — preços por comprador
 
@@ -116,16 +117,36 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 - Testes cobrem cifra/decifra, opt-in, idempotência do outbox, worker desligado,
   HMAC inválido/válido, RLS A/B e ausência de token em claro.
 
+## #58 — equipe, RBAC e convites manuais
+
+- `organization_memberships` (owner/manager/operator/viewer) e
+  `organization_invitations` com token CSPRNG hash, TTL, uso único, e-mail
+  verificado e limite de 3 usuários no Profissional.
+- Matriz de permissões aplicada em RLS e Edge: catálogo/preços/orçamentos por
+  papel; billing, configurações, WhatsApp e equipe ficam com o owner. Nenhum
+  membro vira owner por payload; o owner é protegido por trigger.
+- `requireSupplier` resolve a organização pela membership ativa, não apenas por
+  `owner_user_id`; as Edge Functions refazem `assertRole` e as operações
+  sensíveis de equipe exigem AAL2/TOTP.
+- Convite é criado como link manual (`email_sent:false`, `delivery:'manual'`)
+  porque SMTP não está configurado. O aceite exige login, e-mail verificado e
+  o mesmo e-mail do convite; replay, expiração, divergência e limite são
+  bloqueados.
+- Revogação muda o status da membership e bloqueia leitura/escrita nas próximas
+  requisições; sessões existentes não mantêm escrita privilegiada. Trilha em
+  `audit_events`.
+- UI `/app/equipe` (owner), página `/convite/:token` e navegação por papel.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **63 PASS, 0 FAIL** |
-| `npm run test:edge` | typecheck de **40 Edge Functions** |
-| `npm run test:edge-http` | **48 PASS, 0 FAIL** |
-| `npm run test:unit` | **146 PASS, 0 FAIL** (28 arquivos) |
+| `npm run test:db` | **66 PASS, 0 FAIL** |
+| `npm run test:edge` | typecheck de **45 Edge Functions** |
+| `npm run test:edge-http` | **50 PASS, 0 FAIL** |
+| `npm run test:unit` | **148 PASS, 0 FAIL** (29 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui preços, quotes e tabelas WhatsApp |
+| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp e equipe |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |
@@ -154,5 +175,5 @@ Logs locais usados durante a implementação:
 - SMTP próprio pendente (convites de equipe bloqueados).
 - WhatsApp oficial depende de WABA, templates e consentimento aprovados.
 - Admin bootstrap de produção segue pendente de TOTP/AAL2 do proprietário.
-- Pendente na Parte 2: #58 equipe/RBAC (bloqueado por SMTP) e verificação real
-  da WABA/templates pela Meta para ativar o envio WhatsApp.
+- Pendente na Parte 2: envio automático de e-mail de convite (SMTP) e
+  verificação real da WABA/templates pela Meta para ativar o WhatsApp.

@@ -24,6 +24,11 @@ const USER_B = '22222222-2222-4222-8222-222222222222'
 const USER_C = '33333333-3333-4333-8333-333333333333'
 const USER_D = '44444444-4444-4444-8444-444444444444'
 const USER_F = '66666666-6666-4666-8666-666666666666'
+const USER_G = '77777777-7777-4777-8777-777777777777'
+const USER_H = '88888888-8888-4888-8888-888888888888'
+const USER_I = '99999999-9999-4999-8999-999999999999'
+const USER_J = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+const USER_K = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
 const TOKEN_HASH = 'a'.repeat(64)
 
 let passed = 0
@@ -97,8 +102,10 @@ const BOOTSTRAP_SQL = `
 create schema if not exists auth;
 create table if not exists auth.users (
   id uuid primary key,
-  email text
+  email text,
+  email_confirmed_at timestamptz
 );
+alter table auth.users add column if not exists email_confirmed_at timestamptz;
 create or replace function auth.uid()
 returns uuid
 language sql
@@ -2216,6 +2223,218 @@ async function main() {
           ),
         'permission denied',
         'browser escrevendo conexão',
+      )
+    })
+
+
+    console.log('[11/11] Equipe, RBAC e convites manuais')
+
+    await test('owner tem membership e papéis respeitam a matriz RLS', async () => {
+      await client.query(`
+        insert into auth.users (id, email, email_confirmed_at) values
+          ('${USER_G}', 'manager@example.test', now()),
+          ('${USER_H}', 'operator@example.test', now()),
+          ('${USER_I}', 'viewer@example.test', now()),
+          ('${USER_J}', 'invitee@example.test', now()),
+          ('${USER_K}', 'team-owner@example.test', now())
+        on conflict (id) do update set email = excluded.email, email_confirmed_at = excluded.email_confirmed_at
+      `)
+      const ownerMembership = await client.query(
+        `select role, status from public.organization_memberships
+          where organization_id = $1 and user_id = $2`,
+        [orgA.id, USER_A],
+      )
+      assert(ownerMembership.rows[0]?.role === 'owner', 'membership owner ausente')
+
+      await client.query(`
+        insert into public.organization_memberships
+          (organization_id, user_id, email, role, status)
+        values
+          ('${orgA.id}', '${USER_G}', 'manager@example.test', 'manager', 'active'),
+          ('${orgA.id}', '${USER_H}', 'operator@example.test', 'operator', 'active'),
+          ('${orgB.id}', '${USER_I}', 'viewer@example.test', 'viewer', 'active')
+        on conflict (organization_id, user_id) do nothing
+      `)
+
+      const managerProducts = await asUser(USER_G, () =>
+        client.query('select id from public.products where organization_id = $1', [orgA.id]),
+      )
+      assert(managerProducts.rows.length >= 2, 'manager não leu catálogo')
+      const managerProduct = await asUser(USER_G, () => insertProduct(orgA.id, 'Produto Manager', 700))
+      assert(managerProduct.id, 'manager não criou produto')
+
+      await expectError(
+        () => asUser(USER_H, () => insertProduct(orgA.id, 'Produto Operator', 700)),
+        'row-level security',
+        'operator criando produto',
+      )
+      const order = await client.query(
+        `select id from public.orders where organization_id = $1 order by created_at desc limit 1`,
+        [orgA.id],
+      )
+      await asUser(USER_H, () =>
+        client.query(`update public.orders set status = 'confirmed' where id = $1`, [order.rows[0].id]),
+      )
+
+      const viewerProducts = await asUser(USER_I, () =>
+        client.query('select id from public.products where organization_id = $1', [orgB.id]),
+      )
+      assert(viewerProducts.rows.length >= 1, 'viewer não leu catálogo')
+      await expectError(
+        () => asUser(USER_I, () => insertProduct(orgB.id, 'Produto Viewer', 700)),
+        'row-level security',
+        'viewer criando produto',
+      )
+      const viewerBilling = await asUser(USER_I, () =>
+        client.query('select id from public.subscriptions where organization_id = $1', [orgB.id]),
+      )
+      assert(viewerBilling.rows.length === 0, 'viewer leu billing')
+      const managerBilling = await asUser(USER_G, () =>
+        client.query('select id from public.subscriptions where organization_id = $1', [orgA.id]),
+      )
+      assert(managerBilling.rows.length === 0, 'manager leu billing')
+
+      await expectError(
+        () =>
+          client.query(
+            `update public.organization_memberships set role = 'manager'
+              where organization_id = $1 and user_id = $2`,
+            [orgA.id, USER_A],
+          ),
+        'owner_membership_protected',
+        'rebaixar owner',
+      )
+    })
+
+    await test('convite exige e-mail verificado, é único e aceita uma vez', async () => {
+      const teamOrg = await createOrg(USER_K, 'Equipe Teste', '11955554444')
+      await client.query(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${teamOrg.id}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+      const token = 'team-invite-token-0123456789abcdefghijk'
+      const hash = await quoteHash(token)
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_create_invitation($1, $2, $3, $4, $5, now() + interval '7 days')`,
+          [teamOrg.id, USER_K, 'invitee@example.test', 'operator', hash],
+        ),
+      )
+      assert(created.rows[0].invitation_id, 'convite não criado')
+
+      const accepted = await asService(() =>
+        client.query(`select * from public.api_accept_invitation($1, $2)`, [hash, USER_J]),
+      )
+      assert(accepted.rows[0].organization_id === teamOrg.id, 'org do convite')
+      assert(accepted.rows[0].role === 'operator', 'papel do convite')
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_invitation($1, $2)`, [hash, USER_J]),
+          ),
+        'invitation_unavailable',
+        'replay do convite',
+      )
+
+      const membership = await client.query(
+        `select id from public.organization_memberships
+          where organization_id = $1 and user_id = $2`,
+        [teamOrg.id, USER_J],
+      )
+      await asService(() =>
+        client.query(`select * from public.api_change_member_role($1, $2, $3, 'viewer')`, [
+          teamOrg.id,
+          USER_K,
+          membership.rows[0].id,
+        ]),
+      )
+      await expectError(
+        () =>
+          asUser(USER_J, () =>
+            client.query(
+              `insert into public.customers (organization_id, display_name, contact_phone)
+               values ($1, 'Cliente Viewer', '11933332222')`,
+              [teamOrg.id],
+            ),
+          ),
+        'row-level security',
+        'viewer criando cliente',
+      )
+      await asService(() =>
+        client.query(`select * from public.api_revoke_member($1, $2, $3)`, [
+          teamOrg.id,
+          USER_K,
+          membership.rows[0].id,
+        ]),
+      )
+      const afterRevoke = await asUser(USER_J, () =>
+        client.query('select id from public.organizations where id = $1', [teamOrg.id]),
+      )
+      assert(afterRevoke.rows.length === 0, 'membro revogado ainda lê a organização')
+    })
+
+    await test('convite expirado, e-mail divergente e limite de equipe são bloqueados', async () => {
+      const teamOrg = await client.query(
+        `select id from public.organizations where owner_user_id = $1 limit 1`,
+        [USER_K],
+      )
+      const orgId = teamOrg.rows[0].id
+      const expiredToken = 'team-expired-token-0123456789abcdefghij'
+      const expiredHash = await quoteHash(expiredToken)
+      await client.query(
+        `insert into public.organization_invitations
+           (organization_id, email, role, token_hash, expires_at, invited_by, created_at)
+         values ($1, 'invitee@example.test', 'operator', $2, now() - interval '1 day', $3, now() - interval '2 days')`,
+        [orgId, expiredHash, USER_K],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_invitation($1, $2)`, [expiredHash, USER_J]),
+          ),
+        'invitation_unavailable',
+        'convite expirado',
+      )
+
+      const otherToken = 'team-other-token-0123456789abcdefghijkl'
+      const otherHash = await quoteHash(otherToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_create_invitation($1, $2, $3, $4, $5, now() + interval '7 days')`,
+          [orgId, USER_K, 'other@example.test', 'viewer', otherHash],
+        ),
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_invitation($1, $2)`, [otherHash, USER_J]),
+          ),
+        'invitation_email_mismatch',
+        'e-mail divergente',
+      )
+
+      const secondHash = await quoteHash('team-limit-second')
+      await asService(() =>
+        client.query(
+          `select * from public.api_create_invitation($1, $2, $3, 'viewer', $4, now() + interval '7 days')`,
+          [orgId, USER_K, 'second@example.test', secondHash],
+        ),
+      )
+      const fourthHash = await quoteHash('team-limit-fourth')
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_create_invitation($1, $2, 'fourth@example.test', 'viewer', $3, now() + interval '7 days')`,
+              [orgId, USER_K, fourthHash],
+            ),
+          ),
+        'team_limit_reached',
+        'limite de equipe',
       )
     })
 

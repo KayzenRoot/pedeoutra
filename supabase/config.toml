@@ -156,3 +156,18 @@ verify_jwt = false
 
 [functions.whatsapp-webhook]
 verify_jwt = false
+
+[functions.team-list]
+verify_jwt = true
+
+[functions.team-invite]
+verify_jwt = true
+
+[functions.team-accept]
+verify_jwt = true
+
+[functions.team-role]
+verify_jwt = true
+
+[functions.team-revoke]
+verify_jwt = true
