@@ -275,6 +275,7 @@ export interface OrderTrackingResponse {
   reference: string
   status: string
   created_at: string
+  total_cents: number | null
   items: Array<{ name: string; quantity: number }>
   timeline: Array<{ status: string; at: string }>
   expires_at: string

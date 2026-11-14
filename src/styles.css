@@ -3969,3 +3969,9 @@ svg {
   border-radius: 0 12px 12px 0;
   white-space: pre-wrap;
 }
+
+.receipt-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}

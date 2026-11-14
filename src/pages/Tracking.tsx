@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { Brand } from '../components/Brand'
 import { FormMessage, LoadingScreen } from '../components/ui'
 import { getOrderTracking } from '../lib/edge'
+import { downloadOrderReceipt } from '../lib/order-pdf'
 import { formatDateTime } from '../lib/format'
 import type { OrderTrackingResponse } from '../lib/types'
 
@@ -131,9 +132,31 @@ export function Tracking() {
             </>
           )}
 
+          <button
+            type="button"
+            className="button button-secondary button-block"
+            onClick={() =>
+              downloadOrderReceipt({
+                organizationName: data.supplier.name,
+                reference: data.reference,
+                createdAt: data.created_at,
+                status: data.status,
+                items: data.items.map((item) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                })),
+                totalCents: data.total_cents,
+                includeBuyer: false,
+                includePrices: false,
+                documentTitle: 'Comprovante de acompanhamento',
+              })
+            }
+          >
+            Baixar comprovante em PDF
+          </button>
           <p className="form-note">
-            Este é um acompanhamento informativo. O fornecedor confirma o pedido diretamente
-            com você; não há pagamento nesta página.
+            O PDF reduzido não inclui telefone, observações, preços por item nem links. Este é
+            um acompanhamento informativo; o fornecedor confirma o pedido diretamente com você.
           </p>
           <Link className="text-link" to={`/c/${data.supplier.slug}`}>
             Ver catálogo do fornecedor →

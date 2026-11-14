@@ -31,6 +31,7 @@ describe('acompanhamento público', () => {
       reference: 'PD-ABC123',
       status: 'confirmed',
       created_at: '2026-11-14T12:00:00Z',
+      total_cents: 2500,
       items: [{ name: 'Copo 200ml', quantity: 2 }],
       timeline: [
         { status: 'new', at: '2026-11-14T12:00:00Z' },
@@ -43,6 +44,9 @@ describe('acompanhamento público', () => {
     expect(await screen.findByText('PD-ABC123')).toBeInTheDocument()
     expect(screen.getByText('Distribuidora Teste')).toBeInTheDocument()
     expect(screen.getByText('Copo 200ml')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Baixar comprovante em PDF' }),
+    ).toBeInTheDocument()
     expect(screen.getAllByText('Confirmado pelo fornecedor').length).toBeGreaterThan(0)
     expect(screen.queryByText(/telefone do comprador/i)).not.toBeInTheDocument()
   })

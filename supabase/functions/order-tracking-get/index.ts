@@ -48,7 +48,7 @@ export const handler = (req: Request) =>
     const [orderResult, organizationResult, itemsResult, timelineResult] = await Promise.all([
       supabase
         .from('orders')
-        .select('id, public_reference, status, created_at')
+        .select('id, public_reference, status, created_at, total_cents')
         .eq('id', link.order_id)
         .eq('organization_id', link.organization_id)
         .maybeSingle(),
@@ -91,6 +91,7 @@ export const handler = (req: Request) =>
         reference: orderResult.data.public_reference,
         status: orderResult.data.status,
         created_at: orderResult.data.created_at,
+        total_cents: orderResult.data.total_cents,
         items: (itemsResult.data ?? []).map((item) => ({
           name: item.name_snapshot,
           quantity: item.quantity,

@@ -15,7 +15,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #53 | QR local do catálogo, sem serviço externo | implementado |
 | #50 | Acompanhamento público por token opaco, TTL e revogação | implementado |
 | #48 | Preços por comprador, tabela privada e link opaco | implementado |
-| #51 | Orçamentos B2B com aceite opaco e conversão única em pedido | implementado neste branch |
+| #51 | Orçamentos B2B com aceite opaco e conversão única em pedido | implementado |
+| #55 | Comprovante de pedido em PDF A4, sem natureza fiscal | implementado neste branch |
 
 ## #48 — preços por comprador
 
@@ -61,6 +62,22 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   link, cancelar, revisar e ver eventos. Página pública `/o/:token` com aceite e
   recusa explícitos, sem login do comprador e sem PII de telefone.
 
+## #55 — comprovante de pedido em PDF
+
+- Gerador próprio em `src/lib/order-pdf.ts`, sem HTML, rede, fontes externas ou
+  serviço de terceiros; PDF 1.4 A4 com Helvetica/WinAnsi, paginação, valores em
+  BRL, acentos e nome de arquivo sanitizado.
+- O fornecedor baixa o comprovante a partir dos snapshots do pedido no
+  `OrderDetail`; há versão com comprador e versão sem PII, além de impressão.
+- O comprador baixa uma versão reduzida na página de acompanhamento por token:
+  sem telefone, observações, preços por item ou links; total e status vêm do DTO
+  autorizado pelo token.
+- Rodapé explícito em todas as páginas: “Comprovante de pedido, não é documento
+  fiscal nem prova de pagamento.” Nenhum PDF contém token ou link opaco.
+- Testes geram PDF real, verificam texto/acentos, versão sem PII, 50 itens com
+  múltiplas páginas e sanitização de filename. O PDF também foi validado com
+  `pdftotext` e renderizado com PyMuPDF durante a auditoria local.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
@@ -68,7 +85,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | `npm run test:db` | **60 PASS, 0 FAIL** |
 | `npm run test:edge` | typecheck de **35 Edge Functions** |
 | `npm run test:edge-http` | **43 PASS, 0 FAIL** |
-| `npm run test:unit` | **140 PASS, 0 FAIL** (26 arquivos) |
+| `npm run test:unit` | **144 PASS, 0 FAIL** (27 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
 | `npm run test:restore` | PASS; inclui tabelas de preço, quotes, itens, eventos e links |
 | `npm run lint` / `npm run typecheck` | 0 erros |
@@ -99,5 +116,5 @@ Logs locais usados durante a implementação:
 - SMTP próprio pendente (convites de equipe bloqueados).
 - WhatsApp oficial depende de WABA, templates e consentimento aprovados.
 - Admin bootstrap de produção segue pendente de TOTP/AAL2 do proprietário.
-- Itens seguintes da Parte 2: #55 PDF não fiscal, #58 equipe/RBAC, #29–#31
-  contrato WhatsApp e #63 páginas comerciais.
+- Itens seguintes da Parte 2: #58 equipe/RBAC, #29–#31 contrato WhatsApp e
+  #63 páginas comerciais.
