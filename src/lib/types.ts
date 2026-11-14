@@ -267,6 +267,17 @@ export interface AdminFinancialResponse {
   metrics: AdminFinancialMetric[]
 }
 
+export interface AdminHealthMetric {
+  metric: string
+  value_count: number
+  status: string
+  detail: string
+}
+
+export interface AdminHealthResponse {
+  health: AdminHealthMetric[]
+}
+
 export interface AdminAnalyticsResponse {
   days: number
   events: AdminAnalyticsEvent[]

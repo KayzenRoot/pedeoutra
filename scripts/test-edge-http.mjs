@@ -2149,6 +2149,17 @@ async function main() {
         'custo ausente deveria ser indisponível',
       )
 
+      const health = await fetch(`${edgeBase}/admin-api?view=health`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const healthData = await health.json()
+      assert(health.status === 200, `health HTTP ${health.status}`)
+      assert(Array.isArray(healthData.health), 'saúde administrativa')
+      assert(
+        healthData.health.some((metric) => metric.metric === 'last_billing_sync'),
+        'último sync ausente',
+      )
+
       const supplier = await fetch(`${edgeBase}/admin-api?view=analytics`, {
         headers: { Authorization: `Bearer ${supplierAal2Token}` },
       })

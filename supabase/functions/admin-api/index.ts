@@ -97,6 +97,18 @@ async function getAudit(
   })
 }
 
+async function getHealth(
+  supabase: SupabaseClient,
+  req: Request,
+  adminId: string,
+): Promise<Response> {
+  const { data, error } = await supabase.rpc('api_admin_health', {
+    p_actor_id: adminId,
+  })
+  if (error) throw rpcError(error)
+  return jsonResponse(req, { health: data ?? [] })
+}
+
 async function getFinance(
   supabase: SupabaseClient,
   req: Request,
@@ -148,6 +160,7 @@ async function handleGet(
   if (view === 'audit') return getAudit(supabase, req, url)
   if (view === 'analytics') return getAnalytics(supabase, req, url, adminId)
   if (view === 'finance') return getFinance(supabase, req, url, adminId)
+  if (view === 'health') return getHealth(supabase, req, adminId)
   throw new HttpError(400, 'invalid_view', 'Visão administrativa inválida.')
 }
 

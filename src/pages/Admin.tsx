@@ -15,6 +15,8 @@ import type {
   AdminAuditEvent,
   AdminFinancialMetric,
   AdminFinancialResponse,
+  AdminHealthMetric,
+  AdminHealthResponse,
   AdminAuditResponse,
   AdminOrganization,
   AdminOrganizationsResponse,
@@ -66,6 +68,8 @@ export function Admin() {
   const [analytics, setAnalytics] = useState<AdminAnalyticsEvent[]>([])
   const [analyticsSources, setAnalyticsSources] = useState<AdminAnalyticsSource[]>([])
   const [financial, setFinancial] = useState<AdminFinancialMetric[]>([])
+  const [health, setHealth] = useState<AdminHealthMetric[]>([])
+  const [days, setDays] = useState(30)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
@@ -81,7 +85,8 @@ export function Admin() {
       setLoading(true)
       setError(null)
       try {
-        const [overviewData, listData, auditData, analyticsData, financialData] = await Promise.all([
+        const [overviewData, listData, auditData, analyticsData, financialData, healthData] =
+          await Promise.all([
           callAuthedGet<{ overview: AdminOverview }>('admin-api', { view: 'overview' }),
           callAuthedGet<AdminOrganizationsResponse>('admin-api', {
             view: 'organizations',
@@ -98,12 +103,13 @@ export function Admin() {
           }),
           callAuthedGet<AdminAnalyticsResponse>('admin-api', {
             view: 'analytics',
-            days: 30,
+            days,
           }),
           callAuthedGet<AdminFinancialResponse>('admin-api', {
             view: 'finance',
-            days: 30,
+            days,
           }),
+          callAuthedGet<AdminHealthResponse>('admin-api', { view: 'health' }),
         ])
         setOverview(overviewData.overview)
         setOrganizations(listData.organizations ?? [])
@@ -112,6 +118,7 @@ export function Admin() {
         setAnalytics(analyticsData.events ?? [])
         setAnalyticsSources(analyticsData.sources ?? [])
         setFinancial(financialData.metrics ?? [])
+        setHealth(healthData.health ?? [])
       } catch (loadError) {
         setError(
           loadError instanceof EdgeFunctionError
@@ -122,7 +129,7 @@ export function Admin() {
         setLoading(false)
       }
     },
-    [planFilter, search, session, stateFilter],
+    [days, planFilter, search, session, stateFilter],
   )
 
   useEffect(() => {
@@ -203,6 +210,14 @@ export function Admin() {
           <h1>Console administrativo</h1>
         </div>
         <div className="admin-header-actions">
+          <label className="admin-period">
+            <span>Período</span>
+            <select value={days} onChange={(event) => setDays(Number(event.target.value))}>
+              <option value={7}>7 dias</option>
+              <option value={30}>30 dias</option>
+              <option value={90}>90 dias</option>
+            </select>
+          </label>
           <ThemeToggle compact />
           <Link className="text-link" to="/app">
             Área do fornecedor
@@ -286,6 +301,48 @@ export function Admin() {
               Custos Meta/DeepSeek/Resend aparecem como indisponíveis quando a fonte não está
               conectada; o painel não calcula lucro sem despesas completas.
             </p>
+          </section>
+
+          <section className="card">
+            <div className="card-heading">
+              <div>
+                <span className="eyebrow">Operação</span>
+                <h2>Saúde e integrações</h2>
+              </div>
+              <span className="muted">fontes externas não conectadas ficam explícitas</span>
+            </div>
+            <div className="table-wrap">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Métrica</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Detalhe</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {health.map((metric) => (
+                    <tr key={metric.metric}>
+                      <td data-label="Métrica">{metric.metric}</td>
+                      <td data-label="Valor">{metric.value_count}</td>
+                      <td data-label="Status">
+                        <span className={`badge ${metric.status === 'warning' ? 'badge-muted' : 'badge-active'}`}>
+                          {metric.status}
+                        </span>
+                      </td>
+                      <td data-label="Detalhe">{metric.detail}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <ul className="settings-list">
+              <li><strong>Meta Ads:</strong> não conectado; custos indisponíveis.</li>
+              <li><strong>DeepSeek:</strong> não conectado; custos/uso indisponíveis.</li>
+              <li><strong>Resend/SMTP:</strong> não conectado; envio automático indisponível.</li>
+              <li><strong>Search Console:</strong> não conectado; requer verificação externa.</li>
+            </ul>
           </section>
 
           <section className="card">

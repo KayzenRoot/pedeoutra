@@ -24,7 +24,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #45 | Lembretes manuais com consentimento e histórico | implementado; envio automático desligado |
 | #78 | Analytics first-party do funil, consentimento e fontes | implementado |
 | #79 | Métricas financeiras administrativas (MRR, recebimentos, churn) | implementado |
-| #80 | Dashboard executivo 360° | parcial: overview, organizações, auditoria, funil e financeiro |
+| #80 | Dashboard executivo 360° | implementado no escopo interno; fontes externas ficam indisponíveis |
 | #74 | SEO técnico: robots, sitemap, metadados e Schema.org | implementado (prerender/status HTTP fica para #73) |
 | #75 | Páginas setoriais B2B com conteúdo e CTA | implementado (5 setores) |
 | #73 | Prerender comercial, 404 real, rewrites e noindex | implementado |
@@ -199,9 +199,10 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 - O console `/admin` (UUID+AAL2) ganhou cartões de funil/analytics e tabela
   financeira; visão geral, organizações, auditoria, filtros e ações seguem no
   mesmo console. Fornecedor/equipe/AAL1 continuam negados nas rotas globais.
-- #80 permanece parcial: faltam seções de Meta/DeepSeek/Resend/API e saúde de
-  integrações, que dependem de fontes externas/Parte 4; o painel atual não
-  inventa valores ausentes.
+- #80 cobre overview, organizações, auditoria, funil/analytics, financeiro,
+  filtros 7/30/90 e saúde/integrações. Meta Ads, DeepSeek, Resend/SMTP e Search
+  Console aparecem como não conectados; não há valores inventados. Métricas
+  externas reais dependem dessas integrações.
 
 ## #74 — SEO técnico
 
