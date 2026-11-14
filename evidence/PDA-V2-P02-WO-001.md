@@ -28,6 +28,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #74 | SEO técnico: robots, sitemap, metadados e Schema.org | implementado (prerender/status HTTP fica para #73) |
 | #75 | Páginas setoriais B2B com conteúdo e CTA | implementado (5 setores) |
 | #73 | Prerender comercial, 404 real, rewrites e noindex | implementado |
+| #81 | Glass/tokens e motion acessível na landing | parcial (landing/cards; biblioteca completa pendente) |
+| #82 | Landing V2 com dois planos, recursos, setores e FAQ | implementado no escopo comercial atual |
 | #76 | Monitoramento SEO em CI e GSC | CI implementada; GSC externo pendente |
 | #64/#65/#67 | API B2B v1: chaves, escopos, gateway, quota e OpenAPI | implementado (leitura) |
 | #66 | Webhooks B2B de eventos com HMAC e retry | implementado com entrega desligada |
@@ -255,6 +257,19 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   robots, rewrites e 404 real; foi adicionado à CI e ao `npm run verify`.
 - GSC/CWV real depende de propriedade Google e deploy público autorizado:
   permanece `EXTERNAL_SETUP_REQUIRED`, sem números falsos.
+
+## #81/#82 — landing V2 e design
+
+- Landing reorganizada com hero, como funciona, recursos por grupo, setores,
+  comparação dos dois planos, FAQ ampliado e CTA; claims separam Essencial,
+  Profissional e integrações que exigem Meta/WABA ou ainda são futuras.
+- Tokens de vidro existentes foram aplicados aos planos com fallback sólido;
+  cards têm elevação/hover sutil apenas em `hover: hover` e `pointer: fine`, com
+  `prefers-reduced-motion` respeitado. Contraste/axe e mobile/light/dark
+  continuam passando.
+- A biblioteca completa de componentes GlassCard/FeatureCard/StatCard e motion
+  por IntersectionObserver do #81 permanece parcial; a landing usa os
+  componentes existentes e CSS sem dependência nova.
 
 ## Evidência local (HEAD de trabalho)
 

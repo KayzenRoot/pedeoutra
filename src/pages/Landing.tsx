@@ -36,6 +36,21 @@ const FAQ = [
       'No MVP, não. Você compartilha links de WhatsApp pré-preenchidos com um clique. Nenhuma mensagem é enviada automaticamente.',
   },
   {
+    question: 'A API e a equipe estão incluídas?',
+    answer:
+      'A API de leitura e até 3 usuários fazem parte do Profissional. A API tem 10.000 requisições por mês e 60 por minuto por chave; equipe tem owner, gerente, operador e visualizador.',
+  },
+  {
+    question: 'O WhatsApp automático está disponível?',
+    answer:
+      'Ainda não como envio automático. O WhatsApp manual funciona em todos os planos. O envio oficial exige WABA, templates aprovados e consentimento; o custo é do fornecedor e a integração fica desligada por padrão.',
+  },
+  {
+    question: 'O PedeOutra cobra uma taxa por pedido?',
+    answer:
+      'Não. A assinatura é a única cobrança do PedeOutra. Os pedidos dos seus clientes são combinados diretamente entre você e eles, sem pagamento dentro da plataforma.',
+  },
+  {
     question: 'Meus dados ficam separados de outros fornecedores?',
     answer:
       'Sim. O banco aplica isolamento por organização (RLS) e as APIs públicas só devolvem dados estritamente públicos do catálogo.',
@@ -127,6 +142,7 @@ export function Landing() {
         <Brand />
         <nav className="site-nav" aria-label="Navegação do site">
           <a href="#como-funciona">Como funciona</a>
+          <a href="#recursos">Recursos</a>
           <a href="#preco">Preço</a>
           <a href="#faq">Dúvidas</a>
           <Link to="/demo">Demonstração</Link>
@@ -326,6 +342,52 @@ export function Landing() {
                 </span>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section id="recursos" className="section">
+          <div className="section-heading">
+            <span className="eyebrow">Recursos</span>
+            <h2>Do catálogo à recorrência, sem planilha paralela</h2>
+            <p>
+              Recursos marcados como Profissional dependem do plano ativo. Integrações externas
+              aparecem com o requisito real, sem prometer o que ainda não está conectado.
+            </p>
+          </div>
+          <div className="feature-grid">
+            <article className="feature-card">
+              <span className="pill pill-lime">Essencial</span>
+              <h3>Catálogo e pedidos</h3>
+              <ul>
+                <li><Icon name="check" /> Catálogo público com categorias e fotos</li>
+                <li><Icon name="check" /> SKU, busca e pedido por lista</li>
+                <li><Icon name="check" /> Mínimos, múltiplos e importação CSV/XLSX</li>
+                <li><Icon name="check" /> QR code e acompanhamento por link</li>
+                <li><Icon name="check" /> Comprovante PDF não fiscal</li>
+              </ul>
+            </article>
+            <article className="feature-card">
+              <span className="pill">Profissional</span>
+              <h3>Relacionamento e retenção</h3>
+              <ul>
+                <li><Icon name="check" /> Tabelas de preço por comprador</li>
+                <li><Icon name="check" /> Orçamentos com aceite por link</li>
+                <li><Icon name="check" /> Radar de recompra por cadência real</li>
+                <li><Icon name="check" /> Lembretes manuais com opt-in</li>
+                <li><Icon name="check" /> Analytics first-party consentido</li>
+              </ul>
+            </article>
+            <article className="feature-card">
+              <span className="pill">Profissional</span>
+              <h3>Escala e integrações</h3>
+              <ul>
+                <li><Icon name="check" /> Equipe com RBAC e convites</li>
+                <li><Icon name="check" /> API REST de leitura, chaves e quota</li>
+                <li><Icon name="check" /> Webhooks assinados de pedidos</li>
+                <li><Icon name="check" /> WhatsApp oficial — requer WABA/Meta</li>
+                <li><Icon name="check" /> Meta Ads/DeepSeek — integrações futuras</li>
+              </ul>
+            </article>
           </div>
         </section>
 

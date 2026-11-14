@@ -121,7 +121,7 @@ gates de lançamento.
   (#79), dashboard 360° parcial (#80), SEO técnico (#74) e API B2B v1 de
   leitura (#64/#65/#67), webhooks B2B (#66), páginas setoriais (#75),
   prerender/404 real (#73), monitoramento SEO em CI (#76) e dashboard 360°
-  interno (#80).
+  interno (#80), landing V2 (#82) e glass/motion parcial (#81).
 - **Evidência local no HEAD de trabalho:** 71 DB, 56 Edge HTTP, 150 unit,
   57 Edge Functions typechecked, 7 grupos full-local, restore com preço,
   orçamento, WhatsApp, equipe, lembretes, analytics, API e webhooks, e smoke
