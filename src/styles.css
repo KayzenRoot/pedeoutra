@@ -3561,3 +3561,126 @@ svg {
   flex-wrap: wrap;
   margin-top: 14px;
 }
+
+/* Part 2 — templates de catálogo */
+.template-picker {
+  margin-top: 18px;
+}
+
+.template-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+  border: 0;
+  padding: 0;
+}
+
+.template-option {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px;
+}
+
+.template-option[aria-pressed="true"] {
+  border-color: var(--brand-navy);
+  box-shadow: 0 0 0 2px var(--lime);
+}
+
+.template-option strong {
+  font-size: 0.9rem;
+}
+
+.template-option span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.template-option small {
+  color: var(--blue);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.template-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+  font-size: 0.8rem;
+}
+
+.template-items {
+  display: grid;
+  gap: 8px;
+}
+
+.template-item {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.7fr) minmax(260px, 2fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--surface-2);
+}
+
+.template-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.template-fields {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 0.8fr 0.6fr 0.6fr;
+  gap: 6px;
+}
+
+.template-fields input {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field-bg);
+  color: var(--ink);
+  padding: 7px 8px;
+  font-size: 0.78rem;
+}
+
+.template-price {
+  color: var(--muted);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.template-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.template-empty {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+@media (max-width: 760px) {
+  .template-item {
+    grid-template-columns: 1fr;
+  }
+
+  .template-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}

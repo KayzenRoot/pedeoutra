@@ -1,18 +1,22 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Brand } from '../components/Brand'
+import { CatalogTemplatePicker } from '../components/CatalogTemplatePicker'
 import { FormMessage } from '../components/ui'
 import { useAuth } from '../context/auth-context'
 import { slugify } from '../lib/format'
 
 export function Onboarding() {
-  const { createOrganization, user } = useAuth()
+  const { createOrganization, user, organization } = useAuth()
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [city, setCity] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [step, setStep] = useState<'organization' | 'template'>(
+    organization ? 'template' : 'organization',
+  )
 
   const previewSlug = slugify(name) || 'seu-fornecedor'
 
@@ -22,7 +26,7 @@ export function Onboarding() {
     setSubmitting(true)
     try {
       await createOrganization({ name, whatsapp, city })
-      navigate('/app', { replace: true })
+      setStep('template')
     } catch (submitError) {
       setError(
         submitError instanceof Error
@@ -32,6 +36,43 @@ export function Onboarding() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (step === 'template') {
+    return (
+      <div className="onboarding">
+        <header className="onboarding-header">
+          <Brand />
+          <span className="muted">Conta: {user?.email}</span>
+        </header>
+        <main className="onboarding-main">
+          <div className="onboarding-copy">
+            <span className="eyebrow">Primeiro catálogo</span>
+            <h1>Comece com um modelo do seu segmento</h1>
+            <p>
+              Escolha itens genéricos, edite nomes e unidades e confirme somente o que você
+              vende. Nenhum preço, estoque ou disponibilidade é inventado.
+            </p>
+            <ul className="onboarding-list">
+              <li>
+                <strong>1.</strong> Dados comerciais mínimos
+              </li>
+              <li>
+                <strong>2.</strong> Modelo opcional de catálogo
+              </li>
+              <li>
+                <strong>3.</strong> Link pronto para compartilhar
+              </li>
+            </ul>
+          </div>
+          <CatalogTemplatePicker
+            mode="onboarding"
+            onSeeded={() => navigate('/app', { replace: true })}
+            onSkip={() => navigate('/app', { replace: true })}
+          />
+        </main>
+      </div>
+    )
   }
 
   return (

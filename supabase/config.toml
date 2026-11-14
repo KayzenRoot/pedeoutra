@@ -96,3 +96,9 @@ verify_jwt = true
 
 [functions.product-import]
 verify_jwt = true
+
+[functions.catalog-templates]
+verify_jwt = false
+
+[functions.onboarding-seed]
+verify_jwt = true

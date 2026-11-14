@@ -177,3 +177,25 @@ export interface OrderWithCustomer extends Order {
 export interface OrderItemDetail extends OrderItem {
   products: { active: boolean } | null
 }
+
+
+export interface CatalogTemplateItem {
+  key: string
+  name: string
+  category: string
+  unit: string
+  min_quantity: number
+  quantity_increment: number
+}
+
+export interface CatalogTemplate {
+  code: string
+  name: string
+  description: string
+  version: number
+  items: CatalogTemplateItem[]
+}
+
+export interface CatalogTemplatesResponse {
+  templates: CatalogTemplate[]
+}

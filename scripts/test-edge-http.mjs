@@ -1036,6 +1036,111 @@ async function main() {
       assert(commit.data.error === 'import_validation_failed', 'erro de validação')
     })
 
+
+    await test('catalog-templates expõe cinco modelos sem preço', async () => {
+      const response = await fetch(`${edgeBase}/catalog-templates`)
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status}`)
+      assert(data.templates.length === 5, `templates ${data.templates.length}`)
+      const packaging = data.templates.find((template) => template.code === 'packaging')
+      assert(packaging.items.length > 0, 'template packaging vazio')
+      assert(!('price_cents' in packaging.items[0]), 'template não deve ter preço')
+      const empty = data.templates.find((template) => template.code === 'empty')
+      assert(empty.items.length === 0, 'template vazio')
+    })
+
+    await test('onboarding-seed valida, cria e é idempotente', async () => {
+      const items = [
+        {
+          item_key: 'copo-200',
+          name: 'Copo descartável 200ml',
+          category: 'Copos e potes',
+          unit: 'cento',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+        {
+          item_key: 'sacola',
+          name: 'Sacola plástica reforçada',
+          category: 'Sacolas e sacos',
+          unit: 'pacote',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const preview = await call(
+        'onboarding-seed',
+        { mode: 'preview', template_code: 'packaging', template_version: 1, items },
+        { token: userToken },
+      )
+      assert(preview.status === 200, `preview HTTP ${preview.status}`)
+      assert(preview.data.summary.conflicts === 0, 'preview deveria estar sem conflito')
+
+      const jobId = crypto.randomUUID()
+      const commit = await call(
+        'onboarding-seed',
+        {
+          mode: 'commit',
+          job_id: jobId,
+          template_code: 'packaging',
+          template_version: 1,
+          items,
+        },
+        { token: userToken },
+      )
+      assert(commit.status === 200, `commit HTTP ${commit.status}`)
+      assert(commit.data.summary.created_count === 2, 'created_count')
+      const retry = await call(
+        'onboarding-seed',
+        {
+          mode: 'commit',
+          job_id: jobId,
+          template_code: 'packaging',
+          template_version: 1,
+          items,
+        },
+        { token: userToken },
+      )
+      assert(retry.data.summary.created_count === 2, 'retry não idempotente')
+
+      const after = await call(
+        'onboarding-seed',
+        { mode: 'preview', template_code: 'packaging', template_version: 1, items },
+        { token: userToken },
+      )
+      assert(after.data.summary.conflicts === 2, 'conflito pós-seed não detectado')
+      const price = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select price_cents from public.products where organization_id = '${ORG_ID}' and name = 'Copo descartável 200ml'`,
+      ]).stdout.trim()
+      assert(price === '', `template inventou preço: ${price}`)
+    })
+
+    await test('onboarding-seed rejeita item fora do template', async () => {
+      const response = await call(
+        'onboarding-seed',
+        {
+          mode: 'preview',
+          template_code: 'packaging',
+          template_version: 1,
+          items: [
+            {
+              item_key: 'inventado',
+              name: 'Produto inventado',
+              category: 'X',
+              unit: 'un',
+              min_quantity: 1,
+              quantity_increment: 1,
+            },
+          ],
+        },
+        { token: userToken },
+      )
+      assert(response.status === 400, `HTTP ${response.status}`)
+      assert(response.data.error === 'invalid_seed_items', 'erro de item inválido')
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useAuth } from '../context/auth-context'
+import { CatalogTemplatePicker } from '../components/CatalogTemplatePicker'
 import { ProductImportPanel } from '../components/ProductImportPanel'
 import { ProductMediaManager } from '../components/ProductMediaManager'
 import { supabase } from '../lib/supabase'
@@ -562,6 +563,14 @@ export function Products() {
 
       <ProductImportPanel
         onImported={async () => {
+          await loadProducts()
+          await loadCategories()
+        }}
+      />
+
+      <CatalogTemplatePicker
+        mode="store"
+        onSeeded={async () => {
           await loadProducts()
           await loadCategories()
         }}

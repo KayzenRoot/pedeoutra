@@ -1340,6 +1340,115 @@ async function main() {
       )
     })
 
+
+    await test('template cria somente itens escolhidos e é idempotente', async () => {
+      const jobId = crypto.randomUUID()
+      const items = [
+        {
+          item_key: 'copo-200',
+          name: 'Copo descartável 200ml',
+          category: 'Copos e potes',
+          unit: 'cento',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+        {
+          item_key: 'sacola',
+          name: 'Sacola plástica reforçada',
+          category: 'Sacolas e sacos',
+          unit: 'pacote',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const first = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(first.rows[0].created_count === 2, `created ${first.rows[0].created_count}`)
+      assert(first.rows[0].skipped_count === 0, `skipped ${first.rows[0].skipped_count}`)
+      const created = await client.query(
+        `select id, price_cents, active from public.products
+          where organization_id = $1 and name = 'Copo descartável 200ml'`,
+        [orgA.id],
+      )
+      assert(created.rows.length === 1, 'produto do template ausente')
+      assert(created.rows[0].price_cents === null, 'template não pode inventar preço')
+      assert(created.rows[0].active === true, 'produto deveria ficar ativo')
+
+      const retry = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(retry.rows[0].created_count === 2, 'job não idempotente')
+
+      const newJob = crypto.randomUUID()
+      const rerun = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [newJob, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(rerun.rows[0].created_count === 0, 'novo job duplicou produtos')
+      assert(rerun.rows[0].skipped_count === 2, 'itens já semeados deveriam ser ignorados')
+    })
+
+    await test('template ignora conflito por nome e não cruza tenant', async () => {
+      await client.query(`update public.products set name = 'Copo descartável 300ml' where id = $1`, [
+        productA2.id,
+      ])
+      const jobId = crypto.randomUUID()
+      const items = [
+        {
+          item_key: 'copo-300',
+          name: 'Copo descartável 300ml',
+          category: 'Copos e potes',
+          unit: 'cento',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const result = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(result.rows[0].created_count === 0, 'conflito por nome deveria ser ignorado')
+      assert(result.rows[0].skipped_count === 1, 'conflito não contabilizado')
+      const linked = await client.query(
+        `select product_id from public.catalog_seed_items
+          where organization_id = $1 and template_code = 'packaging' and item_key = 'copo-300'`,
+        [orgA.id],
+      )
+      assert(linked.rows[0].product_id === productA2.id, 'seed não apontou produto existente')
+      const price = await client.query('select price_cents from public.products where id = $1', [
+        productA2.id,
+      ])
+      assert(price.rows[0].price_cents === 1300, 'template sobrescreveu preço existente')
+
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+              [jobId, orgB.id, USER_A, JSON.stringify(items)],
+            ),
+          ),
+        'seed_job_tenant_mismatch',
+        'job de seed de outro tenant',
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select id from public.catalog_seed_jobs')),
+        'permission denied',
+        'fornecedor lendo jobs de template',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

@@ -55,6 +55,19 @@ export async function callPublicFunction<T>(
   return parseResponse<T>(response)
 }
 
+export async function getCatalogTemplates<T>(): Promise<T> {
+  if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/catalog-templates`, {
+    headers: {
+      apikey: ANON_KEY,
+      Authorization: `Bearer ${ANON_KEY}`,
+    },
+  })
+
+  return parseResponse<T>(response)
+}
+
 export async function getPlanCatalog<T>(): Promise<T> {
   if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
 
