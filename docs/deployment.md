@@ -25,8 +25,8 @@ decisão de backup/continuidade (ADR-009 PROPOSED) e auditoria. `pedeoutra.pages
 | Repositório Pages | `KayzenRoot/pedeoutra`, branch de produção `main` |
 | Build Pages | `npm run build`; output `dist`; Node 22; auto-deploy a cada push em `main` |
 | Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
-| Migrations | 4 migrations aplicadas no staging; +2 migrations V2 no repositório, **não aplicadas** |
-| Edge Functions | 11 publicadas; 4 novas no repositório (`admin-api`, `admin-bootstrap`, `change-plan`, `plan-catalog`) **não publicadas**; total 15 |
+| Migrations | **6 migrations aplicadas** (4 MVP + 2 V2) |
+| Edge Functions | **15 publicadas** (11 MVP + 4 V2); 4 da Parte 2 no repositório, **não publicadas** |
 | Auth | Site URL/redirects do Pages; fluxo de recuperação de senha; `mailer_autoconfirm=true` até configurar SMTP próprio |
 | Asaas | Produção configurada (API key, checkout e webhook); Sandbox removido/limpo |
 | Webhook Asaas produção | id `71177108-9a90-43be-92b3-a9cf91595169`, 13 eventos, `enabled=true` |
@@ -196,7 +196,7 @@ Nunca configurar `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY` ou
    evitar alteração de estado; procedimento e deployment anterior estão
    registrados.
 
-## Delta V2 — Parte 1/5 (PROPOSED, não implantado)
+## Delta V2 — Parte 1/5 (implantado em 2026-11-13)
 
 Variáveis **novas** de Edge Function (nunca no frontend):
 
