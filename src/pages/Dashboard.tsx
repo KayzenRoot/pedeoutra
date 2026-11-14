@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CatalogQrPanel } from '../components/CatalogQrPanel'
 import { useAuth } from '../context/auth-context'
 import { ACCESS_TEXT, organizationAccess } from '../lib/access'
 import { formatBRL, formatDateTime, statusLabel, statusTone } from '../lib/format'
@@ -290,6 +291,13 @@ export function Dashboard() {
           </div>
         )}
       </section>
+
+      {organization && (
+        <CatalogQrPanel
+          slug={organization.slug}
+          organizationName={organization.name}
+        />
+      )}
     </div>
   )
 }
