@@ -3,7 +3,7 @@
 Data: 2026-11-14
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
-HEAD de código revisado: `246fc4e`
+HEAD de código revisado: `4718946`
 Base de produção: `main` com Parte 1 ativa (`57511a3`)
 
 ## Estado por parte
@@ -14,9 +14,9 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | 2/5 | completa no branch | #46–#58, #63; sem deploy de produção |
 | 3/5 | parcial | #44/#45/#78/#79; #34–#42 dependem de DeepSeek/Resend/Meta e orçamento |
 | 4/5 | parcial | API B2B v1 leitura (#64/#65/#66/#67); #68–#71 dependem de Meta/DeepSeek |
-| 5/5 | parcial | #74/#75 e landing de dois planos; #72/#73/#76/#81–#83 pendentes |
+| 5/5 | implementado no escopo interno | #73–#76/#80/#82; #81 parcial; #72/#83 produção BLOCKED_DEPLOY |
 
-## Evidência final (HEAD 246fc4e)
+## Evidência final (HEAD 4718946)
 
 | Verificação | Resultado |
 | --- | --- |
@@ -29,6 +29,7 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
 | `npm run test:restore` | PASS, contagens/checksums idênticos |
 | `npm run build` | exit 0 |
+| `npm run test:seo` | PASS HTML inicial, canonical/JSON-LD, sitemap, robots e 404 real |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, axe 0 violações |
 | SonarCloud | **0 issues; quality gate OK** (new-code duplication 2.7%) |
 
@@ -52,7 +53,9 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 - #64/#65/#66/#67 API B2B v1 de leitura, chaves/escopos/quota, OpenAPI e webhooks assinados.
 - #44/#45 radar de recompra e lembretes manuais com opt-in.
 - #78 analytics first-party consentido, com admin agregado.
-- #79 métricas financeiras administrativas; #80 parcial (overview, organizações, auditoria, funil e financeiro).
+- #79 métricas financeiras e #80 dashboard interno com período, saúde e integrações.
+- #73 prerender comercial + 404 real; #74/#75 SEO/setores; #76 monitoramento SEO em CI; #82 landing V2; #81 glass/motion parcial.
+- #83 auditoria integrada interna aprovada; #72 gate de produção BLOCKED_DEPLOY.
 
 ## Invariantes de segurança verificados
 
@@ -77,6 +80,6 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 
 ## Veredito proposto
 
-`PART 2 COMPLETE IN BRANCH / PARTS 3–5 PARTIAL — EXTERNAL BLOCKERS`
+`PART 2–5 IMPLEMENTED IN BRANCH / INTERNAL AUDIT APPROVED — BLOCKED_DEPLOY / COMMERCIAL_BLOCKED`
 com `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` mantidos. Nenhum merge ou deploy
 produtivo foi executado.
