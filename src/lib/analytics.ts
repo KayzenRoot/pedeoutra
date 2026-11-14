@@ -104,8 +104,7 @@ function originData(): OriginData {
   const utmCampaign = params.get('utm_campaign')?.trim().slice(0, 80) || null
   const referrer = document.referrer
   let referrerClass: OriginData['referrer_class'] = 'direct'
-  if (!referrer) referrerClass = 'direct'
-  else if (utmMedium === 'cpc' || utmMedium === 'paid' || utmMedium === 'ads') {
+  if (utmMedium === 'cpc' || utmMedium === 'paid' || utmMedium === 'ads') {
     referrerClass = 'paid'
   } else if (/google|bing|duckduckgo|yahoo|ecosia/i.test(referrer)) {
     referrerClass = 'organic'

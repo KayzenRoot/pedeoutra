@@ -56,9 +56,11 @@ export function sanitizeAnalyticsPath(value: unknown): string | null {
   return path
 }
 
-export function sanitizeMetadata(value: unknown): Record<string, string | number | boolean> {
+export type AnalyticsMetadataValue = string | number | boolean
+
+export function sanitizeMetadata(value: unknown): Record<string, AnalyticsMetadataValue> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
-  const result: Record<string, string | number | boolean> = {}
+  const result: Record<string, AnalyticsMetadataValue> = {}
   for (const [key, raw] of Object.entries(value)) {
     if (!METADATA_KEYS.has(key)) continue
     if (typeof raw === 'string') result[key] = raw.slice(0, 80)
@@ -80,7 +82,7 @@ export async function recordServerAnalytics(
     event: string
     organizationId: string
     userId: string | null
-    metadata?: Record<string, string | number | boolean>
+    metadata?: Record<string, AnalyticsMetadataValue>
   },
 ): Promise<void> {
   const { error } = await supabase.from('analytics_events').insert({

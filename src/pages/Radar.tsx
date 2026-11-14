@@ -91,6 +91,18 @@ export function Radar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId, page, isProfessional])
 
+  function radarState() {
+    if (loading) return <p className="muted">Calculando cadência…</p>
+    if (rows.length === 0) {
+      return (
+        <p className="muted">
+          Nenhum cliente com pedidos confirmados/concluídos suficiente para o radar.
+        </p>
+      )
+    }
+    return null
+  }
+
   function submitSearch(event: React.FormEvent) {
     event.preventDefault()
     setPage(0)
@@ -198,13 +210,7 @@ export function Radar() {
           </form>
         </div>
 
-        {loading ? (
-          <p className="muted">Calculando cadência…</p>
-        ) : rows.length === 0 ? (
-          <p className="muted">
-            Nenhum cliente com pedidos confirmados/concluídos suficiente para o radar.
-          </p>
-        ) : (
+        {radarState() ?? (
           <div className="table-wrap">
             <table className="data-table">
               <thead>

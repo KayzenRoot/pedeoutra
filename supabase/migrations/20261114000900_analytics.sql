@@ -142,10 +142,8 @@ begin
   union all
   select derived.event, derived.sessions, derived.events, derived.last_seen
     from derived
-   where not exists (
-     select 1 from observed o where o.event = derived.event
-   )
-   order by 1;
+   where derived.event not in (select o.event from observed o)
+   order by event asc;
 end;
 $$;
 

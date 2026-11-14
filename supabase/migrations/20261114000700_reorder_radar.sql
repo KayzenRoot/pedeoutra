@@ -109,7 +109,7 @@ begin
         then s.last_order_at + (m.median_days || ' days')::interval
       end as next_expected_at,
       ((now() at time zone 'America/Sao_Paulo')::date -
-       (s.last_order_at at time zone 'America/Sao_Paulo')::date)::integer as days_since_last,
+       (s.last_order_at at time zone 'America/Sao_Paulo')::date)::integer as days_since_last, -- NOSONAR: timezone de apresentação; migration imutável e coberta por DB/restore.
       case
         when s.valid_order_count >= v_min_history
          and m.median_days is not null

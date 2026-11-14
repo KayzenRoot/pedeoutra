@@ -3,7 +3,7 @@
 
 alter table public.organizations
   add column reorder_reminder_enabled boolean not null default false,
-  add column reorder_reminder_channel text not null default 'manual',
+  add column reorder_reminder_channel text not null default 'manual', -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
   add column reorder_reminder_frequency_days integer not null default 7;
 
 alter table public.organizations
