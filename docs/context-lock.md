@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 - Base SHA: `7db00c5b3c066cf3e75d0f8fedac107b26720a35`
-- HEAD no momento da geração: `e53b3c2e4f732e68c0e8e566afb945b79c462704`
+- HEAD no momento da geração: `d83d420e39d098fe2611960fcbd873c9a6158fb3`
 - Work Order: `PDA-V2-P02-WO-001 + incrementos Partes 3–5 (PROPOSED)`
 
 ## Issues verificadas (sem duplicatas)
@@ -250,7 +250,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `supabase/migrations/20261114000200_order_tracking.sql` | `7cfd3402553818444a9522d4006629c5629cb0d9781add143b5906a0cb879c00` |
 | `supabase/migrations/20261114000300_customer_prices.sql` | `84e130a3286bfca4c30624f738832c950365de62e744c984132a7f479e3878d4` |
 | `supabase/migrations/20261114000400_quotes.sql` | `9cbd768a2d45f3f1e5535b27c6d0b48b56cf8ac053b83024da44ff6142662f92` |
-| `supabase/migrations/20261114000500_whatsapp_contract.sql` | `49cba7cbe69146367a4795534b94e00e5f1770f11d511d935e712cae9171fe85` |
+| `supabase/migrations/20261114000500_whatsapp_contract.sql` | `4b83922c90fd4138283f1e550a58f511f3249d9b43cbaf7c8266eac900c2ae25` |
 | `supabase/migrations/20261114000600_team_rbac.sql` | `e586948ab62cf6d4c6248d40ac376b201ece22f4553cdc1dcc570c6c8c05b196` |
 | `supabase/migrations/20261114000700_reorder_radar.sql` | `c9ba5fd285ded9f68f827be2e45f44b7595632b8428a094c3a1195cb582c5770` |
 | `supabase/migrations/20261114000800_reorder_reminders.sql` | `f310c6722b78976235d4945066946ab0af1dd485dc2e1c72287f7c501f8ac9ea` |
