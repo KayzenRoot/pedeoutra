@@ -25,3 +25,45 @@
   X-Robots-Tag: noindex, nofollow
   Referrer-Policy: no-referrer
   Cache-Control: no-store
+
+/app
+  X-Robots-Tag: noindex, nofollow
+
+/app/*
+  X-Robots-Tag: noindex, nofollow
+
+/admin
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/entrar
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/criar-conta
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/recuperar-senha
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/redefinir-senha
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/onboarding
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/c/*
+  X-Robots-Tag: noindex, nofollow
+
+/r/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store

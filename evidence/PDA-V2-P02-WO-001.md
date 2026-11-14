@@ -27,6 +27,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #80 | Dashboard executivo 360° | parcial: overview, organizações, auditoria, funil e financeiro |
 | #74 | SEO técnico: robots, sitemap, metadados e Schema.org | implementado (prerender/status HTTP fica para #73) |
 | #75 | Páginas setoriais B2B com conteúdo e CTA | implementado (5 setores) |
+| #73 | Prerender comercial, 404 real, rewrites e noindex | implementado |
+| #76 | Monitoramento SEO em CI e GSC | CI implementada; GSC externo pendente |
 | #64/#65/#67 | API B2B v1: chaves, escopos, gateway, quota e OpenAPI | implementado (leitura) |
 | #66 | Webhooks B2B de eventos com HMAC e retry | implementado com entrega desligada |
 
@@ -238,6 +240,20 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 - Cada página usa canonical/description próprios e está no sitemap; links da
   landing e a navegação pública levam aos setores. Conteúdo é estático, sem PII
   ou promessa de recurso não implementado.
+
+## #73/#76 — prerender, 404 real e monitoramento SEO
+
+- `npm run build` agora gera HTML estático para `/`, `/demo`, `/privacidade`,
+  `/termos` e os cinco setores via React SSR + `StaticRouter`, com H1, planos e
+  CTAs no HTML inicial; o SPA assume depois.
+- `_redirects` foi trocado de catch-all para rewrites explícitas de rotas
+  privadas/catálogo; URLs inexistentes recebem `404.html` real, sem soft-404.
+  `_headers` marca app, admin, auth, onboarding, `/c/*`, `/r/*`, `/p/*`, `/o/*`,
+  `/convite/*` e `/acompanhar/*` como noindex; tokens não entram no sitemap.
+- `npm run test:seo` valida HTML inicial, preços, canonical/JSON-LD, sitemap,
+  robots, rewrites e 404 real; foi adicionado à CI e ao `npm run verify`.
+- GSC/CWV real depende de propriedade Google e deploy público autorizado:
+  permanece `EXTERNAL_SETUP_REQUIRED`, sem números falsos.
 
 ## Evidência local (HEAD de trabalho)
 
