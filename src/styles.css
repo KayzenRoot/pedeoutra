@@ -1822,6 +1822,66 @@ svg {
   margin-left: 0;
 }
 
+.price-list-picker {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.price-list-picker li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-subtle, transparent);
+}
+
+.price-list-picker li.active {
+  border-color: var(--accent);
+}
+
+.price-list-picker .text-button {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.price-list-picker small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.price-input {
+  width: 100%;
+  min-width: 96px;
+  max-width: 140px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.price-link-row {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.price-link-url {
+  word-break: break-all;
+}
+
+.price-link-row small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
 .cell-sub {
   display: block;
   color: var(--muted);

@@ -23,6 +23,16 @@ export function throwOrderError(error: { message?: string } | null): never {
   if (message.includes('invalid_reorder_link')) {
     throw new HttpError(404, 'link_unavailable', 'Este link não está mais disponível.')
   }
+  if (message.includes('invalid_price_token')) {
+    throw new HttpError(
+      404,
+      'price_link_unavailable',
+      'Este link de preços não está mais disponível.',
+    )
+  }
+  if (message.includes('plan_required')) {
+    throw new HttpError(403, 'plan_required', 'Esta funcionalidade exige o plano Profissional ativo.')
+  }
   if (message.includes('quantity_below_minimum')) {
     throw new HttpError(400, 'quantity_below_minimum', 'Quantidade abaixo do mínimo deste item.')
   }

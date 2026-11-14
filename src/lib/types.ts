@@ -5,6 +5,10 @@ export type Product = Database['public']['Tables']['products']['Row']
 export type ProductCategory = Database['public']['Tables']['product_categories']['Row']
 export type ProductImage = Database['public']['Tables']['product_images']['Row']
 export type Customer = Database['public']['Tables']['customers']['Row']
+export type PriceList = Database['public']['Tables']['price_lists']['Row']
+export type PriceListItem = Database['public']['Tables']['price_list_items']['Row']
+export type CustomerPriceListAssignment =
+  Database['public']['Tables']['customer_price_list_assignments']['Row']
 export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
 export type OrderStatusEvent = Database['public']['Tables']['order_status_events']['Row']
@@ -46,6 +50,19 @@ export interface PublicCatalogResponse {
     }>
   }>
   accepting_orders: boolean
+}
+
+export interface PrivateCatalogResponse extends PublicCatalogResponse {
+  customer: { name: string }
+  price_list: { id: string; name: string } | null
+  products: Array<PublicCatalogResponse['products'][number] & { price_source: 'private' | 'public' }>
+  expires_at: string
+}
+
+export interface CreatePriceLinkResponse {
+  url: string
+  expires_at: string
+  price_list: { id: string; name: string }
 }
 
 export interface ReorderGetResponse {

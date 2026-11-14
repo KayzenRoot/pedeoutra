@@ -111,3 +111,12 @@ verify_jwt = false
 
 [functions.order-tracking-revoke]
 verify_jwt = true
+
+[functions.private-catalog-get]
+verify_jwt = false
+
+[functions.customer-price-link-create]
+verify_jwt = true
+
+[functions.customer-price-link-revoke]
+verify_jwt = true

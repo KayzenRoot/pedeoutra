@@ -104,6 +104,49 @@ describe('validação de pedido público', () => {
       parsePublicOrderInput(validOrder({ items: [{ product_id: 'produto', quantity: 1 }] })).ok,
     ).toBe(false)
   })
+
+  it('aceita link de preço sem nome/telefone e ignora PII enviada', () => {
+    const token = 'A'.repeat(43)
+    const result = parsePublicOrderInput(
+      validOrder({
+        price_token: token,
+        buyer_name: '',
+        buyer_phone: '',
+      }),
+    )
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.priceToken).toBe(token)
+    expect(result.value.buyerName).toBeNull()
+    expect(result.value.buyerPhone).toBeNull()
+
+    const withPii = parsePublicOrderInput(validOrder({ price_token: token }))
+    expect(withPii.ok).toBe(true)
+    if (!withPii.ok) return
+    expect(withPii.value.buyerName).toBeNull()
+    expect(withPii.value.buyerPhone).toBeNull()
+  })
+
+  it('rejeita token de preço com formato inválido', () => {
+    expect(parsePublicOrderInput(validOrder({ price_token: 'curto' }))).toEqual({
+      ok: false,
+      error: 'invalid_price_token',
+    })
+    expect(
+      parsePublicOrderInput(validOrder({ price_token: `${'A'.repeat(42)}!` })),
+    ).toEqual({ ok: false, error: 'invalid_price_token' })
+  })
+
+  it('sem token continua exigindo nome e telefone', () => {
+    expect(parsePublicOrderInput(validOrder({ buyer_name: '' }))).toEqual({
+      ok: false,
+      error: 'invalid_buyer_name',
+    })
+    expect(parsePublicOrderInput(validOrder({ buyer_phone: '' }))).toEqual({
+      ok: false,
+      error: 'invalid_buyer_phone',
+    })
+  })
 })
 
 describe('validação de recompra', () => {

@@ -32,6 +32,7 @@ export const handler = (req: Request) =>
       p_items: input.items,
       p_rate_bucket: await rateBucket(req, 'order-rpc'),
       p_request_id: input.requestId,
+      p_price_token: input.priceToken,
     })
 
     if (error) throwOrderError(error)

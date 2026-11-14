@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/app/pedidos', label: 'Pedidos', icon: 'orders' as const },
   { to: '/app/produtos', label: 'Produtos', icon: 'products' as const },
   { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const },
+  { to: '/app/precos', label: 'Preços', icon: 'prices' as const },
   { to: '/app/assinatura', label: 'Assinatura', icon: 'billing' as const },
   { to: '/app/configuracoes', label: 'Configurações', icon: 'settings' as const },
 ]

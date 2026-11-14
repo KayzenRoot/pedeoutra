@@ -3,16 +3,24 @@ import { Link, useParams } from 'react-router-dom'
 import { Brand } from '../components/Brand'
 import { FormMessage, LoadingScreen, QuantityStepper } from '../components/ui'
 import { track } from '../lib/analytics'
-import { callPublicFunction, getPublicCatalog } from '../lib/edge'
+import { callPublicFunction, getPrivateCatalog, getPublicCatalog } from '../lib/edge'
 import { formatBRL, phoneDigits, whatsappLink } from '../lib/format'
 import { applySkuListToCart } from '../lib/sku'
-import type { PublicCatalogResponse, SubmitOrderResponse } from '../lib/types'
+import type {
+  PrivateCatalogResponse,
+  PublicCatalogResponse,
+  SubmitOrderResponse,
+} from '../lib/types'
+
+type CatalogProduct = PublicCatalogResponse['products'][number] & {
+  price_source?: 'private' | 'public'
+}
 
 function filterCatalogProducts(
-  products: PublicCatalogResponse['products'],
+  products: CatalogProduct[],
   category: string,
   term: string,
-): PublicCatalogResponse['products'] {
+): CatalogProduct[] {
   return products.filter((product) => {
     if (category !== 'all' && product.category_id !== category) return false
     if (!term) return true
@@ -24,6 +32,7 @@ function filterCatalogProducts(
 }
 
 interface OrderValidationInput {
+  privateMode: boolean
   accepting: boolean
   itemCount: number
   buyerName: string
@@ -38,8 +47,10 @@ interface OrderValidationInput {
 function validateOrderInput(input: OrderValidationInput): string | null {
   if (!input.accepting) return 'Este catálogo não está aceitando pedidos no momento.'
   if (input.itemCount === 0) return 'Escolha pelo menos um produto e uma quantidade.'
-  if (input.buyerName.trim().length < 2) return 'Informe seu nome ou o nome da empresa.'
-  if (phoneDigits(input.buyerPhone).length < 10) return 'Informe um telefone válido com DDD.'
+  if (!input.privateMode) {
+    if (input.buyerName.trim().length < 2) return 'Informe seu nome ou o nome da empresa.'
+    if (phoneDigits(input.buyerPhone).length < 10) return 'Informe um telefone válido com DDD.'
+  }
   if (!input.consent) return 'É necessário aceitar o aviso de privacidade para enviar.'
   if (input.belowMinItems) {
     return `Este fornecedor pede pelo menos ${input.minOrderItems} item(ns) por pedido.`
@@ -49,8 +60,9 @@ function validateOrderInput(input: OrderValidationInput): string | null {
 }
 
 export function Catalog() { // NOSONAR: page orchestrator; branches are JSX states covered by smoke/unit tests.
-  const { slug } = useParams<{ slug: string }>()
-  const [catalog, setCatalog] = useState<PublicCatalogResponse | null>(null)
+  const { slug, token } = useParams<{ slug?: string; token?: string }>()
+  const privateMode = Boolean(token)
+  const [catalog, setCatalog] = useState<PrivateCatalogResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [cart, setCart] = useState<Record<string, number>>({})
@@ -70,20 +82,32 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
   const mountedAt = useRef(Date.now())
 
   useEffect(() => {
-    if (!slug) return
+    if (!slug && !token) return
     let active = true
     setLoading(true)
     setLoadError(null)
-    track('catalog_view')
+    track(privateMode ? 'private_catalog_view' : 'catalog_view')
 
-    void getPublicCatalog<PublicCatalogResponse>(slug)
+    const request = token
+      ? getPrivateCatalog<PrivateCatalogResponse>(token)
+      : getPublicCatalog<PublicCatalogResponse>(slug as string)
+
+    void request
       .then((data) => {
         if (!active) return
-        setCatalog(data)
-        document.title = `${data.organization.name} — Catálogo`
+        setCatalog(data as PrivateCatalogResponse)
+        document.title = privateMode
+          ? `Preços exclusivos — ${data.organization.name}`
+          : `${data.organization.name} — Catálogo`
       })
       .catch(() => {
-        if (active) setLoadError('Não foi possível abrir este catálogo.')
+        if (active) {
+          setLoadError(
+            privateMode
+              ? 'Este link de preços expirou ou não está mais disponível.'
+              : 'Não foi possível abrir este catálogo.',
+          )
+        }
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -92,7 +116,16 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
     return () => {
       active = false
     }
-  }, [slug])
+  }, [slug, token, privateMode])
+
+  useEffect(() => {
+    if (!privateMode) return
+    const meta = document.createElement('meta')
+    meta.name = 'robots'
+    meta.content = 'noindex, nofollow'
+    document.head.append(meta)
+    return () => meta.remove()
+  }, [privateMode])
 
   const selectedItems = useMemo(() => {
     if (!catalog) return []
@@ -140,8 +173,9 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
     event.preventDefault()
     setSubmitError(null)
 
-    if (!catalog || !slug) return
+    if (!catalog || (!slug && !token)) return
     const validation = validateOrderInput({
+      privateMode,
       accepting: catalog.accepting_orders,
       itemCount: selectedItems.length,
       buyerName,
@@ -162,9 +196,9 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
     setSubmitting(true)
     try {
       const result = await callPublicFunction<SubmitOrderResponse>('public-order', {
-        slug,
-        buyer_name: buyerName.trim(),
-        buyer_phone: buyerPhone,
+        slug: catalog.organization.slug,
+        buyer_name: privateMode ? undefined : buyerName.trim(),
+        buyer_phone: privateMode ? undefined : buyerPhone,
         note: note.trim() || null,
         items: selectedItems.map((item) => ({
           product_id: item.id,
@@ -174,6 +208,7 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
         elapsed_ms: Date.now() - mountedAt.current,
         consent,
         request_id: requestId.current,
+        price_token: token,
       })
       setSuccess(result)
       track('order_submitted')
@@ -189,7 +224,9 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
     }
   }
 
-  if (loading) return <LoadingScreen label="Abrindo catálogo…" />
+  if (loading) {
+    return <LoadingScreen label={privateMode ? 'Abrindo tabela de preços…' : 'Abrindo catálogo…'} />
+  }
 
   if (loadError || !catalog) {
     return (
@@ -199,11 +236,12 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
         </header>
         <main className="public-main">
           <div className="card centered-card">
-            <span className="eyebrow">Catálogo</span>
-            <h1>Catálogo indisponível</h1>
+            <span className="eyebrow">{privateMode ? 'Tabela de preços' : 'Catálogo'}</span>
+            <h1>{privateMode ? 'Link de preços indisponível' : 'Catálogo indisponível'}</h1>
             <p>
-              O link pode estar incorreto ou o fornecedor pode ter pausado o catálogo. Tente
-              novamente mais tarde.
+              {privateMode
+                ? 'Este link expirou, foi revogado ou o fornecedor pausou os preços privados. Peça um novo link ao fornecedor.'
+                : 'O link pode estar incorreto ou o fornecedor pode ter pausado o catálogo. Tente novamente mais tarde.'}
             </p>
             <Link to="/" className="button button-secondary">
               Voltar ao início
@@ -307,14 +345,20 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
       <main className="public-main">
         <section className="catalog-hero">
           <div>
-            <span className="eyebrow">Catálogo de recompra</span>
+            <span className="eyebrow">
+              {privateMode ? 'Sua tabela de preços' : 'Catálogo de recompra'}
+            </span>
             <h1>{catalog.organization.name}</h1>
             <p>
-              Escolha os itens e as quantidades. O pedido vai para análise do fornecedor; não
-              há pagamento nesta página.
+              {privateMode
+                ? `Preços exclusivos para ${catalog.customer.name}. Escolha os itens e envie o pedido para análise do fornecedor.`
+                : 'Escolha os itens e as quantidades. O pedido vai para análise do fornecedor; não há pagamento nesta página.'}
             </p>
+            {privateMode && catalog.price_list && (
+              <small className="muted">Tabela: {catalog.price_list.name}</small>
+            )}
           </div>
-          <span className="pill">Sem cadastro</span>
+          <span className="pill">{privateMode ? 'Link privado' : 'Sem cadastro'}</span>
         </section>
 
         {!catalog.accepting_orders && (
@@ -429,6 +473,9 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
                       {product.sku && <small className="product-sku">SKU {product.sku}</small>}
                       <h2>{product.name}</h2>
                       <strong className="product-price">{formatBRL(product.price_cents)}</strong>
+                      {privateMode && product.price_source === 'private' && (
+                        <small className="product-rule">Preço especial</small>
+                      )}
                       {(product.min_quantity > 1 || product.quantity_increment > 1) && (
                         <small className="product-rule">
                           Mín. {product.min_quantity} · múltiplo de {product.quantity_increment}
@@ -510,28 +557,37 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
 
                 <form className="form" onSubmit={handleSubmit}>
                   {submitError && <FormMessage>{submitError}</FormMessage>}
-                  <label className="field">
-                    <span>Seu nome ou empresa</span>
-                    <input
-                      required
-                      maxLength={120}
-                      value={buyerName}
-                      onChange={(event) => setBuyerName(event.target.value)}
-                      placeholder="Padaria Pão Bom"
-                      autoComplete="organization"
-                    />
-                  </label>
-                  <label className="field">
-                    <span>Telefone comercial</span>
-                    <input
-                      required
-                      inputMode="tel"
-                      value={buyerPhone}
-                      onChange={(event) => setBuyerPhone(event.target.value)}
-                      placeholder="(11) 97777-6666"
-                      autoComplete="tel"
-                    />
-                  </label>
+                  {privateMode ? (
+                    <FormMessage tone="info">
+                      Este link identifica seu cadastro. Não é necessário preencher nome ou
+                      telefone; o fornecedor usará os dados que já tem.
+                    </FormMessage>
+                  ) : (
+                    <>
+                      <label className="field">
+                        <span>Seu nome ou empresa</span>
+                        <input
+                          required
+                          maxLength={120}
+                          value={buyerName}
+                          onChange={(event) => setBuyerName(event.target.value)}
+                          placeholder="Padaria Pão Bom"
+                          autoComplete="organization"
+                        />
+                      </label>
+                      <label className="field">
+                        <span>Telefone comercial</span>
+                        <input
+                          required
+                          inputMode="tel"
+                          value={buyerPhone}
+                          onChange={(event) => setBuyerPhone(event.target.value)}
+                          placeholder="(11) 97777-6666"
+                          autoComplete="tel"
+                        />
+                      </label>
+                    </>
+                  )}
                   <label className="field">
                     <span>Observação (opcional)</span>
                     <textarea

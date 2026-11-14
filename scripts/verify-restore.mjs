@@ -120,6 +120,40 @@ insert into public.product_images (
   'Copo de água', true
 );
 
+insert into public.price_lists (id, organization_id, name)
+values (
+  'aaaaaaaa-eeee-4eee-8eee-eeeeeeeeeeee',
+  'aaaaaaaa-2222-4222-8222-222222222222', 'Tabela Restore'
+);
+
+insert into public.price_list_items (
+  id, organization_id, price_list_id, product_id, price_cents
+) values (
+  'aaaaaaaa-ffff-4fff-8fff-ffffffffffff',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-eeee-4eee-8eee-eeeeeeeeeeee',
+  'aaaaaaaa-3333-4333-8333-333333333333', 1000
+);
+
+insert into public.customer_price_list_assignments (
+  id, organization_id, customer_id, price_list_id
+) values (
+  'aaaaaaaa-1111-4111-8111-222222222222',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  'aaaaaaaa-eeee-4eee-8eee-eeeeeeeeeeee'
+);
+
+insert into public.customer_price_tokens (
+  id, organization_id, customer_id, token_hash, expires_at, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  repeat('b', 64), now() + interval '30 days',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -237,14 +271,20 @@ select
   (select count(*) from public.quota_usage) as quota_usage,
   (select count(*) from public.product_categories) as product_categories,
   (select count(*) from public.product_images) as product_images,
-  (select md5(string_agg(id::text || ':' || public_reference || ':' || status, ',' order by id)) from public.orders) as orders_hash,
+  (select count(*) from public.price_lists) as price_lists,
+  (select count(*) from public.price_list_items) as price_list_items,
+  (select count(*) from public.customer_price_list_assignments) as price_assignments,
+  (select count(*) from public.customer_price_tokens) as price_tokens,
+  (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
   (select md5(string_agg(plan_code || ':' || plan_version || ':' || state, ',' order by organization_id)) from public.subscriptions) as subscriptions_hash,
   (select md5(string_agg(user_id::text || ':' || status || ':' || risk_score, ',' order by user_id)) from public.trial_grants) as trials_hash,
   (select md5(string_agg(actor_user_id::text || ':' || action, ',' order by id)) from public.platform_audit_events) as platform_audit_hash,
   (select md5(string_agg(id::text || ':' || name || ':' || slug, ',' order by id)) from public.product_categories) as categories_hash,
-  (select md5(string_agg(id::text || ':' || alt_text || ':' || is_cover, ',' order by id)) from public.product_images) as images_hash
+  (select md5(string_agg(id::text || ':' || alt_text || ':' || is_cover, ',' order by id)) from public.product_images) as images_hash,
+  (select md5(string_agg(id::text || ':' || name || ':' || active, ',' order by id)) from public.price_lists) as price_lists_hash,
+  (select md5(string_agg(id::text || ':' || product_id::text || ':' || price_cents, ',' order by id)) from public.price_list_items) as price_items_hash
 `
 
 async function main() {
@@ -341,7 +381,13 @@ async function main() {
       'quota_usage',
       'product_categories',
       'product_images',
+      'price_lists',
+      'price_list_items',
+      'price_assignments',
+      'price_tokens',
       'orders_hash',
+      'price_lists_hash',
+      'price_items_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

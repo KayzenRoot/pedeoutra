@@ -16,6 +16,7 @@ import { NotFound } from './pages/NotFound'
 import { Onboarding } from './pages/Onboarding'
 import { OrderDetail } from './pages/OrderDetail'
 import { Orders } from './pages/Orders'
+import { PrivatePrices } from './pages/PrivatePrices'
 import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="pedidos/:orderId" element={<OrderDetail />} />
             <Route path="produtos" element={<Products />} />
             <Route path="clientes" element={<Customers />} />
+            <Route path="precos" element={<PrivatePrices />} />
             <Route path="assinatura" element={<Billing />} />
             <Route
               path="configuracoes"
@@ -88,6 +90,7 @@ export default function App() {
           </Route>
 
           <Route path="/c/:slug" element={<Catalog />} />
+          <Route path="/p/:token" element={<Catalog />} />
           <Route path="/r/:token" element={<Reorder />} />
           <Route path="/acompanhar/:token" element={<Tracking />} />
           <Route

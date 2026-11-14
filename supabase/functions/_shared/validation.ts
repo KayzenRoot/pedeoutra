@@ -2,6 +2,8 @@
  * Validação pura de payloads públicos. Sem dependências de Deno, para ser
  * testável em Node/Vitest e reutilizável pelas Edge Functions.
  */
+import { OPAQUE_TOKEN_PATTERN } from './tokens.ts'
+
 export const MAX_ITEMS = 50
 export const MAX_QUANTITY = 999
 export const MAX_NOTE_LENGTH = 500
@@ -18,11 +20,12 @@ export interface OrderItemInput {
 
 export interface PublicOrderInput {
   slug: string
-  buyerName: string
-  buyerPhone: string
+  buyerName: string | null
+  buyerPhone: string | null
   note: string | null
   items: OrderItemInput[]
   requestId: string
+  priceToken: string | null
 }
 
 export interface ReorderOrderInput {
@@ -127,11 +130,25 @@ export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOr
     return { ok: false, error: 'invalid_slug' }
   }
 
-  const buyerName = cleanText(input.buyer_name, 120)
-  if (!buyerName || buyerName.length < 2) return { ok: false, error: 'invalid_buyer_name' }
+  const rawPriceToken = input.price_token
+  let priceToken: string | null = null
+  if (rawPriceToken !== undefined && rawPriceToken !== null && rawPriceToken !== '') {
+    if (typeof rawPriceToken !== 'string' || !OPAQUE_TOKEN_PATTERN.test(rawPriceToken)) {
+      return { ok: false, error: 'invalid_price_token' }
+    }
+    priceToken = rawPriceToken
+  }
 
-  const buyerPhone = normalizePhone(input.buyer_phone)
-  if (!buyerPhone) return { ok: false, error: 'invalid_buyer_phone' }
+  let buyerName = cleanText(input.buyer_name, 120)
+  let buyerPhone = normalizePhone(input.buyer_phone)
+  if (priceToken) {
+    // O token identifica o comprador; nome/telefone são ignorados e não persistidos.
+    buyerName = null
+    buyerPhone = null
+  } else {
+    if (!buyerName || buyerName.length < 2) return { ok: false, error: 'invalid_buyer_name' }
+    if (!buyerPhone) return { ok: false, error: 'invalid_buyer_phone' }
+  }
 
   const note = cleanText(input.note, MAX_NOTE_LENGTH)
   if (typeof input.note === 'string' && input.note.length > MAX_NOTE_LENGTH) {
@@ -150,6 +167,7 @@ export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOr
       note,
       items: items.value,
       requestId: common.value.requestId,
+      priceToken,
     },
   }
 }

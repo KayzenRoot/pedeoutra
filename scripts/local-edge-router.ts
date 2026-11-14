@@ -28,6 +28,9 @@ import { handler as onboardingSeed } from '../supabase/functions/onboarding-seed
 import { handler as orderTrackingCreate } from '../supabase/functions/order-tracking-create/index.ts'
 import { handler as orderTrackingGet } from '../supabase/functions/order-tracking-get/index.ts'
 import { handler as orderTrackingRevoke } from '../supabase/functions/order-tracking-revoke/index.ts'
+import { handler as privateCatalogGet } from '../supabase/functions/private-catalog-get/index.ts'
+import { handler as customerPriceLinkCreate } from '../supabase/functions/customer-price-link-create/index.ts'
+import { handler as customerPriceLinkRevoke } from '../supabase/functions/customer-price-link-revoke/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -57,6 +60,9 @@ const routes: Record<string, Handler> = {
   'order-tracking-create': orderTrackingCreate,
   'order-tracking-get': orderTrackingGet,
   'order-tracking-revoke': orderTrackingRevoke,
+  'private-catalog-get': privateCatalogGet,
+  'customer-price-link-create': customerPriceLinkCreate,
+  'customer-price-link-revoke': customerPriceLinkRevoke,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

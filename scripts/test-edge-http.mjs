@@ -32,11 +32,17 @@ const PRODUCT_2 = 'eeeeeeee-4444-4444-8444-444444444444'
 const PRODUCT_INACTIVE = 'eeeeeeee-5555-4555-8555-555555555555'
 const CUSTOMER_ID = 'eeeeeeee-6666-4666-8666-666666666666'
 const LINK_ID = 'eeeeeeee-7777-4777-8777-777777777777'
+const PRICE_LIST_ID = 'eeeeeeee-aaaa-4aaa-8aaa-bbbbbbbbbbbb'
+const CUSTOMER_NO_LIST_ID = 'eeeeeeee-9999-4999-8999-aaaaaaaaaaaa'
 const CATEGORY_ID = 'eeeeeeee-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const REORDER_TOKEN = Buffer.from(
   Array.from({ length: 32 }, (_, index) => (index * 37 + 11) % 256),
 ).toString('base64url')
 const REORDER_TOKEN_HASH = createHash('sha256').update(REORDER_TOKEN).digest('hex')
+const PRICE_TOKEN = Buffer.from(
+  Array.from({ length: 32 }, (_, index) => (index * 53 + 7) % 256),
+).toString('base64url')
+const PRICE_TOKEN_HASH = createHash('sha256').update(PRICE_TOKEN).digest('hex')
 
 let passed = 0
 let failed = 0
@@ -186,7 +192,27 @@ values
   ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false, null, null);
 
 insert into public.customers (id, organization_id, display_name, contact_phone)
-values ('${CUSTOMER_ID}', '${ORG_ID}', 'Padaria Edge', '11977776666');
+values
+  ('${CUSTOMER_ID}', '${ORG_ID}', 'Padaria Edge', '11977776666'),
+  ('${CUSTOMER_NO_LIST_ID}', '${ORG_ID}', 'Mercado Sem Lista', '11966665555');
+
+insert into public.price_lists (id, organization_id, name)
+values ('${PRICE_LIST_ID}', '${ORG_ID}', 'Tabela Ouro Edge');
+
+insert into public.price_list_items
+  (organization_id, price_list_id, product_id, price_cents, valid_from)
+values ('${ORG_ID}', '${PRICE_LIST_ID}', '${PRODUCT_1}', 1000, now() - interval '1 day');
+
+insert into public.customer_price_list_assignments
+  (organization_id, customer_id, price_list_id)
+values ('${ORG_ID}', '${CUSTOMER_ID}', '${PRICE_LIST_ID}');
+
+insert into public.customer_price_tokens
+  (organization_id, customer_id, token_hash, expires_at, created_by)
+values (
+  '${ORG_ID}', '${CUSTOMER_ID}', '${PRICE_TOKEN_HASH}',
+  now() + interval '60 days', '${USER_ID}'
+);
 
 insert into public.reorder_links (
   id, organization_id, customer_id, token_hash, template_json, expires_at, created_by
@@ -599,15 +625,9 @@ async function main() {
     })
 
     await test('reorder-create autenticado emite link', async () => {
-      const customerRow = docker([
-        'exec', PG_CONTAINER,
-        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
-        `select id from public.customers where organization_id = '${ORG_ID}'`,
-      ]).stdout.trim()
-      assert(customerRow, 'cliente não encontrado')
       const response = await call(
         'reorder-create',
-        { customer_id: customerRow },
+        { customer_id: CUSTOMER_ID },
         { token: userToken },
       )
       assert(response.status === 201, `HTTP ${response.status} ${JSON.stringify(response.data)}`)
@@ -1215,6 +1235,191 @@ async function main() {
         { token: userToken },
       )
       assert(other.status === 404, `outro tenant HTTP ${other.status}`)
+    })
+
+
+    console.log('[9/9] Preços por comprador')
+
+    await test('private-catalog exige plano, aplica preço privado e não vaza PII', async () => {
+      const denied = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(PRICE_TOKEN)}`,
+      )
+      assert(denied.status === 404, `sem plano HTTP ${denied.status}`)
+
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+
+      const invalidOrder = await call('public-order', {
+        slug: ORG_SLUG,
+        items: [{ product_id: PRODUCT_1, quantity: 1 }],
+        company_website: '',
+        elapsed_ms: 2000,
+        consent: true,
+        request_id: crypto.randomUUID(),
+        price_token: 'x'.repeat(43),
+      }, { headers: { 'x-forwarded-for': '203.0.113.11' } })
+      assert(invalidOrder.status === 404, `token inválido HTTP ${invalidOrder.status}`)
+      assert(invalidOrder.data.error === 'price_link_unavailable', 'erro de link inválido')
+
+      const response = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(PRICE_TOKEN)}`,
+      )
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status} ${JSON.stringify(data)}`)
+      assert(data.customer.name === 'Padaria Edge', 'cliente do link')
+      assert(data.price_list.name === 'Tabela Ouro Edge', 'tabela aplicada')
+      const privateProduct = data.products.find((product) => product.id === PRODUCT_1)
+      const publicProduct = data.products.find((product) => product.id === PRODUCT_2)
+      assert(privateProduct.price_cents === 1000, `preço privado ${privateProduct.price_cents}`)
+      assert(privateProduct.price_source === 'private', 'origem privada')
+      assert(publicProduct.price_cents === 899, `fallback ${publicProduct.price_cents}`)
+      assert(publicProduct.price_source === 'public', 'origem pública')
+      const serialized = JSON.stringify(data)
+      assert(!serialized.includes('11977776666'), 'telefone do cliente vazou')
+      assert(response.headers.get('x-robots-tag')?.includes('noindex'), 'noindex')
+      assert(response.headers.get('referrer-policy') === 'no-referrer', 'no-referrer')
+    })
+
+    await test('pedido privado usa token, não exige nome/telefone e preserva origem', async () => {
+      const orderRequest = crypto.randomUUID()
+      const response = await call('public-order', {
+        slug: ORG_SLUG,
+        note: 'Pedido com tabela privada',
+        items: [{ product_id: PRODUCT_1, quantity: 1 }],
+        company_website: '',
+        elapsed_ms: 2000,
+        consent: true,
+        request_id: orderRequest,
+        price_token: PRICE_TOKEN,
+      }, { headers: { 'x-forwarded-for': '203.0.113.10' } })
+      assert(response.status === 201, `HTTP ${response.status} ${JSON.stringify(response.data)}`)
+      assert(response.data.total_cents === 1000, `total ${response.data.total_cents}`)
+
+      const order = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select customer_id, buyer_name, buyer_phone, source, price_source, price_list_id
+           from public.orders where request_id = '${orderRequest}'`,
+      ]).stdout.trim()
+      const [customerId, buyerName, buyerPhone, source, priceSource, priceListId] =
+        order.split('|')
+      assert(customerId === CUSTOMER_ID, `cliente ${customerId}`)
+      assert(buyerName === '' && buyerPhone === '', 'PII do comprador foi persistida')
+      assert(source === 'private', `source ${source}`)
+      assert(priceSource === 'private', `price_source ${priceSource}`)
+      assert(priceListId === PRICE_LIST_ID, `price_list ${priceListId}`)
+    })
+
+    await test('link de preço exige tabela, expõe catálogo e revoga', async () => {
+      const missing = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_NO_LIST_ID },
+        { token: userToken },
+      )
+      assert(missing.status === 409, `sem tabela HTTP ${missing.status}`)
+      assert(missing.data.error === 'price_list_required', 'erro de tabela')
+
+      const created = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.url.includes('/p/'), 'url privada')
+      const token = created.data.url.split('/').pop()
+
+      const response = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(response.status === 200, `get HTTP ${response.status}`)
+
+      await clientQuery(`
+        delete from public.customer_price_list_assignments
+         where organization_id = '${ORG_ID}' and customer_id = '${CUSTOMER_ID}'
+      `)
+      const withoutList = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(withoutList.status === 404, `sem tabela HTTP ${withoutList.status}`)
+      await clientQuery(`
+        insert into public.customer_price_list_assignments
+          (organization_id, customer_id, price_list_id)
+        values ('${ORG_ID}', '${CUSTOMER_ID}', '${PRICE_LIST_ID}')
+      `)
+
+      const revoked = await call(
+        'customer-price-link-revoke',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      assert(revoked.data.revoked >= 1, 'nenhum token revogado')
+      const after = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(after.status === 404, `revogado HTTP ${after.status}`)
+    })
+
+    await test('token expirado e downgrade bloqueiam o catálogo privado', async () => {
+      const invalid = await fetch(`${edgeBase}/private-catalog-get?token=${'x'.repeat(43)}`)
+      assert(invalid.status === 404, `inválido HTTP ${invalid.status}`)
+
+      const created = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      const token = created.data.url.split('/').pop()
+      await clientQuery(`
+        update public.customer_price_tokens
+           set created_at = now() - interval '40 days',
+               expires_at = now() - interval '10 days'
+         where organization_id = '${ORG_ID}' and customer_id = '${CUSTOMER_ID}'
+           and revoked_at is null
+      `)
+      const expired = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(expired.status === 404, `expirado HTTP ${expired.status}`)
+
+      const createdAgain = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      const freshToken = createdAgain.data.url.split('/').pop()
+      await clientQuery(`
+        update public.subscriptions
+           set plan_code = 'essential', plan_version = 1, state = 'active',
+               current_period_end = now() + interval '20 days'
+         where organization_id = '${ORG_ID}'
+      `)
+      const downgraded = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(freshToken)}`,
+      )
+      assert(downgraded.status === 404, `downgrade HTTP ${downgraded.status}`)
+
+      const blockedOrder = await call('public-order', {
+        slug: ORG_SLUG,
+        items: [{ product_id: PRODUCT_1, quantity: 1 }],
+        company_website: '',
+        elapsed_ms: 2000,
+        consent: true,
+        request_id: crypto.randomUUID(),
+        price_token: freshToken,
+      }, { headers: { 'x-forwarded-for': '203.0.113.12' } })
+      assert(blockedOrder.status === 403, `downgrade order HTTP ${blockedOrder.status}`)
+      assert(blockedOrder.data.error === 'plan_required', 'erro de plano')
+
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

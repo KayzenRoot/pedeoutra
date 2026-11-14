@@ -222,6 +222,8 @@ export type Database = {
           id: string
           note: string | null
           organization_id: string
+          price_list_id: string | null
+          price_source: string
           public_reference: string
           request_id: string | null
           source: string
@@ -237,6 +239,8 @@ export type Database = {
           id?: string
           note?: string | null
           organization_id: string
+          price_list_id?: string | null
+          price_source?: string
           public_reference: string
           request_id?: string | null
           source?: string
@@ -252,6 +256,8 @@ export type Database = {
           id?: string
           note?: string | null
           organization_id?: string
+          price_list_id?: string | null
+          price_source?: string
           public_reference?: string
           request_id?: string | null
           source?: string
@@ -275,6 +281,126 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      customer_price_list_assignments: {
+        Row: {
+          assigned_at: string
+          customer_id: string
+          id: string
+          organization_id: string
+          price_list_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          customer_id: string
+          id?: string
+          organization_id: string
+          price_list_id: string
+        }
+        Update: {
+          assigned_at?: string
+          customer_id?: string
+          id?: string
+          organization_id?: string
+          price_list_id?: string
+        }
+        Relationships: []
+      }
+      customer_price_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          expires_at: string
+          id: string
+          organization_id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          expires_at: string
+          id?: string
+          organization_id: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      price_list_items: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          price_cents: number
+          price_list_id: string
+          product_id: string
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          price_cents: number
+          price_list_id: string
+          product_id: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          price_cents?: number
+          price_list_id?: string
+          product_id?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
+      price_lists: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       organizations: {
         Row: {

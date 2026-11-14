@@ -190,6 +190,7 @@ export function Icon({
     | 'orders'
     | 'products'
     | 'customers'
+    | 'prices'
     | 'billing'
     | 'settings'
     | 'external'
@@ -214,6 +215,12 @@ export function Icon({
       <>
         <circle cx="9" cy="8" r="3.5" />
         <path d="M2.5 21a6.5 6.5 0 0 1 13 0M16 5.5a3 3 0 0 1 0 5.8M18 21a5.5 5.5 0 0 0-3-4.9" />
+      </>
+    ),
+    prices: (
+      <>
+        <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+        <circle cx="7.5" cy="7.5" r="1.2" />
       </>
     ),
     billing: (

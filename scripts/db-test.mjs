@@ -1507,6 +1507,199 @@ async function main() {
       )
     })
 
+
+    await test('preço privado exige token, aplica fallback e preserva snapshot', async () => {
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      const list = await client.query(
+        `insert into public.price_lists (organization_id, name)
+         values ($1, 'Tabela Ouro') returning id`,
+        [orgA.id],
+      )
+      await client.query(
+        `insert into public.price_list_items
+           (organization_id, price_list_id, product_id, price_cents, valid_from)
+         values ($1, $2, $3, 1000, now() - interval '1 day')`,
+        [orgA.id, list.rows[0].id, productA1.id],
+      )
+      await client.query(
+        `insert into public.customer_price_list_assignments
+           (organization_id, customer_id, price_list_id)
+         values ($1, $2, $3)`,
+        [orgA.id, customerA.id, list.rows[0].id],
+      )
+      const token = 'price-token-test-0123456789abcdef'
+      await client.query(
+        `insert into public.customer_price_tokens
+           (organization_id, customer_id, token_hash, expires_at)
+         values ($1, $2, encode(extensions.digest($3, 'sha256'), 'hex'), now() + interval '7 days')`,
+        [orgA.id, customerA.id, token],
+      )
+
+      const requestId = crypto.randomUUID()
+      const result = await asService(() =>
+        client.query(
+          `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, $5)`,
+          [
+            orgA.slug,
+            JSON.stringify([
+              { product_id: productA1.id, quantity: 1 },
+              { product_id: productA2.id, quantity: 1 },
+            ]),
+            `price-order:${requestId}`,
+            requestId,
+            token,
+          ],
+        ),
+      )
+      assert(result.rows[0].total_cents === 2300, `total ${result.rows[0].total_cents}`)
+      const order = await client.query(
+        `select customer_id, price_list_id, price_source, total_cents
+           from public.orders where id = $1`,
+        [result.rows[0].order_id],
+      )
+      assert(order.rows[0].customer_id === customerA.id, 'cliente do token')
+      assert(order.rows[0].price_list_id === list.rows[0].id, 'price list')
+      assert(order.rows[0].price_source === 'private', 'price source')
+      const items = await client.query(
+        `select product_id, unit_price_cents from public.order_items
+          where order_id = $1 order by product_id`,
+        [result.rows[0].order_id],
+      )
+      const byProduct = Object.fromEntries(items.rows.map((row) => [row.product_id, row.unit_price_cents]))
+      assert(byProduct[productA1.id] === 1000, 'preço privado não aplicado')
+      assert(byProduct[productA2.id] === 1300, 'fallback público não aplicado')
+
+      await client.query(
+        `delete from public.customer_price_list_assignments
+          where organization_id = $1 and customer_id = $2`,
+        [orgA.id, customerA.id],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, $5)`,
+              [
+                orgA.slug,
+                JSON.stringify([{ product_id: productA1.id, quantity: 1 }]),
+                `price-no-list:${crypto.randomUUID()}`,
+                crypto.randomUUID(),
+                token,
+              ],
+            ),
+          ),
+        'invalid_price_token',
+        'token sem tabela ativa',
+      )
+      await client.query(
+        `insert into public.customer_price_list_assignments
+           (organization_id, customer_id, price_list_id)
+         values ($1, $2, $3)`,
+        [orgA.id, customerA.id, list.rows[0].id],
+      )
+
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, 'token-errado')`,
+              [
+                orgA.slug,
+                JSON.stringify([{ product_id: productA1.id, quantity: 1 }]),
+                `price-bad:${crypto.randomUUID()}`,
+                crypto.randomUUID(),
+              ],
+            ),
+          ),
+        'invalid_price_token',
+        'token de preço inválido',
+      )
+
+      await client.query(
+        `update public.customer_price_tokens
+            set created_at = now() - interval '10 days', expires_at = now() - interval '1 day'
+          where organization_id = $1 and customer_id = $2`,
+        [orgA.id, customerA.id],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, $5)`,
+              [
+                orgA.slug,
+                JSON.stringify([{ product_id: productA1.id, quantity: 1 }]),
+                `price-exp:${crypto.randomUUID()}`,
+                crypto.randomUUID(),
+                token,
+              ],
+            ),
+          ),
+        'invalid_price_token',
+        'token expirado',
+      )
+    })
+
+    await test('preço privado é Profissional e RLS isola listas', async () => {
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.price_lists where organization_id = $1', [orgA.id]),
+      )
+      assert(isolated.rows.length === 0, 'B não deveria ver listas de A')
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'essential', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.price_lists (organization_id, name) values ($1, 'Bloqueada')`,
+              [orgA.id],
+            ),
+          ),
+        'row-level security',
+        'Essencial criando lista privada',
+      )
+      const history = await asUser(USER_A, () =>
+        client.query('select id from public.price_lists where organization_id = $1', [orgA.id]),
+      )
+      assert(history.rows.length >= 1, 'histórico de lista deveria permanecer legível')
+    })
+
+
+    await test('RPCs de preço privado não são executáveis pelo browser', async () => {
+      const result = await client.query(`
+        select
+          has_function_privilege(
+            'authenticated',
+            'app.submit_order(text,text,text,text,jsonb,text,uuid,text,uuid,text)',
+            'EXECUTE'
+          ) as submit_order,
+          has_function_privilege(
+            'authenticated',
+            'app.customer_price(uuid,uuid,uuid,timestamptz)',
+            'EXECUTE'
+          ) as customer_price,
+          has_function_privilege(
+            'authenticated',
+            'public.api_submit_order(text,text,text,text,jsonb,text,uuid,text)',
+            'EXECUTE'
+          ) as api_submit
+      `)
+      assert(result.rows[0].submit_order === false, 'app.submit_order exposto')
+      assert(result.rows[0].customer_price === false, 'app.customer_price exposto')
+      assert(result.rows[0].api_submit === false, 'api_submit_order exposto')
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {
