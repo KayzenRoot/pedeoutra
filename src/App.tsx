@@ -26,6 +26,7 @@ import { Products } from './pages/Products'
 import { Radar } from './pages/Radar'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
+import { Sector } from './pages/Sector'
 import { Signup } from './pages/Signup'
 import { Team } from './pages/Team'
 import { Tracking } from './pages/Tracking'
@@ -121,6 +122,7 @@ export default function App() {
               </Suspense>
             }
           />
+          <Route path="/setores/:slug" element={<Sector />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/privacidade" element={<Privacy />} />
           <Route path="/termos" element={<Terms />} />

@@ -255,6 +255,10 @@ async function browserSmoke(browserPath) {
     await page.getByRole('heading', { name: 'Termos de uso' }).waitFor()
     console.log('  PASS /privacidade e /termos')
 
+    await page.goto(`${BASE}/setores/embalagens`, { waitUntil: 'networkidle' })
+    await page.getByRole('heading', { name: /distribuidores de embalagens/i }).waitFor()
+    console.log('  PASS /setores/embalagens')
+
     await page.goto(`${BASE}/rota-inexistente`, { waitUntil: 'networkidle' })
     await page.getByRole('heading', { name: 'Página não encontrada' }).waitFor()
     console.log('  PASS rota 404 (SPA fallback)')

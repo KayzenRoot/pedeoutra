@@ -237,11 +237,11 @@ export function Landing() {
 
         <section className="logos-strip" aria-label="Perfis de uso">
           <span>Feito para quem vende de novo:</span>
-          <strong>embalagens</strong>
-          <strong>limpeza</strong>
-          <strong>água e gelo</strong>
-          <strong>descartáveis</strong>
-          <strong>insumos</strong>
+          <Link to="/setores/embalagens">embalagens</Link>
+          <Link to="/setores/limpeza">limpeza</Link>
+          <Link to="/setores/agua-gelo">água e gelo</Link>
+          <Link to="/setores/descartaveis">descartáveis</Link>
+          <Link to="/setores/insumos">insumos</Link>
         </section>
 
         <section id="como-funciona" className="section">

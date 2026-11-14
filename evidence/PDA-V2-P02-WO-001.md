@@ -26,6 +26,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #79 | Métricas financeiras administrativas (MRR, recebimentos, churn) | implementado |
 | #80 | Dashboard executivo 360° | parcial: overview, organizações, auditoria, funil e financeiro |
 | #74 | SEO técnico: robots, sitemap, metadados e Schema.org | implementado (prerender/status HTTP fica para #73) |
+| #75 | Páginas setoriais B2B com conteúdo e CTA | implementado (5 setores) |
 | #64/#65/#67 | API B2B v1: chaves, escopos, gateway, quota e OpenAPI | implementado (leitura) |
 | #66 | Webhooks B2B de eventos com HMAC e retry | implementado com entrega desligada |
 
@@ -228,6 +229,15 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   (`API_WEBHOOK_SEND_ENABLED`).
 - `public/openapi.json` e `docs/api.md` documentam contrato, autenticação,
   escopos, limites e exemplos.
+
+## #75 — páginas setoriais
+
+- Cinco páginas públicas em `/setores/:slug` (embalagens, limpeza, água/gelo,
+  descartáveis, insumos) com proposta específica, exemplos de itens, CTA para
+  cadastro e demo.
+- Cada página usa canonical/description próprios e está no sitemap; links da
+  landing e a navegação pública levam aos setores. Conteúdo é estático, sem PII
+  ou promessa de recurso não implementado.
 
 ## Evidência local (HEAD de trabalho)
 

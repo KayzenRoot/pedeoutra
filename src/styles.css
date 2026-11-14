@@ -693,7 +693,8 @@ svg {
   font-size: 0.86rem;
 }
 
-.logos-strip strong {
+.logos-strip strong,
+.logos-strip a {
   color: var(--ink-2);
   font-weight: 750;
 }
