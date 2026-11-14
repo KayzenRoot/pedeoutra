@@ -102,3 +102,12 @@ verify_jwt = false
 
 [functions.onboarding-seed]
 verify_jwt = true
+
+[functions.order-tracking-create]
+verify_jwt = true
+
+[functions.order-tracking-get]
+verify_jwt = false
+
+[functions.order-tracking-revoke]
+verify_jwt = true

@@ -1449,6 +1449,64 @@ async function main() {
       )
     })
 
+
+    await test('tracking armazena hash, exige um link ativo e não vaza para fornecedor', async () => {
+      const order = await client.query(
+        `select id from public.orders where organization_id = $1 order by created_at desc limit 1`,
+        [orgA.id],
+      )
+      assert(order.rows.length === 1, 'pedido sintético ausente')
+      const orderId = order.rows[0].id
+      const first = await client.query(
+        `insert into public.order_tracking_links
+           (organization_id, order_id, token_hash, expires_at)
+         values ($1, $2, $3, now() + interval '30 days') returning id`,
+        [orgA.id, orderId, 'c'.repeat(64)],
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.order_tracking_links
+               (organization_id, order_id, token_hash, expires_at)
+             values ($1, $2, $3, now() + interval '30 days')`,
+            [orgA.id, orderId, 'd'.repeat(64)],
+          ),
+        'order_tracking_links_one_active_idx',
+        'segundo link ativo',
+      )
+      await client.query(
+        `update public.order_tracking_links set revoked_at = now() where id = $1`,
+        [first.rows[0].id],
+      )
+      await client.query(
+        `insert into public.order_tracking_links
+           (organization_id, order_id, token_hash, expires_at)
+         values ($1, $2, $3, now() + interval '30 days')`,
+        [orgA.id, orderId, 'd'.repeat(64)],
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select id from public.order_tracking_links')),
+        'permission denied',
+        'fornecedor lendo tracking links',
+      )
+      await client.query(
+        `update public.order_tracking_links set revoked_at = now()
+          where organization_id = $1 and order_id = $2 and revoked_at is null`,
+        [orgA.id, orderId],
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.order_tracking_links
+               (organization_id, order_id, token_hash, expires_at)
+             values ($1, $2, $3, now() + interval '30 days')`,
+            [orgB.id, orderId, 'e'.repeat(64)],
+          ),
+        'order_tracking_links_order_fk',
+        'link cross-tenant',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

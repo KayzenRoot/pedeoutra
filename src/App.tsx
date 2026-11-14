@@ -20,6 +20,7 @@ import { Products } from './pages/Products'
 import { Reorder } from './pages/Reorder'
 import { ResetPassword } from './pages/ResetPassword'
 import { Signup } from './pages/Signup'
+import { Tracking } from './pages/Tracking'
 
 const Admin = lazy(() =>
   import('./pages/Admin').then((module) => ({ default: module.Admin })),
@@ -88,6 +89,7 @@ export default function App() {
 
           <Route path="/c/:slug" element={<Catalog />} />
           <Route path="/r/:token" element={<Reorder />} />
+          <Route path="/acompanhar/:token" element={<Tracking />} />
           <Route
             path="/admin"
             element={

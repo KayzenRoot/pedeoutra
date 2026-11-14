@@ -1141,6 +1141,82 @@ async function main() {
       assert(response.data.error === 'invalid_seed_items', 'erro de item inválido')
     })
 
+
+    await test('order-tracking cria, resolve sem PII e revoga', async () => {
+      const orderId = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select id from public.orders where public_reference = '${firstOrder.public_reference}'`,
+      ]).stdout.trim()
+      assert(orderId, 'pedido público não encontrado')
+
+      const created = await call(
+        'order-tracking-create',
+        { order_id: orderId },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status}`)
+      assert(created.data.url.includes('/acompanhar/'), 'url de acompanhamento')
+      const token = created.data.url.split('/').pop()
+
+      const response = await fetch(
+        `${edgeBase}/order-tracking-get?token=${encodeURIComponent(token)}`,
+      )
+      const data = await response.json()
+      assert(response.status === 200, `get HTTP ${response.status}`)
+      assert(data.reference === firstOrder.public_reference, 'referência')
+      assert(data.items.length >= 1, 'itens resumidos')
+      assert(Array.isArray(data.timeline), 'timeline')
+      const serialized = JSON.stringify(data)
+      assert(!serialized.includes('Padaria Edge'), 'nome do comprador vazou')
+      assert(!serialized.includes('11977776666'), 'telefone do comprador vazou')
+      assert(response.headers.get('x-robots-tag')?.includes('noindex'), 'noindex')
+
+      const revoked = await call(
+        'order-tracking-revoke',
+        { order_id: orderId },
+        { token: userToken },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      const afterRevoke = await fetch(
+        `${edgeBase}/order-tracking-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(afterRevoke.status === 404, `revogado HTTP ${afterRevoke.status}`)
+    })
+
+    await test('order-tracking falha neutro para token inválido/expirado e outro tenant', async () => {
+      const invalid = await fetch(`${edgeBase}/order-tracking-get?token=${'x'.repeat(43)}`)
+      assert(invalid.status === 404, `inválido HTTP ${invalid.status}`)
+
+      const orderId = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select id from public.orders where public_reference = '${firstOrder.public_reference}'`,
+      ]).stdout.trim()
+      const created = await call(
+        'order-tracking-create',
+        { order_id: orderId },
+        { token: userToken },
+      )
+      const token = created.data.url.split('/').pop()
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.order_tracking_links set created_at = now() - interval '40 days', expires_at = now() - interval '10 days' where order_id = '${orderId}'`,
+      ])
+      const expired = await fetch(
+        `${edgeBase}/order-tracking-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(expired.status === 404, `expirado HTTP ${expired.status}`)
+
+      const other = await call(
+        'order-tracking-create',
+        { order_id: crypto.randomUUID() },
+        { token: userToken },
+      )
+      assert(other.status === 404, `outro tenant HTTP ${other.status}`)
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)

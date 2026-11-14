@@ -68,6 +68,22 @@ export async function getCatalogTemplates<T>(): Promise<T> {
   return parseResponse<T>(response)
 }
 
+export async function getOrderTracking<T>(token: string): Promise<T> {
+  if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
+
+  const response = await fetch(
+    `${SUPABASE_URL}/functions/v1/order-tracking-get?token=${encodeURIComponent(token)}`,
+    {
+      headers: {
+        apikey: ANON_KEY,
+        Authorization: `Bearer ${ANON_KEY}`,
+      },
+    },
+  )
+
+  return parseResponse<T>(response)
+}
+
 export async function getPlanCatalog<T>(): Promise<T> {
   if (!SUPABASE_URL || !ANON_KEY) throw new BackendNotConfiguredError()
 

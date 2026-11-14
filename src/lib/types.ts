@@ -199,3 +199,14 @@ export interface CatalogTemplate {
 export interface CatalogTemplatesResponse {
   templates: CatalogTemplate[]
 }
+
+
+export interface OrderTrackingResponse {
+  supplier: { name: string; slug: string }
+  reference: string
+  status: string
+  created_at: string
+  items: Array<{ name: string; quantity: number }>
+  timeline: Array<{ status: string; at: string }>
+  expires_at: string
+}

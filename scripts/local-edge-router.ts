@@ -25,6 +25,9 @@ import { handler as productImageList } from '../supabase/functions/product-image
 import { handler as productImport } from '../supabase/functions/product-import/index.ts'
 import { handler as catalogTemplates } from '../supabase/functions/catalog-templates/index.ts'
 import { handler as onboardingSeed } from '../supabase/functions/onboarding-seed/index.ts'
+import { handler as orderTrackingCreate } from '../supabase/functions/order-tracking-create/index.ts'
+import { handler as orderTrackingGet } from '../supabase/functions/order-tracking-get/index.ts'
+import { handler as orderTrackingRevoke } from '../supabase/functions/order-tracking-revoke/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -51,6 +54,9 @@ const routes: Record<string, Handler> = {
   'product-import': productImport,
   'catalog-templates': catalogTemplates,
   'onboarding-seed': onboardingSeed,
+  'order-tracking-create': orderTrackingCreate,
+  'order-tracking-get': orderTrackingGet,
+  'order-tracking-revoke': orderTrackingRevoke,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

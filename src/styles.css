@@ -3745,3 +3745,61 @@ svg {
     justify-items: start;
   }
 }
+
+/* Part 2 — acompanhamento público do pedido */
+.tracking-card {
+  max-width: 720px;
+  margin: 0 auto 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: var(--shadow-soft);
+}
+
+.tracking-current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+
+.tracking-timeline {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+
+.tracking-timeline li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--lime);
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.tracking-timeline span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.tracking-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.tracking-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px dashed var(--line);
+  padding-bottom: 6px;
+}
