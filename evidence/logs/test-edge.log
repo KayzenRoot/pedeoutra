@@ -2,19 +2,64 @@
 > pedeoutra@0.1.0 test:edge
 > node scripts/edge-typecheck.mjs
 
-Verificando 11 Edge Functions com npx.cmd…
+Verificando 57 Edge Functions com npx.cmd…
+[0m[32mCheck[0m supabase/functions/admin-api/index.ts
+[0m[32mCheck[0m supabase/functions/admin-bootstrap/index.ts
+[0m[32mCheck[0m supabase/functions/analytics-consent/index.ts
+[0m[32mCheck[0m supabase/functions/analytics-ingest/index.ts
+[0m[32mCheck[0m supabase/functions/api-key-create/index.ts
+[0m[32mCheck[0m supabase/functions/api-key-list/index.ts
+[0m[32mCheck[0m supabase/functions/api-key-revoke/index.ts
+[0m[32mCheck[0m supabase/functions/api-v1/index.ts
+[0m[32mCheck[0m supabase/functions/api-webhook-create/index.ts
+[0m[32mCheck[0m supabase/functions/api-webhook-list/index.ts
+[0m[32mCheck[0m supabase/functions/api-webhook-revoke/index.ts
+[0m[32mCheck[0m supabase/functions/api-webhook-worker/index.ts
 [0m[32mCheck[0m supabase/functions/asaas-webhook/index.ts
 [0m[32mCheck[0m supabase/functions/billing-reconcile/index.ts
 [0m[32mCheck[0m supabase/functions/cancel-subscription/index.ts
+[0m[32mCheck[0m supabase/functions/catalog-templates/index.ts
+[0m[32mCheck[0m supabase/functions/change-plan/index.ts
 [0m[32mCheck[0m supabase/functions/create-checkout/index.ts
+[0m[32mCheck[0m supabase/functions/customer-price-link-create/index.ts
+[0m[32mCheck[0m supabase/functions/customer-price-link-revoke/index.ts
 [0m[32mCheck[0m supabase/functions/link-order-customer/index.ts
+[0m[32mCheck[0m supabase/functions/onboarding-seed/index.ts
+[0m[32mCheck[0m supabase/functions/order-tracking-create/index.ts
+[0m[32mCheck[0m supabase/functions/order-tracking-get/index.ts
+[0m[32mCheck[0m supabase/functions/order-tracking-revoke/index.ts
+[0m[32mCheck[0m supabase/functions/plan-catalog/index.ts
+[0m[32mCheck[0m supabase/functions/private-catalog-get/index.ts
+[0m[32mCheck[0m supabase/functions/product-image-cover/index.ts
+[0m[32mCheck[0m supabase/functions/product-image-delete/index.ts
+[0m[32mCheck[0m supabase/functions/product-image-list/index.ts
+[0m[32mCheck[0m supabase/functions/product-image-upload/index.ts
+[0m[32mCheck[0m supabase/functions/product-import/index.ts
 [0m[32mCheck[0m supabase/functions/public-catalog/index.ts
 [0m[32mCheck[0m supabase/functions/public-order/index.ts
+[0m[32mCheck[0m supabase/functions/quote-accept/index.ts
+[0m[32mCheck[0m supabase/functions/quote-cancel/index.ts
+[0m[32mCheck[0m supabase/functions/quote-create/index.ts
+[0m[32mCheck[0m supabase/functions/quote-decline/index.ts
+[0m[32mCheck[0m supabase/functions/quote-get/index.ts
+[0m[32mCheck[0m supabase/functions/quote-send/index.ts
+[0m[32mCheck[0m supabase/functions/quote-update/index.ts
 [0m[32mCheck[0m supabase/functions/reorder-create/index.ts
 [0m[32mCheck[0m supabase/functions/reorder-get/index.ts
+[0m[32mCheck[0m supabase/functions/reorder-reminder-create/index.ts
+[0m[32mCheck[0m supabase/functions/reorder-reminder-open/index.ts
 [0m[32mCheck[0m supabase/functions/reorder-revoke/index.ts
 [0m[32mCheck[0m supabase/functions/reorder-submit/index.ts
+[0m[32mCheck[0m supabase/functions/team-accept/index.ts
+[0m[32mCheck[0m supabase/functions/team-invite/index.ts
+[0m[32mCheck[0m supabase/functions/team-list/index.ts
+[0m[32mCheck[0m supabase/functions/team-revoke/index.ts
+[0m[32mCheck[0m supabase/functions/team-role/index.ts
+[0m[32mCheck[0m supabase/functions/whatsapp-config-get/index.ts
+[0m[32mCheck[0m supabase/functions/whatsapp-connect/index.ts
+[0m[32mCheck[0m supabase/functions/whatsapp-disconnect/index.ts
+[0m[32mCheck[0m supabase/functions/whatsapp-webhook/index.ts
+[0m[32mCheck[0m supabase/functions/whatsapp-worker/index.ts
 PASS Edge Functions typecheck
-(node:4936) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(node:28456) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-exit=0

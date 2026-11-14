@@ -2,14 +2,32 @@
 > pedeoutra@0.1.0 test:edge-http
 > node scripts/test-edge-http.mjs
 
-PedeOutra Edge HTTP test — PostgREST http://127.0.0.1:62055, Deno http://127.0.0.1:62057
-(node:28764) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+PedeOutra Edge HTTP test — PostgREST http://127.0.0.1:55712, Deno http://127.0.0.1:55714
+(node:15740) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 [1/5] Migrations e seed
   applied 20261112000100_core.sql
   applied 20261112000200_rls.sql
   applied 20261112000300_rpc.sql
   applied 20261112000400_api_wrappers.sql
+  applied 20261113000100_plans_entitlements.sql
+  applied 20261113000200_admin_trial.sql
+  applied 20261113000300_catalog_media.sql
+  applied 20261113000400_product_sku.sql
+  applied 20261113000500_order_rules.sql
+  applied 20261113000600_product_import.sql
+  applied 20261114000100_catalog_seed.sql
+  applied 20261114000200_order_tracking.sql
+  applied 20261114000300_customer_prices.sql
+  applied 20261114000400_quotes.sql
+  applied 20261114000500_whatsapp_contract.sql
+  applied 20261114000600_team_rbac.sql
+  applied 20261114000700_reorder_radar.sql
+  applied 20261114000800_reorder_reminders.sql
+  applied 20261114000900_analytics.sql
+  applied 20261114001000_financial_metrics.sql
+  applied 20261114001100_api_keys.sql
+  applied 20261114001200_api_webhooks.sql
 [2/5] PostgREST em /rest/v1
 [3/5] Router Deno com handlers reais
   router pronto
@@ -33,6 +51,54 @@ PedeOutra Edge HTTP test — PostgREST http://127.0.0.1:62055, Deno http://127.0
   PASS  reorder-revoke autenticado revoga link
   PASS  create-checkout retorna PROD BLOCKED sem credenciais
   PASS  cancel-subscription retorna PROD BLOCKED sem credenciais
+[7/8] Planos, checkout e console admin
+  PASS  plan-catalog expõe dois planos e mantém Pro indisponível
+  PASS  create-checkout recusa Profissional antes de chamar o Asaas
+  PASS  admin-api rejeita anônimo, AAL1, fornecedor e token expirado
+  PASS  admin-api AAL2 retorna overview, lista paginada e auditoria
+  PASS  admin-bootstrap exige token dedicado e e-mail do ambiente
+  PASS  admin-bootstrap falha fechado sem ADMIN_EMAIL
+  PASS  change-plan bloqueia troca sem caminho seguro e registra intenção
+  PASS  ações admin são auditadas e reativam o acesso
+[8/8] Categorias e mídia
+  PASS  product-image-list exige sessão e retorna lista vazia
+  PASS  upload de mídia rejeita formulário inválido e SVG
+  PASS  delete e capa de mídia validam o id
+  PASS  product-import faz dry-run, commit e retry idempotente
+  PASS  product-import bloqueia linha inválida antes do commit
+  PASS  catalog-templates expõe cinco modelos sem preço
+  PASS  onboarding-seed valida, cria e é idempotente
+  PASS  onboarding-seed rejeita item fora do template
+  PASS  order-tracking cria, resolve sem PII e revoga
+  PASS  order-tracking falha neutro para token inválido/expirado e outro tenant
+[9/9] Preços por comprador
+  PASS  private-catalog exige plano, aplica preço privado e não vaza PII
+  PASS  pedido privado usa token, não exige nome/telefone e preserva origem
+  PASS  link de preço exige tabela, expõe catálogo e revoga
+  PASS  token expirado e downgrade bloqueiam o catálogo privado
+[10/10] Orçamentos B2B
+  PASS  orçamento HTTP cria, envia, aceita e repete sem duplicar
+  PASS  orçamento HTTP recusa, cancela e bloqueia token inválido
+  PASS  preço alterado no orçamento HTTP exige revisão
+  PASS  orçamento exige Profissional
+[11/11] WhatsApp oficial: configuração e outbox desligado
+  PASS  opt-in cria outbox bloqueado sem integração pronta
+  PASS  configuração cifra token e não o devolve
+  PASS  worker exige token e permanece desligado
+  PASS  webhook valida HMAC e atualiza entrega sem PII
+  PASS  desconectar limpa token e desliga envio
+[12/12] Equipe e convites manuais
+  PASS  equipe exige AAL2, aceita convite e revoga acesso
+  PASS  limite de três usuários e AAL2 protegem convites
+[13/13] Lembretes manuais de reposição
+  PASS  lembrete manual é idempotente, marca abertura e respeita opt-out
+[14/14] Analytics first-party
+  PASS  analytics valida evento, mascara token e exige consentimento
+  PASS  admin vê funil agregado apenas com AAL2
+[15/15] API B2B v1
+  PASS  chave de API é única, escopada, auditável e revogável
+  PASS  escopo insuficiente bloqueia rota de clientes
+[16/16] Webhooks B2B
+  PASS  webhook assinado enfileira eventos de pedido e pode ser revogado
 
-Resultado: 17 PASS, 0 FAIL
-exit=0
+Resultado: 56 PASS, 0 FAIL
