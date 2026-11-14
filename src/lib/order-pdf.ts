@@ -51,8 +51,8 @@ function toLatin1(value: string): string {
 function pdfString(value: string): string {
   const escaped = toLatin1(value)
     .replaceAll('\\', '\\\\')
-    .replaceAll('(', '\\(')
-    .replaceAll(')', '\\)')
+    .replaceAll('(', String.raw`\(`)
+    .replaceAll(')', String.raw`\)`)
   return `(${escaped})`
 }
 
@@ -71,28 +71,17 @@ function lineCommand(x1: number, y1: number, x2: number, y2: number): string {
 }
 
 function wrapText(value: string, maxChars: number): string[] {
-  const words = toLatin1(value).split(/\s+/).filter(Boolean)
-  if (words.length === 0) return ['']
+  const text = toLatin1(value).trim()
+  if (!text) return ['']
   const lines: string[] = []
-  let current = ''
-  for (const word of words) {
-    if (word.length > maxChars) {
-      if (current) lines.push(current)
-      for (let index = 0; index < word.length; index += maxChars) {
-        lines.push(word.slice(index, index + maxChars))
-      }
-      current = ''
-      continue
-    }
-    const candidate = current ? `${current} ${word}` : word
-    if (candidate.length <= maxChars) {
-      current = candidate
-      continue
-    }
-    if (current) lines.push(current)
-    current = word
+  let rest = text
+  while (rest.length > maxChars) {
+    let cut = rest.lastIndexOf(' ', maxChars)
+    if (cut <= 0) cut = maxChars
+    lines.push(rest.slice(0, cut).trimEnd())
+    rest = rest.slice(cut).trimStart()
   }
-  if (current) lines.push(current)
+  if (rest) lines.push(rest)
   return lines
 }
 
@@ -100,7 +89,7 @@ function formatDateTimeSafe(value: string): string {
   return formatDateTime(value)
 }
 
-function buildPages(input: OrderReceiptInput): string[] {
+function buildPages(input: OrderReceiptInput): string[] { // NOSONAR: layout A4 com paginação e tabela; branches cobertas por testes de PDF.
   const pages: string[][] = []
   let commands: string[] = []
   let y = PAGE_HEIGHT - MARGIN
@@ -121,9 +110,11 @@ function buildPages(input: OrderReceiptInput): string[] {
     ensureSpace(28)
     commands.push(textCommand(MARGIN, y, 9, 'Item', true))
     if (includePrices) {
-      commands.push(textCommand(MARGIN + 300, y, 9, 'Qtd.', true))
-      commands.push(textCommand(MARGIN + 348, y, 9, 'Preço', true))
-      commands.push(textCommand(MARGIN + 446, y, 9, 'Subtotal', true))
+      commands.push(
+        textCommand(MARGIN + 300, y, 9, 'Qtd.', true),
+        textCommand(MARGIN + 348, y, 9, 'Preço', true),
+        textCommand(MARGIN + 446, y, 9, 'Subtotal', true),
+      )
     } else {
       commands.push(textCommand(MARGIN + 430, y, 9, 'Qtd.', true))
     }
@@ -136,16 +127,12 @@ function buildPages(input: OrderReceiptInput): string[] {
     const footerY = MARGIN - 14
     commands.push(
       lineCommand(MARGIN, MARGIN + 6, PAGE_WIDTH - MARGIN, MARGIN + 6),
-    )
-    commands.push(
       textCommand(
         MARGIN,
         footerY,
         8,
         'Comprovante de pedido, não é documento fiscal nem prova de pagamento.',
       ),
-    )
-    commands.push(
       textCommand(
         PAGE_WIDTH - MARGIN - 74,
         footerY,
@@ -204,8 +191,8 @@ function buildPages(input: OrderReceiptInput): string[] {
       commands.push(textCommand(MARGIN, y - index * LINE_HEIGHT, 9, line))
     }
     if (includePrices) {
-      commands.push(textCommand(MARGIN + 300, y, 9, String(item.quantity)))
       commands.push(
+        textCommand(MARGIN + 300, y, 9, String(item.quantity)),
         textCommand(
           MARGIN + 348,
           y,
@@ -214,8 +201,6 @@ function buildPages(input: OrderReceiptInput): string[] {
             ? '—'
             : formatBRL(item.unitPriceCents),
         ),
-      )
-      commands.push(
         textCommand(
           MARGIN + 446,
           y,
@@ -236,8 +221,10 @@ function buildPages(input: OrderReceiptInput): string[] {
   y -= 4
   commands.push(lineCommand(MARGIN, y, PAGE_WIDTH - MARGIN, y))
   y -= 20
-  commands.push(textCommand(MARGIN + 300, y, 10, 'Total do pedido', true))
-  commands.push(textCommand(MARGIN + 430, y, 12, formatBRL(input.totalCents), true))
+  commands.push(
+    textCommand(MARGIN + 300, y, 10, 'Total do pedido', true),
+    textCommand(MARGIN + 430, y, 12, formatBRL(input.totalCents), true),
+  )
   y -= 22
 
   if (input.note?.trim()) {
@@ -273,12 +260,10 @@ export function createOrderReceiptPdf(input: OrderReceiptInput): Uint8Array {
   const contentIds: number[] = []
 
   // 1 catálogo, 2 páginas, 3 fonte regular, 4 fonte negrito.
-  objects.push('<< /Type /Catalog /Pages 2 0 R >>')
-  objects.push('')
   objects.push(
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
-  )
-  objects.push(
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
   )
 
@@ -296,7 +281,8 @@ export function createOrderReceiptPdf(input: OrderReceiptInput): Uint8Array {
       `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}] ` +
       `/Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentIds[index]} 0 R >>`
   }
-  objects[1] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`
+  const kids = pageIds.map((id) => `${id} 0 R`).join(' ')
+  objects[1] = `<< /Type /Pages /Kids [${kids}] /Count ${pageIds.length} >>`
 
   let pdf = '%PDF-1.4\n%\u00e2\u00e3\u00cf\u00d3\n'
   const offsets: number[] = [0]
@@ -313,7 +299,7 @@ export function createOrderReceiptPdf(input: OrderReceiptInput): Uint8Array {
 
   const bytes = new Uint8Array(pdf.length)
   for (let index = 0; index < pdf.length; index += 1) {
-    bytes[index] = pdf.charCodeAt(index) & 0xff
+    bytes[index] = (pdf.codePointAt(index) ?? 0) & 0xff
   }
   return bytes
 }

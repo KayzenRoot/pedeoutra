@@ -79,8 +79,8 @@ describe('comprovante de pedido em PDF', () => {
     const pageCount = (pdf.match(/\/Type \/Page\b/g) ?? []).length
     expect(pageCount).toBeGreaterThan(1)
     expect(pdf).toContain(`/Count ${pageCount}`)
-    expect((pdf.match(/Página \d+ de \d+/g) ?? []).length).toBe(pageCount)
-    expect((pdf.match(/não é documento fiscal/g) ?? []).length).toBe(pageCount)
+    expect(pdf.match(/Página \d+ de \d+/g) ?? []).toHaveLength(pageCount)
+    expect(pdf.match(/não é documento fiscal/g) ?? []).toHaveLength(pageCount)
   })
 
   it('sanitiza nome de arquivo', () => {
