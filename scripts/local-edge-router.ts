@@ -50,6 +50,8 @@ import { handler as teamRole } from '../supabase/functions/team-role/index.ts'
 import { handler as teamRevoke } from '../supabase/functions/team-revoke/index.ts'
 import { handler as reorderReminderCreate } from '../supabase/functions/reorder-reminder-create/index.ts'
 import { handler as reorderReminderOpen } from '../supabase/functions/reorder-reminder-open/index.ts'
+import { handler as analyticsIngest } from '../supabase/functions/analytics-ingest/index.ts'
+import { handler as analyticsConsent } from '../supabase/functions/analytics-consent/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -101,6 +103,8 @@ const routes: Record<string, Handler> = {
   'team-revoke': teamRevoke,
   'reorder-reminder-create': reorderReminderCreate,
   'reorder-reminder-open': reorderReminderOpen,
+  'analytics-ingest': analyticsIngest,
+  'analytics-consent': analyticsConsent,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

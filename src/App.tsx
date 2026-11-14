@@ -1,8 +1,10 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
+import { ConsentBanner } from './components/ConsentBanner'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import { track } from './lib/analytics'
 import { Billing } from './pages/Billing'
 import { Catalog } from './pages/Catalog'
 import { Customers } from './pages/Customers'
@@ -45,6 +47,7 @@ function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+    track('page_view')
   }, [pathname])
   return null
 }
@@ -123,6 +126,7 @@ export default function App() {
           <Route path="/termos" element={<Terms />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ConsentBanner />
       </AuthProvider>
     </BrowserRouter>
   )

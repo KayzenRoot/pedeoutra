@@ -103,9 +103,11 @@ create schema if not exists auth;
 create table if not exists auth.users (
   id uuid primary key,
   email text,
-  email_confirmed_at timestamptz
+  email_confirmed_at timestamptz,
+  created_at timestamptz not null default now()
 );
 alter table auth.users add column if not exists email_confirmed_at timestamptz;
+alter table auth.users add column if not exists created_at timestamptz not null default now();
 create or replace function auth.uid()
 returns uuid
 language sql
@@ -2539,6 +2541,37 @@ async function main() {
           ),
         'reorder_reminders_unique',
         'lembrete duplicado',
+      )
+    })
+
+
+    await test('analytics é somente service_role e não expõe eventos ao browser', async () => {
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query('select id from public.analytics_events limit 1'),
+          ),
+        'permission denied',
+        'browser lendo analytics',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.analytics_events (event, session_id, path)
+               values ('page_view', 'session-test-1234567890', '/')`,
+            ),
+          ),
+        'permission denied',
+        'browser escrevendo analytics',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query('select session_id from public.analytics_consents limit 1'),
+          ),
+        'permission denied',
+        'browser lendo consentimentos',
       )
     })
 

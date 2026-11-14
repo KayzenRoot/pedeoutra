@@ -22,6 +22,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #58 | Equipe, RBAC e convites manuais com AAL2 | implementado; envio de e-mail depende de SMTP |
 | #44 | Radar de recompra por cadência real | implementado neste branch |
 | #45 | Lembretes manuais com consentimento e histórico | implementado; envio automático desligado |
+| #78 | Analytics first-party do funil, consentimento e fontes | implementado |
 
 ## #48 — preços por comprador
 
@@ -158,16 +159,36 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   histórico recente e ação manual; Configurações permitem ativar lembretes,
   frequência, histórico mínimo e tolerância; Clientes permite registrar opt-in.
 
+## #78 — analytics first-party
+
+- `analytics_events` e `analytics_consents` guardam apenas evento, sessão
+  pseudônima, rota saneada, classe de referrer/UTM, versão de consentimento e
+  metadata allowlisted; sem IP integral, e-mail, telefone, token ou query string.
+- `analytics-ingest` valida allowlist, sessão, rota e consentimento; mascara
+  `/p/`, `/r/`, `/o/`, `/convite/` e `/acompanhar/` para `:token`; rejeita
+  eventos financeiros vindos do browser. `analytics-consent` registra
+  analytics/marketing por sessão.
+- Banner de consentimento global (analytics/marketing; necessários sempre
+  ativos), respeita DNT/GPC e mantém analytics desligado por padrão. Eventos de
+  landing, planos, CTA, FAQ, demo, catálogo, pedido, signup, trial e checkout
+  são instrumentados; financeiros são derivados de `billing_events`/trial no
+  servidor.
+- `api_admin_analytics` e `api_admin_analytics_sources` só respondem a
+  superadmin; o console `/admin` mostra funil de 30 dias e fontes, com ausência
+  de dados distinta de zero.
+- RLS nega acesso direto a `authenticated`; ingestão é pública, rate-limited e
+  sem PII.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **68 PASS, 0 FAIL** |
-| `npm run test:edge` | typecheck de **47 Edge Functions** |
-| `npm run test:edge-http` | **51 PASS, 0 FAIL** |
+| `npm run test:db` | **69 PASS, 0 FAIL** |
+| `npm run test:edge` | typecheck de **49 Edge Functions** |
+| `npm run test:edge-http` | **53 PASS, 0 FAIL** |
 | `npm run test:unit` | **150 PASS, 0 FAIL** (30 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe e lembretes |
+| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe, lembretes e analytics |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |

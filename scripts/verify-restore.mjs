@@ -268,6 +268,18 @@ insert into public.reorder_reminders (
   'restore-cycle-1', 'Lembrete de restore', 'suggested'
 );
 
+insert into public.analytics_events (
+  id, event, session_id, path, source, organization_id, consent_version, metadata
+) values (
+  'aaaaaaaa-1111-4111-8111-eeeeeeeeeeee',
+  'landing_view', 'restore-session-123456', '/', 'frontend',
+  'aaaaaaaa-2222-4222-8222-222222222222', '2026-11-14', '{"plan_code":"essential"}'::jsonb
+);
+
+insert into public.analytics_consents (
+  session_id, analytics, marketing, consent_version
+) values ('restore-session-123456', true, false, '2026-11-14');
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -400,6 +412,8 @@ select
   (select count(*) from public.organization_memberships) as team_members,
   (select count(*) from public.organization_invitations) as team_invitations,
   (select count(*) from public.reorder_reminders) as reorder_reminders,
+  (select count(*) from public.analytics_events) as analytics_events,
+  (select count(*) from public.analytics_consents) as analytics_consents,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -416,7 +430,9 @@ select
   (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.whatsapp_outbox) as whatsapp_outbox_hash,
   (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_memberships) as team_members_hash,
   (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_invitations) as team_invitations_hash,
-  (select md5(string_agg(id::text || ':' || cycle_key || ':' || status, ',' order by id)) from public.reorder_reminders) as reorder_reminders_hash
+  (select md5(string_agg(id::text || ':' || cycle_key || ':' || status, ',' order by id)) from public.reorder_reminders) as reorder_reminders_hash,
+  (select md5(string_agg(id::text || ':' || event || ':' || path, ',' order by id)) from public.analytics_events) as analytics_events_hash,
+  (select md5(string_agg(session_id || ':' || analytics || ':' || marketing, ',' order by session_id)) from public.analytics_consents) as analytics_consents_hash
 `
 
 async function main() {
@@ -528,6 +544,8 @@ async function main() {
       'team_members',
       'team_invitations',
       'reorder_reminders',
+      'analytics_events',
+      'analytics_consents',
       'orders_hash',
       'price_lists_hash',
       'price_items_hash',
@@ -538,6 +556,8 @@ async function main() {
       'team_members_hash',
       'team_invitations_hash',
       'reorder_reminders_hash',
+      'analytics_events_hash',
+      'analytics_consents_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

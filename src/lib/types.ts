@@ -239,6 +239,26 @@ export interface AdminAuditResponse {
   total: number
 }
 
+export interface AdminAnalyticsEvent {
+  event: string
+  sessions: number
+  events: number
+  last_seen: string | null
+}
+
+export interface AdminAnalyticsSource {
+  referrer_class: string
+  utm_source: string | null
+  sessions: number
+  events: number
+}
+
+export interface AdminAnalyticsResponse {
+  days: number
+  events: AdminAnalyticsEvent[]
+  sources: AdminAnalyticsSource[]
+}
+
 export interface OrderWithCustomer extends Order {
   customers: { display_name: string } | null
 }

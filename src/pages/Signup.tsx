@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { BackendNotice, FormMessage } from '../components/ui'
 import { useAuth } from '../context/auth-context'
+import { track } from '../lib/analytics'
 
 export function Signup() {
   const { configured, signUp } = useAuth()
@@ -37,6 +38,7 @@ export function Signup() {
     setSubmitting(true)
     try {
       const result = await signUp(email.trim(), password)
+      track('signup_completed')
       if (result.needsEmailConfirmation) {
         setNeedsConfirmation(true)
       } else {

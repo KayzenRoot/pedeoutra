@@ -1,4 +1,5 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { track } from '../lib/analytics'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
 import { FormMessage, QuantityStepper } from '../components/ui'
@@ -14,6 +15,10 @@ const DEMO_PRODUCTS = [
 ]
 
 export function Demo() {
+  useEffect(() => {
+    track('demo_open')
+  }, [])
+
   const [cart, setCart] = useState<Record<string, number>>({
     'demo-copo': 2,
     'demo-agua': 3,

@@ -2045,6 +2045,97 @@ async function main() {
       await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 
+
+    console.log('[14/14] Analytics first-party')
+
+    await test('analytics valida evento, mascara token e exige consentimento', async () => {
+      const sessionId = 'session-test-1234567890abcdef'
+      const valid = await call(
+        'analytics-ingest',
+        {
+          event: 'landing_view',
+          session_id: sessionId,
+          path: '/p/token-super-secreto',
+          consent_version: '2026-11-14',
+          referrer_class: 'organic',
+          utm_source: 'google',
+          metadata: { plan_code: 'essential', secret: 'não permitido' },
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.40' } },
+      )
+      assert(valid.status === 202, `ingest HTTP ${valid.status}`)
+
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select path, metadata::text from public.analytics_events
+          where session_id = '${sessionId}' order by created_at desc limit 1`,
+      ]).stdout.trim()
+      assert(stored.startsWith('/p/:token|'), `path ${stored}`)
+      assert(!stored.includes('token-super-secreto'), 'token vazou')
+      assert(!stored.includes('secret'), 'metadata não allowlisted')
+
+      const serverOnly = await call(
+        'analytics-ingest',
+        {
+          event: 'subscription_payment_confirmed',
+          session_id: sessionId,
+          path: '/',
+          consent_version: '2026-11-14',
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.40' } },
+      )
+      assert(serverOnly.status === 400, `server-only HTTP ${serverOnly.status}`)
+
+      const invalidSession = await call(
+        'analytics-ingest',
+        {
+          event: 'landing_view',
+          session_id: 'curta',
+          path: '/',
+          consent_version: '2026-11-14',
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.40' } },
+      )
+      assert(invalidSession.status === 400, `sessão HTTP ${invalidSession.status}`)
+
+      const consent = await call(
+        'analytics-consent',
+        {
+          session_id: sessionId,
+          analytics: true,
+          marketing: false,
+          consent_version: '2026-11-14',
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.41' } },
+      )
+      assert(consent.status === 200, `consent HTTP ${consent.status}`)
+      assert(consent.data.analytics === true, 'consentimento analytics')
+      const consentRow = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select analytics, marketing from public.analytics_consents where session_id = '${sessionId}'`,
+      ]).stdout.trim()
+      assert(consentRow === 't|f', `consent ${consentRow}`)
+    })
+
+    await test('admin vê funil agregado apenas com AAL2', async () => {
+      const response = await fetch(`${edgeBase}/admin-api?view=analytics&days=30`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const data = await response.json()
+      assert(response.status === 200, `analytics HTTP ${response.status}`)
+      assert(data.days === 30, 'janela')
+      assert(Array.isArray(data.events), 'eventos')
+      assert(data.events.some((event) => event.event === 'landing_view'), 'landing_view')
+      assert(Array.isArray(data.sources), 'fontes')
+
+      const supplier = await fetch(`${edgeBase}/admin-api?view=analytics`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      assert(supplier.status === 403, `fornecedor HTTP ${supplier.status}`)
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)

@@ -118,6 +118,9 @@ describe('console administrativo', () => {
         if (query.view === 'organizations') {
           return Promise.resolve({ organizations: [organization], total: 1 })
         }
+        if (query.view === 'analytics') {
+          return Promise.resolve({ days: 30, events: [], sources: [] })
+        }
         return Promise.resolve({
           audit: [
             {

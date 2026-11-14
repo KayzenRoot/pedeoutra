@@ -3,6 +3,7 @@ import { adminClient } from '../_shared/supabase.ts'
 import { requireSupplier , assertRole} from '../_shared/auth.ts'
 import { enforceRateLimit } from '../_shared/rate-limit.ts'
 import { auditEvent } from '../_shared/audit.ts'
+import { recordServerAnalytics } from '../_shared/analytics.ts'
 import {
   HttpError,
   jsonResponse,
@@ -190,6 +191,13 @@ export const handler = (req: Request) =>
         plan_code: plan.plan_code,
         plan_version: plan.plan_version,
       },
+    })
+
+    await recordServerAnalytics(supabase, {
+      event: 'checkout_started',
+      organizationId: organization.id,
+      userId: user.id,
+      metadata: { plan_code: plan.plan_code, source: 'asaas' },
     })
 
     return jsonResponse(

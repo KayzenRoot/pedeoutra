@@ -177,3 +177,9 @@ verify_jwt = true
 
 [functions.reorder-reminder-open]
 verify_jwt = true
+
+[functions.analytics-ingest]
+verify_jwt = false
+
+[functions.analytics-consent]
+verify_jwt = false

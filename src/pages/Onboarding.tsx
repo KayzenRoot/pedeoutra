@@ -4,6 +4,7 @@ import { Brand } from '../components/Brand'
 import { CatalogTemplatePicker } from '../components/CatalogTemplatePicker'
 import { FormMessage } from '../components/ui'
 import { useAuth } from '../context/auth-context'
+import { track } from '../lib/analytics'
 import { slugify } from '../lib/format'
 
 export function Onboarding() {
@@ -26,6 +27,7 @@ export function Onboarding() {
     setSubmitting(true)
     try {
       await createOrganization({ name, whatsapp, city })
+      track('trial_started')
       setStep('template')
     } catch (submitError) {
       setError(

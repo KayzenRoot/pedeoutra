@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
+import { track } from '../lib/analytics'
 import { ACCESS_TEXT, organizationAccess } from '../lib/access'
 import { callAuthedFunction, EdgeFunctionError, getPlanCatalog } from '../lib/edge'
 import { formatBRL, formatDateTime } from '../lib/format'
@@ -72,6 +73,7 @@ export function Billing() {
     setError(null)
     setSuccess(null)
     try {
+      track('checkout_started', { plan_code: planCode })
       const result = await callAuthedFunction<CheckoutResponse>('create-checkout', {
         plan_code: planCode,
       })

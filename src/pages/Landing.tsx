@@ -84,6 +84,7 @@ export function Landing() {
 
   useEffect(() => {
     track('landing_view')
+    track('plan_view')
     let active = true
     void getPlanCatalog<PlanCatalogResponse>()
       .then((data) => {
@@ -134,7 +135,11 @@ export function Landing() {
               planilha no WhatsApp.
             </p>
             <div className="hero-actions">
-              <Link to="/criar-conta" className="button button-primary button-large">
+              <Link
+                to="/criar-conta"
+                className="button button-primary button-large"
+                onClick={() => track('cta_click', { event_target: 'hero_signup' })}
+              >
                 Testar 7 dias grátis
               </Link>
               <Link to="/demo" className="button button-secondary button-large">
@@ -383,7 +388,15 @@ export function Landing() {
           </div>
           <div className="faq-list">
             {FAQ.map((item) => (
-              <details key={item.question} className="faq-item">
+              <details
+                key={item.question}
+                className="faq-item"
+                onToggle={(event) => {
+                  if (event.currentTarget.open) {
+                    track('faq_expand', { event_target: item.question.slice(0, 80) })
+                  }
+                }}
+              >
                 <summary>{item.question}</summary>
                 <p>{item.answer}</p>
               </details>
@@ -396,7 +409,11 @@ export function Landing() {
             <span className="eyebrow">Próximo pedido</span>
             <h2>Seu cliente já sabe o que quer. Facilite a repetição.</h2>
           </div>
-          <Link to="/criar-conta" className="button button-lime button-large">
+          <Link
+            to="/criar-conta"
+            className="button button-lime button-large"
+            onClick={() => track('cta_click', { event_target: 'final_signup' })}
+          >
             Criar catálogo grátis
           </Link>
         </section>

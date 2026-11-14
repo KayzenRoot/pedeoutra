@@ -7,9 +7,11 @@ create schema if not exists auth;
 create table if not exists auth.users (
   id uuid primary key,
   email text,
-  email_confirmed_at timestamptz
+  email_confirmed_at timestamptz,
+  created_at timestamptz not null default now()
 );
 alter table auth.users add column if not exists email_confirmed_at timestamptz;
+alter table auth.users add column if not exists created_at timestamptz not null default now();
 
 create or replace function auth.uid()
 returns uuid

@@ -9,6 +9,9 @@ import { formatBRL, formatDateTime } from '../lib/format'
 import { PLAN_NAMES } from '../lib/plans'
 import { supabase } from '../lib/supabase'
 import type {
+  AdminAnalyticsEvent,
+  AdminAnalyticsResponse,
+  AdminAnalyticsSource,
   AdminAuditEvent,
   AdminAuditResponse,
   AdminOrganization,
@@ -52,6 +55,8 @@ export function Admin() {
   const [overview, setOverview] = useState<AdminOverview | null>(null)
   const [organizations, setOrganizations] = useState<AdminOrganization[]>([])
   const [audit, setAudit] = useState<AdminAuditEvent[]>([])
+  const [analytics, setAnalytics] = useState<AdminAnalyticsEvent[]>([])
+  const [analyticsSources, setAnalyticsSources] = useState<AdminAnalyticsSource[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
@@ -67,7 +72,7 @@ export function Admin() {
       setLoading(true)
       setError(null)
       try {
-        const [overviewData, listData, auditData] = await Promise.all([
+        const [overviewData, listData, auditData, analyticsData] = await Promise.all([
           callAuthedGet<{ overview: AdminOverview }>('admin-api', { view: 'overview' }),
           callAuthedGet<AdminOrganizationsResponse>('admin-api', {
             view: 'organizations',
@@ -82,11 +87,17 @@ export function Admin() {
             limit: 20,
             offset: 0,
           }),
+          callAuthedGet<AdminAnalyticsResponse>('admin-api', {
+            view: 'analytics',
+            days: 30,
+          }),
         ])
         setOverview(overviewData.overview)
         setOrganizations(listData.organizations ?? [])
         setTotal(listData.total ?? 0)
         setAudit(auditData.audit ?? [])
+        setAnalytics(analyticsData.events ?? [])
+        setAnalyticsSources(analyticsData.sources ?? [])
       } catch (loadError) {
         setError(
           loadError instanceof EdgeFunctionError
@@ -224,6 +235,54 @@ export function Admin() {
               ))}
             </section>
           )}
+
+          <section className="card">
+            <div className="card-heading">
+              <div>
+                <span className="eyebrow">Funil</span>
+                <h2>Analytics first-party (30 dias)</h2>
+              </div>
+              <span className="muted">Dados observados; ausência ≠ zero</span>
+            </div>
+            {analytics.length === 0 ? (
+              <p className="muted">Nenhum evento consentido no período.</p>
+            ) : (
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Evento</th>
+                      <th>Sessões</th>
+                      <th>Eventos</th>
+                      <th>Último</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analytics.map((event) => (
+                      <tr key={event.event}>
+                        <td data-label="Evento">{event.event}</td>
+                        <td data-label="Sessões">{event.sessions}</td>
+                        <td data-label="Eventos">{event.events}</td>
+                        <td data-label="Último">
+                          {event.last_seen ? formatDateTime(event.last_seen) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {analyticsSources.length > 0 && (
+              <ul className="settings-list">
+                {analyticsSources.slice(0, 8).map((source) => (
+                  <li key={`${source.referrer_class}-${source.utm_source ?? 'none'}`}>
+                    <strong>{source.referrer_class}</strong> · {source.utm_source ?? 'sem UTM'} ·{' '}
+                    {source.sessions} sessão(ões)
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
           <section className="card">
             <div className="card-heading">
