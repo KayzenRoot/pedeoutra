@@ -30,6 +30,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #73 | Prerender comercial, 404 real, rewrites e noindex | implementado |
 | #81 | Glass/tokens e motion acessível na landing | parcial (landing/cards; biblioteca completa pendente) |
 | #82 | Landing V2 com dois planos, recursos, setores e FAQ | implementado no escopo comercial atual |
+| #83 | Auditoria integrada SEO/analytics/financeiro/UI | interna concluída; produção BLOCKED_DEPLOY |
+| #72 | Gate final V2.0 | BLOCKED_DEPLOY; exige autorização/deploy real |
 | #76 | Monitoramento SEO em CI e GSC | CI implementada; GSC externo pendente |
 | #64/#65/#67 | API B2B v1: chaves, escopos, gateway, quota e OpenAPI | implementado (leitura) |
 | #66 | Webhooks B2B de eventos com HMAC e retry | implementado com entrega desligada |
