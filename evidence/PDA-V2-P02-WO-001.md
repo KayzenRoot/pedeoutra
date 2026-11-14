@@ -16,7 +16,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #50 | Acompanhamento público por token opaco, TTL e revogação | implementado |
 | #48 | Preços por comprador, tabela privada e link opaco | implementado |
 | #51 | Orçamentos B2B com aceite opaco e conversão única em pedido | implementado |
-| #55 | Comprovante de pedido em PDF A4, sem natureza fiscal | implementado neste branch |
+| #55 | Comprovante de pedido em PDF A4, sem natureza fiscal | implementado |
+| #63 | Comparação comercial dos dois planos na landing | implementado neste branch |
 
 ## #48 — preços por comprador
 
@@ -78,6 +79,20 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   múltiplas páginas e sanitização de filename. O PDF também foi validado com
   `pdftotext` e renderizado com PyMuPDF durante a auditoria local.
 
+## #63 — páginas comerciais
+
+- A landing passou a comparar Essencial e Profissional lado a lado, com preços
+  vindos de `plan-catalog` (fallback estático apenas se a API não estiver
+  configurada), recursos por plano, trial e limites.
+- O Profissional aparece como “Em preparação”, com checkout desabilitado e
+  aviso de que WhatsApp automático depende de WABA/templates aprovados; nenhum
+  recurso externo é apresentado como ativo.
+- `Assinatura` já exibe plano atual, status, renovação, recursos e ações; o
+  console admin já filtra organizações por estado/plano e audita ações. Não
+  houve alteração no motor de cobrança, Asaas ou permissões.
+- Smoke desktop/mobile light/dark/system e axe sem violações nas duas
+  apresentações.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
@@ -116,5 +131,5 @@ Logs locais usados durante a implementação:
 - SMTP próprio pendente (convites de equipe bloqueados).
 - WhatsApp oficial depende de WABA, templates e consentimento aprovados.
 - Admin bootstrap de produção segue pendente de TOTP/AAL2 do proprietário.
-- Itens seguintes da Parte 2: #58 equipe/RBAC, #29–#31 contrato WhatsApp e
-  #63 páginas comerciais.
+- Itens seguintes da Parte 2: #58 equipe/RBAC (bloqueado por SMTP) e #29–#31
+  contrato WhatsApp (bloqueado por WABA/Meta).

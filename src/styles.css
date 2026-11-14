@@ -832,10 +832,29 @@ svg {
 }
 
 .pricing-section {
+  display: block;
+}
+
+.pricing-grid {
   display: grid;
-  grid-template-columns: 1fr 460px;
-  gap: 50px;
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 34px;
+  align-items: stretch;
+}
+
+.price-card-pro {
+  border-color: var(--accent);
+  box-shadow: 10px 10px 0 var(--surface-2);
+}
+
+.price-list-muted {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.price-list-muted .icon {
+  display: none;
 }
 
 .price-card {
@@ -3974,4 +3993,10 @@ svg {
   display: grid;
   gap: 8px;
   margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -114,7 +114,8 @@ gates de lançamento.
 - **Entregue:** categorias/fotos privadas (#52), SKU e pedido rápido (#47),
   mínimos/múltiplos (#49), importação CSV/XLSX (#46), templates (#57), QR (#53),
   acompanhamento por token (#50), preços por comprador (#48), orçamentos com
-  aceite opaco (#51) e comprovante PDF não fiscal (#55).
+  aceite opaco (#51), comprovante PDF não fiscal (#55) e comparação comercial
+  dos planos (#63).
 - **Evidência local no HEAD de trabalho:** 60 DB, 43 Edge HTTP, 144 unit,
   35 Edge Functions typechecked, 7 grupos full-local, restore com as novas
   tabelas de preço/orçamento e smoke light/dark/system.
@@ -122,8 +123,8 @@ gates de lançamento.
   tokens opacos com SHA-256/TTL/revogação, snapshots de preço, aceite idempotente
   com lock e um pedido por quote, headers `noindex`/`no-referrer`/`no-store`;
   RPCs internas restritas a `service_role`.
-- **Pendente na Parte 2:** #58 equipe/RBAC, #29–#31 contrato WhatsApp e #63
-  páginas comerciais.
+- **Pendente na Parte 2:** #58 equipe/RBAC (SMTP) e #29–#31 contrato WhatsApp
+  (WABA/Meta).
 - **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (TOTP/AAL2 do proprietário),
   SMTP próprio para convites, WABA/templates para WhatsApp e
   `COMMERCIAL_BLOCKED`/`GO_LIVE_BLOCKED`.
