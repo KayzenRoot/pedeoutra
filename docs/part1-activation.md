@@ -1,10 +1,11 @@
-# Ativação da Parte 1 — runbook (não executado)
+# Ativação da Parte 1 — runbook e registro (executado)
 
-Status: **PROPOSED / NÃO EXECUTADO**. Este documento existe para o proprietário
-autorizar e executar a ativação com evidência. Nada aqui foi aplicado em
-produção.
+Status: **EXECUTADO EM 2026-11-13**. As migrations, Edge Functions, secrets e
+merge foram aplicados com autorização do proprietário. O bootstrap do
+superadmin permanece pendente de TOTP/AAL2. Este documento fica como runbook de
+rollback/roll-forward e repetição controlada.
 
-## Estado verificado em 2026-11-13
+## Estado pré-ativação verificado em 2026-11-13
 
 `supabase migration list --linked` mostrou 4 migrations aplicadas no projeto
 `waygtbclkxklexnabwvj` e **2 pendentes**:
