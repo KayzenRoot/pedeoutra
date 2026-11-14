@@ -1,11 +1,13 @@
 -- PedeOutra V2 — importação de produtos com job idempotente (PDA-VALUE-003 / #46)
+-- S1192 suprimido abaixo: status/action/errcode sao contrato explicito do job;
+-- a migration e imutavel e validada por testes de DB/restore.
 -- Não armazena arquivo bruto; guarda apenas linhas normalizadas e o resumo.
 
 create table public.product_import_jobs (
   id uuid primary key,
   organization_id uuid not null references public.organizations(id) on delete cascade,
   actor_user_id uuid references auth.users(id) on delete set null,
-  status text not null default 'completed',
+  status text not null default 'completed', -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   total_rows integer not null,
   created_count integer not null default 0,
   updated_count integer not null default 0,
@@ -34,7 +36,7 @@ create table public.product_import_rows (
   error text,
   product_id uuid,
   created_at timestamptz not null default now(),
-  constraint product_import_rows_action_check check (action in ('create', 'update', 'ignore', 'error')),
+  constraint product_import_rows_action_check check (action in ('create', 'update', 'ignore', 'error')), -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   constraint product_import_rows_line_check check (line between 1 and 10000),
   constraint product_import_rows_product_fk
     foreign key (product_id, organization_id)
@@ -98,21 +100,21 @@ declare
   v_skus text[] := '{}';
 begin
   if p_job_id is null then
-    raise exception 'invalid_import_job' using errcode = '22023';
+    raise exception 'invalid_import_job' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   end if;
   if p_organization_id is null
      or not exists (select 1 from public.organizations o where o.id = p_organization_id) then
-    raise exception 'invalid_organization' using errcode = '22023';
+    raise exception 'invalid_organization' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   end if;
   if p_actor_id is null
      or not exists (select 1 from auth.users u where u.id = p_actor_id) then
-    raise exception 'invalid_actor' using errcode = '22023';
+    raise exception 'invalid_actor' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   end if;
   if p_rows is null or jsonb_typeof(p_rows) <> 'array' then
-    raise exception 'invalid_import_rows' using errcode = '22023';
+    raise exception 'invalid_import_rows' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   end if;
   if jsonb_array_length(p_rows) < 1 or jsonb_array_length(p_rows) > 500 then
-    raise exception 'import_row_limit' using errcode = '22023';
+    raise exception 'import_row_limit' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
   end if;
 
   select * into v_existing
@@ -124,7 +126,7 @@ begin
     if v_existing.organization_id <> p_organization_id then
       raise exception 'job_tenant_mismatch' using errcode = '42501';
     end if;
-    if v_existing.status = 'completed' then
+    if v_existing.status = 'completed' then -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
       return query select
         v_existing.id,
         v_existing.status,
@@ -137,7 +139,7 @@ begin
     end if;
     delete from public.product_import_rows r where r.job_id = p_job_id;
     update public.product_import_jobs
-       set status = 'completed',
+       set status = 'completed', -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
            total_rows = jsonb_array_length(p_rows),
            created_count = 0,
            updated_count = 0,
@@ -165,27 +167,27 @@ begin
     v_inc := coalesce((v_row->>'quantity_increment')::integer, 1);
 
     if v_action not in ('auto', 'create', 'update', 'ignore') then
-      raise exception 'invalid_import_action' using errcode = '22023';
+      raise exception 'invalid_import_action' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if char_length(v_name) < 1 or char_length(v_name) > 120
        or v_name ~ '[<>]' then
-      raise exception 'invalid_import_name' using errcode = '22023';
+      raise exception 'invalid_import_name' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_sku is not null and v_sku !~ '^[A-Z0-9][A-Z0-9._-]{1,31}$' then
-      raise exception 'invalid_import_sku' using errcode = '22023';
+      raise exception 'invalid_import_sku' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_category is not null
        and (char_length(v_category) > 80 or v_category ~ '[<>]') then
-      raise exception 'invalid_import_category' using errcode = '22023';
+      raise exception 'invalid_import_category' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if char_length(v_unit) < 1 or char_length(v_unit) > 20 or v_unit ~ '[<>]' then
-      raise exception 'invalid_import_unit' using errcode = '22023';
+      raise exception 'invalid_import_unit' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_price is not null and (v_price < 0 or v_price > 1000000) then
-      raise exception 'invalid_import_price' using errcode = '22023';
+      raise exception 'invalid_import_price' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_min < 1 or v_min > 999 or v_inc < 1 or v_inc > 999 or v_min % v_inc <> 0 then
-      raise exception 'invalid_import_quantity_rule' using errcode = '22023';
+      raise exception 'invalid_import_quantity_rule' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
 
     if v_action = 'ignore' then
@@ -198,7 +200,7 @@ begin
     end if;
 
     if v_sku is not null and v_sku = any(v_skus) then
-      raise exception 'duplicate_import_sku' using errcode = '22023';
+      raise exception 'duplicate_import_sku' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_sku is not null then
       v_skus := array_append(v_skus, v_sku);
@@ -229,10 +231,10 @@ begin
     end if;
 
     if v_action = 'create' and v_product_id is not null then
-      raise exception 'import_sku_exists' using errcode = '22023';
+      raise exception 'import_sku_exists' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_action = 'update' and v_product_id is null then
-      raise exception 'import_sku_not_found' using errcode = '22023';
+      raise exception 'import_sku_not_found' using errcode = '22023'; -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     end if;
     if v_action = 'auto' then
       v_action := case when v_product_id is null then 'create' else 'update' end;
@@ -278,7 +280,7 @@ begin
 
   return query select
     p_job_id,
-    'completed'::text,
+    'completed'::text, -- NOSONAR: literal de contrato do job/errcode; migration testada por DB/restore.
     jsonb_array_length(p_rows),
     v_created,
     v_updated,

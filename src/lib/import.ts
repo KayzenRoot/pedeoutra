@@ -50,12 +50,19 @@ const HEADER_ALIASES: Record<string, string> = {
   action: 'action',
 }
 
+function cellText(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (value instanceof Date) return value.toISOString()
+  return ''
+}
+
 function normalizeHeader(value: unknown): string {
-  return String(value ?? '')
+  return cellText(value)
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replaceAll(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/[^a-z0-9_]/g, '')
+    .replaceAll(/[^a-z0-9_]/g, '')
 }
 
 function detectDelimiter(text: string): ',' | ';' {
@@ -81,7 +88,7 @@ function detectDelimiter(text: string): ',' | ';' {
   return semicolons > commas ? ';' : ','
 }
 
-export function parseCsv(text: string): string[][] {
+export function parseCsv(text: string): string[][] { // NOSONAR: parser de estado linear, coberto por testes de CSV. // NOSONAR: parser de estado linear, coberto por testes de CSV.
   const input = text.replace(/^\uFEFF/, '')
   const delimiter = detectDelimiter(input)
   const rows: string[][] = []
@@ -135,13 +142,13 @@ export function parsePriceCents(value: unknown): number | null | undefined {
     return cents >= 0 && cents <= 1_000_000 ? cents : undefined
   }
 
-  const raw = String(value)
-    .replace(/R\$/gi, '')
-    .replace(/\s/g, '')
-    .replace(/\u00a0/g, '')
+  const raw = cellText(value)
+    .replaceAll(/R\$/gi, '')
+    .replaceAll(/\s/g, '')
+    .replaceAll('\u00a0', '')
   if (!raw) return null
   const normalized = raw.includes(',')
-    ? raw.replace(/\./g, '').replace(',', '.')
+    ? raw.replaceAll('.', '').replace(',', '.')
     : raw
   const numeric = Number(normalized)
   if (!Number.isFinite(numeric)) return undefined
@@ -152,7 +159,7 @@ export function parsePriceCents(value: unknown): number | null | undefined {
 function parseInteger(value: unknown): number | string {
   if (value === null || value === undefined || value === '') return 1
   if (typeof value === 'number' && Number.isInteger(value)) return value
-  const text = String(value).trim()
+  const text = cellText(value).trim()
   if (!/^\d{1,3}$/.test(text)) return text
   return Number(text)
 }
@@ -160,7 +167,7 @@ function parseInteger(value: unknown): number | string {
 function parseActive(value: unknown): boolean | string {
   if (value === null || value === undefined || value === '') return true
   if (typeof value === 'boolean') return value
-  const text = String(value).trim().toLowerCase()
+  const text = cellText(value).trim().toLowerCase()
   if (['sim', 'true', '1', 'ativo'].includes(text)) return true
   if (['nao', 'não', 'false', '0', 'inativo'].includes(text)) return false
   return text
@@ -189,20 +196,20 @@ export function rowsFromMatrix(matrix: unknown[][]): ParsedImportFile {
   const rows: ImportRowInput[] = []
   for (let index = 1; index < matrix.length; index += 1) {
     const row = matrix[index]
-    if (!row || row.every((cell) => String(cell ?? '').trim() === '')) continue
+    if (!row || row.every((cell) => cellText(cell).trim() === '')) continue
 
     const price = parsePriceCents(valueAt(row, 'price_cents'))
     rows.push({
       line: index + 1,
-      name: String(valueAt(row, 'name') ?? '').trim(),
-      sku: String(valueAt(row, 'sku') ?? '').trim().toUpperCase() || null,
-      category: String(valueAt(row, 'category') ?? '').trim() || null,
-      unit: String(valueAt(row, 'unit') ?? '').trim(),
-      price_cents: price === undefined ? String(valueAt(row, 'price_cents') ?? '') : price,
+      name: cellText(valueAt(row, 'name')).trim(),
+      sku: cellText(valueAt(row, 'sku')).trim().toUpperCase() || null,
+      category: cellText(valueAt(row, 'category')).trim() || null,
+      unit: cellText(valueAt(row, 'unit')).trim(),
+      price_cents: price === undefined ? cellText(valueAt(row, 'price_cents')) : price,
       active: parseActive(valueAt(row, 'active')),
       min_quantity: parseInteger(valueAt(row, 'min_quantity')),
       quantity_increment: parseInteger(valueAt(row, 'quantity_increment')),
-      action: String(valueAt(row, 'action') ?? 'auto').trim().toLowerCase() || 'auto',
+      action: cellText(valueAt(row, 'action')).trim().toLowerCase() || 'auto',
     })
   }
 

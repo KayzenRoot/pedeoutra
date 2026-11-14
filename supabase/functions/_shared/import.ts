@@ -67,13 +67,21 @@ function boolValue(value: unknown): boolean | null {
   return null
 }
 
-function validateRow(
-  raw: unknown,
-  index: number,
-  productsBySku: Map<string, ImportProductRef>,
-  categoriesByName: Map<string, ImportCategoryRef>,
-  seenSkus: Set<string>,
-): ImportPlanRow {
+interface ParsedRow {
+  line: number
+  name: string
+  sku: string | null
+  category: string | null
+  unit: string
+  price: number | null
+  active: boolean
+  minQuantity: number
+  quantityIncrement: number
+  action: ImportAction | 'invalid'
+  errors: string[]
+}
+
+function parseRow(raw: unknown, index: number): ParsedRow {
   const row = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {}
   const line = intValue(row.line, index + 1)
   const name = text(row.name)
@@ -89,15 +97,15 @@ function validateRow(
   const action = (['auto', 'create', 'update', 'ignore'].includes(rawAction)
     ? rawAction
     : 'invalid') as ImportAction | 'invalid'
-
   const errors: string[] = []
 
   if (line === null || line < 1 || line > 10000) errors.push('Linha inválida')
   if (!name || name.length > 120 || /[<>]/.test(name) || FORMULA_PATTERN.test(name)) {
     errors.push('Nome inválido')
   }
-  if (sku && !SKU_PATTERN.test(sku)) errors.push('SKU inválido')
-  if (sku && FORMULA_PATTERN.test(sku)) errors.push('SKU inválido')
+  if (sku && (!SKU_PATTERN.test(sku) || FORMULA_PATTERN.test(sku))) {
+    errors.push('SKU inválido')
+  }
   if (category && (category.length > 80 || /[<>]/.test(category) || FORMULA_PATTERN.test(category))) {
     errors.push('Categoria inválida')
   }
@@ -118,44 +126,77 @@ function validateRow(
     errors.push('Regra de quantidade inválida')
   }
   if (action === 'invalid') errors.push('Ação inválida')
-  if (sku && action !== 'ignore') {
-    if (seenSkus.has(sku)) errors.push('SKU duplicado no arquivo')
-    seenSkus.add(sku)
-  }
-
-  const existing = sku ? productsBySku.get(sku) : undefined
-  let resolvedAction: ImportPlanAction = 'create'
-  if (action === 'ignore') {
-    resolvedAction = 'ignore'
-  } else if (action === 'create' && existing) {
-    errors.push('SKU já existe; use update ou ignore')
-  } else if (action === 'update' && !existing) {
-    errors.push('SKU não encontrado para atualização')
-  } else if (action === 'update' && !sku) {
-    errors.push('Update exige SKU')
-  } else if (action === 'auto') {
-    resolvedAction = existing ? 'update' : 'create'
-  } else if (action === 'create') {
-    resolvedAction = 'create'
-  } else if (action === 'update') {
-    resolvedAction = 'update'
-  }
-
-  if (errors.length > 0) resolvedAction = 'error'
 
   return {
     line: line ?? index + 1,
-    action: resolvedAction,
-    error: errors.length > 0 ? errors.join('; ') : null,
     name,
     sku,
     category,
-    category_new: Boolean(category && !categoriesByName.has(category.toLowerCase())),
     unit,
-    price_cents: price === undefined ? null : price,
+    price: price === undefined ? null : price,
     active: active ?? true,
-    min_quantity: minQuantity ?? 1,
-    quantity_increment: quantityIncrement ?? 1,
+    minQuantity: minQuantity ?? 1,
+    quantityIncrement: quantityIncrement ?? 1,
+    action,
+    errors,
+  }
+}
+
+function resolveAction(
+  action: ImportAction | 'invalid',
+  sku: string | null,
+  existing: ImportProductRef | undefined,
+  errors: string[],
+): ImportPlanAction {
+  if (action === 'ignore') return 'ignore'
+  if (action === 'create' && existing) {
+    errors.push('SKU já existe; use update ou ignore')
+    return 'error'
+  }
+  if (action === 'update' && !existing) {
+    errors.push('SKU não encontrado para atualização')
+    return 'error'
+  }
+  if (action === 'update' && !sku) {
+    errors.push('Update exige SKU')
+    return 'error'
+  }
+  if (action === 'auto') return existing ? 'update' : 'create'
+  return action === 'update' ? 'update' : 'create'
+}
+
+function validateRow(
+  raw: unknown,
+  index: number,
+  productsBySku: Map<string, ImportProductRef>,
+  categoriesByName: Map<string, ImportCategoryRef>,
+  seenSkus: Set<string>,
+): ImportPlanRow {
+  const parsed = parseRow(raw, index)
+  if (parsed.sku && parsed.action !== 'ignore') {
+    if (seenSkus.has(parsed.sku)) parsed.errors.push('SKU duplicado no arquivo')
+    seenSkus.add(parsed.sku)
+  }
+
+  const existing = parsed.sku ? productsBySku.get(parsed.sku) : undefined
+  const action = resolveAction(parsed.action, parsed.sku, existing, parsed.errors)
+  const finalAction: ImportPlanAction = parsed.errors.length > 0 ? 'error' : action
+
+  return {
+    line: parsed.line,
+    action: finalAction,
+    error: parsed.errors.length > 0 ? parsed.errors.join('; ') : null,
+    name: parsed.name,
+    sku: parsed.sku,
+    category: parsed.category,
+    category_new: Boolean(
+      parsed.category && !categoriesByName.has(parsed.category.toLowerCase()),
+    ),
+    unit: parsed.unit,
+    price_cents: parsed.price,
+    active: parsed.active,
+    min_quantity: parsed.minQuantity,
+    quantity_increment: parsed.quantityIncrement,
     product_id: existing?.id ?? null,
   }
 }

@@ -57,6 +57,18 @@ function actionLabel(action: ImportPlanRow['action']): string {
   return 'Erro'
 }
 
+function downloadImportTemplate() {
+  const blob = new Blob([`\uFEFF${importTemplateCsv()}`], {
+    type: 'text/csv;charset=utf-8',
+  })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = 'modelo-importacao-produtos.csv'
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
 export function ProductImportPanel({
   onImported,
 }: {
@@ -175,17 +187,7 @@ export function ProductImportPanel({
     }
   }
 
-  function downloadTemplate() {
-    const blob = new Blob([`\uFEFF${importTemplateCsv()}`], {
-      type: 'text/csv;charset=utf-8',
-    })
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = 'modelo-importacao-produtos.csv'
-    anchor.click()
-    URL.revokeObjectURL(url)
-  }
+
 
   const preview = plan.slice(0, 20)
 
@@ -196,7 +198,7 @@ export function ProductImportPanel({
           <span className="eyebrow">Importação em lote</span>
           <h2>CSV ou XLSX</h2>
         </div>
-        <button type="button" className="button button-secondary" onClick={downloadTemplate}>
+        <button type="button" className="button button-secondary" onClick={downloadImportTemplate}>
           Baixar modelo
         </button>
       </div>
