@@ -5,7 +5,7 @@
  */
 import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
-import { extname, join, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const DIST = join(ROOT, 'dist')
