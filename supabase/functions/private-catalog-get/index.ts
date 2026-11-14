@@ -60,7 +60,7 @@ async function loadPrivatePrices(
     .eq('id', assignment.price_list_id)
     .maybeSingle()
   if (listError) throw new HttpError(503, 'price_list_lookup_failed')
-  if (!list || !list.active) return { priceList: null, prices: new Map() }
+  if (!list?.active) return { priceList: null, prices: new Map() }
 
   const { data: items, error: itemsError } = await supabase
     .from('price_list_items')

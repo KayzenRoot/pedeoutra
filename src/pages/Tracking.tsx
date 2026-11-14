@@ -17,6 +17,12 @@ function statusText(status: string): string {
   return STATUS_TEXT[status] ?? status
 }
 
+function statusBadgeClass(status: string): string {
+  if (status === 'canceled') return 'badge badge-muted'
+  if (status === 'completed') return 'badge badge-success'
+  return 'badge badge-confirmed'
+}
+
 export function Tracking() {
   const { token } = useParams<{ token: string }>()
   const [data, setData] = useState<OrderTrackingResponse | null>(null)
@@ -95,7 +101,7 @@ export function Tracking() {
           </p>
 
           <div className="tracking-current">
-            <span className={`badge badge-${data.status === 'canceled' ? 'muted' : data.status === 'completed' ? 'success' : 'confirmed'}`}>
+            <span className={statusBadgeClass(data.status)}>
               {statusText(data.status)}
             </span>
             <small>Link válido até {formatDateTime(data.expires_at)}</small>

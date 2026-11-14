@@ -2,6 +2,7 @@ import { adminClient } from '../_shared/supabase.ts'
 import { findPublicOrganization } from '../_shared/org.ts'
 import { enforceRateLimit } from '../_shared/rate-limit.ts'
 import { loadCatalog, mapProducts, signImagePaths } from '../_shared/catalog.ts'
+import { isValidSlug } from '../_shared/validation.ts'
 import {
   HttpError,
   jsonResponse,
@@ -10,7 +11,6 @@ import {
   withHttpErrors,
 } from '../_shared/http.ts'
 
-const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
 export const handler = (req: Request) =>
   withHttpErrors(req, 'public-catalog', async () => {
@@ -18,7 +18,7 @@ export const handler = (req: Request) =>
 
     const url = new URL(req.url)
     const slug = (url.searchParams.get('slug') ?? '').trim()
-    if (!SLUG_PATTERN.test(slug)) {
+    if (!isValidSlug(slug)) {
       throw new HttpError(400, 'invalid_slug', 'Catálogo inválido.')
     }
 

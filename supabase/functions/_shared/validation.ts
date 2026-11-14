@@ -118,6 +118,38 @@ function validateCommonFields(input: Record<string, unknown>): ValidationResult<
   }
 }
 
+export function isValidSlug(value: string): boolean {
+  if (value.length < 1 || value.length > 120) return false
+  return value.split('-').every((part) => /^[a-z0-9]+$/.test(part))
+}
+
+function parsePriceToken(value: unknown): ValidationResult<string | null> {
+  if (value === undefined || value === null || value === '') {
+    return { ok: true, value: null }
+  }
+  if (typeof value !== 'string' || !OPAQUE_TOKEN_PATTERN.test(value)) {
+    return { ok: false, error: 'invalid_price_token' }
+  }
+  return { ok: true, value }
+}
+
+function parseBuyer(
+  input: Record<string, unknown>,
+  priceToken: string | null,
+): ValidationResult<{ buyerName: string | null; buyerPhone: string | null }> {
+  if (priceToken) {
+    // O token identifica o comprador; nome/telefone são ignorados e não persistidos.
+    return { ok: true, value: { buyerName: null, buyerPhone: null } }
+  }
+  const buyerName = cleanText(input.buyer_name, 120)
+  if (!buyerName || buyerName.length < 2) {
+    return { ok: false, error: 'invalid_buyer_name' }
+  }
+  const buyerPhone = normalizePhone(input.buyer_phone)
+  if (!buyerPhone) return { ok: false, error: 'invalid_buyer_phone' }
+  return { ok: true, value: { buyerName, buyerPhone } }
+}
+
 export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOrderInput> {
   if (!isRecord(input)) return { ok: false, error: 'invalid_body' }
 
@@ -126,29 +158,13 @@ export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOr
   if (!common.value.consent) return { ok: false, error: 'consent_required' }
 
   const slug = typeof input.slug === 'string' ? input.slug.trim() : ''
-  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) {
-    return { ok: false, error: 'invalid_slug' }
-  }
+  if (!isValidSlug(slug)) return { ok: false, error: 'invalid_slug' }
 
-  const rawPriceToken = input.price_token
-  let priceToken: string | null = null
-  if (rawPriceToken !== undefined && rawPriceToken !== null && rawPriceToken !== '') {
-    if (typeof rawPriceToken !== 'string' || !OPAQUE_TOKEN_PATTERN.test(rawPriceToken)) {
-      return { ok: false, error: 'invalid_price_token' }
-    }
-    priceToken = rawPriceToken
-  }
-
-  let buyerName = cleanText(input.buyer_name, 120)
-  let buyerPhone = normalizePhone(input.buyer_phone)
-  if (priceToken) {
-    // O token identifica o comprador; nome/telefone são ignorados e não persistidos.
-    buyerName = null
-    buyerPhone = null
-  } else {
-    if (!buyerName || buyerName.length < 2) return { ok: false, error: 'invalid_buyer_name' }
-    if (!buyerPhone) return { ok: false, error: 'invalid_buyer_phone' }
-  }
+  const priceTokenResult = parsePriceToken(input.price_token)
+  if (!priceTokenResult.ok) return priceTokenResult
+  const buyerResult = parseBuyer(input, priceTokenResult.value)
+  if (!buyerResult.ok) return buyerResult
+  const { buyerName, buyerPhone } = buyerResult.value
 
   const note = cleanText(input.note, MAX_NOTE_LENGTH)
   if (typeof input.note === 'string' && input.note.length > MAX_NOTE_LENGTH) {
@@ -167,7 +183,7 @@ export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOr
       note,
       items: items.value,
       requestId: common.value.requestId,
-      priceToken,
+      priceToken: priceTokenResult.value,
     },
   }
 }

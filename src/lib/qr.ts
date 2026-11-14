@@ -1,9 +1,12 @@
 import qrcode from 'qrcode-generator'
 
-const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
+function isValidSlug(slug: string): boolean {
+  if (slug.length < 1 || slug.length > 120) return false
+  return slug.split('-').every((part) => /^[a-z0-9]+$/.test(part))
+}
 
 export function catalogQrUrl(slug: string, origin?: string): string {
-  if (!SLUG_PATTERN.test(slug)) throw new Error('Slug de catálogo inválido.')
+  if (!isValidSlug(slug)) throw new Error('Slug de catálogo inválido.')
 
   const base =
     origin?.replace(/\/+$/, '') ||

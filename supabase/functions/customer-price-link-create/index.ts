@@ -66,7 +66,7 @@ export const handler = (req: Request) =>
       .eq('id', assignmentResult.data.price_list_id)
       .maybeSingle()
     if (listError) throw new HttpError(503, 'price_list_lookup_failed')
-    if (!list || !list.active) {
+    if (!list?.active) {
       throw new HttpError(
         409,
         'price_list_required',

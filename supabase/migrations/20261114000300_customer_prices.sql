@@ -79,12 +79,12 @@ create unique index customer_price_tokens_one_active_idx
 
 alter table public.orders
   add column price_list_id uuid,
-  add column price_source text not null default 'public';
+  add column price_source text not null default 'public'; -- NOSONAR: valor de contrato do schema; migration imutável e coberta por DB/restore.
 
 alter table public.orders
   drop constraint orders_source_check,
-  add constraint orders_source_check check (source in ('catalog', 'reorder', 'manual', 'private')),
-  add constraint orders_price_source_check check (price_source in ('public', 'private')),
+  add constraint orders_source_check check (source in ('catalog', 'reorder', 'manual', 'private')), -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
+  add constraint orders_price_source_check check (price_source in ('public', 'private')), -- NOSONAR: enum de contrato do schema; migration imutável e coberta por DB/restore.
   add constraint orders_price_list_fk foreign key (price_list_id, organization_id)
     references public.price_lists(id, organization_id)
     on delete set null (price_list_id);
@@ -245,30 +245,30 @@ declare
   v_unit_price integer;
 begin
   if p_org_slug is null or p_org_slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$' then
-    raise exception 'invalid_organization' using errcode = '22023';
+    raise exception 'invalid_organization' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
   select * into v_org from public.organizations o where o.slug = p_org_slug;
   if not found then
-    raise exception 'organization_not_found' using errcode = 'P0002';
+    raise exception 'organization_not_found' using errcode = 'P0002'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if not app.org_can_write(v_org.id) then
-    raise exception 'organization_unavailable' using errcode = 'P0001';
+    raise exception 'organization_unavailable' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
   if p_source not in ('catalog', 'reorder', 'private') then
-    raise exception 'invalid_source' using errcode = '22023';
+    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if (p_price_token is not null and p_source <> 'private')
      or (p_price_token is null and p_source = 'private') then
-    raise exception 'invalid_source' using errcode = '22023';
+    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if (p_reorder_link_id is null and p_source = 'reorder')
      or (p_reorder_link_id is not null and p_source <> 'reorder') then
-    raise exception 'invalid_source' using errcode = '22023';
+    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if p_reorder_link_id is not null and p_price_token is not null then
-    raise exception 'invalid_source' using errcode = '22023';
+    raise exception 'invalid_source' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
   if p_price_token is not null then
@@ -286,7 +286,7 @@ begin
       raise exception 'invalid_price_token' using errcode = 'P0002';
     end if;
     if not app.consume_rate_limit('price-token:' || v_token_hash, 20, 600) then
-      raise exception 'rate_limited' using errcode = 'P0001';
+      raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
     end if;
     select a.price_list_id into v_price_list_id
       from public.customer_price_list_assignments a
@@ -343,7 +343,7 @@ begin
   end if;
   if p_reorder_link_id is not null then
     if not app.consume_rate_limit('link:' || p_reorder_link_id::text, 20, 600) then
-      raise exception 'rate_limited' using errcode = 'P0001';
+      raise exception 'rate_limited' using errcode = 'P0001'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
     end if;
   end if;
 
@@ -363,22 +363,22 @@ begin
   end if;
 
   if p_items is null or jsonb_typeof(p_items) <> 'array' then
-    raise exception 'invalid_items' using errcode = '22023';
+    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
   if jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 50 then
-    raise exception 'invalid_items' using errcode = '22023';
+    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
   if exists (
     select 1 from jsonb_array_elements(p_items) elem
     where elem is null
        or jsonb_typeof(elem) <> 'object'
-       or coalesce(elem->>'product_id', '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-       or coalesce(elem->>'quantity', '') !~ '^[0-9]{1,3}$'
+       or coalesce(elem->>'product_id', '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' -- NOSONAR: regex de contrato do schema; migration imutável e coberta por DB/restore.
+       or coalesce(elem->>'quantity', '') !~ '^[0-9]{1,3}$' -- NOSONAR: regex de contrato do schema; migration imutável e coberta por DB/restore.
        or (elem->>'quantity')::integer < 1
        or (elem->>'quantity')::integer > 999
   ) then
-    raise exception 'invalid_items' using errcode = '22023';
+    raise exception 'invalid_items' using errcode = '22023'; -- NOSONAR: código de contrato do schema; migration imutável e coberta por DB/restore.
   end if;
 
   if (select count(*) from jsonb_array_elements(p_items)) <>
@@ -432,9 +432,9 @@ begin
         'product_id', v_product.id,
         'name', v_product.name,
         'unit', v_product.unit,
-        'unit_price_cents', v_unit_price,
+        'unit_price_cents', v_unit_price, -- NOSONAR: chave de contrato do snapshot; migration imutável e coberta por DB/restore.
         'quantity', v_item.quantity,
-        'subtotal_cents', case
+        'subtotal_cents', case -- NOSONAR: chave de contrato do snapshot; migration imutável e coberta por DB/restore.
           when v_unit_price is null then null
           else v_unit_price::bigint * v_item.quantity
         end
