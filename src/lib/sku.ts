@@ -12,6 +12,8 @@ export interface SkuProduct {
   unit: string
   price_cents: number | null
   sku: string | null
+  min_quantity: number
+  quantity_increment: number
 }
 
 export interface SkuMatch {

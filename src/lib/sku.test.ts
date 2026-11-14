@@ -2,9 +2,33 @@ import { describe, expect, it } from 'vitest'
 import { parseSkuList, resolveSkuLines, type SkuProduct } from './sku'
 
 const products: SkuProduct[] = [
-  { id: 'p1', name: 'Copo', unit: 'cento', price_cents: 1250, sku: 'COPO-200' },
-  { id: 'p2', name: 'Água', unit: 'galão', price_cents: 899, sku: 'AGUA-5L' },
-  { id: 'p3', name: 'Sem SKU', unit: 'un', price_cents: null, sku: null },
+  {
+    id: 'p1',
+    name: 'Copo',
+    unit: 'cento',
+    price_cents: 1250,
+    sku: 'COPO-200',
+    min_quantity: 1,
+    quantity_increment: 1,
+  },
+  {
+    id: 'p2',
+    name: 'Água',
+    unit: 'galão',
+    price_cents: 899,
+    sku: 'AGUA-5L',
+    min_quantity: 1,
+    quantity_increment: 1,
+  },
+  {
+    id: 'p3',
+    name: 'Sem SKU',
+    unit: 'un',
+    price_cents: null,
+    sku: null,
+    min_quantity: 1,
+    quantity_increment: 1,
+  },
 ]
 
 describe('lista de SKU', () => {

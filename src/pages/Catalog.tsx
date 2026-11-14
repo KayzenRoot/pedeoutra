@@ -5,7 +5,7 @@ import { FormMessage, LoadingScreen, QuantityStepper } from '../components/ui'
 import { track } from '../lib/analytics'
 import { callPublicFunction, getPublicCatalog } from '../lib/edge'
 import { formatBRL, phoneDigits, whatsappLink } from '../lib/format'
-import { parseSkuList, resolveSkuLines } from '../lib/sku'
+import { parseSkuList, resolveSkuLines, type SkuMatch } from '../lib/sku'
 import type { PublicCatalogResponse, SubmitOrderResponse } from '../lib/types'
 
 export function Catalog() {
@@ -68,6 +68,11 @@ export function Catalog() {
         (total, item) => total + (item.price_cents ?? 0) * item.quantity,
         0,
       )
+  const minOrderCents = catalog?.organization.min_order_cents ?? null
+  const minOrderItems = catalog?.organization.min_order_items ?? null
+  const belowMinimum =
+    minOrderCents !== null && !hasUnpriced && (totalCents ?? 0) < minOrderCents
+  const belowMinItems = minOrderItems !== null && selectedItems.length < minOrderItems
 
   function setQuantity(productId: string, quantity: number) {
     setCart((current) => {
@@ -248,10 +253,21 @@ export function Catalog() {
   function applySkuList() {
     if (!catalog) return
     const { matches, errors } = resolveSkuLines(parseSkuList(skuInput), catalog.products)
-    if (matches.length > 0) {
+    const valid: SkuMatch[] = []
+    for (const match of matches) {
+      const { min_quantity: min, quantity_increment: increment } = match.product
+      if (match.quantity < min || match.quantity % increment !== 0) {
+        errors.push(
+          `SKU ${match.product.sku}: mínimo ${min} e múltiplo de ${increment}`,
+        )
+        continue
+      }
+      valid.push(match)
+    }
+    if (valid.length > 0) {
       setCart((current) => {
         const next = { ...current }
-        for (const match of matches) {
+        for (const match of valid) {
           next[match.product.id] = Math.min(
             999,
             (next[match.product.id] ?? 0) + match.quantity,
@@ -260,8 +276,8 @@ export function Catalog() {
         return next
       })
     }
-    setSkuFeedback({ added: matches.length, errors })
-    if (matches.length > 0) setSkuInput('')
+    setSkuFeedback({ added: valid.length, errors })
+    if (valid.length > 0) setSkuInput('')
   }
 
   return (
@@ -404,18 +420,25 @@ export function Catalog() {
                       {product.sku && <small className="product-sku">SKU {product.sku}</small>}
                       <h2>{product.name}</h2>
                       <strong className="product-price">{formatBRL(product.price_cents)}</strong>
+                      {(product.min_quantity > 1 || product.quantity_increment > 1) && (
+                        <small className="product-rule">
+                          Mín. {product.min_quantity} · múltiplo de {product.quantity_increment}
+                        </small>
+                      )}
                     </div>
                     {quantity === 0 ? (
                       <button
                         type="button"
                         className="button button-secondary button-block"
-                        onClick={() => setQuantity(product.id, 1)}
+                        onClick={() => setQuantity(product.id, product.min_quantity)}
                       >
                         Adicionar
                       </button>
                     ) : (
                       <QuantityStepper
                         value={quantity}
+                        min={product.min_quantity}
+                        step={product.quantity_increment}
                         onChange={(next) => setQuantity(product.id, next)}
                         label={product.name}
                       />
@@ -457,6 +480,13 @@ export function Catalog() {
                         </li>
                       ))}
                     </ul>
+                    {(belowMinimum || belowMinItems) && (
+                      <FormMessage tone="info">
+                        {belowMinItems
+                          ? `Este fornecedor pede pelo menos ${minOrderItems} item(ns) por pedido.`
+                          : `Pedido mínimo de ${formatBRL(minOrderCents)}.`}
+                      </FormMessage>
+                    )}
                     <div className="cart-total">
                       <span>Total</span>
                       <strong>{formatBRL(totalCents)}</strong>
@@ -526,7 +556,9 @@ export function Catalog() {
                   <button
                     type="submit"
                     className="button button-primary button-block button-large"
-                    disabled={submitting || !catalog.accepting_orders}
+                    disabled={
+                      submitting || !catalog.accepting_orders || belowMinimum || belowMinItems
+                    }
                   >
                     {submitting ? 'Enviando pedido…' : 'Enviar pedido para análise'}
                   </button>

@@ -111,19 +111,21 @@ export function QuantityStepper({
   onChange,
   min = 1,
   max = 999,
+  step = 1,
   label,
 }: {
   value: number
   onChange: (value: number) => void
   min?: number
   max?: number
+  step?: number
   label: string
 }) {
   return (
     <div className="stepper" role="group" aria-label={label}>
       <button
         type="button"
-        onClick={() => onChange(Math.max(min, value - 1))}
+        onClick={() => onChange(Math.max(min, value - step))}
         disabled={value <= min}
         aria-label={`Diminuir ${label}`}
       >
@@ -138,12 +140,15 @@ export function QuantityStepper({
         aria-label={label}
         onChange={(event) => {
           const next = Number(event.target.value)
-          if (Number.isFinite(next)) onChange(Math.min(max, Math.max(min, Math.round(next))))
+          if (!Number.isFinite(next)) return
+          const safeStep = Math.max(1, step)
+          const steps = Math.max(0, Math.round((next - min) / safeStep))
+          onChange(Math.min(max, min + steps * safeStep))
         }}
       />
       <button
         type="button"
-        onClick={() => onChange(Math.min(max, value + 1))}
+        onClick={() => onChange(Math.min(max, value + step))}
         disabled={value >= max}
         aria-label={`Aumentar ${label}`}
       >

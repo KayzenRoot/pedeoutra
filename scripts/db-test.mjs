@@ -1136,6 +1136,80 @@ async function main() {
       )
     })
 
+
+    await test('regras de quantidade e mínimo são aplicadas no servidor', async () => {
+      await client.query(
+        `update public.products set min_quantity = 12, quantity_increment = 12 where id = $1`,
+        [productA1.id],
+      )
+      const submit = (items, requestId) =>
+        asService(() =>
+          client.query(
+            `select * from app.submit_order($1, 'Teste Regras', '11999998888', '', $2::jsonb, $3, null, 'catalog', $4)`,
+            [orgA.slug, JSON.stringify(items), `rules:${requestId}`, requestId],
+          ),
+        )
+
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 6 }], crypto.randomUUID()),
+        'quantity_below_minimum',
+        'quantidade abaixo do mínimo',
+      )
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 13 }], crypto.randomUUID()),
+        'quantity_not_multiple',
+        'quantidade fora do múltiplo',
+      )
+      const ok = await submit([{ product_id: productA1.id, quantity: 12 }], crypto.randomUUID())
+      assert(ok.rows[0].total_cents === 15000, `total ${ok.rows[0].total_cents}`)
+
+      await client.query(
+        `update public.organizations set min_order_cents = 20000 where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 12 }], crypto.randomUUID()),
+        'order_below_minimum',
+        'pedido abaixo do valor mínimo',
+      )
+
+      await client.query(
+        `update public.organizations set min_order_cents = null, min_order_items = 2 where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 12 }], crypto.randomUUID()),
+        'order_below_minimum_items',
+        'pedido abaixo da quantidade mínima de itens',
+      )
+
+      await client.query(`update public.products set price_cents = null where id = $1`, [
+        productA2.id,
+      ])
+      await client.query(
+        `update public.organizations set min_order_items = null, min_order_cents = 1000 where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => submit([{ product_id: productA2.id, quantity: 1 }], crypto.randomUUID()),
+        'minimum_unverifiable',
+        'mínimo sem preço verificável',
+      )
+
+      await client.query(
+        `update public.products set price_cents = 899, min_quantity = 1, quantity_increment = 1 where id = $1`,
+        [productA2.id],
+      )
+      await client.query(
+        `update public.products set min_quantity = 1, quantity_increment = 1 where id = $1`,
+        [productA1.id],
+      )
+      await client.query(
+        `update public.organizations set min_order_cents = null, min_order_items = null where id = $1`,
+        [orgA.id],
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

@@ -282,6 +282,8 @@ export type Database = {
           city: string | null
           created_at: string
           id: string
+          min_order_cents: number | null
+          min_order_items: number | null
           name: string
           owner_user_id: string
           slug: string
@@ -294,6 +296,8 @@ export type Database = {
           city?: string | null
           created_at?: string
           id?: string
+          min_order_cents?: number | null
+          min_order_items?: number | null
           name: string
           owner_user_id: string
           slug: string
@@ -306,6 +310,8 @@ export type Database = {
           city?: string | null
           created_at?: string
           id?: string
+          min_order_cents?: number | null
+          min_order_items?: number | null
           name?: string
           owner_user_id?: string
           slug?: string
@@ -400,6 +406,8 @@ export type Database = {
           organization_id: string
           price_cents: number | null
           sku: string | null
+          min_quantity: number
+          quantity_increment: number
           unit: string
           updated_at: string
         }
@@ -412,6 +420,8 @@ export type Database = {
           organization_id: string
           price_cents?: number | null
           sku?: string | null
+          min_quantity?: number
+          quantity_increment?: number
           unit: string
           updated_at?: string
         }
@@ -424,6 +434,8 @@ export type Database = {
           organization_id?: string
           price_cents?: number | null
           sku?: string | null
+          min_quantity?: number
+          quantity_increment?: number
           unit?: string
           updated_at?: string
         }
@@ -625,6 +637,8 @@ export type Database = {
           city: string | null
           created_at: string
           id: string
+          min_order_cents: number | null
+          min_order_items: number | null
           name: string
           owner_user_id: string
           slug: string

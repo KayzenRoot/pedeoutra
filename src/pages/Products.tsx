@@ -12,6 +12,8 @@ interface ProductForm {
   sku: string
   unit: string
   price: string
+  minQuantity: string
+  quantityIncrement: string
   categoryId: string
   active: boolean
 }
@@ -22,6 +24,8 @@ const EMPTY_FORM: ProductForm = {
   sku: '',
   unit: '',
   price: '',
+  minQuantity: '1',
+  quantityIncrement: '1',
   categoryId: '',
   active: true,
 }
@@ -108,6 +112,8 @@ export function Products() {
       sku: product.sku ?? '',
       unit: product.unit,
       price: centsToInput(product.price_cents),
+      minQuantity: String(product.min_quantity),
+      quantityIncrement: String(product.quantity_increment),
       categoryId: product.category_id ?? '',
       active: product.active,
     })
@@ -134,6 +140,21 @@ export function Products() {
       return
     }
 
+    const minQuantity = Number(form.minQuantity)
+    const quantityIncrement = Number(form.quantityIncrement)
+    if (
+      !Number.isInteger(minQuantity) ||
+      !Number.isInteger(quantityIncrement) ||
+      minQuantity < 1 ||
+      minQuantity > 999 ||
+      quantityIncrement < 1 ||
+      quantityIncrement > 999 ||
+      minQuantity % quantityIncrement !== 0
+    ) {
+      setFormError('Quantidade mínima e múltiplo devem ser inteiros; o mínimo precisa ser múltiplo do incremento.')
+      return
+    }
+
     let priceCents: number | null = null
     if (form.price.trim()) {
       priceCents = parsePriceToCents(form.price)
@@ -153,6 +174,8 @@ export function Products() {
       sku: form.sku.trim().toUpperCase() || null,
       unit,
       price_cents: priceCents,
+      min_quantity: minQuantity,
+      quantity_increment: quantityIncrement,
       category_id: form.categoryId || null,
       active: form.active,
     }
@@ -342,6 +365,9 @@ export function Products() {
                     <tr key={product.id} className={product.active ? '' : 'row-muted'}>
                       <td data-label="Produto">
                         <strong>{product.name}</strong>
+                        <small>
+                          mín. {product.min_quantity} · múlt. {product.quantity_increment}
+                        </small>
                       </td>
                       <td data-label="SKU">{product.sku ?? '—'}</td>
                       <td data-label="Unidade">{product.unit}</td>
@@ -420,6 +446,26 @@ export function Products() {
                   value={form.price}
                   onChange={(event) => setForm({ ...form, price: event.target.value })}
                   placeholder="12,50"
+                />
+              </label>
+            </div>
+            <div className="form-row">
+              <label className="field">
+                <span>Quantidade mínima</span>
+                <input
+                  inputMode="numeric"
+                  value={form.minQuantity}
+                  onChange={(event) => setForm({ ...form, minQuantity: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span>Múltiplo de embalagem</span>
+                <input
+                  inputMode="numeric"
+                  value={form.quantityIncrement}
+                  onChange={(event) =>
+                    setForm({ ...form, quantityIncrement: event.target.value })
+                  }
                 />
               </label>
             </div>

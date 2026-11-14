@@ -19,6 +19,8 @@ export interface PublicCatalogResponse {
     slug: string
     city: string | null
     whatsapp: string
+    min_order_cents: number | null
+    min_order_items: number | null
   }
   categories: Array<{
     id: string
@@ -32,6 +34,8 @@ export interface PublicCatalogResponse {
     unit: string
     price_cents: number | null
     sku: string | null
+    min_quantity: number
+    quantity_increment: number
     category_id: string | null
     images: Array<{
       id: string

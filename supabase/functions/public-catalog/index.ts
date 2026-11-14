@@ -28,6 +28,8 @@ interface CatalogProduct {
   unit: string
   price_cents: number | null
   sku: string | null
+  min_quantity: number
+  quantity_increment: number
   category_id: string | null
   product_images: CatalogImage[] | null
 }
@@ -54,7 +56,7 @@ async function loadCatalog(
     supabase
       .from('products')
       .select(
-        'id, name, unit, price_cents, sku, category_id, product_images(id, alt_text, is_cover, position, storage_path, thumb_path)',
+        'id, name, unit, price_cents, sku, min_quantity, quantity_increment, category_id, product_images(id, alt_text, is_cover, position, storage_path, thumb_path)',
       )
       .eq('organization_id', organizationId)
       .eq('active', true)
@@ -105,6 +107,8 @@ function mapProducts(products: CatalogProduct[], signed: Map<string, string>) {
     unit: product.unit,
     price_cents: product.price_cents,
     sku: product.sku,
+    min_quantity: product.min_quantity,
+    quantity_increment: product.quantity_increment,
     category_id: product.category_id,
     images: [...(product.product_images ?? [])]
       .sort(
@@ -149,6 +153,8 @@ export const handler = (req: Request) =>
         slug: organization.slug,
         city: organization.city,
         whatsapp: organization.whatsapp,
+        min_order_cents: organization.min_order_cents,
+        min_order_items: organization.min_order_items,
       },
       categories,
       products: mapProducts(products, signed),

@@ -3521,3 +3521,10 @@ svg {
   gap: 12px;
   flex-wrap: wrap;
 }
+
+.product-rule {
+  display: block;
+  color: var(--warning);
+  font-size: 0.72rem;
+  font-weight: 700;
+}

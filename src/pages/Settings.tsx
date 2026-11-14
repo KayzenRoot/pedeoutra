@@ -5,7 +5,7 @@ import { ThemeToggle } from '../components/ThemeToggle'
 import { FormMessage, PageHeader } from '../components/ui'
 import { useAuth } from '../context/auth-context'
 import { getPlanCatalog } from '../lib/edge'
-import { formatBRL, formatDateTime } from '../lib/format'
+import { centsToInput, formatBRL, formatDateTime, parsePriceToCents } from '../lib/format'
 import { featureLabel } from '../lib/plans'
 import { supabase } from '../lib/supabase'
 import type { PlanCatalogResponse, PlanCode, PublicPlan } from '../lib/types'
@@ -26,6 +26,8 @@ export function Settings() {
   const [name, setName] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [city, setCity] = useState('')
+  const [minOrder, setMinOrder] = useState('')
+  const [minItems, setMinItems] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -35,6 +37,8 @@ export function Settings() {
     setName(organization?.name ?? '')
     setWhatsapp(organization?.whatsapp ?? '')
     setCity(organization?.city ?? '')
+    setMinOrder(centsToInput(organization?.min_order_cents ?? null))
+    setMinItems(organization?.min_order_items ? String(organization.min_order_items) : '')
   }, [organization])
 
   useEffect(() => {
@@ -69,12 +73,31 @@ export function Settings() {
       setError('Informe um WhatsApp válido com DDD.')
       return
     }
+    const minOrderCents = minOrder.trim() ? parsePriceToCents(minOrder) : null
+    if (minOrder.trim() && minOrderCents === null) {
+      setError('Valor mínimo inválido. Use, por exemplo, 50,00.')
+      return
+    }
+    const minOrderItems = minItems.trim() ? Number(minItems) : null
+    if (
+      minOrderItems !== null &&
+      (!Number.isInteger(minOrderItems) || minOrderItems < 1 || minOrderItems > 1000)
+    ) {
+      setError('A quantidade mínima de itens deve ficar entre 1 e 1000.')
+      return
+    }
     setSaving(true)
     setError(null)
     setSuccess(null)
     const { error: updateError } = await supabase
       .from('organizations')
-      .update({ name: name.trim(), whatsapp: digits, city: city.trim() || null })
+      .update({
+        name: name.trim(),
+        whatsapp: digits,
+        city: city.trim() || null,
+        min_order_cents: minOrderCents,
+        min_order_items: minOrderItems,
+      })
       .eq('id', organization.id)
     if (updateError) {
       setError('Não foi possível salvar os dados. Tente novamente.')
@@ -118,6 +141,26 @@ export function Settings() {
               <span>Cidade (opcional)</span>
               <input value={city} onChange={(event) => setCity(event.target.value)} />
             </label>
+            <div className="form-row">
+              <label className="field">
+                <span>Pedido mínimo (R$, opcional)</span>
+                <input
+                  inputMode="decimal"
+                  value={minOrder}
+                  onChange={(event) => setMinOrder(event.target.value)}
+                  placeholder="50,00"
+                />
+              </label>
+              <label className="field">
+                <span>Mínimo de itens (opcional)</span>
+                <input
+                  inputMode="numeric"
+                  value={minItems}
+                  onChange={(event) => setMinItems(event.target.value)}
+                  placeholder="2"
+                />
+              </label>
+            </div>
             <button type="submit" className="button button-primary" disabled={saving}>
               {saving ? 'Salvando…' : 'Salvar dados'}
             </button>
