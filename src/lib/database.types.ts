@@ -231,6 +231,9 @@ export type Database = {
           status: string
           total_cents: number | null
           updated_at: string
+          whatsapp_opt_in: boolean
+          whatsapp_opt_in_at: string | null
+          whatsapp_opt_out_at: string | null
         }
         Insert: {
           buyer_name?: string | null
@@ -249,6 +252,9 @@ export type Database = {
           status?: string
           total_cents?: number | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
+          whatsapp_opt_in_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Update: {
           buyer_name?: string | null
@@ -267,6 +273,9 @@ export type Database = {
           status?: string
           total_cents?: number | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
+          whatsapp_opt_in_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Relationships: [
           {
@@ -582,6 +591,165 @@ export type Database = {
           updated_at?: string
           valid_until?: string
           version?: number
+        }
+        Relationships: []
+      }
+      whatsapp_connections: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          last_error: string | null
+          organization_id: string
+          phone_number_id: string
+          status: string
+          token_ciphertext: string | null
+          updated_at: string
+          waba_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          organization_id: string
+          phone_number_id: string
+          status?: string
+          token_ciphertext?: string | null
+          updated_at?: string
+          waba_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          organization_id?: string
+          phone_number_id?: string
+          status?: string
+          token_ciphertext?: string | null
+          updated_at?: string
+          waba_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_events: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          outbox_id: string
+          payload: Json
+          provider_status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          outbox_id: string
+          payload?: Json
+          provider_status: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          outbox_id?: string
+          payload?: Json
+          provider_status?: string
+        }
+        Relationships: []
+      }
+      whatsapp_outbox: {
+        Row: {
+          attempts: number
+          blocked_reason: string | null
+          created_at: string
+          event: string
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          next_attempt_at: string | null
+          organization_id: string
+          order_id: string
+          payload: Json
+          provider_message_id: string | null
+          provider_status: string | null
+          recipient_phone: string
+          status: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          blocked_reason?: string | null
+          created_at?: string
+          event: string
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          next_attempt_at?: string | null
+          organization_id: string
+          order_id: string
+          payload?: Json
+          provider_message_id?: string | null
+          provider_status?: string | null
+          recipient_phone: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          blocked_reason?: string | null
+          created_at?: string
+          event?: string
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          next_attempt_at?: string | null
+          organization_id?: string
+          order_id?: string
+          payload?: Json
+          provider_message_id?: string | null
+          provider_status?: string | null
+          recipient_phone?: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          language: string
+          organization_id: string
+          status: string
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          language?: string
+          organization_id: string
+          status?: string
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          language?: string
+          organization_id?: string
+          status?: string
+          template_name?: string
+          updated_at?: string
         }
         Relationships: []
       }

@@ -141,3 +141,18 @@ verify_jwt = false
 
 [functions.quote-decline]
 verify_jwt = false
+
+[functions.whatsapp-config-get]
+verify_jwt = true
+
+[functions.whatsapp-connect]
+verify_jwt = true
+
+[functions.whatsapp-disconnect]
+verify_jwt = true
+
+[functions.whatsapp-worker]
+verify_jwt = false
+
+[functions.whatsapp-webhook]
+verify_jwt = false

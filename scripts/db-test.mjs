@@ -1681,7 +1681,7 @@ async function main() {
         select
           has_function_privilege(
             'authenticated',
-            'app.submit_order(text,text,text,text,jsonb,text,uuid,text,uuid,text)',
+            'app.submit_order(text,text,text,text,jsonb,text,uuid,text,uuid,text,boolean)',
             'EXECUTE'
           ) as submit_order,
           has_function_privilege(
@@ -1691,7 +1691,7 @@ async function main() {
           ) as customer_price,
           has_function_privilege(
             'authenticated',
-            'public.api_submit_order(text,text,text,text,jsonb,text,uuid,text)',
+            'public.api_submit_order(text,text,text,text,jsonb,text,uuid,text,boolean)',
             'EXECUTE'
           ) as api_submit
       `)
@@ -2069,6 +2069,153 @@ async function main() {
           ),
         'quote_link_unavailable',
         'token inválido',
+      )
+    })
+
+
+    console.log('[10/10] WhatsApp: opt-in e outbox desligado')
+
+    await test('opt-in grava outbox bloqueado e é idempotente por evento', async () => {
+      const requestId = crypto.randomUUID()
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_submit_order($1, $2, $3, '', $4::jsonb, $5, $6, $7, $8)`,
+          [
+            orgA.slug,
+            'Padaria Pão Bom',
+            '11977776666',
+            JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+            `wa:${requestId}`,
+            requestId,
+            null,
+            true,
+          ],
+        ),
+      )
+      const orderId = created.rows[0].order_id
+      const order = await client.query(
+        `select whatsapp_opt_in, whatsapp_opt_in_at from public.orders where id = $1`,
+        [orderId],
+      )
+      assert(order.rows[0].whatsapp_opt_in === true, 'opt-in não gravado')
+      assert(order.rows[0].whatsapp_opt_in_at !== null, 'timestamp do opt-in')
+      const outbox = await client.query(
+        `select event, status, blocked_reason from public.whatsapp_outbox
+          where order_id = $1 order by event`,
+        [orderId],
+      )
+      assert(outbox.rows.length === 1, `outbox ${outbox.rows.length}`)
+      assert(outbox.rows[0].event === 'new', 'evento new')
+      assert(outbox.rows[0].status === 'blocked', 'deveria estar bloqueado')
+      assert(
+        outbox.rows[0].blocked_reason === 'connection_not_ready',
+        `motivo ${outbox.rows[0].blocked_reason}`,
+      )
+
+      await client.query(`update public.orders set status = 'confirmed' where id = $1`, [orderId])
+      await client.query(`update public.orders set status = 'completed' where id = $1`, [orderId])
+      const after = await client.query(
+        `select event, count(*)::integer as total from public.whatsapp_outbox
+          where order_id = $1 group by event order by event`,
+        [orderId],
+      )
+      assert(after.rows.length === 3, `eventos ${after.rows.length}`)
+      assert(after.rows.every((row) => row.total === 1), 'outbox duplicada')
+    })
+
+    await test('outbox fica pendente com conexão e template aprovados, sem envio', async () => {
+      await client.query(
+        `insert into public.whatsapp_connections
+           (organization_id, waba_id, phone_number_id, status)
+         values ($1, 'waba-test', 'phone-test', 'connected')
+         on conflict (organization_id) do update
+           set status = 'connected', waba_id = 'waba-test', phone_number_id = 'phone-test'`,
+        [orgA.id],
+      )
+      await client.query(
+        `insert into public.whatsapp_templates
+           (organization_id, event, template_name, language, status)
+         values ($1, 'new', 'pedido_novo', 'pt_BR', 'approved')
+         on conflict (organization_id, event, language) do update set status = 'approved'`,
+        [orgA.id],
+      )
+      const requestId = crypto.randomUUID()
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_submit_order($1, $2, $3, '', $4::jsonb, $5, $6, $7, $8)`,
+          [
+            orgA.slug,
+            'Padaria Pão Bom',
+            '11977776666',
+            JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+            `wa-ready:${requestId}`,
+            requestId,
+            null,
+            true,
+          ],
+        ),
+      )
+      const outbox = await client.query(
+        `select status, template_id from public.whatsapp_outbox where order_id = $1`,
+        [created.rows[0].order_id],
+      )
+      assert(outbox.rows[0].status === 'pending', `status ${outbox.rows[0].status}`)
+      assert(outbox.rows[0].template_id !== null, 'template não vinculado')
+      const sent = await client.query(
+        `select count(*)::integer as total from public.whatsapp_outbox
+          where order_id = $1 and status = 'sent'`,
+        [created.rows[0].order_id],
+      )
+      assert(sent.rows[0].total === 0, 'outbox não pode enviar sem worker')
+    })
+
+    await test('WhatsApp exige opt-in, RLS isola e escrita é restrita', async () => {
+      const requestId = crypto.randomUUID()
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_submit_order($1, $2, $3, '', $4::jsonb, $5, $6, $7, $8)`,
+          [
+            orgA.slug,
+            'Padaria Pão Bom',
+            '11977776666',
+            JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+            `wa-no:${requestId}`,
+            requestId,
+            null,
+            false,
+          ],
+        ),
+      )
+      const outbox = await client.query(
+        `select count(*)::integer as total from public.whatsapp_outbox where order_id = $1`,
+        [created.rows[0].order_id],
+      )
+      assert(outbox.rows[0].total === 0, 'opt-in falso gerou outbox')
+
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.whatsapp_connections where organization_id = $1', [
+          orgA.id,
+        ]),
+      )
+      assert(isolated.rows.length === 0, 'B viu conexão de A')
+      const own = await asUser(USER_A, () =>
+        client.query('select id from public.whatsapp_connections where organization_id = $1', [
+          orgA.id,
+        ]),
+      )
+      assert(own.rows.length === 1, 'A não viu a própria conexão')
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.whatsapp_connections
+                 (organization_id, waba_id, phone_number_id)
+               values ($1, 'x', 'y')`,
+              [orgA.id],
+            ),
+          ),
+        'permission denied',
+        'browser escrevendo conexão',
       )
     })
 

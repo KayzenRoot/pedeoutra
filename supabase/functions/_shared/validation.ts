@@ -26,6 +26,7 @@ export interface PublicOrderInput {
   items: OrderItemInput[]
   requestId: string
   priceToken: string | null
+  whatsappUpdates: boolean
 }
 
 export interface ReorderOrderInput {
@@ -184,6 +185,7 @@ export function parsePublicOrderInput(input: unknown): ValidationResult<PublicOr
       items: items.value,
       requestId: common.value.requestId,
       priceToken: priceTokenResult.value,
+      whatsappUpdates: input.whatsapp_updates === true,
     },
   }
 }

@@ -17,7 +17,8 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | #48 | Preços por comprador, tabela privada e link opaco | implementado |
 | #51 | Orçamentos B2B com aceite opaco e conversão única em pedido | implementado |
 | #55 | Comprovante de pedido em PDF A4, sem natureza fiscal | implementado |
-| #63 | Comparação comercial dos dois planos na landing | implementado neste branch |
+| #63 | Comparação comercial dos dois planos na landing | implementado |
+| #29–#31 | Contrato WhatsApp oficial, opt-in, outbox e webhook | implementado com envio desligado; verificação Meta pendente |
 
 ## #48 — preços por comprador
 
@@ -93,16 +94,38 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 - Smoke desktop/mobile light/dark/system e axe sem violações nas duas
   apresentações.
 
+## #29–#31 — contrato WhatsApp oficial (envio desligado)
+
+- `whatsapp_connections` guarda WABA/phone IDs e token cifrado com AES-GCM
+  (chave em `WHATSAPP_ENCRYPTION_KEY`, fora do DB); a API nunca devolve o token.
+- `whatsapp-connect` valida IDs/token, exige entitlement `whatsapp_automation` e
+  deixa a conexão em `pending_verification`; `whatsapp-disconnect` limpa o token
+  e bloqueia o envio. Não há chamada real à Meta para “verificar” sem permissões.
+- Opt-in explícito no pedido público (`whatsapp_updates`) grava
+  `orders.whatsapp_opt_in` e o trigger transacional cria no máximo um evento por
+  `order_id:status` no outbox, com status `blocked` quando conexão/template não
+  estão prontos e `pending` quando estão.
+- `whatsapp-worker` exige token de worker, respeita `WHATSAPP_SEND_ENABLED`
+  (desligado por padrão), tem retry limitado/backoff e só envia template
+  aprovado; `whatsapp-webhook` valida HMAC SHA-256, atualiza entrega/leitura/
+  falha e registra eventos sem PII desnecessária.
+- UI de Configurações mostra status, criptografia/webhook, fila e formulário
+  cifrado; textos deixam claro que a integração oficial e o envio automático
+  dependem de WABA, templates e aprovação da Meta. WhatsApp manual continua
+  inalterado.
+- Testes cobrem cifra/decifra, opt-in, idempotência do outbox, worker desligado,
+  HMAC inválido/válido, RLS A/B e ausência de token em claro.
+
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **60 PASS, 0 FAIL** |
-| `npm run test:edge` | typecheck de **35 Edge Functions** |
-| `npm run test:edge-http` | **43 PASS, 0 FAIL** |
-| `npm run test:unit` | **144 PASS, 0 FAIL** (27 arquivos) |
+| `npm run test:db` | **63 PASS, 0 FAIL** |
+| `npm run test:edge` | typecheck de **40 Edge Functions** |
+| `npm run test:edge-http` | **48 PASS, 0 FAIL** |
+| `npm run test:unit` | **146 PASS, 0 FAIL** (28 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui tabelas de preço, quotes, itens, eventos e links |
+| `npm run test:restore` | PASS; inclui preços, quotes e tabelas WhatsApp |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |
@@ -131,5 +154,5 @@ Logs locais usados durante a implementação:
 - SMTP próprio pendente (convites de equipe bloqueados).
 - WhatsApp oficial depende de WABA, templates e consentimento aprovados.
 - Admin bootstrap de produção segue pendente de TOTP/AAL2 do proprietário.
-- Itens seguintes da Parte 2: #58 equipe/RBAC (bloqueado por SMTP) e #29–#31
-  contrato WhatsApp (bloqueado por WABA/Meta).
+- Pendente na Parte 2: #58 equipe/RBAC (bloqueado por SMTP) e verificação real
+  da WABA/templates pela Meta para ativar o envio WhatsApp.

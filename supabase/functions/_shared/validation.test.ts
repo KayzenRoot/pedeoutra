@@ -38,7 +38,11 @@ describe('validação de pedido público', () => {
     expect(result.value.buyerPhone).toBe('11977776666')
     expect(result.value.buyerName).toBe('Padaria Pão Bom')
     expect(result.value.slug).toBe('distribuidora-aurora-abc123')
+    expect(result.value.whatsappUpdates).toBe(false)
     expect(result.value.items).toEqual([{ product_id: PRODUCT_A, quantity: 2 }])
+    const opted = parsePublicOrderInput(validOrder({ whatsapp_updates: true }))
+    expect(opted.ok).toBe(true)
+    if (opted.ok) expect(opted.value.whatsappUpdates).toBe(true)
   })
 
   it('rejeita honeypot preenchido', () => {

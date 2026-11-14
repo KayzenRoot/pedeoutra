@@ -197,6 +197,45 @@ insert into public.quote_links (
   'aaaaaaaa-1111-4111-8111-111111111111'
 );
 
+insert into public.whatsapp_connections (
+  id, organization_id, waba_id, phone_number_id, token_ciphertext, status, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-888888888888',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'waba-restore', 'phone-restore', 'cipher-restore', 'pending_verification',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.whatsapp_templates (
+  id, organization_id, event, template_name, language, status
+) values (
+  'aaaaaaaa-1111-4111-8111-999999999999',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'confirmed', 'pedido_confirmado', 'pt_BR', 'approved'
+);
+
+insert into public.whatsapp_outbox (
+  id, organization_id, order_id, event, recipient_phone, template_id,
+  payload, status, idempotency_key, provider_message_id, provider_status
+) values (
+  'aaaaaaaa-2222-4222-8222-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-5555-4555-8555-555555555555',
+  'confirmed', '11977776666',
+  'aaaaaaaa-1111-4111-8111-999999999999',
+  '{"reference":"PD-RESTORE001","event":"confirmed"}'::jsonb,
+  'sent', 'restore:confirmed', 'wamid.restore', 'delivered'
+);
+
+insert into public.whatsapp_events (
+  id, organization_id, outbox_id, provider_status, payload
+) values (
+  'aaaaaaaa-3333-4333-8333-444444444444',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-2222-4222-8222-333333333333',
+  'delivered', '{"status":"delivered"}'::jsonb
+);
+
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
 
@@ -322,6 +361,10 @@ select
   (select count(*) from public.quote_items) as quote_items,
   (select count(*) from public.quote_events) as quote_events,
   (select count(*) from public.quote_links) as quote_links,
+  (select count(*) from public.whatsapp_connections) as whatsapp_connections,
+  (select count(*) from public.whatsapp_templates) as whatsapp_templates,
+  (select count(*) from public.whatsapp_outbox) as whatsapp_outbox,
+  (select count(*) from public.whatsapp_events) as whatsapp_events,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -333,7 +376,9 @@ select
   (select md5(string_agg(id::text || ':' || name || ':' || active, ',' order by id)) from public.price_lists) as price_lists_hash,
   (select md5(string_agg(id::text || ':' || product_id::text || ':' || price_cents, ',' order by id)) from public.price_list_items) as price_items_hash,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || total_cents, ',' order by id)) from public.quotes) as quotes_hash,
-  (select md5(string_agg(id::text || ':' || name_snapshot || ':' || subtotal_cents, ',' order by id)) from public.quote_items) as quote_items_hash
+  (select md5(string_agg(id::text || ':' || name_snapshot || ':' || subtotal_cents, ',' order by id)) from public.quote_items) as quote_items_hash,
+  (select md5(string_agg(id::text || ':' || status || ':' || waba_id, ',' order by id)) from public.whatsapp_connections) as whatsapp_connections_hash,
+  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.whatsapp_outbox) as whatsapp_outbox_hash
 `
 
 async function main() {
@@ -438,11 +483,17 @@ async function main() {
       'quote_items',
       'quote_events',
       'quote_links',
+      'whatsapp_connections',
+      'whatsapp_templates',
+      'whatsapp_outbox',
+      'whatsapp_events',
       'orders_hash',
       'price_lists_hash',
       'price_items_hash',
       'quotes_hash',
       'quote_items_hash',
+      'whatsapp_connections_hash',
+      'whatsapp_outbox_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',

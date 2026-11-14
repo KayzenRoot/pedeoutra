@@ -74,6 +74,7 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
   const [buyerPhone, setBuyerPhone] = useState('')
   const [note, setNote] = useState('')
   const [consent, setConsent] = useState(false)
+  const [whatsappUpdates, setWhatsappUpdates] = useState(false)
   const [honeypot, setHoneypot] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -163,6 +164,7 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
     setBuyerPhone('')
     setNote('')
     setConsent(false)
+    setWhatsappUpdates(false)
     setSubmitError(null)
     requestId.current = null
     mountedAt.current = Date.now()
@@ -207,6 +209,7 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
         company_website: honeypot,
         elapsed_ms: Date.now() - mountedAt.current,
         consent,
+        whatsapp_updates: privateMode ? false : whatsappUpdates,
         request_id: requestId.current,
         price_token: token,
       })
@@ -618,6 +621,20 @@ export function Catalog() { // NOSONAR: page orchestrator; branches are JSX stat
                       pedido, conforme o <Link to="/privacidade">aviso de privacidade</Link>.
                     </span>
                   </label>
+                  {!privateMode && (
+                    <label className="checkbox-field">
+                      <input
+                        type="checkbox"
+                        checked={whatsappUpdates}
+                        onChange={(event) => setWhatsappUpdates(event.target.checked)}
+                      />
+                      <span>
+                        Quero receber atualizações deste pedido pelo WhatsApp. O envio
+                        automático só ocorre se o fornecedor tiver a integração oficial ativa;
+                        você pode pedir para parar a qualquer momento.
+                      </span>
+                    </label>
+                  )}
                   <button
                     type="submit"
                     className="button button-primary button-block button-large"

@@ -38,6 +38,11 @@ import { handler as quoteCancel } from '../supabase/functions/quote-cancel/index
 import { handler as quoteGet } from '../supabase/functions/quote-get/index.ts'
 import { handler as quoteAccept } from '../supabase/functions/quote-accept/index.ts'
 import { handler as quoteDecline } from '../supabase/functions/quote-decline/index.ts'
+import { handler as whatsappConfigGet } from '../supabase/functions/whatsapp-config-get/index.ts'
+import { handler as whatsappConnect } from '../supabase/functions/whatsapp-connect/index.ts'
+import { handler as whatsappDisconnect } from '../supabase/functions/whatsapp-disconnect/index.ts'
+import { handler as whatsappWorker } from '../supabase/functions/whatsapp-worker/index.ts'
+import { handler as whatsappWebhook } from '../supabase/functions/whatsapp-webhook/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -77,6 +82,11 @@ const routes: Record<string, Handler> = {
   'quote-get': quoteGet,
   'quote-accept': quoteAccept,
   'quote-decline': quoteDecline,
+  'whatsapp-config-get': whatsappConfigGet,
+  'whatsapp-connect': whatsappConnect,
+  'whatsapp-disconnect': whatsappDisconnect,
+  'whatsapp-worker': whatsappWorker,
+  'whatsapp-webhook': whatsappWebhook,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')

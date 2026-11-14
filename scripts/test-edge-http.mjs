@@ -43,6 +43,9 @@ const PRICE_TOKEN = Buffer.from(
   Array.from({ length: 32 }, (_, index) => (index * 53 + 7) % 256),
 ).toString('base64url')
 const PRICE_TOKEN_HASH = createHash('sha256').update(PRICE_TOKEN).digest('hex')
+const WHATSAPP_KEY = Buffer.from(Array.from({ length: 32 }, (_, index) => (index * 29 + 3) % 256)).toString('base64')
+const WHATSAPP_WEBHOOK_SECRET = 'whatsapp-webhook-test-secret'
+const WHATSAPP_WORKER_TOKEN = 'whatsapp-worker-test-token'
 
 let passed = 0
 let failed = 0
@@ -388,6 +391,9 @@ async function main() {
           APP_URL: 'http://127.0.0.1:5173',
           ADMIN_EMAIL: 'admin@example.test',
           ADMIN_BOOTSTRAP_TOKEN: 'bootstrap-test-token',
+          WHATSAPP_ENCRYPTION_KEY: WHATSAPP_KEY,
+          WHATSAPP_WEBHOOK_SECRET,
+          WHATSAPP_WORKER_TOKEN,
           EDGE_PORT: String(edgePort),
         },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -1678,6 +1684,171 @@ async function main() {
       )
       assert(denied.status === 403, `plano HTTP ${denied.status}`)
       assert(denied.data.error === 'plan_required', 'erro de plano')
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[11/11] WhatsApp oficial: configuração e outbox desligado')
+
+    await test('opt-in cria outbox bloqueado sem integração pronta', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+      const requestId = crypto.randomUUID()
+      const response = await call(
+        'public-order',
+        {
+          slug: ORG_SLUG,
+          buyer_name: 'Padaria Edge',
+          buyer_phone: '11977776666',
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          company_website: '',
+          elapsed_ms: 2000,
+          consent: true,
+          whatsapp_updates: true,
+          request_id: requestId,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.30' } },
+      )
+      assert(response.status === 201, `order HTTP ${response.status}`)
+      const order = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select id, whatsapp_opt_in from public.orders where request_id = '${requestId}'`,
+      ]).stdout.trim()
+      const [orderId, optIn] = order.split('|')
+      assert(optIn === 't', `opt-in ${optIn}`)
+      const outbox = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select status, blocked_reason from public.whatsapp_outbox where order_id = '${orderId}'`,
+      ]).stdout.trim()
+      assert(outbox === 'blocked|connection_not_ready', `outbox ${outbox}`)
+    })
+
+    await test('configuração cifra token e não o devolve', async () => {
+      const token = 'EAAG-edge-token-super-secreto-123456'
+      const connected = await call(
+        'whatsapp-connect',
+        { waba_id: 'waba-edge', phone_number_id: 'phone-edge', access_token: token },
+        { token: userToken },
+      )
+      assert(connected.status === 201, `connect HTTP ${connected.status} ${JSON.stringify(connected.data)}`)
+      assert(connected.data.status === 'pending_verification', 'status')
+      assert(connected.data.send_enabled === false, 'envio não pode estar ativo')
+      assert(!JSON.stringify(connected.data).includes(token), 'token retornado')
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select token_ciphertext from public.whatsapp_connections where organization_id = '${ORG_ID}'`,
+      ]).stdout.trim()
+      assert(stored && !stored.includes(token), 'token em texto aberto')
+
+      const config = await fetch(`${edgeBase}/whatsapp-config-get`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      const data = await config.json()
+      assert(config.status === 200, `config HTTP ${config.status}`)
+      assert(data.connection.status === 'pending_verification', 'config status')
+      assert(data.send_enabled === false, 'config envio')
+      assert(!JSON.stringify(data).includes(token), 'config vazou token')
+    })
+
+    await test('worker exige token e permanece desligado', async () => {
+      const wrong = await fetch(`${edgeBase}/whatsapp-worker`, {
+        method: 'POST',
+        headers: { 'x-whatsapp-worker-token': 'errado' },
+      })
+      assert(wrong.status === 401, `worker errado HTTP ${wrong.status}`)
+      const disabled = await fetch(`${edgeBase}/whatsapp-worker`, {
+        method: 'POST',
+        headers: { 'x-whatsapp-worker-token': WHATSAPP_WORKER_TOKEN },
+      })
+      const data = await disabled.json()
+      assert(disabled.status === 200, `worker HTTP ${disabled.status}`)
+      assert(data.disabled === true, 'worker deveria estar desligado')
+    })
+
+    await test('webhook valida HMAC e atualiza entrega sem PII', async () => {
+      const orderRow = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select id from public.orders where organization_id = '${ORG_ID}' order by created_at desc limit 1`,
+      ]).stdout.trim()
+      const outboxRow = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `insert into public.whatsapp_outbox
+           (organization_id, order_id, event, recipient_phone, status, provider_message_id, idempotency_key)
+         values ('${ORG_ID}', '${orderRow}', 'confirmed', '11977776666', 'sent', 'wamid.edge.1', 'webhook:${Date.now()}')
+         returning id`,
+      ]).stdout.trim().split('\n')[0]
+      assert(outboxRow, 'outbox não criada')
+      await clientQuery(`
+        update public.whatsapp_connections set status = 'connected'
+         where organization_id = '${ORG_ID}'
+      `)
+
+      const body = JSON.stringify({
+        entry: [
+          {
+            changes: [
+              {
+                value: {
+                  metadata: { phone_number_id: 'phone-edge' },
+                  statuses: [{ id: 'wamid.edge.1', status: 'delivered' }],
+                },
+              },
+            ],
+          },
+        ],
+      })
+      const invalid = await fetch(`${edgeBase}/whatsapp-webhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-hub-signature-256': 'sha256=errado' },
+        body,
+      })
+      assert(invalid.status === 401, `assinatura inválida HTTP ${invalid.status}`)
+
+      const signature = `sha256=${createHmac('sha256', WHATSAPP_WEBHOOK_SECRET).update(body).digest('hex')}`
+      const response = await fetch(`${edgeBase}/whatsapp-webhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-hub-signature-256': signature },
+        body,
+      })
+      const data = await response.json()
+      assert(response.status === 200, `webhook HTTP ${response.status}`)
+      assert(data.processed === 1, `processados ${data.processed}`)
+      const state = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select provider_status, status from public.whatsapp_outbox where id = '${outboxRow}'`,
+      ]).stdout.trim()
+      assert(state === 'delivered|sent', `estado ${state}`)
+      const events = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.whatsapp_events where outbox_id = '${outboxRow}'`,
+      ]).stdout.trim()
+      assert(events === '1', `eventos ${events}`)
+    })
+
+    await test('desconectar limpa token e desliga envio', async () => {
+      const response = await call('whatsapp-disconnect', {}, { token: userToken })
+      assert(response.status === 200, `disconnect HTTP ${response.status}`)
+      const row = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select status, token_ciphertext from public.whatsapp_connections where organization_id = '${ORG_ID}'`,
+      ]).stdout.trim()
+      assert(row === 'disabled|', `conexão ${row}`)
       await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 

@@ -114,17 +114,17 @@ gates de lançamento.
 - **Entregue:** categorias/fotos privadas (#52), SKU e pedido rápido (#47),
   mínimos/múltiplos (#49), importação CSV/XLSX (#46), templates (#57), QR (#53),
   acompanhamento por token (#50), preços por comprador (#48), orçamentos com
-  aceite opaco (#51), comprovante PDF não fiscal (#55) e comparação comercial
-  dos planos (#63).
-- **Evidência local no HEAD de trabalho:** 60 DB, 43 Edge HTTP, 144 unit,
-  35 Edge Functions typechecked, 7 grupos full-local, restore com as novas
-  tabelas de preço/orçamento e smoke light/dark/system.
+  aceite opaco (#51), comprovante PDF não fiscal (#55), comparação comercial dos
+  planos (#63) e contrato WhatsApp oficial com envio desligado (#29–#31).
+- **Evidência local no HEAD de trabalho:** 63 DB, 48 Edge HTTP, 146 unit,
+  40 Edge Functions typechecked, 7 grupos full-local, restore com preço,
+  orçamento e WhatsApp, e smoke light/dark/system.
 - **Segurança #48/#51:** RLS por tenant, entitlements `private_prices`/`quotes`,
   tokens opacos com SHA-256/TTL/revogação, snapshots de preço, aceite idempotente
   com lock e um pedido por quote, headers `noindex`/`no-referrer`/`no-store`;
   RPCs internas restritas a `service_role`.
-- **Pendente na Parte 2:** #58 equipe/RBAC (SMTP) e #29–#31 contrato WhatsApp
-  (WABA/Meta).
+- **Pendente na Parte 2:** #58 equipe/RBAC (SMTP) e ativação real do WhatsApp
+  (WABA/templates/Meta); o código de envio permanece desligado por padrão.
 - **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (TOTP/AAL2 do proprietário),
   SMTP próprio para convites, WABA/templates para WhatsApp e
   `COMMERCIAL_BLOCKED`/`GO_LIVE_BLOCKED`.

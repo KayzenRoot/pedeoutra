@@ -33,6 +33,7 @@ export const handler = (req: Request) =>
       p_rate_bucket: await rateBucket(req, 'order-rpc'),
       p_request_id: input.requestId,
       p_price_token: input.priceToken,
+      p_whatsapp_opt_in: input.whatsappUpdates,
     })
 
     if (error) throwOrderError(error)

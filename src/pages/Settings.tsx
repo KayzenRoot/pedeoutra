@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MfaPanel } from '../components/MfaPanel'
+import { WhatsAppPanel } from '../components/WhatsAppPanel'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { FormMessage, PageHeader } from '../components/ui'
 import { useAuth } from '../context/auth-context'
@@ -250,6 +251,8 @@ export function Settings() {
             </li>
           </ul>
         </section>
+
+        <WhatsAppPanel />
 
         <section className="card">
           <span className="eyebrow">Privacidade e ajuda</span>
