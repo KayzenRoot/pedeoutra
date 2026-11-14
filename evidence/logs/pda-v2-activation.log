@@ -1,0 +1,49 @@
+PDA-V2-P01-WO-001 — ativação em produção
+Data: 2026-11-13
+
+Backup manual antes das migrations (fora do repositório):
+- C:\Users\csn19\pedeoutra-backups\pre-v2-20261113-195950-schema.sql
+  sha256=6bd06606826bcd0440c042619a924e13d73ad404daf8dfdc60fdf6dcba787226
+- C:\Users\csn19\pedeoutra-backups\pre-v2-20261113-200337-data.sql
+  sha256=096dfa1260317b72e1f56e55d9c14e5a829cc743dcd17b93316f98278326fd42
+  (1 auth user, 1 organization, 1 product, 1 order, 1 subscription)
+
+Migrations:
+- supabase migration list --linked: 4 aplicadas, 2 pendentes
+- supabase db push --linked --dry-run: plans_entitlements + admin_trial
+- supabase db push --linked --yes: exit 0
+- supabase migration list --linked: 6/6 aplicadas
+
+Dados após migration (service role, contagens):
+organizations=1 products=1 orders=1 subscriptions=1
+plan_catalog=2 plan_feature_entitlements=48
+trial_grants=1 trial_signals=2
+platform_admins=0 plan_changes=0 quota_usage=0
+
+Secrets configurados (nomes apenas; valores não registrados):
+ADMIN_EMAIL, ADMIN_BOOTSTRAP_TOKEN, PRO_PLAN_CHECKOUT_ENABLED=false, PLAN_CHANGE_MODE=disabled
+
+Edge Functions publicadas (15 ativas):
+plan-catalog, admin-api, admin-bootstrap, change-plan,
+create-checkout, cancel-subscription, asaas-webhook, billing-reconcile,
+public-catalog, public-order, reorder-get, reorder-submit,
+reorder-create, reorder-revoke, link-order-customer
+
+Probes de produção (sem mutação):
+plan-catalog=200 (essential:2990:true, professional:6990:false)
+admin-api sem sessão=403
+admin-bootstrap sem token=401
+asaas-webhook token inválido=401
+billing-reconcile token inválido=401
+
+Frontend:
+- PR #89 mergeada em main: 57511a33aea8c02135296b202d44d65be31beb36
+- main CI 43525061298: success
+- Pages 200; asset index-BZxb7nMM.js; theme-init.js 200
+- /admin carrega e mostra login (fail-closed); tema system/light sem erro
+
+Pendente:
+- ADMIN_BOOTSTRAP_BLOCKED: o usuário goodzlanchonete@gmail.com ainda não tem fator TOTP.
+  O bootstrap exige AAL2. Assistente local:
+  node C:\Users\csn19\pedeoutra-secrets\bootstrap-admin.mjs
+- Nenhuma cobrança real, e-mail, WhatsApp ou compra de serviço foi executada.

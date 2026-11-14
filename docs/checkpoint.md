@@ -91,10 +91,14 @@ gates de lançamento.
   com as 8 tabelas V2 e smoke light/dark/system desktop/mobile. `npm audit`
   mantém 0 HIGH/CRITICAL e 9 moderate.
 - **PR da Parte 1:** [#89](https://github.com/KayzenRoot/pedeoutra/pull/89), Draft, CI verde no HEAD de código `8e777de`; sem merge.
-- **Status proposto:** `PART 1 IMPLEMENTED — PENDING AUDIT`, mantendo
-  `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` (SMTP, backup, suporte/legal,
-  primeira cobrança e gates das Partes 2–5). Nenhum merge, deploy, migration
-  em produção, cobrança ou envio real foi executado.
+- **Status:** `PART 1 ACTIVE IN PRODUCTION — ADMIN BOOTSTRAP PENDING MFA`,
+  mantendo `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` (SMTP, backup,
+  suporte/legal, primeira cobrança e gates das Partes 2–5).
+- **Ativação (2026-11-13):** PR #89 mergeada em `main` (`57511a3`), CI
+  `43525061298` success; 2 migrations aplicadas após export manual; 15 Edge
+  Functions ativas; Pages no novo frontend. Dados reais preservados.
+  `ADMIN_BOOTSTRAP_BLOCKED` até o proprietário cadastrar TOTP/AAL2 e rodar o
+  assistente de bootstrap. Nenhuma cobrança, e-mail ou envio real.
 - **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (e-mail do superadmin não
   fornecido), `PRO_PLAN_CHECKOUT_DISABLED` (funcionalidade da Parte 2/4 ainda
   não pronta) e `PLAN_CHANGE_REQUIRES_SUPPORT` (limite do Asaas em assinatura

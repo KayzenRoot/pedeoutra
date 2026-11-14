@@ -11,7 +11,7 @@
 | Base | `40b4224d61da23a53990bf91a6fadcbd52ff969c` (merge da PR #77) |
 | Head de código | `73b600effd83ca233c0e1604ee6a17c902ef5861` |
 | Data | 2026-11-13 |
-| Deploy/migração em produção | **não executados nesta WO** |
+| Deploy/migração em produção | **executados em 2026-11-13** (2 migrations, 15 Edge Functions, Pages) |
 | Cobrança/e-mail real | **não executados** |
 
 Este bundle descreve a Parte 1 implementada e **não** declara release pronta,
@@ -140,20 +140,26 @@ de execução; os dados sintéticos foram removidos pelos próprios harnesses.
 
 ## 10. Veredito
 
-**PART 1 IMPLEMENTED — PENDING OWNER AUDIT.**
+**PART 1 ACTIVE IN PRODUCTION — ADMIN BOOTSTRAP PENDING MFA.**
 
-- Código, migrations, testes e UI estão implementados e verdes no HEAD de
-  código.
-- Não há merge, deploy, migração em produção, cobrança, e-mail ou contratação.
-- O console admin está intencionalmente inoperante sem o e-mail/token do
-  superadmin; o Profissional está intencionalmente indisponível.
-- A promoção de ADR/checkpoint e o merge só ocorrem após auditoria e
-  autorização explícita do proprietário.
+- PR #89 foi mergeada em `main` no commit `57511a3`; CI da main
+  `43525061298` passou; Pages publicou o novo frontend.
+- As duas migrations V2 foram aplicadas no projeto de produção após export
+  manual; os dados reais permaneceram (1 usuário, 1 organização, 1 produto,
+  1 pedido, 1 assinatura).
+- As 15 Edge Functions estão ativas; `plan-catalog` responde 2990/6990 com
+  Profissional indisponível; admin/webhook/reconcile falham fechados.
+- O console admin permanece **ADMIN_BOOTSTRAP_BLOCKED** até o proprietário
+  cadastrar TOTP (AAL2) e rodar o assistente de bootstrap.
+- Nenhuma cobrança real, e-mail, WhatsApp, compra de serviço ou alteração de
+  assinatura foi executada.
 
 ## 11. Adendo — CI do PR #89
 
 - PR Draft: https://github.com/KayzenRoot/pedeoutra/pull/89
 - Head de código com CI verde: `8e777ded3d54e6fb93c5e90ea1e912d4fb67c8b2`
+- PR mergeada em `main`: `57511a33aea8c02135296b202d44d65be31beb36`
+- CI da `main`: run `43525061298` — success
 - Checks verdes: Cloudflare Pages (preview), Edge Functions typecheck, Full
   local E2E, Postgres/RLS/restore, Web/unit/build, Socket Project Report,
   Socket PR Alerts e SonarCloud Code Analysis.
@@ -185,15 +191,26 @@ vulnerabilities e 0 code smells**, com ratings 1.0. A suíte unitária subiu
 para 94 testes com cobertura de Billing, Admin e Settings. As supressões `NOSONAR`
 ficaram restritas às migrations; nenhum código de produto foi suprimido.
 
-## 13. Estado de ativação (não executado)
+## 13. Ativação executada
 
-`supabase migration list --linked` em 2026-11-13 confirmou 4 migrations
-aplicadas no projeto de produção e **2 pendentes** (`plans_entitlements` e
-`admin_trial`). `supabase db push --linked --dry-run` listou exatamente essas
-duas, sem erro. Nenhum push, deploy de Edge Function, merge ou alteração de
-produção foi executado.
+- Export manual antes das migrations:
+  `pre-v2-20261113-195950-schema.sql` (SHA-256 `6bd06606...`) e
+  `pre-v2-20261113-200337-data.sql` (SHA-256 `096dfa12...`), fora do repositório.
+- `supabase db push --linked --yes`: exit 0; `migration list` passou a 6/6.
+- Contagens pós-migration: 1 organização, 1 produto, 1 pedido, 1 assinatura,
+  2 planos, 48 feature rows, 1 trial grant, 2 sinais; `platform_admins=0`.
+- Secrets configurados: `ADMIN_EMAIL`, `ADMIN_BOOTSTRAP_TOKEN`,
+  `PRO_PLAN_CHECKOUT_ENABLED=false`, `PLAN_CHANGE_MODE=disabled` (valores não
+  registrados).
+- 15 Edge Functions ativas; probes: `plan-catalog` 200, `admin-api` 403 sem
+  sessão, `admin-bootstrap` 401 sem token, webhook/reconcile 401 com token
+  inválido.
+- Pages 200 com asset novo; `/admin` fail-closed; tema system/light sem erro.
+- `ADMIN_BOOTSTRAP_BLOCKED`: o usuário `goodzlanchonete@gmail.com` não possui
+  fator TOTP; o assistente local `bootstrap-admin.mjs` faz enrollment + AAL2 +
+  bootstrap quando o proprietário o executar.
+- Log completo: `evidence/logs/pda-v2-activation.log`.
 
 O bundle foi dividido (`react`, `supabase`, `Admin`, `Settings`, `MfaPanel`);
-o maior chunk caiu de ~518 kB para 225 kB. O runbook completo, com backup
-manual obrigatório, ordem de deploy, secrets, bootstrap e rollback, está em
-`docs/part1-activation.md`.
+o maior chunk caiu de ~518 kB para 225 kB. O runbook permanece em
+`docs/part1-activation.md` para rollback/roll-forward.

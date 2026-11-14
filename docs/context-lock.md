@@ -2,16 +2,16 @@
 
 ## Identificação
 
-- Data do lock: 2026-11-13
+- Data do lock: 2026-11-14
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
-- Branch: `feat/PDA-V2-P01-WO-001-foundation-billing-admin`
-- Base SHA: `40b4224d61da23a53990bf91a6fadcbd52ff969c`
-- HEAD no momento da geração: `8e777ded3d54e6fb93c5e90ea1e912d4fb67c8b2`
+- Branch: `docs/PDA-V2-P01-WO-001-activation-record`
+- Base SHA: `57511a33aea8c02135296b202d44d65be31beb36`
+- HEAD no momento da geração: `57511a33aea8c02135296b202d44d65be31beb36`
 - Work Order: `PDA-V2-P01-WO-001 (PDF, 13/11/2026)`
 
 ## Issues verificadas (sem duplicatas)
 
-Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhuma issue foi criada ou duplicada. Links:
+Issues #24–#28, #32, #60–#62 e o tracker #84. Nenhuma issue foi criada ou duplicada. Links:
 `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 
 ## Hashes SHA-256 dos arquivos críticos
@@ -22,16 +22,16 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
 | `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
 | `.github/workflows/release-health.yml` | `c7c0eabaf13b1a95c1118e4f9f5b210ad8979ce8752da6e4886752ae21ce627d` |
-| `README.md` | `f6ded3ff7a506d2a2704b2efd57c43723f143bfc36f03571d515cd37b048c59e` |
+| `README.md` | `e34ed8dc8d4299d31429d1eb0e439655f85a59f702e2f72c69f9208c2a00d4e6` |
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `29a456ed263c5ab820cb4dde1355e7fecc33c76090780e3303d76a09141d27b8` |
+| `docs/checkpoint.md` | `73497dca2ac51fb8ea5e033dc89327bf1d28c632425780ce219b218505c5e8b4` |
 | `docs/decisions-ledger.md` | `f8a49ab27df7691a1c7eb2cbfe60ae9adc4872caed4290eb09d01fc23831341e` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
-| `docs/deployment.md` | `57724d845a994b1c91f3e8372f921b415f0625bee4d01f1b19e6ff7474cf6947` |
-| `docs/part1-activation.md` | `d8904c91be801d62e424e678273f8ebada0b5f0e1386ba9198f49d05c5df4924` |
-| `docs/plan-matrix.md` | `10f2fe3e721eb22dfde5c804a4f8c1f8fcac3db8e2faf4db35eed91e75a5fe6d` |
+| `docs/deployment.md` | `fe98043df802b4bde69d691486da7dc63ed77ae656f964ba652fab06580f72e6` |
+| `docs/part1-activation.md` | `dfa1885848420ed387856ea8ef7fcabbe8c44a2b7ed834bac0c4219a3459fc34` |
+| `docs/plan-matrix.md` | `fc7908b9bfd9a20ed76b0a9571b98cea1177d08c2868f735fb5beb5e80bedebf` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
 | `docs/requirements.md` | `1e869a2f0b91ee7f5791846dbedcafd959764d634a49c7a03199c67f7376aabc` |
 | `docs/scope.md` | `cb34d40b33678c5fe70ffd4aa8fd25830022b6e301d17eaa4afdac74353e7f5b` |
@@ -52,16 +52,16 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `scripts/prod-smoke.mjs` | `3062842803b4166b2298ae670862a0afa45880df8d1995edd7b9b58ba7c1e969` |
 | `scripts/smoke.mjs` | `fad4623f819551291c695efa2a825e92168270f790c8b166dfbf0db6a0d27f7b` |
 | `scripts/test-edge-http.mjs` | `00d6b982510798dd7b9da8745224ef7b617fc24d8c102f8699011fefef2ff131` |
-| `scripts/test-full-local.mjs` | `f8dd3d8bf744ebe71556874128800568e0e3f8c24531a6b9aa0ca2feabd1afb4` |
-| `scripts/test-postgrest.mjs` | `6831366b2c6338d566a67fba44a6978bae77de9314d8fea9a87165409142ac1a` |
-| `scripts/verify-restore.mjs` | `537d045c5514b043224f0b360ebd54e2111d9ace24d47af6d2801028310b2d77` |
+| `scripts/test-full-local.mjs` | `f4dd01b4d2f477f523c768827de63c384c369d4344f71212e0214343d23ff2c7` |
+| `scripts/test-postgrest.mjs` | `6374291c12c196e3c925b9bc635391e315e1bf32b7f6d1a54e459c2403e5a89b` |
+| `scripts/verify-restore.mjs` | `f156d1cfed7eb9e95a3191c6a17aa1b5f6f0d9c0a4f10324492325f4d721cba8` |
 | `src/App.tsx` | `7a795faceffbeb5a154dd3b8aac22d9ad5628ce1bf34f6c6a6261f4ef2f5a7eb` |
 | `src/components/AppShell.tsx` | `eefef899cc3552fbe89d32ce4e866218d87f9e99d5b2a48774bd5846d34780c6` |
 | `src/components/AuthLayout.tsx` | `2d793e1cef445d3d9a2caf96289ed792cbeb5ba75d458048411a1bbd71f32ea2` |
 | `src/components/Brand.tsx` | `270b850ed4b611f0ea950c253ca422dba36d1c78056f65ed2a56897600934d82` |
 | `src/components/MfaPanel.tsx` | `43a0425aaa45d435e9cc659fd14de05187849cb87edc059777eb786ea016efe2` |
 | `src/components/ProtectedRoute.tsx` | `6ed279f45f355dcaedf8709290cc0ae5ac620ad6d2a1aa9170aa8fe8b0de3916` |
-| `src/components/ThemeToggle.tsx` | `221f23c191257583730fcd02266ec2fa06f405e59683adc920b26f0594627723` |
+| `src/components/ThemeToggle.tsx` | `b97405fb4a9ab0164b9b95358311186b9451df178de53e9c808f39ae14406e01` |
 | `src/components/ui.tsx` | `0c37f1e57123acb7aee4e7f75c08c0215d9db61261aee9b49848b4a415dd39d3` |
 | `src/context/AuthContext.tsx` | `81236f02f2a187bd058aaf6eb1e309443a4aae396e7f4504a58ab7c03b4c183a` |
 | `src/context/auth-context.ts` | `92b7a64adfcb7c314f1ce96b44e98d2b3546f3a184afc9f14d724064067844b9` |
@@ -73,10 +73,10 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `src/lib/format.ts` | `67419a037fda19fe19c88f8232dd0239290162faa9b150d2f4dd6bcdef454a5c` |
 | `src/lib/navigation.test.ts` | `430e4d7c8a17aedb4664ce759190920fef23891dfa62a7c54c187f83acdfd370` |
 | `src/lib/navigation.ts` | `ea47eab28b661e899c38b142103311bb016eab556982257a451b15210e65e265` |
-| `src/lib/plans.ts` | `af8f4d046d417e5aa55f5763636d546900120e065596e6334d3744b43e40564c` |
+| `src/lib/plans.ts` | `0ce53e9096ad57e34180329bbadf00b0abf55ee030cf827af6aabfd1bfbadfb3` |
 | `src/lib/supabase.ts` | `f900ffc9786b00d1493cb481d28c19dbe5d130ac4b872b0f4aaac40004d0525b` |
-| `src/lib/theme.test.ts` | `1e87c5e38a74d539bb87820e0fde2e6de1b66e03d05e0965eca81e10449a0024` |
-| `src/lib/theme.ts` | `0bcaf0c076b9fa54c592cd85c52f6ecefadfb571f4731b8ba0061e03c9bd8729` |
+| `src/lib/theme.test.ts` | `e5d935ea0b0203bba22a99cc8fe60d710d45c22684e5fb37fdb72b8333df0ef7` |
+| `src/lib/theme.ts` | `a4a0b2a328157edf4de187c5e0a52239dac1174abdd365bc3799fa3ace0c6f65` |
 | `src/lib/types.ts` | `7d84763a6bce7224910e3863fc62cdc8403780d0b17644e50d05650526a2b55e` |
 | `src/main.tsx` | `b3f023da133154adff448b24c256c554072536939e52291490a6128a9cfc82f7` |
 | `src/pages/Admin.test.tsx` | `5a3c3106c8b2bd05a59f8e748a66f5cf6b9440268011e05c4c7095bbad5e4140` |
@@ -103,13 +103,13 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `src/pages/Settings.test.tsx` | `26a60827e610c9632885d932c9a37f5b6fc00c17288558948e025f54140218e0` |
 | `src/pages/Settings.tsx` | `4810648a80dc1428dd9a08228299cdd6bb83d4c6c9164134e02b04caf0ae7a1b` |
 | `src/pages/Signup.tsx` | `2d9a43738237c7135abd28d156643713b2c40c16b94a9b347e5e546f28841fe3` |
-| `src/styles.css` | `53dc0cd72d5144ce9a8823f4512366e7995247464419d65c2a8e52ade4dec875` |
+| `src/styles.css` | `29351c29c9bc3a5bb85914638e6e5d76d8e29a21aaf9913452a3de61809939b8` |
 | `src/test/setup.ts` | `31f9b0650fa5a1fc26d640fce75f0a6bda14af4e40dd624576c5a075ff8d14ed` |
 | `src/vite-env.d.ts` | `424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92` |
-| `supabase/config.toml` | `abc5001be1d6e91f19a45ea2d92d95e4c9a64a3737a1427e7d5d4f7270dbdb83` |
+| `supabase/config.toml` | `649f2c073d4e633da01ce0f9a93635ec8225fc082b2e95de049596ec2555c54c` |
 | `supabase/functions/_shared/access.test.ts` | `a674d7de37db0ae78c3ff54101244e3d9d19f6432c5023356919689dae01b132` |
 | `supabase/functions/_shared/access.ts` | `3d0dd2da03d36452296c684cd8086c5f823ca3bd59802b5b8ccb11ffb602f5a9` |
-| `supabase/functions/_shared/admin.ts` | `2ac592c0fdb5ad6f1e0855384dccd452b60a6286c01723a2fec04fdb960fb01b` |
+| `supabase/functions/_shared/admin.ts` | `85d74cefebb60be39c1a07b074f31dc1770fe783db634bb8e56ec9095519325f` |
 | `supabase/functions/_shared/asaas.test.ts` | `72705e41d629b61ebf1fe57e88cb268769e03f7432f4255971d4690233d531be` |
 | `supabase/functions/_shared/asaas.ts` | `9e464069ed42335073f16e459fd09f40f3a01af41ad518d96111195897412315` |
 | `supabase/functions/_shared/audit.ts` | `74baceaad5cec364a3d2cc83ddc9ef43a09ec2584a8dc7a920322b4af635a139` |
@@ -119,11 +119,11 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `supabase/functions/_shared/billing-processor.ts` | `b9222cbdb2547d32ea219adad4ae4d656f73b267640015cd784f7b9feddaf218` |
 | `supabase/functions/_shared/billing.test.ts` | `9787480409169243dd7d2d73fb820364bf35882c787a1709a3719839acb0d5ce` |
 | `supabase/functions/_shared/billing.ts` | `f20f6267f51c6d3d8e8efde06854baf1c06c3d093baea2ae51b14d57f5e0803b` |
-| `supabase/functions/_shared/entitlements.ts` | `085b45066c0264fa0b4a576d4d49766cfcbf5cb310c4462f2fb7945b30635b7b` |
+| `supabase/functions/_shared/entitlements.ts` | `61ce787e886b338822b5f655f39c7137c57a3ad21bfb8d5301aad7c0f57c48c8` |
 | `supabase/functions/_shared/http.ts` | `3eaf389fe8c01986d9c6002d51a848495f4d6f1a29343b1c076e1cdbbeefceb2` |
 | `supabase/functions/_shared/order-errors.ts` | `01f37421b9f112342f7c9f3ebf8e38b1903cd94eefca0583b48c9b806d84756b` |
 | `supabase/functions/_shared/org.ts` | `17fff4e47cf082d18bdaf045bec0a62b161ffec14248276c9c51bd195784e1bb` |
-| `supabase/functions/_shared/plans.ts` | `bd3e5ccdb9a2b78b79070d77a105a8518bc8b6c4593cf567c373cd1e4fa46215` |
+| `supabase/functions/_shared/plans.ts` | `30e141761a434c7aab172543418d253060efecd831cbe6bcb990cc53e22dc1b3` |
 | `supabase/functions/_shared/rate-limit.ts` | `171a2be59ad195fd4f9093d12f5f0bc4073da8484de081c0f22b4305daeafa2a` |
 | `supabase/functions/_shared/request-ip.test.ts` | `b96403e24b6efd7013b5b5c50743b8476020494b8891ec47c406dcdf52b52079` |
 | `supabase/functions/_shared/request-ip.ts` | `929394ca1e514988f8e878f6db6d6ba32ec4a3c6d60c870d7b9ad57f2fbdd537` |
@@ -132,15 +132,15 @@ Issues #24–#28, #32, #60–#62 e o tracker #84 estavam abertas na base. Nenhum
 | `supabase/functions/_shared/tokens.ts` | `0a18582bb7a4d603ce593b06d7768e640f6b5dd1085fc50da450b3a74c066bc3` |
 | `supabase/functions/_shared/validation.test.ts` | `eb1e6a5b39fc00e1321093f7fb4f64a604edcb340ff101f513dcd67a7eea2bcc` |
 | `supabase/functions/_shared/validation.ts` | `5a2afe0a2138df0a0195327123783d017f3f2a2e405d166020bdb2d11ade8fcb` |
-| `supabase/functions/admin-api/index.ts` | `901532bf56f54d926e4c47bfd90c26e846286376174a4517431ab8f3d462fd0c` |
-| `supabase/functions/admin-bootstrap/index.ts` | `652d52ab55a348a00c250f5140b39e10da76a37d297b0a07ff60f06296f21c05` |
+| `supabase/functions/admin-api/index.ts` | `3e8f54258c0ed29d067ca7daf997d906d1e634c464f683399aa6d23cdfd14f42` |
+| `supabase/functions/admin-bootstrap/index.ts` | `a420bb542cdb5270041e6ad60209b9610c99427ebd2365d9a79bac05e11e99d8` |
 | `supabase/functions/asaas-webhook/index.ts` | `1f66293b7cc3265c53b25834bcacd510b1cb99abd88529250239d519be05be2c` |
 | `supabase/functions/billing-reconcile/index.ts` | `838325202ecb5ea5c07417d187fa4856bed834a8dbda5f109ad4415f3e0bd068` |
 | `supabase/functions/cancel-subscription/index.ts` | `84aa2f32cfff56eb1446be0fe3c7159a3afe86c9e88081e07af3598985112a9a` |
-| `supabase/functions/change-plan/index.ts` | `6ba16ee8712151ef2cef74f97cb4e527c52947c4d8266b4d72976843d2272b3f` |
+| `supabase/functions/change-plan/index.ts` | `fe49d030a922555ebca369209aceaffab65cf31e0aa0eebba5a7a19a4527b02f` |
 | `supabase/functions/create-checkout/index.ts` | `66013beaa56be50cee6b80a87010d4d3a34864ad5890f03e494666c5371587ee` |
 | `supabase/functions/link-order-customer/index.ts` | `4e0a39d91bb765e45d518912d3151e9e094d63e94b0c72b89d4925cc60615f38` |
-| `supabase/functions/plan-catalog/index.ts` | `86add223f7bf370976ee622c2cae8d35d89e219c74204c252afc7e5cc91e87fd` |
+| `supabase/functions/plan-catalog/index.ts` | `3bfbe32e1dcb2a4eb746068f7b49c619aac0364513d41bd76081832b798acd03` |
 | `supabase/functions/public-catalog/index.ts` | `06594e6be1765fcbb13f62fb8783dfb16c9535a83e1c8eddb9ee00407bd59f58` |
 | `supabase/functions/public-order/index.ts` | `c97e4135c742c8e959821b5a8d0ab04ab3093afe2d299790a62f9f403e967276` |
 | `supabase/functions/reorder-create/index.ts` | `228f62393407a07ad2a406ec4b392f9f4951868d50d67b37c8ac4ccf5519b33b` |
