@@ -111,19 +111,21 @@ export function QuantityStepper({
   onChange,
   min = 1,
   max = 999,
+  step = 1,
   label,
 }: {
   value: number
   onChange: (value: number) => void
   min?: number
   max?: number
+  step?: number
   label: string
 }) {
   return (
     <div className="stepper" role="group" aria-label={label}>
       <button
         type="button"
-        onClick={() => onChange(Math.max(min, value - 1))}
+        onClick={() => onChange(Math.max(min, value - step))}
         disabled={value <= min}
         aria-label={`Diminuir ${label}`}
       >
@@ -138,12 +140,15 @@ export function QuantityStepper({
         aria-label={label}
         onChange={(event) => {
           const next = Number(event.target.value)
-          if (Number.isFinite(next)) onChange(Math.min(max, Math.max(min, Math.round(next))))
+          if (!Number.isFinite(next)) return
+          const safeStep = Math.max(1, step)
+          const steps = Math.max(0, Math.round((next - min) / safeStep))
+          onChange(Math.min(max, min + steps * safeStep))
         }}
       />
       <button
         type="button"
-        onClick={() => onChange(Math.min(max, value + 1))}
+        onClick={() => onChange(Math.min(max, value + step))}
         disabled={value >= max}
         aria-label={`Aumentar ${label}`}
       >
@@ -185,6 +190,10 @@ export function Icon({
     | 'orders'
     | 'products'
     | 'customers'
+    | 'radar'
+    | 'prices'
+    | 'quotes'
+    | 'team'
     | 'billing'
     | 'settings'
     | 'external'
@@ -209,6 +218,31 @@ export function Icon({
       <>
         <circle cx="9" cy="8" r="3.5" />
         <path d="M2.5 21a6.5 6.5 0 0 1 13 0M16 5.5a3 3 0 0 1 0 5.8M18 21a5.5 5.5 0 0 0-3-4.9" />
+      </>
+    ),
+    radar: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 3v4M21 12h-4M12 21v-4M3 12h4" />
+      </>
+    ),
+    prices: (
+      <>
+        <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+        <circle cx="7.5" cy="7.5" r="1.2" />
+      </>
+    ),
+    quotes: (
+      <>
+        <path d="M6 3h9l4 4v14H6z" />
+        <path d="M15 3v5h4M9 12h6M9 16h4" />
+      </>
+    ),
+    team: (
+      <>
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3 21a6 6 0 0 1 12 0M16 5.5a3 3 0 0 1 0 5.8M18 21a5.5 5.5 0 0 0-3-4.9" />
       </>
     ),
     billing: (

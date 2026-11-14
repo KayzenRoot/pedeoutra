@@ -81,3 +81,129 @@ verify_jwt = true
 
 [functions.change-plan]
 verify_jwt = true
+
+[functions.product-image-upload]
+verify_jwt = true
+
+[functions.product-image-delete]
+verify_jwt = true
+
+[functions.product-image-cover]
+verify_jwt = true
+
+[functions.product-image-list]
+verify_jwt = true
+
+[functions.product-import]
+verify_jwt = true
+
+[functions.catalog-templates]
+verify_jwt = false
+
+[functions.onboarding-seed]
+verify_jwt = true
+
+[functions.order-tracking-create]
+verify_jwt = true
+
+[functions.order-tracking-get]
+verify_jwt = false
+
+[functions.order-tracking-revoke]
+verify_jwt = true
+
+[functions.private-catalog-get]
+verify_jwt = false
+
+[functions.customer-price-link-create]
+verify_jwt = true
+
+[functions.customer-price-link-revoke]
+verify_jwt = true
+
+[functions.quote-create]
+verify_jwt = true
+
+[functions.quote-update]
+verify_jwt = true
+
+[functions.quote-send]
+verify_jwt = true
+
+[functions.quote-cancel]
+verify_jwt = true
+
+[functions.quote-get]
+verify_jwt = false
+
+[functions.quote-accept]
+verify_jwt = false
+
+[functions.quote-decline]
+verify_jwt = false
+
+[functions.whatsapp-config-get]
+verify_jwt = true
+
+[functions.whatsapp-connect]
+verify_jwt = true
+
+[functions.whatsapp-disconnect]
+verify_jwt = true
+
+[functions.whatsapp-worker]
+verify_jwt = false
+
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+[functions.team-list]
+verify_jwt = true
+
+[functions.team-invite]
+verify_jwt = true
+
+[functions.team-accept]
+verify_jwt = true
+
+[functions.team-role]
+verify_jwt = true
+
+[functions.team-revoke]
+verify_jwt = true
+
+[functions.reorder-reminder-create]
+verify_jwt = true
+
+[functions.reorder-reminder-open]
+verify_jwt = true
+
+[functions.analytics-ingest]
+verify_jwt = false
+
+[functions.analytics-consent]
+verify_jwt = false
+
+[functions.api-key-create]
+verify_jwt = true
+
+[functions.api-key-list]
+verify_jwt = true
+
+[functions.api-key-revoke]
+verify_jwt = true
+
+[functions.api-v1]
+verify_jwt = false
+
+[functions.api-webhook-create]
+verify_jwt = true
+
+[functions.api-webhook-list]
+verify_jwt = true
+
+[functions.api-webhook-revoke]
+verify_jwt = true
+
+[functions.api-webhook-worker]
+verify_jwt = false

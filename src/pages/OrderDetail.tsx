@@ -23,6 +23,7 @@ import type {
   ReorderLink,
 } from '../lib/types'
 import { CopyButton, FormMessage, LoadingScreen } from '../components/ui'
+import { downloadOrderReceipt, printOrderReceipt } from '../lib/order-pdf'
 
 interface OrderDetailRow extends Order {
   customers: { display_name: string; contact_phone: string } | null
@@ -49,6 +50,9 @@ export function OrderDetail() {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [createdLink, setCreatedLink] = useState<string | null>(null)
+  const [trackingUrl, setTrackingUrl] = useState<string | null>(null)
+  const [trackingExpires, setTrackingExpires] = useState<string | null>(null)
+  const [trackingBusy, setTrackingBusy] = useState(false)
 
   const organizationId = organization?.id
 
@@ -233,6 +237,96 @@ export function OrderDetail() {
   const waLink = whatsappLink(phone, message)
   const transitions = nextStatuses(order.status)
 
+  function receiptInput(includeBuyer: boolean) {
+    if (!order || !organization) return null
+    return {
+      organizationName: organization.name,
+      reference: order.public_reference,
+      createdAt: order.created_at,
+      status: order.status,
+      items: items.map((item) => ({
+        name: item.name_snapshot,
+        unit: item.unit_snapshot,
+        quantity: item.quantity,
+        unitPriceCents: item.unit_price_cents,
+        subtotalCents: item.subtotal_cents,
+      })),
+      totalCents: order.total_cents,
+      buyerName: order.customers?.display_name ?? order.buyer_name,
+      buyerPhone: phone,
+      includeBuyer,
+      includePrices: true,
+      note: null,
+    }
+  }
+
+  function downloadReceipt(includeBuyer: boolean) {
+    setActionError(null)
+    setActionSuccess(null)
+    try {
+      const input = receiptInput(includeBuyer)
+      if (!input) return
+      downloadOrderReceipt(input)
+      setActionSuccess(
+        includeBuyer
+          ? 'Comprovante PDF baixado com os dados do comprador.'
+          : 'Comprovante PDF baixado sem dados do comprador.',
+      )
+    } catch {
+      setActionError('Não foi possível gerar o comprovante PDF.')
+    }
+  }
+
+  function printReceipt() {
+    setActionError(null)
+    setActionSuccess(null)
+    const input = receiptInput(true)
+    if (!input) return
+    const opened = printOrderReceipt(input)
+    if (opened) setActionSuccess('Comprovante aberto para impressão.')
+    else setActionError('O navegador bloqueou a janela de impressão. Use o download.')
+  }
+
+  async function createTracking() {
+    if (!order) return
+    setTrackingBusy(true)
+    setActionError(null)
+    setActionSuccess(null)
+    try {
+      const response = await callAuthedFunction<{ url: string; expires_at: string }>(
+        'order-tracking-create',
+        { order_id: order.id },
+      )
+      setTrackingUrl(response.url)
+      setTrackingExpires(response.expires_at)
+      setActionSuccess('Link de acompanhamento criado. Envie ao comprador.')
+    } catch {
+      setActionError('Não foi possível gerar o link de acompanhamento.')
+    } finally {
+      setTrackingBusy(false)
+    }
+  }
+
+  async function revokeTracking() {
+    if (!order) return
+    if (!window.confirm('Revogar o link de acompanhamento? Ele deixará de abrir o pedido.')) {
+      return
+    }
+    setTrackingBusy(true)
+    setActionError(null)
+    setActionSuccess(null)
+    try {
+      await callAuthedFunction('order-tracking-revoke', { order_id: order.id })
+      setTrackingUrl(null)
+      setTrackingExpires(null)
+      setActionSuccess('Link de acompanhamento revogado.')
+    } catch {
+      setActionError('Não foi possível revogar o link.')
+    } finally {
+      setTrackingBusy(false)
+    }
+  }
+
   return (
     <div className="order-detail">
       <Link to="/app/pedidos" className="back-link">
@@ -325,6 +419,47 @@ export function OrderDetail() {
           )}
         </section>
 
+
+        <section className="card">
+          <div className="card-heading">
+            <div>
+              <span className="eyebrow">Documento</span>
+              <h2>Comprovante</h2>
+            </div>
+          </div>
+          <p className="muted">
+            PDF A4 com os snapshots deste pedido. Não é nota fiscal, boleto ou prova de
+            pagamento.
+          </p>
+          <div className="receipt-actions">
+            <button
+              type="button"
+              className="button button-primary button-block"
+              onClick={() => downloadReceipt(true)}
+            >
+              Baixar com comprador
+            </button>
+            <button
+              type="button"
+              className="button button-secondary button-block"
+              onClick={() => downloadReceipt(false)}
+            >
+              Baixar sem PII
+            </button>
+            <button
+              type="button"
+              className="button button-secondary button-block"
+              onClick={printReceipt}
+            >
+              Imprimir
+            </button>
+          </div>
+          <p className="form-note">
+            A versão sem PII omite nome e telefone do comprador. Nenhuma versão contém links
+            opacos ou tokens.
+          </p>
+        </section>
+
         <aside className="order-side">
           <section className="card">
             <div className="card-heading">
@@ -370,6 +505,50 @@ export function OrderDetail() {
             <p className="form-note">
               A mensagem é apenas um rascunho. O envio depende do seu clique no WhatsApp.
             </p>
+          </section>
+
+          <section className="card">
+            <div className="card-heading">
+              <div>
+                <span className="eyebrow">Comprador</span>
+                <h2>Acompanhamento</h2>
+              </div>
+            </div>
+            <p className="muted">
+              Link público para o comprador ver o status sem login. Não exibe telefone,
+              observações nem preço particular.
+            </p>
+            {trackingUrl ? (
+              <>
+                <code className="qr-url">{trackingUrl}</code>
+                <div className="link-created-actions">
+                  <CopyButton value={trackingUrl} label="Copiar link de acompanhamento" />
+                  <button
+                    type="button"
+                    className="button button-danger"
+                    onClick={() => void revokeTracking()}
+                    disabled={trackingBusy}
+                  >
+                    Revogar link
+                  </button>
+                </div>
+                {trackingExpires && (
+                  <p className="form-note">
+                    Válido até {formatDateTime(trackingExpires)}. Gerar outro link revoga o
+                    anterior.
+                  </p>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className="button button-secondary button-block"
+                onClick={() => void createTracking()}
+                disabled={trackingBusy}
+              >
+                {trackingBusy ? 'Gerando…' : 'Gerar link de acompanhamento'}
+              </button>
+            )}
           </section>
 
           <section className="card">

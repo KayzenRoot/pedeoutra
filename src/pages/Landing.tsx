@@ -1,9 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Icon } from '../components/ui'
 import { track } from '../lib/analytics'
+import { useSeo } from '../lib/seo'
+import { getPlanCatalog } from '../lib/edge'
+import { featureLabel, PLAN_NAMES } from '../lib/plans'
+import type { PlanCatalogResponse, PublicPlan } from '../lib/types'
 
 const FAQ = [
   {
@@ -38,9 +42,83 @@ const FAQ = [
   },
 ]
 
+function planOrder(code: PublicPlan['plan_code']): number {
+  return code === 'essential' ? 0 : 1
+}
+
+const FALLBACK_PLANS: PublicPlan[] = [
+  {
+    plan_code: 'essential',
+    plan_version: 1,
+    price_cents: 2990,
+    currency: 'BRL',
+    trial_days: 7,
+    available: true,
+    unavailable_reason: null,
+    features: [
+      ['catalog_public', 'products', 'customers', 'orders', 'order_tracking_link'],
+      ['reorder_manual', 'whatsapp_manual', 'dashboard_basic', 'import_csv', 'pdf_nonfiscal'],
+      ['qr_code', 'onboarding_templates', 'sku_quick_order', 'order_minimum'],
+    ].flatMap((keys) =>
+      keys.map((key) => ({ key, enabled: true, limit_value: null, limit_window: null })),
+    ),
+  },
+  {
+    plan_code: 'professional',
+    plan_version: 1,
+    price_cents: 6990,
+    currency: 'BRL',
+    trial_days: 0,
+    available: false,
+    unavailable_reason: 'PRO_PLAN_CHECKOUT_DISABLED',
+    features: [
+      ['private_prices', 'quotes', 'team', 'whatsapp_automation', 'api_access'],
+      ['import_csv', 'pdf_nonfiscal', 'qr_code', 'sku_quick_order', 'order_minimum'],
+    ].flatMap((keys) =>
+      keys.map((key) => ({ key, enabled: true, limit_value: null, limit_window: null })),
+    ),
+  },
+]
+
 export function Landing() {
+  useSeo({
+    title: 'PedeOutra — Pediu uma vez? Pede outra!',
+    description:
+      'Catálogo B2B, pedidos organizados e links de recompra para pequenos distribuidores. Teste o Essencial por 7 dias sem cartão.',
+    path: '/',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'PedeOutra',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description:
+        'Catálogo e pedidos recorrentes para pequenos distribuidores, com catálogo público e links de recompra.',
+      offers: {
+        '@type': 'Offer',
+        price: '29.90',
+        priceCurrency: 'BRL',
+      },
+    },
+  })
+
+  const [plans, setPlans] = useState<PublicPlan[]>(FALLBACK_PLANS)
+
   useEffect(() => {
     track('landing_view')
+    track('plan_view')
+    let active = true
+    void getPlanCatalog<PlanCatalogResponse>()
+      .then((data) => {
+        if (!active || !data.plans?.length) return
+        setPlans(
+          [...data.plans].sort((a, b) => planOrder(a.plan_code) - planOrder(b.plan_code)),
+        )
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
+    }
   }, [])
 
   return (
@@ -79,7 +157,11 @@ export function Landing() {
               planilha no WhatsApp.
             </p>
             <div className="hero-actions">
-              <Link to="/criar-conta" className="button button-primary button-large">
+              <Link
+                to="/criar-conta"
+                className="button button-primary button-large"
+                onClick={() => track('cta_click', { event_target: 'hero_signup' })}
+              >
                 Testar 7 dias grátis
               </Link>
               <Link to="/demo" className="button button-secondary button-large">
@@ -155,11 +237,11 @@ export function Landing() {
 
         <section className="logos-strip" aria-label="Perfis de uso">
           <span>Feito para quem vende de novo:</span>
-          <strong>embalagens</strong>
-          <strong>limpeza</strong>
-          <strong>água e gelo</strong>
-          <strong>descartáveis</strong>
-          <strong>insumos</strong>
+          <Link to="/setores/embalagens">embalagens</Link>
+          <Link to="/setores/limpeza">limpeza</Link>
+          <Link to="/setores/agua-gelo">água e gelo</Link>
+          <Link to="/setores/descartaveis">descartáveis</Link>
+          <Link to="/setores/insumos">insumos</Link>
         </section>
 
         <section id="como-funciona" className="section">
@@ -249,49 +331,75 @@ export function Landing() {
 
         <section id="preco" className="section pricing-section">
           <div className="section-heading">
-            <span className="eyebrow">Preço simples</span>
-            <h2>Essencial agora. Profissional em preparação.</h2>
+            <span className="eyebrow">Planos</span>
+            <h2>Essencial para começar. Profissional para crescer.</h2>
             <p>
-              Comece grátis por 7 dias no Essencial. Depois, R$ 29,90 por mês. O
-              Profissional (R$ 69,90) será liberado após a Parte 2/4.
+              O Essencial libera o catálogo e os pedidos. O Profissional adiciona preços
+              por comprador, orçamentos e equipe. Nenhum plano cobra pedidos dos seus
+              clientes.
             </p>
           </div>
-          <div className="price-card">
-            <div className="price-head">
-              <span className="pill pill-lime">Teste sem cartão</span>
-              <h3>PedeOutra Essencial</h3>
-              <p>Para pequenos distribuidores e fornecedores de recompra.</p>
-            </div>
-            <div className="price-amount">
-              <span>R$</span>
-              <strong>29,90</strong>
-              <small>/mês</small>
-            </div>
-            <ul className="price-list">
-              <li>
-                <Icon name="check" /> Catálogo público ilimitado
-              </li>
-              <li>
-                <Icon name="check" /> Pedidos e clientes ilimitados
-              </li>
-              <li>
-                <Icon name="check" /> Links de recompra com revogação
-              </li>
-              <li>
-                <Icon name="check" /> WhatsApp manual e histórico
-              </li>
-              <li>
-                <Icon name="check" /> Um fornecedor por conta
-              </li>
-            </ul>
-            <Link to="/criar-conta" className="button button-primary button-block button-large">
-              Começar teste de 7 dias
-            </Link>
-            <p className="price-note">
-              Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do
-              fornecedor, em cartão, via Asaas. O Profissional está em preparação e não é
-              vendido nesta fase.
-            </p>
+          <div className="pricing-grid">
+            {plans.map((plan) => {
+              const enabledFeatures = plan.features.filter((feature) => feature.enabled)
+              const isProfessional = plan.plan_code === 'professional'
+              return (
+                <article
+                  className={isProfessional ? 'price-card price-card-pro' : 'price-card'}
+                  key={plan.plan_code}
+                >
+                  <div className="price-head">
+                    <span className={plan.available ? 'pill pill-lime' : 'pill'}>
+                      {plan.available ? 'Disponível' : 'Em preparação'}
+                    </span>
+                    <h3>PedeOutra {PLAN_NAMES[plan.plan_code]}</h3>
+                    <p>
+                      {isProfessional
+                        ? 'Para quem vende com tabela por cliente, orçamentos e equipe.'
+                        : 'Para pequenos distribuidores e fornecedores de recompra.'}
+                    </p>
+                  </div>
+                  <div className="price-amount">
+                    <span>R$</span>
+                    <strong>{(plan.price_cents / 100).toFixed(2).replace('.', ',')}</strong>
+                    <small>/mês</small>
+                  </div>
+                  <ul className="price-list">
+                    {enabledFeatures.slice(0, 7).map((feature) => (
+                      <li key={feature.key}>
+                        <Icon name="check" /> {featureLabel(feature.key)}
+                      </li>
+                    ))}
+                    {isProfessional && (
+                      <li className="price-list-muted">
+                        WhatsApp automático depende de WABA/templates aprovados
+                      </li>
+                    )}
+                  </ul>
+                  {plan.available ? (
+                    <Link
+                      to="/criar-conta"
+                      className="button button-primary button-block button-large"
+                    >
+                      Começar {plan.trial_days > 0 ? `teste de ${plan.trial_days} dias` : 'agora'}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className="button button-secondary button-block button-large"
+                      disabled
+                    >
+                      Checkout em preparação
+                    </button>
+                  )}
+                  <p className="price-note">
+                    {isProfessional
+                      ? 'Recursos Pro em validação. Sem promessa de disponibilidade, cobrança ou envio automático nesta fase.'
+                      : 'Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do fornecedor, em cartão, via Asaas.'}
+                  </p>
+                </article>
+              )
+            })}
           </div>
         </section>
 
@@ -302,7 +410,15 @@ export function Landing() {
           </div>
           <div className="faq-list">
             {FAQ.map((item) => (
-              <details key={item.question} className="faq-item">
+              <details
+                key={item.question}
+                className="faq-item"
+                onToggle={(event) => {
+                  if (event.currentTarget.open) {
+                    track('faq_expand', { event_target: item.question.slice(0, 80) })
+                  }
+                }}
+              >
                 <summary>{item.question}</summary>
                 <p>{item.answer}</p>
               </details>
@@ -315,7 +431,11 @@ export function Landing() {
             <span className="eyebrow">Próximo pedido</span>
             <h2>Seu cliente já sabe o que quer. Facilite a repetição.</h2>
           </div>
-          <Link to="/criar-conta" className="button button-lime button-large">
+          <Link
+            to="/criar-conta"
+            className="button button-lime button-large"
+            onClick={() => track('cta_click', { event_target: 'final_signup' })}
+          >
             Criar catálogo grátis
           </Link>
         </section>

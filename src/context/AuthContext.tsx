@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [membershipRole, setMembershipRole] = useState<string | null>(null)
   const loadSequence = useRef(0)
 
   const loadOrganization = useCallback(async (userId: string) => {
@@ -50,11 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setOrganizationLoading(true)
 
     try {
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('owner_user_id', userId)
+      const { data: membership } = await supabase
+        .from('organization_memberships')
+        .select('organization_id, role')
+        .eq('user_id', userId)
+        .eq('status', 'active')
         .maybeSingle()
+
+      const orgQuery = membership?.organization_id
+        ? supabase.from('organizations').select('*').eq('id', membership.organization_id)
+        : supabase.from('organizations').select('*').eq('owner_user_id', userId)
+      const { data: org } = await orgQuery.maybeSingle()
 
       let sub: Subscription | null = null
       if (org) {
@@ -69,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (loadSequence.current === sequence) {
         setOrganization(org ?? null)
         setSubscription(sub)
+        setMembershipRole(membership?.role ?? (org ? 'owner' : null))
       }
     } finally {
       if (loadSequence.current === sequence) setOrganizationLoading(false)
@@ -97,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setOrganization(null)
         setSubscription(null)
+        setMembershipRole(null)
       }
     })
 
@@ -167,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setOrganization(data)
       setSubscription(null)
+      setMembershipRole('owner')
       return data
     },
     [],
@@ -185,6 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: session?.user ?? null,
       organization,
       subscription,
+      membershipRole,
       signIn,
       signUp,
       signOut,
@@ -199,6 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       organization,
       subscription,
+      membershipRole,
       signIn,
       signUp,
       signOut,

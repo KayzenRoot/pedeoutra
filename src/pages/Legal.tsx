@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
+import { useSeo } from '../lib/seo'
 
 function LegalLayout({
   title,
@@ -36,6 +37,12 @@ function LegalLayout({
 }
 
 export function Privacy() {
+  useSeo({
+    title: 'Aviso de privacidade — PedeOutra',
+    description: 'Como o PedeOutra trata dados de fornecedores, compradores e pedidos.',
+    path: '/privacidade',
+  })
+
   return (
     <LegalLayout title="Aviso de privacidade">
       <h2>1. Papéis no tratamento</h2>
@@ -126,6 +133,12 @@ export function Privacy() {
 }
 
 export function Terms() {
+  useSeo({
+    title: 'Termos de uso — PedeOutra',
+    description: 'Termos do serviço PedeOutra para fornecedores assinantes.',
+    path: '/termos',
+  })
+
   return (
     <LegalLayout title="Termos de uso">
       <h2>1. Serviço</h2>

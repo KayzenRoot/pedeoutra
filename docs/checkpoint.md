@@ -105,3 +105,32 @@ gates de lançamento.
   de cartão não validado para troca sem dupla cobrança).
 - **Não promovido:** ADR-010 a ADR-013 permanecem PROPOSED; ADR-007/009 e o
   veredito comercial não foram alterados.
+
+## Checkpoint Delta — PDA-V2-P02-WO-001 (PROPOSED)
+
+- **Branch/PR:** `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`,
+  [#90](https://github.com/KayzenRoot/pedeoutra/pull/90), Draft; nada da Parte 2
+  foi aplicado em produção.
+- **Entregue:** categorias/fotos privadas (#52), SKU e pedido rápido (#47),
+  mínimos/múltiplos (#49), importação CSV/XLSX (#46), templates (#57), QR (#53),
+  acompanhamento por token (#50), preços por comprador (#48), orçamentos com
+  aceite opaco (#51), comprovante PDF não fiscal (#55), comparação comercial dos
+  planos (#63), contrato WhatsApp oficial com envio desligado (#29–#31) e
+  equipe/RBAC com convites manuais (#58), radar de recompra (#44), lembretes
+  manuais (#45), analytics first-party do funil (#78), financeiro administrativo
+  (#79), dashboard 360° parcial (#80), SEO técnico (#74) e API B2B v1 de
+  leitura (#64/#65/#67), webhooks B2B (#66) e páginas setoriais (#75).
+- **Evidência local no HEAD de trabalho:** 71 DB, 56 Edge HTTP, 150 unit,
+  57 Edge Functions typechecked, 7 grupos full-local, restore com preço,
+  orçamento, WhatsApp, equipe, lembretes, analytics, API e webhooks, e smoke
+  light/dark/system.
+- **Segurança #48/#51:** RLS por tenant, entitlements `private_prices`/`quotes`,
+  tokens opacos com SHA-256/TTL/revogação, snapshots de preço, aceite idempotente
+  com lock e um pedido por quote, headers `noindex`/`no-referrer`/`no-store`;
+  RPCs internas restritas a `service_role`.
+- **Pendente na Parte 2:** SMTP para envio automático de convites e ativação
+  real do WhatsApp (WABA/templates/Meta); o envio permanece desligado por
+  padrão e o convite manual já funciona.
+- **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (TOTP/AAL2 do proprietário),
+  SMTP próprio para convites, WABA/templates para WhatsApp e
+  `COMMERCIAL_BLOCKED`/`GO_LIVE_BLOCKED`.

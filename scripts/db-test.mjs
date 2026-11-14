@@ -24,6 +24,11 @@ const USER_B = '22222222-2222-4222-8222-222222222222'
 const USER_C = '33333333-3333-4333-8333-333333333333'
 const USER_D = '44444444-4444-4444-8444-444444444444'
 const USER_F = '66666666-6666-4666-8666-666666666666'
+const USER_G = '77777777-7777-4777-8777-777777777777'
+const USER_H = '88888888-8888-4888-8888-888888888888'
+const USER_I = '99999999-9999-4999-8999-999999999999'
+const USER_J = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+const USER_K = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
 const TOKEN_HASH = 'a'.repeat(64)
 
 let passed = 0
@@ -97,8 +102,12 @@ const BOOTSTRAP_SQL = `
 create schema if not exists auth;
 create table if not exists auth.users (
   id uuid primary key,
-  email text
+  email text,
+  email_confirmed_at timestamptz,
+  created_at timestamptz not null default now()
 );
+alter table auth.users add column if not exists email_confirmed_at timestamptz;
+alter table auth.users add column if not exists created_at timestamptz not null default now();
 create or replace function auth.uid()
 returns uuid
 language sql
@@ -174,7 +183,7 @@ async function main() {
       )
     }
 
-    console.log('\n[1/7] Bootstrap e migrations')
+    console.log('\n[1/8] Bootstrap e migrations')
     await client.query(BOOTSTRAP_SQL)
     const migrations = readdirSync(MIGRATIONS_DIR)
       .filter((file) => file.endsWith('.sql'))
@@ -235,7 +244,7 @@ async function main() {
       return result.rows[0]
     }
 
-    console.log('\n[2/7] Seed sintético e criação de organizações')
+    console.log('\n[2/8] Seed sintético e criação de organizações')
     await client.query('insert into auth.users (id, email) values ($1, $2), ($3, $4)', [
       USER_A, 'a@example.test', USER_B, 'b@example.test',
     ])
@@ -251,7 +260,7 @@ async function main() {
     const customerA = await asUser(USER_A, () => insertCustomer(orgA.id, 'Padaria Pão Bom', '11977776666'))
     const customerB = await asUser(USER_B, () => insertCustomer(orgB.id, 'Mercado Boreal', '21966665555'))
 
-    console.log('\n[3/7] RLS A/B')
+    console.log('\n[3/8] RLS A/B')
     await test('A lê apenas a própria organização', async () => {
       const rows = await asUser(USER_A, async () => (await client.query('select id from public.organizations')).rows)
       assert(rows.length === 1 && rows[0].id === orgA.id, 'A deveria ver só org A')
@@ -325,7 +334,7 @@ async function main() {
       )
     })
 
-    console.log('\n[4/7] Trial, assinatura e escrita')
+    console.log('\n[4/8] Trial, assinatura e escrita')
     await test('trial expirado bloqueia escrita', async () => {
       await client.query(`update public.organizations set trial_ends_at = now() - interval '1 day' where id = $1`, [orgA.id])
       await expectError(
@@ -415,7 +424,7 @@ async function main() {
       [orgA.id],
     )
 
-    console.log('\n[5/7] Pedido público, recompra, rate limit e idempotência')
+    console.log('\n[5/8] Pedido público, recompra, rate limit e idempotência')
     const requestId = '33333333-3333-4333-8333-333333333333'
     let publicOrder
 
@@ -590,7 +599,7 @@ async function main() {
       )
     })
 
-    console.log('\n[6/7] Status do pedido e billing')
+    console.log('\n[6/8] Status do pedido e billing')
     await test('transição válida grava evento com autor', async () => {
       await asUser(USER_A, () => client.query(
         `update public.orders set status = 'confirmed' where id = $1`,
@@ -655,7 +664,7 @@ async function main() {
       )
     })
 
-    console.log('\n[7/7] Planos, entitlements, trial e admin')
+    console.log('\n[7/8] Planos, entitlements, trial e admin')
 
     await test('catálogo contém exatamente os dois planos com preços aprovados', async () => {
       const plans = await client.query(
@@ -905,6 +914,1737 @@ async function main() {
       )
       assert(list.rows.length === 2, `paginação retornou ${list.rows.length}`)
       assert(Number(list.rows[0].total_count) >= 2, 'total_count')
+    })
+
+
+    console.log('\n[8/8] Categorias e mídia de produto')
+
+    await test('categoria é isolada por tenant e gera slug', async () => {
+      const category = await asUser(USER_A, () =>
+        client.query(
+          `insert into public.product_categories (organization_id, name)
+           values ($1, 'Bebidas') returning *`,
+          [orgA.id],
+        ),
+      )
+      assert(category.rows[0].slug === 'bebidas', `slug ${category.rows[0].slug}`)
+      const seenByB = await asUser(USER_B, () =>
+        client.query('select id from public.product_categories'),
+      )
+      assert(seenByB.rows.length === 0, 'B viu categoria de A')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(
+              `insert into public.product_categories (organization_id, name)
+               values ($1, 'Invasão')`,
+              [orgA.id],
+            ),
+          ),
+        'row-level security',
+        'B inserindo categoria em A',
+      )
+    })
+
+    await test('produto aceita categoria do próprio tenant e rejeita de outro', async () => {
+      const category = await client.query(
+        `select id from public.product_categories where organization_id = $1 limit 1`,
+        [orgA.id],
+      )
+      await asUser(USER_A, () =>
+        client.query(`update public.products set category_id = $1 where id = $2`, [
+          category.rows[0].id,
+          productA1.id,
+        ]),
+      )
+      const updated = await client.query('select category_id from public.products where id = $1', [
+        productA1.id,
+      ])
+      assert(updated.rows[0].category_id === category.rows[0].id, 'categoria não vinculada')
+      const crossTenant = await asUser(USER_A, () =>
+        client.query(`update public.products set category_id = $1 where id = $2`, [
+          category.rows[0].id,
+          productB.id,
+        ]),
+      )
+      assert(crossTenant.rowCount === 0, 'A alterou produto B')
+    })
+
+    await test('metadados de imagem são isolados e exigem path do tenant', async () => {
+      const imageId = crypto.randomUUID()
+      const path = `${orgA.id}/${productA1.id}/${imageId}.jpg`
+      await asUser(USER_A, () =>
+        client.query(
+          `insert into public.product_images
+             (id, organization_id, product_id, storage_path, alt_text, is_cover)
+           values ($1, $2, $3, $4, 'Copo de água', true)`,
+          [imageId, orgA.id, productA1.id, path],
+        ),
+      )
+      const seenByB = await asUser(USER_B, () =>
+        client.query('select id from public.product_images'),
+      )
+      assert(seenByB.rows.length === 0, 'B viu imagem de A')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(
+              `insert into public.product_images
+                 (organization_id, product_id, storage_path, alt_text)
+               values ($1, $2, $3, 'Invasão')`,
+              [orgA.id, productA1.id, `${orgA.id}/${productA1.id}/${crypto.randomUUID()}.jpg`],
+            ),
+          ),
+        'row-level security',
+        'B inserindo imagem em A',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.product_images
+                 (organization_id, product_id, storage_path, alt_text)
+               values ($1, $2, $3, 'Path cruzado')`,
+              [orgA.id, productA1.id, `${orgB.id}/${productA1.id}/${crypto.randomUUID()}.jpg`],
+            ),
+          ),
+        'product_images_path_tenant',
+        'path de outro tenant',
+      )
+    })
+
+    await test('capa é única e o RPC de capa troca atomicamente', async () => {
+      const first = await client.query(
+        'select id from public.product_images where product_id = $1 and is_cover = true',
+        [productA1.id],
+      )
+      const secondId = crypto.randomUUID()
+      await client
+        .query(
+          `insert into public.product_images
+             (id, organization_id, product_id, storage_path, alt_text, is_cover)
+           values ($1, $2, $3, $4, 'Segunda foto', true)`,
+          [secondId, orgA.id, productA1.id, `${orgA.id}/${productA1.id}/${secondId}.jpg`],
+        )
+        .then(
+          () => {
+            throw new Error('capa duplicada foi aceita')
+          },
+          (error) => {
+            assert(
+              String(error.message).includes('product_images_one_cover_idx'),
+              `erro inesperado: ${error.message}`,
+            )
+          },
+        )
+      // A tentativa acima não cria a segunda imagem; insere sem capa para o RPC.
+      await client.query(
+        `insert into public.product_images
+           (id, organization_id, product_id, storage_path, alt_text, is_cover)
+         values ($1, $2, $3, $4, 'Segunda foto', false)`,
+        [secondId, orgA.id, productA1.id, `${orgA.id}/${productA1.id}/${secondId}.jpg`],
+      )
+
+      await asService(() =>
+        client.query('select public.api_set_product_image_cover($1, $2)', [
+          orgA.id,
+          secondId,
+        ]),
+      )
+      const covers = await client.query(
+        `select id, is_cover from public.product_images
+          where product_id = $1 order by created_at`,
+        [productA1.id],
+      )
+      assert(
+        covers.rows.filter((row) => row.is_cover).length === 1 &&
+          covers.rows.find((row) => row.is_cover).id === secondId,
+        'capa não trocou',
+      )
+      assert(
+        covers.rows.find((row) => row.id === first.rows[0].id).is_cover === false,
+        'capa antiga permaneceu',
+      )
+    })
+
+    await test('RPC de mídia valida path e remove metadado', async () => {
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select public.api_add_product_image($1, $2, $3, null, 'Path errado', 0, false, $4)`,
+              [orgA.id, productA1.id, `${orgB.id}/${productA1.id}/${crypto.randomUUID()}.jpg`, USER_A],
+            ),
+          ),
+        'invalid_storage_path',
+        'path inválido no RPC',
+      )
+
+      const imageId = crypto.randomUUID()
+      const path = `${orgA.id}/${productA1.id}/${imageId}.jpg`
+      const inserted = await asService(() =>
+        client.query(
+          `select * from public.api_add_product_image($1, $2, $3, null, 'Foto removível', 1, false, $4)`,
+          [orgA.id, productA1.id, path, USER_A],
+        ),
+      )
+      const rowId = inserted.rows[0].id
+      const deleted = await asService(() =>
+        client.query('select * from public.api_delete_product_image($1, $2)', [
+          orgA.id,
+          rowId,
+        ]),
+      )
+      assert(deleted.rows[0].storage_path === path, 'path de retorno')
+      const remaining = await client.query('select id from public.product_images where id = $1', [
+        rowId,
+      ])
+      assert(remaining.rows.length === 0, 'metadado não removido')
+    })
+
+
+    await test('SKU é normalizado e único por tenant', async () => {
+      await asUser(USER_A, () =>
+        client.query(`update public.products set sku = 'copo-200' where id = $1`, [
+          productA2.id,
+        ]),
+      )
+      const normalized = await client.query('select sku from public.products where id = $1', [
+        productA2.id,
+      ])
+      assert(normalized.rows[0].sku === 'COPO-200', `sku ${normalized.rows[0].sku}`)
+
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(`update public.products set sku = 'COPO-200' where id = $1`, [
+              productA1.id,
+            ]),
+          ),
+        'products_org_sku_unique',
+        'SKU duplicado no mesmo tenant',
+      )
+
+      await asUser(USER_B, () =>
+        client.query(`update public.products set sku = 'COPO-200' where id = $1`, [
+          productB.id,
+        ]),
+      )
+      const crossTenant = await client.query('select sku from public.products where id = $1', [
+        productB.id,
+      ])
+      assert(crossTenant.rows[0].sku === 'COPO-200', 'SKU deveria ser permitido em outro tenant')
+
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(`update public.products set sku = 'a' where id = $1`, [productA1.id]),
+          ),
+        'products_sku_format',
+        'SKU curto',
+      )
+    })
+
+
+    await test('regras de quantidade e mínimo são aplicadas no servidor', async () => {
+      await client.query(
+        `update public.products set min_quantity = 12, quantity_increment = 12 where id = $1`,
+        [productA1.id],
+      )
+      const submit = (items, requestId) =>
+        asService(() =>
+          client.query(
+            `select * from app.submit_order($1, 'Teste Regras', '11999998888', '', $2::jsonb, $3, null, 'catalog', $4)`,
+            [orgA.slug, JSON.stringify(items), `rules:${requestId}`, requestId],
+          ),
+        )
+
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 6 }], crypto.randomUUID()),
+        'quantity_below_minimum',
+        'quantidade abaixo do mínimo',
+      )
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 13 }], crypto.randomUUID()),
+        'quantity_not_multiple',
+        'quantidade fora do múltiplo',
+      )
+      const ok = await submit([{ product_id: productA1.id, quantity: 12 }], crypto.randomUUID())
+      assert(ok.rows[0].total_cents === 15000, `total ${ok.rows[0].total_cents}`)
+
+      await client.query(
+        `update public.organizations set min_order_cents = 20000 where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 12 }], crypto.randomUUID()),
+        'order_below_minimum',
+        'pedido abaixo do valor mínimo',
+      )
+
+      await client.query(
+        `update public.organizations set min_order_cents = null, min_order_items = 2 where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => submit([{ product_id: productA1.id, quantity: 12 }], crypto.randomUUID()),
+        'order_below_minimum_items',
+        'pedido abaixo da quantidade mínima de itens',
+      )
+
+      await client.query(`update public.products set price_cents = null where id = $1`, [
+        productA2.id,
+      ])
+      await client.query(
+        `update public.organizations set min_order_items = null, min_order_cents = 1000 where id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () => submit([{ product_id: productA2.id, quantity: 1 }], crypto.randomUUID()),
+        'minimum_unverifiable',
+        'mínimo sem preço verificável',
+      )
+
+      await client.query(
+        `update public.products set price_cents = 899, min_quantity = 1, quantity_increment = 1 where id = $1`,
+        [productA2.id],
+      )
+      await client.query(
+        `update public.products set min_quantity = 1, quantity_increment = 1 where id = $1`,
+        [productA1.id],
+      )
+      await client.query(
+        `update public.organizations set min_order_cents = null, min_order_items = null where id = $1`,
+        [orgA.id],
+      )
+    })
+
+
+    await test('importação cria, atualiza e é idempotente por job', async () => {
+      const jobId = crypto.randomUUID()
+      const rows = [
+        {
+          line: 2,
+          action: 'create',
+          name: 'Produto Importado',
+          sku: 'IMP-1',
+          category: 'Importados',
+          unit: 'un',
+          price_cents: 1000,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+        {
+          line: 3,
+          action: 'update',
+          name: 'Copo Atualizado',
+          sku: 'COPO-200',
+          category: null,
+          unit: 'cento',
+          price_cents: 1300,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const first = await asService(() =>
+        client.query(
+          `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(rows)],
+        ),
+      )
+      assert(first.rows[0].created_count === 1, `created ${first.rows[0].created_count}`)
+      assert(first.rows[0].updated_count === 1, `updated ${first.rows[0].updated_count}`)
+      const imported = await client.query(
+        `select id, category_id from public.products where organization_id = $1 and sku = 'IMP-1'`,
+        [orgA.id],
+      )
+      assert(imported.rows.length === 1, 'produto importado ausente')
+      const category = await client.query(
+        `select id from public.product_categories where organization_id = $1 and name = 'Importados'`,
+        [orgA.id],
+      )
+      assert(category.rows.length === 1, 'categoria importada ausente')
+      assert(imported.rows[0].category_id === category.rows[0].id, 'categoria não vinculada')
+      const updated = await client.query('select name, price_cents from public.products where id = $1', [
+        productA2.id,
+      ])
+      assert(updated.rows[0].name === 'Copo Atualizado', 'update de nome')
+      assert(updated.rows[0].price_cents === 1300, 'update de preço')
+
+      const second = await asService(() =>
+        client.query(
+          `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(rows)],
+        ),
+      )
+      assert(second.rows[0].created_count === 1, 'job não foi idempotente')
+      const count = await client.query(
+        `select count(*)::integer as total from public.products where organization_id = $1 and sku = 'IMP-1'`,
+        [orgA.id],
+      )
+      assert(count.rows[0].total === 1, 'produto duplicado pelo job')
+    })
+
+    await test('importação rejeita SKU duplicado no arquivo e tenant divergente', async () => {
+      const jobId = crypto.randomUUID()
+      const duplicateRows = [
+        { line: 2, action: 'auto', name: 'Duplicado A', sku: 'DUP-1', unit: 'un' },
+        { line: 3, action: 'auto', name: 'Duplicado B', sku: 'DUP-1', unit: 'un' },
+      ]
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+              [jobId, orgA.id, USER_A, JSON.stringify(duplicateRows)],
+            ),
+          ),
+        'duplicate_import_sku',
+        'SKU duplicado na importação',
+      )
+      const notCreated = await client.query(
+        `select id from public.products where organization_id = $1 and sku = 'DUP-1'`,
+        [orgA.id],
+      )
+      assert(notCreated.rows.length === 0, 'importação parcial deixou produto')
+
+      const tenantJob = crypto.randomUUID()
+      await asService(() =>
+        client.query(
+          `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+          [
+            tenantJob,
+            orgA.id,
+            USER_A,
+            JSON.stringify([
+              { line: 2, action: 'create', name: 'Job Tenant', sku: 'JOB-T', unit: 'un' },
+            ]),
+          ],
+        ),
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_import_products($1, $2, $3, $4::jsonb)`,
+              [
+                tenantJob,
+                orgB.id,
+                USER_A,
+                JSON.stringify([
+                  { line: 2, action: 'create', name: 'Outro', sku: 'JOB-T2', unit: 'un' },
+                ]),
+              ],
+            ),
+          ),
+        'job_tenant_mismatch',
+        'job de outro tenant',
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select id from public.product_import_jobs')),
+        'permission denied',
+        'fornecedor lendo jobs de importação',
+      )
+    })
+
+
+    await test('template cria somente itens escolhidos e é idempotente', async () => {
+      const jobId = crypto.randomUUID()
+      const items = [
+        {
+          item_key: 'copo-200',
+          name: 'Copo descartável 200ml',
+          category: 'Copos e potes',
+          unit: 'cento',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+        {
+          item_key: 'sacola',
+          name: 'Sacola plástica reforçada',
+          category: 'Sacolas e sacos',
+          unit: 'pacote',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const first = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(first.rows[0].created_count === 2, `created ${first.rows[0].created_count}`)
+      assert(first.rows[0].skipped_count === 0, `skipped ${first.rows[0].skipped_count}`)
+      const created = await client.query(
+        `select id, price_cents, active from public.products
+          where organization_id = $1 and name = 'Copo descartável 200ml'`,
+        [orgA.id],
+      )
+      assert(created.rows.length === 1, 'produto do template ausente')
+      assert(created.rows[0].price_cents === null, 'template não pode inventar preço')
+      assert(created.rows[0].active === true, 'produto deveria ficar ativo')
+
+      const retry = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(retry.rows[0].created_count === 2, 'job não idempotente')
+
+      const newJob = crypto.randomUUID()
+      const rerun = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [newJob, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(rerun.rows[0].created_count === 0, 'novo job duplicou produtos')
+      assert(rerun.rows[0].skipped_count === 2, 'itens já semeados deveriam ser ignorados')
+    })
+
+    await test('template ignora conflito por nome e não cruza tenant', async () => {
+      await client.query(`update public.products set name = 'Copo descartável 300ml' where id = $1`, [
+        productA2.id,
+      ])
+      const jobId = crypto.randomUUID()
+      const items = [
+        {
+          item_key: 'copo-300',
+          name: 'Copo descartável 300ml',
+          category: 'Copos e potes',
+          unit: 'cento',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const result = await asService(() =>
+        client.query(
+          `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+          [jobId, orgA.id, USER_A, JSON.stringify(items)],
+        ),
+      )
+      assert(result.rows[0].created_count === 0, 'conflito por nome deveria ser ignorado')
+      assert(result.rows[0].skipped_count === 1, 'conflito não contabilizado')
+      const linked = await client.query(
+        `select product_id from public.catalog_seed_items
+          where organization_id = $1 and template_code = 'packaging' and item_key = 'copo-300'`,
+        [orgA.id],
+      )
+      assert(linked.rows[0].product_id === productA2.id, 'seed não apontou produto existente')
+      const price = await client.query('select price_cents from public.products where id = $1', [
+        productA2.id,
+      ])
+      assert(price.rows[0].price_cents === 1300, 'template sobrescreveu preço existente')
+
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_seed_catalog($1, $2, $3, 'packaging', 1, $4::jsonb)`,
+              [jobId, orgB.id, USER_A, JSON.stringify(items)],
+            ),
+          ),
+        'seed_job_tenant_mismatch',
+        'job de seed de outro tenant',
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select id from public.catalog_seed_jobs')),
+        'permission denied',
+        'fornecedor lendo jobs de template',
+      )
+    })
+
+
+    await test('tracking armazena hash, exige um link ativo e não vaza para fornecedor', async () => {
+      const order = await client.query(
+        `select id from public.orders where organization_id = $1 order by created_at desc limit 1`,
+        [orgA.id],
+      )
+      assert(order.rows.length === 1, 'pedido sintético ausente')
+      const orderId = order.rows[0].id
+      const first = await client.query(
+        `insert into public.order_tracking_links
+           (organization_id, order_id, token_hash, expires_at)
+         values ($1, $2, $3, now() + interval '30 days') returning id`,
+        [orgA.id, orderId, 'c'.repeat(64)],
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.order_tracking_links
+               (organization_id, order_id, token_hash, expires_at)
+             values ($1, $2, $3, now() + interval '30 days')`,
+            [orgA.id, orderId, 'd'.repeat(64)],
+          ),
+        'order_tracking_links_one_active_idx',
+        'segundo link ativo',
+      )
+      await client.query(
+        `update public.order_tracking_links set revoked_at = now() where id = $1`,
+        [first.rows[0].id],
+      )
+      await client.query(
+        `insert into public.order_tracking_links
+           (organization_id, order_id, token_hash, expires_at)
+         values ($1, $2, $3, now() + interval '30 days')`,
+        [orgA.id, orderId, 'd'.repeat(64)],
+      )
+      await expectError(
+        () => asUser(USER_A, () => client.query('select id from public.order_tracking_links')),
+        'permission denied',
+        'fornecedor lendo tracking links',
+      )
+      await client.query(
+        `update public.order_tracking_links set revoked_at = now()
+          where organization_id = $1 and order_id = $2 and revoked_at is null`,
+        [orgA.id, orderId],
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.order_tracking_links
+               (organization_id, order_id, token_hash, expires_at)
+             values ($1, $2, $3, now() + interval '30 days')`,
+            [orgB.id, orderId, 'e'.repeat(64)],
+          ),
+        'order_tracking_links_order_fk',
+        'link cross-tenant',
+      )
+    })
+
+
+    await test('preço privado exige token, aplica fallback e preserva snapshot', async () => {
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      const list = await client.query(
+        `insert into public.price_lists (organization_id, name)
+         values ($1, 'Tabela Ouro') returning id`,
+        [orgA.id],
+      )
+      await client.query(
+        `insert into public.price_list_items
+           (organization_id, price_list_id, product_id, price_cents, valid_from)
+         values ($1, $2, $3, 1000, now() - interval '1 day')`,
+        [orgA.id, list.rows[0].id, productA1.id],
+      )
+      await client.query(
+        `insert into public.customer_price_list_assignments
+           (organization_id, customer_id, price_list_id)
+         values ($1, $2, $3)`,
+        [orgA.id, customerA.id, list.rows[0].id],
+      )
+      const token = 'price-token-test-0123456789abcdef'
+      await client.query(
+        `insert into public.customer_price_tokens
+           (organization_id, customer_id, token_hash, expires_at)
+         values ($1, $2, encode(extensions.digest($3, 'sha256'), 'hex'), now() + interval '7 days')`,
+        [orgA.id, customerA.id, token],
+      )
+
+      const requestId = crypto.randomUUID()
+      const result = await asService(() =>
+        client.query(
+          `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, $5)`,
+          [
+            orgA.slug,
+            JSON.stringify([
+              { product_id: productA1.id, quantity: 1 },
+              { product_id: productA2.id, quantity: 1 },
+            ]),
+            `price-order:${requestId}`,
+            requestId,
+            token,
+          ],
+        ),
+      )
+      assert(result.rows[0].total_cents === 2300, `total ${result.rows[0].total_cents}`)
+      const order = await client.query(
+        `select customer_id, price_list_id, price_source, total_cents
+           from public.orders where id = $1`,
+        [result.rows[0].order_id],
+      )
+      assert(order.rows[0].customer_id === customerA.id, 'cliente do token')
+      assert(order.rows[0].price_list_id === list.rows[0].id, 'price list')
+      assert(order.rows[0].price_source === 'private', 'price source')
+      const items = await client.query(
+        `select product_id, unit_price_cents from public.order_items
+          where order_id = $1 order by product_id`,
+        [result.rows[0].order_id],
+      )
+      const byProduct = Object.fromEntries(items.rows.map((row) => [row.product_id, row.unit_price_cents]))
+      assert(byProduct[productA1.id] === 1000, 'preço privado não aplicado')
+      assert(byProduct[productA2.id] === 1300, 'fallback público não aplicado')
+
+      await client.query(
+        `delete from public.customer_price_list_assignments
+          where organization_id = $1 and customer_id = $2`,
+        [orgA.id, customerA.id],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, $5)`,
+              [
+                orgA.slug,
+                JSON.stringify([{ product_id: productA1.id, quantity: 1 }]),
+                `price-no-list:${crypto.randomUUID()}`,
+                crypto.randomUUID(),
+                token,
+              ],
+            ),
+          ),
+        'invalid_price_token',
+        'token sem tabela ativa',
+      )
+      await client.query(
+        `insert into public.customer_price_list_assignments
+           (organization_id, customer_id, price_list_id)
+         values ($1, $2, $3)`,
+        [orgA.id, customerA.id, list.rows[0].id],
+      )
+
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, 'token-errado')`,
+              [
+                orgA.slug,
+                JSON.stringify([{ product_id: productA1.id, quantity: 1 }]),
+                `price-bad:${crypto.randomUUID()}`,
+                crypto.randomUUID(),
+              ],
+            ),
+          ),
+        'invalid_price_token',
+        'token de preço inválido',
+      )
+
+      await client.query(
+        `update public.customer_price_tokens
+            set created_at = now() - interval '10 days', expires_at = now() - interval '1 day'
+          where organization_id = $1 and customer_id = $2`,
+        [orgA.id, customerA.id],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from app.submit_order($1, null, null, '', $2::jsonb, $3, null, 'private', $4, $5)`,
+              [
+                orgA.slug,
+                JSON.stringify([{ product_id: productA1.id, quantity: 1 }]),
+                `price-exp:${crypto.randomUUID()}`,
+                crypto.randomUUID(),
+                token,
+              ],
+            ),
+          ),
+        'invalid_price_token',
+        'token expirado',
+      )
+    })
+
+    await test('preço privado é Profissional e RLS isola listas', async () => {
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.price_lists where organization_id = $1', [orgA.id]),
+      )
+      assert(isolated.rows.length === 0, 'B não deveria ver listas de A')
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'essential', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.price_lists (organization_id, name) values ($1, 'Bloqueada')`,
+              [orgA.id],
+            ),
+          ),
+        'row-level security',
+        'Essencial criando lista privada',
+      )
+      const history = await asUser(USER_A, () =>
+        client.query('select id from public.price_lists where organization_id = $1', [orgA.id]),
+      )
+      assert(history.rows.length >= 1, 'histórico de lista deveria permanecer legível')
+    })
+
+
+    await test('RPCs de preço privado não são executáveis pelo browser', async () => {
+      const result = await client.query(`
+        select
+          has_function_privilege(
+            'authenticated',
+            'app.submit_order(text,text,text,text,jsonb,text,uuid,text,uuid,text,boolean)',
+            'EXECUTE'
+          ) as submit_order,
+          has_function_privilege(
+            'authenticated',
+            'app.customer_price(uuid,uuid,uuid,timestamptz)',
+            'EXECUTE'
+          ) as customer_price,
+          has_function_privilege(
+            'authenticated',
+            'public.api_submit_order(text,text,text,text,jsonb,text,uuid,text,boolean)',
+            'EXECUTE'
+          ) as api_submit
+      `)
+      assert(result.rows[0].submit_order === false, 'app.submit_order exposto')
+      assert(result.rows[0].customer_price === false, 'app.customer_price exposto')
+      assert(result.rows[0].api_submit === false, 'api_submit_order exposto')
+    })
+
+
+    console.log('[9/9] Orçamentos')
+
+    async function quoteHash(token) {
+      const result = await client.query(
+        `select encode(extensions.digest($1, 'sha256'), 'hex') as hash`,
+        [token],
+      )
+      return result.rows[0].hash
+    }
+
+    async function createQuote(items, notes = 'Condições de teste') {
+      const result = await asService(() =>
+        client.query(
+          `select * from public.api_create_quote($1, $2, $3, $4::jsonb, now() + interval '7 days', $5)`,
+          [orgA.id, USER_A, customerA.id, JSON.stringify(items), notes],
+        ),
+      )
+      return result.rows[0]
+    }
+
+    await test('orçamento congela preço privado, envia e aceita uma única vez', async () => {
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+
+      const created = await createQuote([
+        { product_id: productA1.id, quantity: 1 },
+        { product_id: productA2.id, quantity: 1 },
+      ])
+      assert(created.total_cents === 2300, `total ${created.total_cents}`)
+      assert(created.item_count === 2, `itens ${created.item_count}`)
+      const quoteId = created.quote_id
+      const items = await client.query(
+        `select product_id, unit_price_cents, price_source
+           from public.quote_items where quote_id = $1 order by product_id`,
+        [quoteId],
+      )
+      const itemByProduct = Object.fromEntries(
+        items.rows.map((row) => [row.product_id, row]),
+      )
+      assert(itemByProduct[productA1.id].unit_price_cents === 1000, 'preço privado no snapshot')
+      assert(itemByProduct[productA1.id].price_source === 'private', 'origem privada')
+      assert(itemByProduct[productA2.id].unit_price_cents === 1300, 'fallback público')
+      assert(itemByProduct[productA2.id].price_source === 'public', 'origem pública')
+
+      const updated = await asService(() =>
+        client.query(
+          `select * from public.api_update_quote($1, $2, $3, $4, $5::jsonb, now() + interval '7 days', $6)`,
+          [
+            orgA.id,
+            USER_A,
+            quoteId,
+            1,
+            JSON.stringify([{ product_id: productA1.id, quantity: 2 }]),
+            'Revisado',
+          ],
+        ),
+      )
+      assert(updated.rows[0].total_cents === 2000, `update total ${updated.rows[0].total_cents}`)
+      assert(updated.rows[0].version === 2, `versão ${updated.rows[0].version}`)
+
+      const token = 'quote-token-test-0123456789abcdefghijklmno'
+      const hash = await quoteHash(token)
+      const sent = await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, $4, $5, now() + interval '7 days')`,
+          [orgA.id, USER_A, quoteId, 2, hash],
+        ),
+      )
+      assert(sent.rows[0].version === 3, `envio versão ${sent.rows[0].version}`)
+      const quoteState = await client.query(
+        `select status, total_cents, version from public.quotes where id = $1`,
+        [quoteId],
+      )
+      assert(quoteState.rows[0].status === 'sent', 'status enviado')
+
+      const requestId = crypto.randomUUID()
+      const accepted = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'test-agent')`, [
+          hash,
+          requestId,
+        ]),
+      )
+      assert(accepted.rows[0].order_id, 'pedido não criado')
+      assert(accepted.rows[0].total_cents === 2000, 'total aceito')
+      assert(accepted.rows[0].already_accepted === false, 'primeiro aceite')
+
+      const order = await client.query(
+        `select source, quote_id, customer_id, buyer_name, buyer_phone,
+                price_source, price_list_id, total_cents
+           from public.orders where id = $1`,
+        [accepted.rows[0].order_id],
+      )
+      assert(order.rows[0].source === 'quote', 'origem quote')
+      assert(order.rows[0].quote_id === quoteId, 'correlação quote')
+      assert(order.rows[0].customer_id === customerA.id, 'cliente do orçamento')
+      assert(order.rows[0].buyer_name === null && order.rows[0].buyer_phone === null, 'PII')
+      assert(order.rows[0].price_source === 'private', 'preço privado no pedido')
+      assert(order.rows[0].total_cents === 2000, 'total do pedido')
+      const orderItems = await client.query(
+        `select count(*)::integer as total, min(unit_price_cents) as price
+           from public.order_items where order_id = $1`,
+        [accepted.rows[0].order_id],
+      )
+      assert(orderItems.rows[0].total === 1, 'itens do pedido')
+      assert(orderItems.rows[0].price === 1000, 'preço do item')
+
+      const after = await client.query(
+        `select status, order_id from public.quotes where id = $1`,
+        [quoteId],
+      )
+      assert(after.rows[0].status === 'accepted', 'status aceito')
+      assert(after.rows[0].order_id === accepted.rows[0].order_id, 'order_id na quote')
+      const link = await client.query(
+        `select revoked_at from public.quote_links where quote_id = $1`,
+        [quoteId],
+      )
+      assert(link.rows[0].revoked_at !== null, 'link não revogado')
+
+      const replay = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'test-agent')`, [
+          hash,
+          requestId,
+        ]),
+      )
+      assert(replay.rows[0].already_accepted === true, 'replay não idempotente')
+      assert(replay.rows[0].order_id === accepted.rows[0].order_id, 'pedido diferente')
+      const count = await client.query(
+        `select count(*)::integer as total from public.orders where quote_id = $1`,
+        [quoteId],
+      )
+      assert(count.rows[0].total === 1, 'pedido duplicado')
+    })
+
+    await test('reenvio rotaciona o link e invalida o anterior', async () => {
+      const created = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const firstToken = 'quote-rotate-first-0123456789abcdefghij'
+      const secondToken = 'quote-rotate-second-0123456789abcdefghij'
+      const firstHash = await quoteHash(firstToken)
+      const secondHash = await quoteHash(secondToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, created.quote_id, firstHash],
+        ),
+      )
+      const rotated = await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 2, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, created.quote_id, secondHash],
+        ),
+      )
+      assert(rotated.rows[0].version === 3, `rotação versão ${rotated.rows[0].version}`)
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_quote($1, $2, null)`, [
+              firstHash,
+              crypto.randomUUID(),
+            ]),
+          ),
+        'quote_link_unavailable',
+        'link antigo ainda válido',
+      )
+      const accepted = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, null)`, [
+          secondHash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(accepted.rows[0].order_id, 'link novo não aceitou')
+    })
+
+    await test('orçamento expirado não vira pedido', async () => {
+      const created = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const token = 'quote-expired-test-0123456789abcdefghijkl'
+      const hash = await quoteHash(token)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, created.quote_id, hash],
+        ),
+      )
+      await client.query(
+        `update public.quotes
+            set created_at = now() - interval '10 days',
+                valid_until = now() - interval '1 day'
+          where id = $1`,
+        [created.quote_id],
+      )
+      const expired = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'agent')`, [
+          hash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(expired.rows[0].error_code === 'quote_expired', 'aceite expirado')
+      assert(expired.rows[0].order_id === null, 'expirado criou pedido')
+      const state = await client.query(
+        `select status from public.quotes where id = $1`,
+        [created.quote_id],
+      )
+      assert(state.rows[0].status === 'expired', `status ${state.rows[0].status}`)
+    })
+
+    await test('preço alterado ou produto inativo exige revisão, sem pedido', async () => {
+      const assignment = await client.query(
+        `select price_list_id from public.customer_price_list_assignments
+          where organization_id = $1 and customer_id = $2`,
+        [orgA.id, customerA.id],
+      )
+      const priceListId = assignment.rows[0].price_list_id
+
+      const staleQuote = await createQuote([{ product_id: productA1.id, quantity: 1 }])
+      const staleToken = 'quote-stale-test-0123456789abcdefghijklm'
+      const staleHash = await quoteHash(staleToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, staleQuote.quote_id, staleHash],
+        ),
+      )
+      await client.query(
+        `update public.price_list_items set price_cents = 1100
+          where organization_id = $1 and price_list_id = $2 and product_id = $3`,
+        [orgA.id, priceListId, productA1.id],
+      )
+      const stale = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'agent')`, [
+          staleHash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(stale.rows[0].error_code === 'quote_stale', 'preço alterado')
+      assert(stale.rows[0].order_id === null, 'preço alterado criou pedido')
+      const staleState = await client.query(
+        `select status from public.quotes where id = $1`,
+        [staleQuote.quote_id],
+      )
+      assert(staleState.rows[0].status === 'expired', 'quote stale não expirou')
+      const review = await client.query(
+        `select event, metadata from public.quote_events
+          where quote_id = $1 and event = 'review_required'`,
+        [staleQuote.quote_id],
+      )
+      assert(review.rows.length === 1, 'evento de revisão ausente')
+      await client.query(
+        `update public.price_list_items set price_cents = 1000
+          where organization_id = $1 and price_list_id = $2 and product_id = $3`,
+        [orgA.id, priceListId, productA1.id],
+      )
+
+      const inactiveQuote = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const inactiveToken = 'quote-inactive-test-0123456789abcdefghij'
+      const inactiveHash = await quoteHash(inactiveToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, inactiveQuote.quote_id, inactiveHash],
+        ),
+      )
+      await client.query(`update public.products set active = false where id = $1`, [
+        productA2.id,
+      ])
+      const inactive = await asService(() =>
+        client.query(`select * from public.api_accept_quote($1, $2, 'agent')`, [
+          inactiveHash,
+          crypto.randomUUID(),
+        ]),
+      )
+      assert(inactive.rows[0].error_code === 'quote_product_inactive', 'produto inativo')
+      assert(inactive.rows[0].order_id === null, 'produto inativo criou pedido')
+      await client.query(`update public.products set active = true where id = $1`, [
+        productA2.id,
+      ])
+    })
+
+    await test('orçamento pode ser recusado ou cancelado sem criar pedido', async () => {
+      const declinedQuote = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const declineToken = 'quote-decline-test-0123456789abcdefghijk'
+      const declineHash = await quoteHash(declineToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_send_quote($1, $2, $3, 1, $4, now() + interval '7 days')`,
+          [orgA.id, USER_A, declinedQuote.quote_id, declineHash],
+        ),
+      )
+      const declined = await asService(() =>
+        client.query(`select * from public.api_decline_quote($1, 'agent')`, [declineHash]),
+      )
+      assert(declined.rows[0].status === 'declined', 'status recusado')
+      const replay = await asService(() =>
+        client.query(`select * from public.api_decline_quote($1, 'agent')`, [declineHash]),
+      )
+      assert(replay.rows[0].status === 'declined', 'recusa não idempotente')
+      const orders = await client.query(
+        `select count(*)::integer as total from public.orders where quote_id = $1`,
+        [declinedQuote.quote_id],
+      )
+      assert(orders.rows[0].total === 0, 'recusa criou pedido')
+
+      const canceledQuote = await createQuote([{ product_id: productA2.id, quantity: 1 }])
+      const canceled = await asService(() =>
+        client.query(`select * from public.api_cancel_quote($1, $2, $3, 1)`, [
+          orgA.id,
+          USER_A,
+          canceledQuote.quote_id,
+        ]),
+      )
+      assert(canceled.rows[0].status === 'canceled', 'status cancelado')
+    })
+
+    await test('orçamento é Profissional, RLS isola e RPC não é exposta', async () => {
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.quotes where organization_id = $1', [orgA.id]),
+      )
+      assert(isolated.rows.length === 0, 'B não deveria ver orçamentos de A')
+      const own = await asUser(USER_A, () =>
+        client.query('select id from public.quotes where organization_id = $1 limit 1', [orgA.id]),
+      )
+      assert(own.rows.length === 1, 'A deveria ver o próprio orçamento')
+
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'essential', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_create_quote($1, $2, $3, $4::jsonb, now() + interval '7 days', null)`,
+              [
+                orgA.id,
+                USER_A,
+                customerA.id,
+                JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+              ],
+            ),
+          ),
+        'plan_required',
+        'Essencial criando orçamento',
+      )
+
+      const grant = await client.query(`
+        select
+          has_function_privilege('authenticated', 'app.accept_quote(text,uuid,text)', 'EXECUTE') as accept,
+          has_function_privilege('authenticated', 'public.api_create_quote(uuid,uuid,uuid,jsonb,timestamptz,text)', 'EXECUTE') as create
+      `)
+      assert(grant.rows[0].accept === false, 'app.accept_quote exposto')
+      assert(grant.rows[0].create === false, 'api_create_quote exposto')
+
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_quote($1, $2, null)`, [
+              'f'.repeat(64),
+              crypto.randomUUID(),
+            ]),
+          ),
+        'quote_link_unavailable',
+        'token inválido',
+      )
+    })
+
+
+    console.log('[10/10] WhatsApp: opt-in e outbox desligado')
+
+    await test('opt-in grava outbox bloqueado e é idempotente por evento', async () => {
+      const requestId = crypto.randomUUID()
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_submit_order($1, $2, $3, '', $4::jsonb, $5, $6, $7, $8)`,
+          [
+            orgA.slug,
+            'Padaria Pão Bom',
+            '11977776666',
+            JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+            `wa:${requestId}`,
+            requestId,
+            null,
+            true,
+          ],
+        ),
+      )
+      const orderId = created.rows[0].order_id
+      const order = await client.query(
+        `select whatsapp_opt_in, whatsapp_opt_in_at from public.orders where id = $1`,
+        [orderId],
+      )
+      assert(order.rows[0].whatsapp_opt_in === true, 'opt-in não gravado')
+      assert(order.rows[0].whatsapp_opt_in_at !== null, 'timestamp do opt-in')
+      const outbox = await client.query(
+        `select event, status, blocked_reason from public.whatsapp_outbox
+          where order_id = $1 order by event`,
+        [orderId],
+      )
+      assert(outbox.rows.length === 1, `outbox ${outbox.rows.length}`)
+      assert(outbox.rows[0].event === 'new', 'evento new')
+      assert(outbox.rows[0].status === 'blocked', 'deveria estar bloqueado')
+      assert(
+        outbox.rows[0].blocked_reason === 'connection_not_ready',
+        `motivo ${outbox.rows[0].blocked_reason}`,
+      )
+
+      await client.query(`update public.orders set status = 'confirmed' where id = $1`, [orderId])
+      await client.query(`update public.orders set status = 'completed' where id = $1`, [orderId])
+      const after = await client.query(
+        `select event, count(*)::integer as total from public.whatsapp_outbox
+          where order_id = $1 group by event order by event`,
+        [orderId],
+      )
+      assert(after.rows.length === 3, `eventos ${after.rows.length}`)
+      assert(after.rows.every((row) => row.total === 1), 'outbox duplicada')
+    })
+
+    await test('outbox fica pendente com conexão e template aprovados, sem envio', async () => {
+      await client.query(
+        `insert into public.whatsapp_connections
+           (organization_id, waba_id, phone_number_id, status)
+         values ($1, 'waba-test', 'phone-test', 'connected')
+         on conflict (organization_id) do update
+           set status = 'connected', waba_id = 'waba-test', phone_number_id = 'phone-test'`,
+        [orgA.id],
+      )
+      await client.query(
+        `insert into public.whatsapp_templates
+           (organization_id, event, template_name, language, status)
+         values ($1, 'new', 'pedido_novo', 'pt_BR', 'approved')
+         on conflict (organization_id, event, language) do update set status = 'approved'`,
+        [orgA.id],
+      )
+      const requestId = crypto.randomUUID()
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_submit_order($1, $2, $3, '', $4::jsonb, $5, $6, $7, $8)`,
+          [
+            orgA.slug,
+            'Padaria Pão Bom',
+            '11977776666',
+            JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+            `wa-ready:${requestId}`,
+            requestId,
+            null,
+            true,
+          ],
+        ),
+      )
+      const outbox = await client.query(
+        `select status, template_id from public.whatsapp_outbox where order_id = $1`,
+        [created.rows[0].order_id],
+      )
+      assert(outbox.rows[0].status === 'pending', `status ${outbox.rows[0].status}`)
+      assert(outbox.rows[0].template_id !== null, 'template não vinculado')
+      const sent = await client.query(
+        `select count(*)::integer as total from public.whatsapp_outbox
+          where order_id = $1 and status = 'sent'`,
+        [created.rows[0].order_id],
+      )
+      assert(sent.rows[0].total === 0, 'outbox não pode enviar sem worker')
+    })
+
+    await test('WhatsApp exige opt-in, RLS isola e escrita é restrita', async () => {
+      const requestId = crypto.randomUUID()
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_submit_order($1, $2, $3, '', $4::jsonb, $5, $6, $7, $8)`,
+          [
+            orgA.slug,
+            'Padaria Pão Bom',
+            '11977776666',
+            JSON.stringify([{ product_id: productA2.id, quantity: 1 }]),
+            `wa-no:${requestId}`,
+            requestId,
+            null,
+            false,
+          ],
+        ),
+      )
+      const outbox = await client.query(
+        `select count(*)::integer as total from public.whatsapp_outbox where order_id = $1`,
+        [created.rows[0].order_id],
+      )
+      assert(outbox.rows[0].total === 0, 'opt-in falso gerou outbox')
+
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.whatsapp_connections where organization_id = $1', [
+          orgA.id,
+        ]),
+      )
+      assert(isolated.rows.length === 0, 'B viu conexão de A')
+      const own = await asUser(USER_A, () =>
+        client.query('select id from public.whatsapp_connections where organization_id = $1', [
+          orgA.id,
+        ]),
+      )
+      assert(own.rows.length === 1, 'A não viu a própria conexão')
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.whatsapp_connections
+                 (organization_id, waba_id, phone_number_id)
+               values ($1, 'x', 'y')`,
+              [orgA.id],
+            ),
+          ),
+        'permission denied',
+        'browser escrevendo conexão',
+      )
+    })
+
+
+    console.log('[11/11] Equipe, RBAC e convites manuais')
+
+    await test('owner tem membership e papéis respeitam a matriz RLS', async () => {
+      await client.query(`
+        insert into auth.users (id, email, email_confirmed_at) values
+          ('${USER_G}', 'manager@example.test', now()),
+          ('${USER_H}', 'operator@example.test', now()),
+          ('${USER_I}', 'viewer@example.test', now()),
+          ('${USER_J}', 'invitee@example.test', now()),
+          ('${USER_K}', 'team-owner@example.test', now())
+        on conflict (id) do update set email = excluded.email, email_confirmed_at = excluded.email_confirmed_at
+      `)
+      const ownerMembership = await client.query(
+        `select role, status from public.organization_memberships
+          where organization_id = $1 and user_id = $2`,
+        [orgA.id, USER_A],
+      )
+      assert(ownerMembership.rows[0]?.role === 'owner', 'membership owner ausente')
+
+      await client.query(`
+        insert into public.organization_memberships
+          (organization_id, user_id, email, role, status)
+        values
+          ('${orgA.id}', '${USER_G}', 'manager@example.test', 'manager', 'active'),
+          ('${orgA.id}', '${USER_H}', 'operator@example.test', 'operator', 'active'),
+          ('${orgB.id}', '${USER_I}', 'viewer@example.test', 'viewer', 'active')
+        on conflict (organization_id, user_id) do nothing
+      `)
+
+      const managerProducts = await asUser(USER_G, () =>
+        client.query('select id from public.products where organization_id = $1', [orgA.id]),
+      )
+      assert(managerProducts.rows.length >= 2, 'manager não leu catálogo')
+      const managerProduct = await asUser(USER_G, () => insertProduct(orgA.id, 'Produto Manager', 700))
+      assert(managerProduct.id, 'manager não criou produto')
+
+      await expectError(
+        () => asUser(USER_H, () => insertProduct(orgA.id, 'Produto Operator', 700)),
+        'row-level security',
+        'operator criando produto',
+      )
+      const order = await client.query(
+        `select id from public.orders where organization_id = $1 order by created_at desc limit 1`,
+        [orgA.id],
+      )
+      await asUser(USER_H, () =>
+        client.query(`update public.orders set status = 'confirmed' where id = $1`, [order.rows[0].id]),
+      )
+
+      const viewerProducts = await asUser(USER_I, () =>
+        client.query('select id from public.products where organization_id = $1', [orgB.id]),
+      )
+      assert(viewerProducts.rows.length >= 1, 'viewer não leu catálogo')
+      await expectError(
+        () => asUser(USER_I, () => insertProduct(orgB.id, 'Produto Viewer', 700)),
+        'row-level security',
+        'viewer criando produto',
+      )
+      const viewerBilling = await asUser(USER_I, () =>
+        client.query('select id from public.subscriptions where organization_id = $1', [orgB.id]),
+      )
+      assert(viewerBilling.rows.length === 0, 'viewer leu billing')
+      const managerBilling = await asUser(USER_G, () =>
+        client.query('select id from public.subscriptions where organization_id = $1', [orgA.id]),
+      )
+      assert(managerBilling.rows.length === 1, 'manager deveria ler status da assinatura')
+
+      await expectError(
+        () =>
+          client.query(
+            `update public.organization_memberships set role = 'manager'
+              where organization_id = $1 and user_id = $2`,
+            [orgA.id, USER_A],
+          ),
+        'owner_membership_protected',
+        'rebaixar owner',
+      )
+    })
+
+    await test('convite exige e-mail verificado, é único e aceita uma vez', async () => {
+      const teamOrg = await createOrg(USER_K, 'Equipe Teste', '11955554444')
+      await client.query(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${teamOrg.id}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+      const token = 'team-invite-token-0123456789abcdefghijk'
+      const hash = await quoteHash(token)
+      const created = await asService(() =>
+        client.query(
+          `select * from public.api_create_invitation($1, $2, $3, $4, $5, now() + interval '7 days')`,
+          [teamOrg.id, USER_K, 'invitee@example.test', 'operator', hash],
+        ),
+      )
+      assert(created.rows[0].invitation_id, 'convite não criado')
+
+      const accepted = await asService(() =>
+        client.query(`select * from public.api_accept_invitation($1, $2)`, [hash, USER_J]),
+      )
+      assert(accepted.rows[0].organization_id === teamOrg.id, 'org do convite')
+      assert(accepted.rows[0].role === 'operator', 'papel do convite')
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_invitation($1, $2)`, [hash, USER_J]),
+          ),
+        'invitation_unavailable',
+        'replay do convite',
+      )
+
+      const membership = await client.query(
+        `select id from public.organization_memberships
+          where organization_id = $1 and user_id = $2`,
+        [teamOrg.id, USER_J],
+      )
+      await asService(() =>
+        client.query(`select * from public.api_change_member_role($1, $2, $3, 'viewer')`, [
+          teamOrg.id,
+          USER_K,
+          membership.rows[0].id,
+        ]),
+      )
+      await expectError(
+        () =>
+          asUser(USER_J, () =>
+            client.query(
+              `insert into public.customers (organization_id, display_name, contact_phone)
+               values ($1, 'Cliente Viewer', '11933332222')`,
+              [teamOrg.id],
+            ),
+          ),
+        'row-level security',
+        'viewer criando cliente',
+      )
+      await asService(() =>
+        client.query(`select * from public.api_revoke_member($1, $2, $3)`, [
+          teamOrg.id,
+          USER_K,
+          membership.rows[0].id,
+        ]),
+      )
+      const afterRevoke = await asUser(USER_J, () =>
+        client.query('select id from public.organizations where id = $1', [teamOrg.id]),
+      )
+      assert(afterRevoke.rows.length === 0, 'membro revogado ainda lê a organização')
+    })
+
+    await test('convite expirado, e-mail divergente e limite de equipe são bloqueados', async () => {
+      const teamOrg = await client.query(
+        `select id from public.organizations where owner_user_id = $1 limit 1`,
+        [USER_K],
+      )
+      const orgId = teamOrg.rows[0].id
+      const expiredToken = 'team-expired-token-0123456789abcdefghij'
+      const expiredHash = await quoteHash(expiredToken)
+      await client.query(
+        `insert into public.organization_invitations
+           (organization_id, email, role, token_hash, expires_at, invited_by, created_at)
+         values ($1, 'invitee@example.test', 'operator', $2, now() - interval '1 day', $3, now() - interval '2 days')`,
+        [orgId, expiredHash, USER_K],
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_invitation($1, $2)`, [expiredHash, USER_J]),
+          ),
+        'invitation_unavailable',
+        'convite expirado',
+      )
+
+      const otherToken = 'team-other-token-0123456789abcdefghijkl'
+      const otherHash = await quoteHash(otherToken)
+      await asService(() =>
+        client.query(
+          `select * from public.api_create_invitation($1, $2, $3, $4, $5, now() + interval '7 days')`,
+          [orgId, USER_K, 'other@example.test', 'viewer', otherHash],
+        ),
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_accept_invitation($1, $2)`, [otherHash, USER_J]),
+          ),
+        'invitation_email_mismatch',
+        'e-mail divergente',
+      )
+
+      const secondHash = await quoteHash('team-limit-second')
+      await asService(() =>
+        client.query(
+          `select * from public.api_create_invitation($1, $2, $3, 'viewer', $4, now() + interval '7 days')`,
+          [orgId, USER_K, 'second@example.test', secondHash],
+        ),
+      )
+      const fourthHash = await quoteHash('team-limit-fourth')
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(
+              `select * from public.api_create_invitation($1, $2, 'fourth@example.test', 'viewer', $3, now() + interval '7 days')`,
+              [orgId, USER_K, fourthHash],
+            ),
+          ),
+        'team_limit_reached',
+        'limite de equipe',
+      )
+    })
+
+
+    console.log('[12/12] Radar de recompra')
+
+    await test('radar calcula mediana, ignora cancelados e sinaliza atraso', async () => {
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1, state = 'active',
+                current_period_end = now() + interval '30 days'
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      const radarCustomer = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Radar Cliente', '11944443333'),
+      )
+      const radarShort = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Radar Curto', '11944442222'),
+      )
+      const insertOrder = async (customerId, daysAgo, status, suffix) => {
+        await client.query(
+          `insert into public.orders
+             (organization_id, customer_id, public_reference, status, total_cents, source, created_at)
+           values ($1, $2, $3, $4, 1000, 'manual', now() - ($5 || ' days')::interval)`,
+          [orgA.id, customerId, `PD-RADAR-${suffix}-${crypto.randomUUID().slice(0, 8)}`, status, daysAgo],
+        )
+      }
+      await insertOrder(radarCustomer.id, 50, 'completed', 'a')
+      await insertOrder(radarCustomer.id, 40, 'completed', 'b')
+      await insertOrder(radarCustomer.id, 30, 'completed', 'c')
+      await insertOrder(radarCustomer.id, 20, 'completed', 'd')
+      await insertOrder(radarCustomer.id, 5, 'canceled', 'e')
+      await insertOrder(radarShort.id, 20, 'completed', 'f')
+      await insertOrder(radarShort.id, 10, 'completed', 'g')
+
+      const radar = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_reorder_radar($1, 'Radar', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      const late = radar.rows.find((row) => row.customer_id === radarCustomer.id)
+      const short = radar.rows.find((row) => row.customer_id === radarShort.id)
+      assert(late, 'cliente atrasado ausente')
+      assert(late.valid_order_count === 4, `pedidos ${late.valid_order_count}`)
+      assert(Number(late.median_interval_days) === 10, `mediana ${late.median_interval_days}`)
+      assert(late.overdue === true, 'deveria estar atrasado')
+      assert(short.insufficient === true, 'histórico curto deveria ser insuficiente')
+      assert(short.median_interval_days === null, 'não pode inventar mediana')
+      assert(radar.rows[0].total_count >= 2, 'total_count')
+
+      await asUser(USER_A, () =>
+        client.query(
+          `update public.customers set reorder_snoozed_until = now() + interval '30 days'
+            where id = $1`,
+          [radarCustomer.id],
+        ),
+      )
+      const snoozed = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_reorder_radar($1, 'Radar Cliente', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(snoozed.rows[0].overdue === false, 'soneca não silenciou')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(`select * from public.api_reorder_radar($1, null, 50, 0)`, [orgA.id]),
+          ),
+        'forbidden',
+        'B acessando radar de A',
+      )
+    })
+
+
+    await test('lembretes são isolados por tenant e exigem histórico válido', async () => {
+      const reminder = await client.query(
+        `insert into public.reorder_reminders
+           (organization_id, customer_id, cycle_key, message, status)
+         values ($1, $2, 'db-cycle-1', 'Lembrete de teste', 'suggested')
+         returning id`,
+        [orgA.id, customerA.id],
+      )
+      assert(reminder.rows[0].id, 'lembrete não criado')
+      const isolated = await asUser(USER_B, () =>
+        client.query('select id from public.reorder_reminders where organization_id = $1', [orgA.id]),
+      )
+      assert(isolated.rows.length === 0, 'B viu lembrete de A')
+      const own = await asUser(USER_A, () =>
+        client.query('select id from public.reorder_reminders where organization_id = $1', [orgA.id]),
+      )
+      assert(own.rows.length >= 1, 'A não viu o próprio lembrete')
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.reorder_reminders
+               (organization_id, customer_id, cycle_key, message)
+             values ($1, $2, 'db-cycle-1', 'Duplicado')`,
+            [orgA.id, customerA.id],
+          ),
+        'reorder_reminders_unique',
+        'lembrete duplicado',
+      )
+    })
+
+
+    await test('analytics é somente service_role e não expõe eventos ao browser', async () => {
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query('select id from public.analytics_events limit 1'),
+          ),
+        'permission denied',
+        'browser lendo analytics',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `insert into public.analytics_events (event, session_id, path)
+               values ('page_view', 'session-test-1234567890', '/')`,
+            ),
+          ),
+        'permission denied',
+        'browser escrevendo analytics',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query('select session_id from public.analytics_consents limit 1'),
+          ),
+        'permission denied',
+        'browser lendo consentimentos',
+      )
+    })
+
+
+    await test('chaves de API são service_role, hash único e escopos válidos', async () => {
+      await client.query(
+        `insert into public.api_keys
+           (organization_id, name, key_prefix, key_hash, scopes)
+         values ($1, 'DB Key', 'po_live_abc', $2, array['catalog:read'])`,
+        [orgA.id, 'e'.repeat(64)],
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.api_keys
+               (organization_id, name, key_prefix, key_hash)
+             values ($1, 'Duplicada', 'po_live_def', $2)`,
+            [orgA.id, 'e'.repeat(64)],
+          ),
+        'api_keys_hash_unique',
+        'hash duplicado',
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.api_keys
+               (organization_id, name, key_prefix, key_hash, scopes)
+             values ($1, 'Escopo inválido', 'po_live_ghi', $2, array['admin:write'])`,
+            [orgA.id, 'f'.repeat(64)],
+          ),
+        'api_keys_scopes_check',
+        'escopo inválido',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () => client.query('select id from public.api_keys limit 1')),
+        'permission denied',
+        'browser lendo chaves',
+      )
+    })
+
+
+    await test('webhooks enfileiram eventos por pedido e são service_role', async () => {
+      const webhook = await client.query(
+        `insert into public.api_webhooks
+           (organization_id, url, secret_ciphertext, events)
+         values ($1, 'https://example.test/db-hook', 'cipher', array['order.created', 'order.confirmed'])
+         returning id`,
+        [orgA.id],
+      )
+      const orderId = crypto.randomUUID()
+      await client.query(
+        `insert into public.orders
+           (id, organization_id, public_reference, status, total_cents, source)
+         values ($1, $2, $3, 'new', 500, 'manual')`,
+        [orderId, orgA.id, `PD-WEBHOOK-DB-${crypto.randomUUID().slice(0, 8)}`],
+      )
+      await client.query(`update public.orders set status = 'confirmed' where id = $1`, [orderId])
+      const deliveries = await client.query(
+        `select event, count(*)::integer as total from public.api_webhook_deliveries
+          where webhook_id = $1 group by event order by event`,
+        [webhook.rows[0].id],
+      )
+      assert(deliveries.rows.length === 2, `eventos ${deliveries.rows.length}`)
+      assert(deliveries.rows.every((row) => row.total === 1), 'entrega duplicada')
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query('select id from public.api_webhooks limit 1'),
+          ),
+        'permission denied',
+        'browser lendo webhooks',
+      )
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)

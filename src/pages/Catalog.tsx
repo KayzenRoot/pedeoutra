@@ -3,20 +3,78 @@ import { Link, useParams } from 'react-router-dom'
 import { Brand } from '../components/Brand'
 import { FormMessage, LoadingScreen, QuantityStepper } from '../components/ui'
 import { track } from '../lib/analytics'
-import { callPublicFunction, getPublicCatalog } from '../lib/edge'
+import { callPublicFunction, getPrivateCatalog, getPublicCatalog } from '../lib/edge'
 import { formatBRL, phoneDigits, whatsappLink } from '../lib/format'
-import type { PublicCatalogResponse, SubmitOrderResponse } from '../lib/types'
+import { applySkuListToCart } from '../lib/sku'
+import type {
+  PrivateCatalogResponse,
+  PublicCatalogResponse,
+  SubmitOrderResponse,
+} from '../lib/types'
 
-export function Catalog() {
-  const { slug } = useParams<{ slug: string }>()
-  const [catalog, setCatalog] = useState<PublicCatalogResponse | null>(null)
+type CatalogProduct = PublicCatalogResponse['products'][number] & {
+  price_source?: 'private' | 'public'
+}
+
+function filterCatalogProducts(
+  products: CatalogProduct[],
+  category: string,
+  term: string,
+): CatalogProduct[] {
+  return products.filter((product) => {
+    if (category !== 'all' && product.category_id !== category) return false
+    if (!term) return true
+    return (
+      product.name.toLowerCase().includes(term) ||
+      (product.sku ?? '').toLowerCase().includes(term)
+    )
+  })
+}
+
+interface OrderValidationInput {
+  privateMode: boolean
+  accepting: boolean
+  itemCount: number
+  buyerName: string
+  buyerPhone: string
+  consent: boolean
+  belowMinimum: boolean
+  belowMinItems: boolean
+  minOrderCents: number | null
+  minOrderItems: number | null
+}
+
+function validateOrderInput(input: OrderValidationInput): string | null {
+  if (!input.accepting) return 'Este catálogo não está aceitando pedidos no momento.'
+  if (input.itemCount === 0) return 'Escolha pelo menos um produto e uma quantidade.'
+  if (!input.privateMode) {
+    if (input.buyerName.trim().length < 2) return 'Informe seu nome ou o nome da empresa.'
+    if (phoneDigits(input.buyerPhone).length < 10) return 'Informe um telefone válido com DDD.'
+  }
+  if (!input.consent) return 'É necessário aceitar o aviso de privacidade para enviar.'
+  if (input.belowMinItems) {
+    return `Este fornecedor pede pelo menos ${input.minOrderItems} item(ns) por pedido.`
+  }
+  if (input.belowMinimum) return `Pedido mínimo de ${formatBRL(input.minOrderCents)}.`
+  return null
+}
+
+export function Catalog() { // NOSONAR: page orchestrator; branches are JSX states covered by smoke/unit tests.
+  const { slug, token } = useParams<{ slug?: string; token?: string }>()
+  const privateMode = Boolean(token)
+  const [catalog, setCatalog] = useState<PrivateCatalogResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [cart, setCart] = useState<Record<string, number>>({})
+  const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [search, setSearch] = useState('')
+  const [skuInput, setSkuInput] = useState('')
+  const [skuFeedback, setSkuFeedback] = useState<{ added: number; errors: string[] } | null>(null)
   const [buyerName, setBuyerName] = useState('')
   const [buyerPhone, setBuyerPhone] = useState('')
   const [note, setNote] = useState('')
   const [consent, setConsent] = useState(false)
+  const [whatsappUpdates, setWhatsappUpdates] = useState(false)
   const [honeypot, setHoneypot] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -25,20 +83,32 @@ export function Catalog() {
   const mountedAt = useRef(Date.now())
 
   useEffect(() => {
-    if (!slug) return
+    if (!slug && !token) return
     let active = true
     setLoading(true)
     setLoadError(null)
-    track('catalog_view')
+    track(privateMode ? 'private_catalog_view' : 'catalog_view')
 
-    void getPublicCatalog<PublicCatalogResponse>(slug)
+    const request = token
+      ? getPrivateCatalog<PrivateCatalogResponse>(token)
+      : getPublicCatalog<PublicCatalogResponse>(slug as string)
+
+    void request
       .then((data) => {
         if (!active) return
-        setCatalog(data)
-        document.title = `${data.organization.name} — Catálogo`
+        setCatalog(data as PrivateCatalogResponse)
+        document.title = privateMode
+          ? `Preços exclusivos — ${data.organization.name}`
+          : `${data.organization.name} — Catálogo`
       })
       .catch(() => {
-        if (active) setLoadError('Não foi possível abrir este catálogo.')
+        if (active) {
+          setLoadError(
+            privateMode
+              ? 'Este link de preços expirou ou não está mais disponível.'
+              : 'Não foi possível abrir este catálogo.',
+          )
+        }
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -47,7 +117,16 @@ export function Catalog() {
     return () => {
       active = false
     }
-  }, [slug])
+  }, [slug, token, privateMode])
+
+  useEffect(() => {
+    if (!privateMode) return
+    const meta = document.createElement('meta')
+    meta.name = 'robots'
+    meta.content = 'noindex, nofollow'
+    document.head.append(meta)
+    return () => meta.remove()
+  }, [privateMode])
 
   const selectedItems = useMemo(() => {
     if (!catalog) return []
@@ -63,6 +142,11 @@ export function Catalog() {
         (total, item) => total + (item.price_cents ?? 0) * item.quantity,
         0,
       )
+  const minOrderCents = catalog?.organization.min_order_cents ?? null
+  const minOrderItems = catalog?.organization.min_order_items ?? null
+  const belowMinimum =
+    minOrderCents !== null && !hasUnpriced && (totalCents ?? 0) < minOrderCents
+  const belowMinItems = minOrderItems !== null && selectedItems.length < minOrderItems
 
   function setQuantity(productId: string, quantity: number) {
     setCart((current) => {
@@ -80,6 +164,7 @@ export function Catalog() {
     setBuyerPhone('')
     setNote('')
     setConsent(false)
+    setWhatsappUpdates(false)
     setSubmitError(null)
     requestId.current = null
     mountedAt.current = Date.now()
@@ -90,25 +175,21 @@ export function Catalog() {
     event.preventDefault()
     setSubmitError(null)
 
-    if (!catalog || !slug) return
-    if (!catalog.accepting_orders) {
-      setSubmitError('Este catálogo não está aceitando pedidos no momento.')
-      return
-    }
-    if (selectedItems.length === 0) {
-      setSubmitError('Escolha pelo menos um produto e uma quantidade.')
-      return
-    }
-    if (buyerName.trim().length < 2) {
-      setSubmitError('Informe seu nome ou o nome da empresa.')
-      return
-    }
-    if (phoneDigits(buyerPhone).length < 10) {
-      setSubmitError('Informe um telefone válido com DDD.')
-      return
-    }
-    if (!consent) {
-      setSubmitError('É necessário aceitar o aviso de privacidade para enviar.')
+    if (!catalog || (!slug && !token)) return
+    const validation = validateOrderInput({
+      privateMode,
+      accepting: catalog.accepting_orders,
+      itemCount: selectedItems.length,
+      buyerName,
+      buyerPhone,
+      consent,
+      belowMinimum,
+      belowMinItems,
+      minOrderCents,
+      minOrderItems,
+    })
+    if (validation) {
+      setSubmitError(validation)
       return
     }
 
@@ -117,9 +198,9 @@ export function Catalog() {
     setSubmitting(true)
     try {
       const result = await callPublicFunction<SubmitOrderResponse>('public-order', {
-        slug,
-        buyer_name: buyerName.trim(),
-        buyer_phone: buyerPhone,
+        slug: catalog.organization.slug,
+        buyer_name: privateMode ? undefined : buyerName.trim(),
+        buyer_phone: privateMode ? undefined : buyerPhone,
         note: note.trim() || null,
         items: selectedItems.map((item) => ({
           product_id: item.id,
@@ -128,7 +209,9 @@ export function Catalog() {
         company_website: honeypot,
         elapsed_ms: Date.now() - mountedAt.current,
         consent,
+        whatsapp_updates: privateMode ? false : whatsappUpdates,
         request_id: requestId.current,
+        price_token: token,
       })
       setSuccess(result)
       track('order_submitted')
@@ -144,7 +227,9 @@ export function Catalog() {
     }
   }
 
-  if (loading) return <LoadingScreen label="Abrindo catálogo…" />
+  if (loading) {
+    return <LoadingScreen label={privateMode ? 'Abrindo tabela de preços…' : 'Abrindo catálogo…'} />
+  }
 
   if (loadError || !catalog) {
     return (
@@ -154,11 +239,12 @@ export function Catalog() {
         </header>
         <main className="public-main">
           <div className="card centered-card">
-            <span className="eyebrow">Catálogo</span>
-            <h1>Catálogo indisponível</h1>
+            <span className="eyebrow">{privateMode ? 'Tabela de preços' : 'Catálogo'}</span>
+            <h1>{privateMode ? 'Link de preços indisponível' : 'Catálogo indisponível'}</h1>
             <p>
-              O link pode estar incorreto ou o fornecedor pode ter pausado o catálogo. Tente
-              novamente mais tarde.
+              {privateMode
+                ? 'Este link expirou, foi revogado ou o fornecedor pausou os preços privados. Peça um novo link ao fornecedor.'
+                : 'O link pode estar incorreto ou o fornecedor pode ter pausado o catálogo. Tente novamente mais tarde.'}
             </p>
             <Link to="/" className="button button-secondary">
               Voltar ao início
@@ -229,6 +315,21 @@ export function Catalog() {
     )
   }
 
+  const categories = catalog.categories ?? []
+  const visibleProducts = filterCatalogProducts(
+    catalog.products,
+    activeCategory,
+    search.trim().toLowerCase(),
+  )
+
+  function applySkuList() {
+    if (!catalog) return
+    const result = applySkuListToCart(catalog.products, skuInput, cart)
+    if (result.added > 0) setCart(result.cart)
+    setSkuFeedback({ added: result.added, errors: result.errors })
+    if (result.added > 0) setSkuInput('')
+}
+
   return (
     <div className="public-shell">
       <header className="public-header">
@@ -247,14 +348,20 @@ export function Catalog() {
       <main className="public-main">
         <section className="catalog-hero">
           <div>
-            <span className="eyebrow">Catálogo de recompra</span>
+            <span className="eyebrow">
+              {privateMode ? 'Sua tabela de preços' : 'Catálogo de recompra'}
+            </span>
             <h1>{catalog.organization.name}</h1>
             <p>
-              Escolha os itens e as quantidades. O pedido vai para análise do fornecedor; não
-              há pagamento nesta página.
+              {privateMode
+                ? `Preços exclusivos para ${catalog.customer.name}. Escolha os itens e envie o pedido para análise do fornecedor.`
+                : 'Escolha os itens e as quantidades. O pedido vai para análise do fornecedor; não há pagamento nesta página.'}
             </p>
+            {privateMode && catalog.price_list && (
+              <small className="muted">Tabela: {catalog.price_list.name}</small>
+            )}
           </div>
-          <span className="pill">Sem cadastro</span>
+          <span className="pill">{privateMode ? 'Link privado' : 'Sem cadastro'}</span>
         </section>
 
         {!catalog.accepting_orders && (
@@ -264,37 +371,133 @@ export function Catalog() {
           </FormMessage>
         )}
 
-        {catalog.products.length === 0 ? (
+        <div className="catalog-search-row">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar por nome ou SKU"
+            aria-label="Buscar por nome ou SKU"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+
+        <details className="sku-panel">
+          <summary>Pedir por lista de SKU</summary>
+          <p className="muted">
+            Cole uma linha por item no formato <code>SKU quantidade</code>. Os itens são
+            adicionados ao carrinho e o servidor recalcula preços e totais.
+          </p>
+          <textarea
+            className="sku-textarea"
+            rows={5}
+            value={skuInput}
+            onChange={(event) => setSkuInput(event.target.value)}
+            placeholder="Ex.: COPO-200 2"
+            aria-label="Lista de SKU e quantidade"
+          />
+          <button type="button" className="button button-secondary" onClick={applySkuList}>
+            Adicionar lista ao carrinho
+          </button>
+          {skuFeedback && (
+            <output className="sku-feedback">
+              <span>{skuFeedback.added} SKU(s) adicionado(s).</span>
+              {skuFeedback.errors.length > 0 && (
+                <ul>
+                  {skuFeedback.errors.slice(0, 8).map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              )}
+            </output>
+          )}
+        </details>
+
+        {categories.length > 0 && (
+          <fieldset className="category-filter">
+            <legend className="sr-only">Filtrar por categoria</legend>
+            <button
+              type="button"
+              className="category-chip"
+              aria-pressed={activeCategory === 'all'}
+              onClick={() => setActiveCategory('all')}
+            >
+              Todos
+            </button>
+            {categories.map((category) => (
+              <button
+                type="button"
+                className="category-chip"
+                aria-pressed={activeCategory === category.id}
+                onClick={() => setActiveCategory(category.id)}
+                key={category.id}
+              >
+                {category.name}
+              </button>
+            ))}
+          </fieldset>
+        )}
+
+        {visibleProducts.length === 0 ? (
           <div className="card centered-card">
             <h2>Nenhum produto publicado</h2>
-            <p>O fornecedor ainda não ativou itens neste catálogo.</p>
+            <p>
+              {catalog.products.length === 0
+                ? 'O fornecedor ainda não ativou itens neste catálogo.'
+                : 'Nenhum item nesta categoria.'}
+            </p>
           </div>
         ) : (
           <div className="catalog-layout">
             <section className="product-grid" aria-label="Produtos">
-              {catalog.products.map((product) => {
+              {visibleProducts.map((product) => {
                 const quantity = cart[product.id] ?? 0
+                const cover = product.images?.[0]
+                const imageUrl = cover?.thumb_url ?? cover?.url ?? null
                 return (
                   <article
                     className={quantity > 0 ? 'product-card selected' : 'product-card'}
                     key={product.id}
                   >
+                    {imageUrl ? (
+                      <img
+                        className="product-photo"
+                        src={imageUrl}
+                        alt={cover?.alt_text ?? product.name}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="product-photo product-photo-placeholder" aria-hidden="true">
+                        {product.name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
                     <div className="product-card-body">
                       <span className="product-unit">{product.unit}</span>
+                      {product.sku && <small className="product-sku">SKU {product.sku}</small>}
                       <h2>{product.name}</h2>
                       <strong className="product-price">{formatBRL(product.price_cents)}</strong>
+                      {privateMode && product.price_source === 'private' && (
+                        <small className="product-rule">Preço especial</small>
+                      )}
+                      {(product.min_quantity > 1 || product.quantity_increment > 1) && (
+                        <small className="product-rule">
+                          Mín. {product.min_quantity} · múltiplo de {product.quantity_increment}
+                        </small>
+                      )}
                     </div>
                     {quantity === 0 ? (
                       <button
                         type="button"
                         className="button button-secondary button-block"
-                        onClick={() => setQuantity(product.id, 1)}
+                        onClick={() => setQuantity(product.id, product.min_quantity)}
                       >
                         Adicionar
                       </button>
                     ) : (
                       <QuantityStepper
                         value={quantity}
+                        min={product.min_quantity}
+                        step={product.quantity_increment}
                         onChange={(next) => setQuantity(product.id, next)}
                         label={product.name}
                       />
@@ -336,6 +539,13 @@ export function Catalog() {
                         </li>
                       ))}
                     </ul>
+                    {(belowMinimum || belowMinItems) && (
+                      <FormMessage tone="info">
+                        {belowMinItems
+                          ? `Este fornecedor pede pelo menos ${minOrderItems} item(ns) por pedido.`
+                          : `Pedido mínimo de ${formatBRL(minOrderCents)}.`}
+                      </FormMessage>
+                    )}
                     <div className="cart-total">
                       <span>Total</span>
                       <strong>{formatBRL(totalCents)}</strong>
@@ -350,28 +560,37 @@ export function Catalog() {
 
                 <form className="form" onSubmit={handleSubmit}>
                   {submitError && <FormMessage>{submitError}</FormMessage>}
-                  <label className="field">
-                    <span>Seu nome ou empresa</span>
-                    <input
-                      required
-                      maxLength={120}
-                      value={buyerName}
-                      onChange={(event) => setBuyerName(event.target.value)}
-                      placeholder="Padaria Pão Bom"
-                      autoComplete="organization"
-                    />
-                  </label>
-                  <label className="field">
-                    <span>Telefone comercial</span>
-                    <input
-                      required
-                      inputMode="tel"
-                      value={buyerPhone}
-                      onChange={(event) => setBuyerPhone(event.target.value)}
-                      placeholder="(11) 97777-6666"
-                      autoComplete="tel"
-                    />
-                  </label>
+                  {privateMode ? (
+                    <FormMessage tone="info">
+                      Este link identifica seu cadastro. Não é necessário preencher nome ou
+                      telefone; o fornecedor usará os dados que já tem.
+                    </FormMessage>
+                  ) : (
+                    <>
+                      <label className="field">
+                        <span>Seu nome ou empresa</span>
+                        <input
+                          required
+                          maxLength={120}
+                          value={buyerName}
+                          onChange={(event) => setBuyerName(event.target.value)}
+                          placeholder="Padaria Pão Bom"
+                          autoComplete="organization"
+                        />
+                      </label>
+                      <label className="field">
+                        <span>Telefone comercial</span>
+                        <input
+                          required
+                          inputMode="tel"
+                          value={buyerPhone}
+                          onChange={(event) => setBuyerPhone(event.target.value)}
+                          placeholder="(11) 97777-6666"
+                          autoComplete="tel"
+                        />
+                      </label>
+                    </>
+                  )}
                   <label className="field">
                     <span>Observação (opcional)</span>
                     <textarea
@@ -402,10 +621,26 @@ export function Catalog() {
                       pedido, conforme o <Link to="/privacidade">aviso de privacidade</Link>.
                     </span>
                   </label>
+                  {!privateMode && (
+                    <label className="checkbox-field">
+                      <input
+                        type="checkbox"
+                        checked={whatsappUpdates}
+                        onChange={(event) => setWhatsappUpdates(event.target.checked)}
+                      />
+                      <span>
+                        Quero receber atualizações deste pedido pelo WhatsApp. O envio
+                        automático só ocorre se o fornecedor tiver a integração oficial ativa;
+                        você pode pedir para parar a qualquer momento.
+                      </span>
+                    </label>
+                  )}
                   <button
                     type="submit"
                     className="button button-primary button-block button-large"
-                    disabled={submitting || !catalog.accepting_orders}
+                    disabled={
+                      submitting || !catalog.accepting_orders || belowMinimum || belowMinItems
+                    }
                   >
                     {submitting ? 'Enviando pedido…' : 'Enviar pedido para análise'}
                   </button>

@@ -25,12 +25,35 @@ const SYNTHETIC_SQL = `
 insert into auth.users (id, email)
 values ('aaaaaaaa-1111-4111-8111-111111111111', 'restore@example.test');
 
+insert into auth.users (id, email, email_confirmed_at)
+values ('aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa', 'manager@restore.test', now());
+
 insert into public.organizations (id, owner_user_id, name, slug, whatsapp, city)
 values (
   'aaaaaaaa-2222-4222-8222-222222222222',
   'aaaaaaaa-1111-4111-8111-111111111111',
   'Distribuidora Restore', 'distribuidora-restore-abc123', '11999998888', 'São Paulo'
 );
+
+insert into public.organization_memberships (
+  id, organization_id, user_id, email, role, status, invited_by
+) values (
+  'aaaaaaaa-1111-4111-8111-bbbbbbbbbbbb',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa',
+  'manager@restore.test', 'manager', 'active',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.organization_invitations (
+  id, organization_id, email, role, token_hash, expires_at, invited_by
+) values (
+  'aaaaaaaa-1111-4111-8111-cccccccccccc',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'invite@restore.test', 'operator', repeat('d', 64), now() + interval '7 days',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
 
 insert into public.products (id, organization_id, name, unit, price_cents)
 values (
@@ -103,6 +126,189 @@ values ('aaaaaaaa-2222-4222-8222-222222222222', 'restore.seeded', 'database');
 
 insert into public.rate_limits (bucket, window_started_at, counter)
 values ('restore:bucket:0000000000000000000000000000000000000000000000000000000000000000', now(), 1);
+
+insert into public.product_categories (id, organization_id, name, slug, position)
+values (
+  'aaaaaaaa-cccc-4ccc-8ccc-cccccccccccc',
+  'aaaaaaaa-2222-4222-8222-222222222222', 'Bebidas', 'bebidas', 1
+);
+
+insert into public.product_images (
+  id, organization_id, product_id, storage_path, alt_text, is_cover
+) values (
+  'aaaaaaaa-dddd-4ddd-8ddd-dddddddddddd',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-3333-4333-8333-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222/aaaaaaaa-3333-4333-8333-333333333333/aaaaaaaa-dddd-4ddd-8ddd-dddddddddddd.jpg',
+  'Copo de água', true
+);
+
+insert into public.price_lists (id, organization_id, name)
+values (
+  'aaaaaaaa-eeee-4eee-8eee-eeeeeeeeeeee',
+  'aaaaaaaa-2222-4222-8222-222222222222', 'Tabela Restore'
+);
+
+insert into public.price_list_items (
+  id, organization_id, price_list_id, product_id, price_cents
+) values (
+  'aaaaaaaa-ffff-4fff-8fff-ffffffffffff',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-eeee-4eee-8eee-eeeeeeeeeeee',
+  'aaaaaaaa-3333-4333-8333-333333333333', 1000
+);
+
+insert into public.customer_price_list_assignments (
+  id, organization_id, customer_id, price_list_id
+) values (
+  'aaaaaaaa-1111-4111-8111-222222222222',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  'aaaaaaaa-eeee-4eee-8eee-eeeeeeeeeeee'
+);
+
+insert into public.customer_price_tokens (
+  id, organization_id, customer_id, token_hash, expires_at, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  repeat('b', 64), now() + interval '30 days',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.quotes (
+  id, organization_id, customer_id, public_reference, status, version,
+  valid_until, notes, price_source, total_cents, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  'OR-RESTORE1', 'sent', 2, now() + interval '7 days',
+  'Proposta de restore', 'public', 2500,
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.quote_items (
+  id, organization_id, quote_id, product_id, name_snapshot, unit_snapshot,
+  quantity, unit_price_cents, subtotal_cents, price_source
+) values (
+  'aaaaaaaa-1111-4111-8111-555555555555',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  'aaaaaaaa-3333-4333-8333-333333333333',
+  'Copo 200ml', 'cento', 2, 1250, 2500, 'public'
+);
+
+insert into public.quote_events (
+  id, organization_id, quote_id, actor_user_id, event, to_status, metadata
+) values (
+  'aaaaaaaa-1111-4111-8111-666666666666',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  'aaaaaaaa-1111-4111-8111-111111111111',
+  'sent', 'sent', '{"expires_at":"2026-12-01T00:00:00Z"}'::jsonb
+);
+
+insert into public.quote_links (
+  id, organization_id, quote_id, token_hash, expires_at, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-777777777777',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-444444444444',
+  repeat('c', 64), now() + interval '7 days',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.whatsapp_connections (
+  id, organization_id, waba_id, phone_number_id, token_ciphertext, status, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-888888888888',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'waba-restore', 'phone-restore', 'cipher-restore', 'pending_verification',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.whatsapp_templates (
+  id, organization_id, event, template_name, language, status
+) values (
+  'aaaaaaaa-1111-4111-8111-999999999999',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'confirmed', 'pedido_confirmado', 'pt_BR', 'approved'
+);
+
+insert into public.whatsapp_outbox (
+  id, organization_id, order_id, event, recipient_phone, template_id,
+  payload, status, idempotency_key, provider_message_id, provider_status
+) values (
+  'aaaaaaaa-2222-4222-8222-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-5555-4555-8555-555555555555',
+  'confirmed', '11977776666',
+  'aaaaaaaa-1111-4111-8111-999999999999',
+  '{"reference":"PD-RESTORE001","event":"confirmed"}'::jsonb,
+  'sent', 'restore:confirmed', 'wamid.restore', 'delivered'
+);
+
+insert into public.whatsapp_events (
+  id, organization_id, outbox_id, provider_status, payload
+) values (
+  'aaaaaaaa-3333-4333-8333-444444444444',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-2222-4222-8222-333333333333',
+  'delivered', '{"status":"delivered"}'::jsonb
+);
+
+insert into public.reorder_reminders (
+  id, organization_id, customer_id, cycle_key, message, status
+) values (
+  'aaaaaaaa-1111-4111-8111-dddddddddddd',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-4444-4444-8444-444444444444',
+  'restore-cycle-1', 'Lembrete de restore', 'suggested'
+);
+
+insert into public.analytics_events (
+  id, event, session_id, path, source, organization_id, consent_version, metadata
+) values (
+  'aaaaaaaa-1111-4111-8111-eeeeeeeeeeee',
+  'landing_view', 'restore-session-123456', '/', 'frontend',
+  'aaaaaaaa-2222-4222-8222-222222222222', '2026-11-14', '{"plan_code":"essential"}'::jsonb
+);
+
+insert into public.analytics_consents (
+  session_id, analytics, marketing, consent_version
+) values ('restore-session-123456', true, false, '2026-11-14');
+
+insert into public.api_keys (
+  id, organization_id, name, key_prefix, key_hash, scopes, status, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-ffffffffffff',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'Restore API', 'po_live_rest', repeat('e', 64),
+  array['catalog:read'], 'active',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.api_webhooks (
+  id, organization_id, url, secret_ciphertext, events, status, created_by
+) values (
+  'aaaaaaaa-1111-4111-8111-121212121212',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'https://example.test/hook', 'cipher-webhook',
+  array['order.confirmed'], 'active',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.api_webhook_deliveries (
+  id, organization_id, webhook_id, event, payload, status, idempotency_key
+) values (
+  'aaaaaaaa-1111-4111-8111-131313131313',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'aaaaaaaa-1111-4111-8111-121212121212',
+  'order.confirmed', '{"event":"order.confirmed"}'::jsonb,
+  'pending', 'restore:confirmed'
+);
 
 insert into public.platform_admins (singleton, user_id)
 values (true, 'aaaaaaaa-1111-4111-8111-111111111111');
@@ -219,12 +425,50 @@ select
   (select count(*) from public.platform_audit_events) as platform_audit_events,
   (select count(*) from public.plan_changes) as plan_changes,
   (select count(*) from public.quota_usage) as quota_usage,
-  (select md5(string_agg(id::text || ':' || public_reference || ':' || status, ',' order by id)) from public.orders) as orders_hash,
+  (select count(*) from public.product_categories) as product_categories,
+  (select count(*) from public.product_images) as product_images,
+  (select count(*) from public.price_lists) as price_lists,
+  (select count(*) from public.price_list_items) as price_list_items,
+  (select count(*) from public.customer_price_list_assignments) as price_assignments,
+  (select count(*) from public.customer_price_tokens) as price_tokens,
+  (select count(*) from public.quotes) as quotes,
+  (select count(*) from public.quote_items) as quote_items,
+  (select count(*) from public.quote_events) as quote_events,
+  (select count(*) from public.quote_links) as quote_links,
+  (select count(*) from public.whatsapp_connections) as whatsapp_connections,
+  (select count(*) from public.whatsapp_templates) as whatsapp_templates,
+  (select count(*) from public.whatsapp_outbox) as whatsapp_outbox,
+  (select count(*) from public.whatsapp_events) as whatsapp_events,
+  (select count(*) from public.organization_memberships) as team_members,
+  (select count(*) from public.organization_invitations) as team_invitations,
+  (select count(*) from public.reorder_reminders) as reorder_reminders,
+  (select count(*) from public.analytics_events) as analytics_events,
+  (select count(*) from public.analytics_consents) as analytics_consents,
+  (select count(*) from public.api_keys) as api_keys,
+  (select count(*) from public.api_webhooks) as api_webhooks,
+  (select count(*) from public.api_webhook_deliveries) as api_webhook_deliveries,
+  (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
   (select md5(string_agg(plan_code || ':' || plan_version || ':' || state, ',' order by organization_id)) from public.subscriptions) as subscriptions_hash,
   (select md5(string_agg(user_id::text || ':' || status || ':' || risk_score, ',' order by user_id)) from public.trial_grants) as trials_hash,
-  (select md5(string_agg(actor_user_id::text || ':' || action, ',' order by id)) from public.platform_audit_events) as platform_audit_hash
+  (select md5(string_agg(actor_user_id::text || ':' || action, ',' order by id)) from public.platform_audit_events) as platform_audit_hash,
+  (select md5(string_agg(id::text || ':' || name || ':' || slug, ',' order by id)) from public.product_categories) as categories_hash,
+  (select md5(string_agg(id::text || ':' || alt_text || ':' || is_cover, ',' order by id)) from public.product_images) as images_hash,
+  (select md5(string_agg(id::text || ':' || name || ':' || active, ',' order by id)) from public.price_lists) as price_lists_hash,
+  (select md5(string_agg(id::text || ':' || product_id::text || ':' || price_cents, ',' order by id)) from public.price_list_items) as price_items_hash,
+  (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || total_cents, ',' order by id)) from public.quotes) as quotes_hash,
+  (select md5(string_agg(id::text || ':' || name_snapshot || ':' || subtotal_cents, ',' order by id)) from public.quote_items) as quote_items_hash,
+  (select md5(string_agg(id::text || ':' || status || ':' || waba_id, ',' order by id)) from public.whatsapp_connections) as whatsapp_connections_hash,
+  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.whatsapp_outbox) as whatsapp_outbox_hash,
+  (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_memberships) as team_members_hash,
+  (select md5(string_agg(id::text || ':' || email || ':' || role, ',' order by id)) from public.organization_invitations) as team_invitations_hash,
+  (select md5(string_agg(id::text || ':' || cycle_key || ':' || status, ',' order by id)) from public.reorder_reminders) as reorder_reminders_hash,
+  (select md5(string_agg(id::text || ':' || event || ':' || path, ',' order by id)) from public.analytics_events) as analytics_events_hash,
+  (select md5(string_agg(session_id || ':' || analytics || ':' || marketing, ',' order by session_id)) from public.analytics_consents) as analytics_consents_hash,
+  (select md5(string_agg(id::text || ':' || name || ':' || status, ',' order by id)) from public.api_keys) as api_keys_hash,
+  (select md5(string_agg(id::text || ':' || url || ':' || status, ',' order by id)) from public.api_webhooks) as api_webhooks_hash,
+  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.api_webhook_deliveries) as api_deliveries_hash
 `
 
 async function main() {
@@ -319,12 +563,50 @@ async function main() {
       'platform_audit_events',
       'plan_changes',
       'quota_usage',
+      'product_categories',
+      'product_images',
+      'price_lists',
+      'price_list_items',
+      'price_assignments',
+      'price_tokens',
+      'quotes',
+      'quote_items',
+      'quote_events',
+      'quote_links',
+      'whatsapp_connections',
+      'whatsapp_templates',
+      'whatsapp_outbox',
+      'whatsapp_events',
+      'team_members',
+      'team_invitations',
+      'reorder_reminders',
+      'analytics_events',
+      'analytics_consents',
+      'api_keys',
+      'api_webhooks',
+      'api_webhook_deliveries',
       'orders_hash',
+      'price_lists_hash',
+      'price_items_hash',
+      'quotes_hash',
+      'quote_items_hash',
+      'whatsapp_connections_hash',
+      'whatsapp_outbox_hash',
+      'team_members_hash',
+      'team_invitations_hash',
+      'reorder_reminders_hash',
+      'analytics_events_hash',
+      'analytics_consents_hash',
+      'api_keys_hash',
+      'api_webhooks_hash',
+      'api_deliveries_hash',
       'items_hash',
       'plans_hash',
       'subscriptions_hash',
       'trials_hash',
       'platform_audit_hash',
+      'categories_hash',
+      'images_hash',
     ]
     const values = source.split('|')
     columns.forEach((name, index) => console.log(`  ${name}=${values[index]}`))

@@ -1,0 +1,129 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PedeOutra API B2B",
+    "version": "1.0.0",
+    "description": "API de leitura do catálogo, clientes e pedidos do fornecedor. Exige plano Profissional, chave por organização, escopos e quota mensal. Não processa pagamentos de pedidos."
+  },
+  "servers": [
+    {
+      "url": "https://waygtbclkxklexnabwvj.supabase.co/functions/v1/api-v1"
+    }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "PedeOutra API key"
+      }
+    },
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "sku": { "type": ["string", "null"] },
+          "unit": { "type": "string" },
+          "price_cents": { "type": ["integer", "null"] },
+          "min_quantity": { "type": "integer" },
+          "quantity_increment": { "type": "integer" },
+          "category_id": { "type": ["string", "null"] },
+          "active": { "type": "boolean" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "display_name": { "type": "string" },
+          "contact_phone": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "public_reference": { "type": "string" },
+          "status": { "type": "string", "enum": ["new", "confirmed", "completed", "canceled"] },
+          "total_cents": { "type": ["integer", "null"] },
+          "customer_id": { "type": ["string", "null"] },
+          "source": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "integer" },
+          "offset": { "type": "integer" },
+          "returned": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/v1/me": {
+      "get": {
+        "summary": "Organização, plano, escopos e prefixo da chave",
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Chave inválida" } }
+      }
+    },
+    "/v1/products": {
+      "get": {
+        "summary": "Produtos ativos",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/customers": {
+      "get": {
+        "summary": "Clientes do fornecedor",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
+        ],
+        "responses": { "200": { "description": "OK" }, "403": { "description": "Escopo insuficiente" } }
+      }
+    },
+    "/v1/orders": {
+      "get": {
+        "summary": "Pedidos do fornecedor",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["new", "confirmed", "completed", "canceled"] }
+          }
+        ],
+        "responses": { "200": { "description": "OK" }, "403": { "description": "Escopo insuficiente" } }
+      }
+    }
+  }
+}

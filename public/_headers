@@ -3,5 +3,25 @@
   X-Frame-Options: DENY
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
   Cache-Control: public, max-age=0, must-revalidate
+
+/acompanhar/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
+/p/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
+/o/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
+/convite/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store

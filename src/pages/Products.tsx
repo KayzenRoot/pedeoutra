@@ -1,23 +1,34 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useAuth } from '../context/auth-context'
+import { CatalogTemplatePicker } from '../components/CatalogTemplatePicker'
+import { ProductImportPanel } from '../components/ProductImportPanel'
+import { ProductMediaManager } from '../components/ProductMediaManager'
 import { supabase } from '../lib/supabase'
-import type { Product } from '../lib/types'
+import type { Product, ProductCategory } from '../lib/types'
 import { centsToInput, formatBRL, parsePriceToCents } from '../lib/format'
 import { EmptyState, FormMessage, PageHeader } from '../components/ui'
 
 interface ProductForm {
   id: string | null
   name: string
+  sku: string
   unit: string
   price: string
+  minQuantity: string
+  quantityIncrement: string
+  categoryId: string
   active: boolean
 }
 
 const EMPTY_FORM: ProductForm = {
   id: null,
   name: '',
+  sku: '',
   unit: '',
   price: '',
+  minQuantity: '1',
+  quantityIncrement: '1',
+  categoryId: '',
   active: true,
 }
 
@@ -28,6 +39,8 @@ function databaseMessage(message: string): string {
   if (message.includes('products_name_len')) return 'O nome deve ter entre 1 e 120 caracteres.'
   if (message.includes('products_unit_len')) return 'A unidade deve ter entre 1 e 20 caracteres.'
   if (message.includes('products_price_range')) return 'O preço máximo é R$ 10.000,00.'
+  if (message.includes('products_org_sku_unique')) return 'Este SKU já está em uso nesta organização.'
+  if (message.includes('products_sku_format')) return 'SKU inválido. Use letras, números, ponto, hífen ou sublinhado.'
   return 'Não foi possível salvar. Revise os dados e tente novamente.'
 }
 
@@ -41,6 +54,9 @@ export function Products() {
   const [formError, setFormError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [categories, setCategories] = useState<ProductCategory[]>([])
+  const [categoryName, setCategoryName] = useState('')
+  const [categoryBusy, setCategoryBusy] = useState(false)
 
   const organizationId = organization?.id
 
@@ -62,8 +78,20 @@ export function Products() {
     setLoading(false)
   }
 
+  async function loadCategories() {
+    if (!supabase || !organizationId) return
+    const { data, error } = await supabase
+      .from('product_categories')
+      .select('*')
+      .eq('organization_id', organizationId)
+      .order('position', { ascending: true })
+      .order('name', { ascending: true })
+    if (!error) setCategories(data ?? [])
+  }
+
   useEffect(() => {
     void loadProducts()
+    void loadCategories()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId])
 
@@ -83,8 +111,12 @@ export function Products() {
     setForm({
       id: product.id,
       name: product.name,
+      sku: product.sku ?? '',
       unit: product.unit,
       price: centsToInput(product.price_cents),
+      minQuantity: String(product.min_quantity),
+      quantityIncrement: String(product.quantity_increment),
+      categoryId: product.category_id ?? '',
       active: product.active,
     })
     setFormError(null)
@@ -110,6 +142,21 @@ export function Products() {
       return
     }
 
+    const minQuantity = Number(form.minQuantity)
+    const quantityIncrement = Number(form.quantityIncrement)
+    if (
+      !Number.isInteger(minQuantity) ||
+      !Number.isInteger(quantityIncrement) ||
+      minQuantity < 1 ||
+      minQuantity > 999 ||
+      quantityIncrement < 1 ||
+      quantityIncrement > 999 ||
+      minQuantity % quantityIncrement !== 0
+    ) {
+      setFormError('Quantidade mínima e múltiplo devem ser inteiros; o mínimo precisa ser múltiplo do incremento.')
+      return
+    }
+
     let priceCents: number | null = null
     if (form.price.trim()) {
       priceCents = parsePriceToCents(form.price)
@@ -126,8 +173,12 @@ export function Products() {
     setSaving(true)
     const payload = {
       name,
+      sku: form.sku.trim().toUpperCase() || null,
       unit,
       price_cents: priceCents,
+      min_quantity: minQuantity,
+      quantity_increment: quantityIncrement,
+      category_id: form.categoryId || null,
       active: form.active,
     }
 
@@ -170,13 +221,102 @@ export function Products() {
     }
   }
 
+  async function addCategory(event: FormEvent) {
+    event.preventDefault()
+    if (!supabase || !organizationId) return
+    const name = categoryName.trim()
+    if (name.length < 1) return
+    setCategoryBusy(true)
+    setFormError(null)
+    const { error } = await supabase.from('product_categories').insert({
+      organization_id: organizationId,
+      name,
+    })
+    if (error) {
+      setFormError(databaseMessage(error.message))
+    } else {
+      setCategoryName('')
+      setSuccess('Categoria criada.')
+      await loadCategories()
+    }
+    setCategoryBusy(false)
+  }
+
+  async function toggleCategory(category: ProductCategory) {
+    if (!supabase || !organizationId) return
+    const { error } = await supabase
+      .from('product_categories')
+      .update({ active: !category.active })
+      .eq('id', category.id)
+      .eq('organization_id', organizationId)
+    if (error) setFormError(databaseMessage(error.message))
+    else await loadCategories()
+  }
+
+  async function deleteCategory(category: ProductCategory) {
+    if (!supabase || !organizationId) return
+    if (!window.confirm(`Excluir a categoria ${category.name}? Os produtos ficam sem categoria.`)) {
+      return
+    }
+    const { error } = await supabase
+      .from('product_categories')
+      .delete()
+      .eq('id', category.id)
+      .eq('organization_id', organizationId)
+    if (error) {
+      setFormError(databaseMessage(error.message))
+    } else {
+      setSuccess('Categoria removida.')
+      await loadCategories()
+      await loadProducts()
+    }
+  }
+
+  function exportSkuList() {
+    const rows = [
+      ['sku', 'produto', 'unidade', 'preco_centavos'],
+      ...products.map((product) => [
+        product.sku ?? '',
+        product.name,
+        product.unit,
+        product.price_cents === null ? '' : String(product.price_cents),
+      ]),
+    ]
+    const csv = rows
+      .map((row) =>
+        row
+          .map((cell) => {
+            const value = String(cell)
+            const safe = /^[=+\-@]/.test(value) ? `'${value}` : value
+            return `"${safe.replaceAll('"', '""')}"`
+          })
+          .join(','),
+      )
+      .join('\r\n')
+
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = 'produtos-sku.csv'
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div>
       <PageHeader
         eyebrow="Catálogo"
         title="Produtos"
-        description="Nome, unidade e preço opcional. Produtos pausados não aparecem no catálogo, mas preservam o histórico."
-        action={<span className="muted">{activeCount} ativos de {products.length}</span>}
+        description="Nome, SKU, unidade e preço opcional. Produtos pausados não aparecem no catálogo, mas preservam o histórico."
+        action={
+          <div className="header-actions">
+            <span className="muted">{activeCount} ativos de {products.length}</span>
+            <button type="button" className="button button-secondary" onClick={exportSkuList}>
+              Baixar SKUs
+            </button>
+          </div>
+        }
       />
 
       {loadError && <FormMessage>{loadError}</FormMessage>}
@@ -215,6 +355,7 @@ export function Products() {
                 <thead>
                   <tr>
                     <th>Produto</th>
+                    <th>SKU</th>
                     <th>Unidade</th>
                     <th>Preço</th>
                     <th>Status</th>
@@ -226,7 +367,11 @@ export function Products() {
                     <tr key={product.id} className={product.active ? '' : 'row-muted'}>
                       <td data-label="Produto">
                         <strong>{product.name}</strong>
+                        <small>
+                          mín. {product.min_quantity} · múlt. {product.quantity_increment}
+                        </small>
                       </td>
+                      <td data-label="SKU">{product.sku ?? '—'}</td>
                       <td data-label="Unidade">{product.unit}</td>
                       <td data-label="Preço">{formatBRL(product.price_cents)}</td>
                       <td data-label="Status">
@@ -276,6 +421,15 @@ export function Products() {
                 placeholder="Copo descartável 200ml"
               />
             </label>
+            <label className="field">
+              <span>SKU (opcional)</span>
+              <input
+                maxLength={32}
+                value={form.sku}
+                onChange={(event) => setForm({ ...form, sku: event.target.value })}
+                placeholder="COPO-200"
+              />
+            </label>
             <div className="form-row">
               <label className="field">
                 <span>Unidade</span>
@@ -297,6 +451,41 @@ export function Products() {
                 />
               </label>
             </div>
+            <div className="form-row">
+              <label className="field">
+                <span>Quantidade mínima</span>
+                <input
+                  inputMode="numeric"
+                  value={form.minQuantity}
+                  onChange={(event) => setForm({ ...form, minQuantity: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span>Múltiplo de embalagem</span>
+                <input
+                  inputMode="numeric"
+                  value={form.quantityIncrement}
+                  onChange={(event) =>
+                    setForm({ ...form, quantityIncrement: event.target.value })
+                  }
+                />
+              </label>
+            </div>
+            <label className="field">
+              <span>Categoria (opcional)</span>
+              <select
+                value={form.categoryId}
+                onChange={(event) => setForm({ ...form, categoryId: event.target.value })}
+              >
+                <option value="">Sem categoria</option>
+                {categories.map((category) => (
+                  <option value={category.id} key={category.id}>
+                    {category.name}
+                    {category.active ? '' : ' (pausada)'}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="checkbox-field">
               <input
                 type="checkbox"
@@ -315,6 +504,77 @@ export function Products() {
           </form>
         </section>
       </div>
+
+      <section className="card media-card">
+        <div className="card-heading">
+          <div>
+            <span className="eyebrow">Organização do catálogo</span>
+            <h2>Categorias</h2>
+          </div>
+          <span className="muted">{categories.filter((category) => category.active).length} ativas</span>
+        </div>
+        <form className="inline-form" onSubmit={(event) => void addCategory(event)}>
+          <input
+            className="search-input"
+            placeholder="Nova categoria"
+            aria-label="Nome da nova categoria"
+            maxLength={80}
+            value={categoryName}
+            onChange={(event) => setCategoryName(event.target.value)}
+          />
+          <button type="submit" className="button button-primary" disabled={categoryBusy}>
+            {categoryBusy ? 'Criando…' : 'Adicionar categoria'}
+          </button>
+        </form>
+        <ul className="category-manager-list">
+          {categories.map((category) => (
+            <li key={category.id}>
+              <span>
+                <strong>{category.name}</strong>
+                {!category.active && <small> · pausada</small>}
+              </span>
+              <div className="table-actions">
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => void toggleCategory(category)}
+                >
+                  {category.active ? 'Pausar' : 'Ativar'}
+                </button>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => void deleteCategory(category)}
+                >
+                  Excluir
+                </button>
+              </div>
+            </li>
+          ))}
+          {categories.length === 0 && <li className="muted">Nenhuma categoria criada.</li>}
+        </ul>
+        <p className="form-note">
+          Categorias pausadas somem do catálogo público; os produtos continuam preservados e
+          podem ser reclassificados depois.
+        </p>
+      </section>
+
+      <ProductMediaManager products={products} />
+
+      <ProductImportPanel
+        onImported={async () => {
+          await loadProducts()
+          await loadCategories()
+        }}
+      />
+
+      <CatalogTemplatePicker
+        mode="store"
+        onSeeded={async () => {
+          await loadProducts()
+          await loadCategories()
+        }}
+      />
     </div>
   )
 }

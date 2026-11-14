@@ -6,21 +6,33 @@ import { Brand } from './Brand'
 import { ThemeToggle } from './ThemeToggle'
 import { CopyButton, Icon } from './ui'
 
+const ALL_ROLES = ['owner', 'manager', 'operator', 'viewer']
 const NAV_ITEMS = [
-  { to: '/app', label: 'Painel', icon: 'home' as const, end: true },
-  { to: '/app/pedidos', label: 'Pedidos', icon: 'orders' as const },
-  { to: '/app/produtos', label: 'Produtos', icon: 'products' as const },
-  { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const },
-  { to: '/app/assinatura', label: 'Assinatura', icon: 'billing' as const },
-  { to: '/app/configuracoes', label: 'Configurações', icon: 'settings' as const },
+  { to: '/app', label: 'Painel', icon: 'home' as const, end: true, roles: ALL_ROLES },
+  { to: '/app/pedidos', label: 'Pedidos', icon: 'orders' as const, roles: ALL_ROLES },
+  { to: '/app/produtos', label: 'Produtos', icon: 'products' as const, roles: ALL_ROLES },
+  { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const, roles: ALL_ROLES },
+  { to: '/app/radar', label: 'Radar', icon: 'radar' as const, roles: ALL_ROLES },
+  { to: '/app/precos', label: 'Preços', icon: 'prices' as const, roles: ['owner', 'manager'] },
+  { to: '/app/orcamentos', label: 'Orçamentos', icon: 'quotes' as const, roles: ['owner', 'manager'] },
+  { to: '/app/equipe', label: 'Equipe', icon: 'team' as const, roles: ['owner'] },
+  { to: '/app/assinatura', label: 'Assinatura', icon: 'billing' as const, roles: ['owner'] },
+  { to: '/app/configuracoes', label: 'Configurações', icon: 'settings' as const, roles: ['owner'] },
 ]
 
+const MOBILE_NAV_ITEMS = NAV_ITEMS.filter(
+  (item) => item.to !== '/app/orcamentos' && item.to !== '/app/equipe',
+)
+
 export function AppShell() {
-  const { organization, subscription, user, signOut } = useAuth()
+  const { organization, subscription, user, membershipRole, signOut } = useAuth()
 
   if (!organization) return null
 
   const access = organizationAccess(organization, subscription)
+  const role = membershipRole ?? 'owner'
+  const navItems = NAV_ITEMS.filter((item) => item.roles.includes(role))
+  const mobileNavItems = MOBILE_NAV_ITEMS.filter((item) => item.roles.includes(role))
   const publicUrl = catalogUrl(organization.slug)
 
   return (
@@ -28,7 +40,7 @@ export function AppShell() {
       <header className="app-header">
         <Brand to="/app" />
         <nav className="app-nav" aria-label="Navegação principal">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -76,7 +88,7 @@ export function AppShell() {
       </main>
 
       <nav className="mobile-nav" aria-label="Navegação mobile">
-        {NAV_ITEMS.map((item) => (
+        {mobileNavItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

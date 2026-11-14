@@ -1,6 +1,8 @@
 import { adminClient } from '../_shared/supabase.ts'
 import { findPublicOrganization } from '../_shared/org.ts'
 import { enforceRateLimit } from '../_shared/rate-limit.ts'
+import { loadCatalog, mapProducts, signImagePaths } from '../_shared/catalog.ts'
+import { isValidSlug } from '../_shared/validation.ts'
 import {
   HttpError,
   jsonResponse,
@@ -9,7 +11,6 @@ import {
   withHttpErrors,
 } from '../_shared/http.ts'
 
-const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
 export const handler = (req: Request) =>
   withHttpErrors(req, 'public-catalog', async () => {
@@ -17,7 +18,7 @@ export const handler = (req: Request) =>
 
     const url = new URL(req.url)
     const slug = (url.searchParams.get('slug') ?? '').trim()
-    if (!SLUG_PATTERN.test(slug)) {
+    if (!isValidSlug(slug)) {
       throw new HttpError(400, 'invalid_slug', 'Catálogo inválido.')
     }
 
@@ -29,14 +30,8 @@ export const handler = (req: Request) =>
       throw new HttpError(404, 'catalog_not_found', 'Catálogo não encontrado.')
     }
 
-    const { data: products, error } = await supabase
-      .from('products')
-      .select('id, name, unit, price_cents')
-      .eq('organization_id', organization.id)
-      .eq('active', true)
-      .order('name', { ascending: true })
-
-    if (error) throw new HttpError(500, 'catalog_lookup_failed')
+    const { categories, products } = await loadCatalog(supabase, organization.id)
+    const signed = await signImagePaths(supabase, products)
 
     return jsonResponse(req, {
       organization: {
@@ -44,8 +39,11 @@ export const handler = (req: Request) =>
         slug: organization.slug,
         city: organization.city,
         whatsapp: organization.whatsapp,
+        min_order_cents: organization.min_order_cents,
+        min_order_items: organization.min_order_items,
       },
-      products: products ?? [],
+      categories,
+      products: mapProducts(products, signed),
       accepting_orders: organization.accepting_orders,
     })
   })

@@ -191,6 +191,13 @@ async function assertTheme(page, expected) {
   console.log(`  PASS tema ${expected} (${actual.preference})`)
 }
 
+async function dismissConsent(page) {
+  const button = page.getByRole('button', { name: 'Apenas necessários' })
+  if (await button.count()) {
+    await button.click({ timeout: 5000 }).catch(() => undefined)
+  }
+}
+
 async function browserSmoke(browserPath) {
   let chromium
   try {
@@ -227,6 +234,7 @@ async function browserSmoke(browserPath) {
       fullPage: true,
     })
     console.log('  PASS / (landing desktop renderizada)')
+    await dismissConsent(page)
 
     await page.goto(`${BASE}/demo`, { waitUntil: 'networkidle' })
     await page.getByRole('heading', { name: 'Bella Limpeza' }).waitFor()
@@ -246,6 +254,10 @@ async function browserSmoke(browserPath) {
     await page.goto(`${BASE}/termos`, { waitUntil: 'networkidle' })
     await page.getByRole('heading', { name: 'Termos de uso' }).waitFor()
     console.log('  PASS /privacidade e /termos')
+
+    await page.goto(`${BASE}/setores/embalagens`, { waitUntil: 'networkidle' })
+    await page.getByRole('heading', { name: /distribuidores de embalagens/i }).waitFor()
+    console.log('  PASS /setores/embalagens')
 
     await page.goto(`${BASE}/rota-inexistente`, { waitUntil: 'networkidle' })
     await page.getByRole('heading', { name: 'Página não encontrada' }).waitFor()
@@ -274,6 +286,7 @@ async function browserSmoke(browserPath) {
       path: join(SCREENSHOTS_DIR, 'landing-dark-desktop.png'),
       fullPage: true,
     })
+    await dismissConsent(darkPage)
 
     await darkPage.goto(`${BASE}/demo`, { waitUntil: 'networkidle' })
     await darkPage.getByRole('heading', { name: 'Bella Limpeza' }).waitFor()
@@ -323,6 +336,7 @@ async function browserSmoke(browserPath) {
       path: join(SCREENSHOTS_DIR, 'landing-mobile.png'),
       fullPage: true,
     })
+    await dismissConsent(mobilePage)
 
     await mobilePage.goto(`${BASE}/demo`, { waitUntil: 'networkidle' })
     await mobilePage.getByRole('heading', { name: 'Bella Limpeza' }).waitFor()
@@ -354,6 +368,7 @@ async function browserSmoke(browserPath) {
       path: join(SCREENSHOTS_DIR, 'landing-dark-mobile.png'),
       fullPage: true,
     })
+    await dismissConsent(darkMobilePage)
     await darkMobile.close()
 
     await mobile.close()

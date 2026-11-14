@@ -93,6 +93,9 @@ export type Database = {
           display_name: string
           id: string
           organization_id: string
+          reorder_snoozed_until: string | null
+          reorder_opt_in: boolean
+          reorder_opt_out_at: string | null
           updated_at: string
         }
         Insert: {
@@ -101,6 +104,9 @@ export type Database = {
           display_name: string
           id?: string
           organization_id: string
+          reorder_snoozed_until?: string | null
+          reorder_opt_in?: boolean
+          reorder_opt_out_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -109,6 +115,9 @@ export type Database = {
           display_name?: string
           id?: string
           organization_id?: string
+          reorder_snoozed_until?: string | null
+          reorder_opt_in?: boolean
+          reorder_opt_out_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -222,12 +231,18 @@ export type Database = {
           id: string
           note: string | null
           organization_id: string
+          price_list_id: string | null
+          price_source: string
           public_reference: string
+          quote_id: string | null
           request_id: string | null
           source: string
           status: string
           total_cents: number | null
           updated_at: string
+          whatsapp_opt_in: boolean
+          whatsapp_opt_in_at: string | null
+          whatsapp_opt_out_at: string | null
         }
         Insert: {
           buyer_name?: string | null
@@ -237,12 +252,18 @@ export type Database = {
           id?: string
           note?: string | null
           organization_id: string
+          price_list_id?: string | null
+          price_source?: string
           public_reference: string
+          quote_id?: string | null
           request_id?: string | null
           source?: string
           status?: string
           total_cents?: number | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
+          whatsapp_opt_in_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Update: {
           buyer_name?: string | null
@@ -252,12 +273,18 @@ export type Database = {
           id?: string
           note?: string | null
           organization_id?: string
+          price_list_id?: string | null
+          price_source?: string
           public_reference?: string
+          quote_id?: string | null
           request_id?: string | null
           source?: string
           status?: string
           total_cents?: number | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
+          whatsapp_opt_in_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Relationships: [
           {
@@ -276,12 +303,604 @@ export type Database = {
           },
         ]
       }
+      customer_price_list_assignments: {
+        Row: {
+          assigned_at: string
+          customer_id: string
+          id: string
+          organization_id: string
+          price_list_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          customer_id: string
+          id?: string
+          organization_id: string
+          price_list_id: string
+        }
+        Update: {
+          assigned_at?: string
+          customer_id?: string
+          id?: string
+          organization_id?: string
+          price_list_id?: string
+        }
+        Relationships: []
+      }
+      customer_price_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          expires_at: string
+          id: string
+          organization_id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          expires_at: string
+          id?: string
+          organization_id: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      price_list_items: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          price_cents: number
+          price_list_id: string
+          product_id: string
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          price_cents: number
+          price_list_id: string
+          product_id: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          price_cents?: number
+          price_list_id?: string
+          product_id?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
+      price_lists: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quote_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event: string
+          from_status: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          quote_id: string
+          to_status: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event: string
+          from_status?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          quote_id: string
+          to_status?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event?: string
+          from_status?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          quote_id?: string
+          to_status?: string | null
+        }
+        Relationships: []
+      }
+      quote_items: {
+        Row: {
+          created_at: string
+          id: string
+          name_snapshot: string
+          organization_id: string
+          price_list_id: string | null
+          price_source: string
+          product_id: string | null
+          quantity: number
+          quote_id: string
+          subtotal_cents: number
+          unit_price_cents: number
+          unit_snapshot: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name_snapshot: string
+          organization_id: string
+          price_list_id?: string | null
+          price_source?: string
+          product_id?: string | null
+          quantity: number
+          quote_id: string
+          subtotal_cents: number
+          unit_price_cents: number
+          unit_snapshot: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name_snapshot?: string
+          organization_id?: string
+          price_list_id?: string | null
+          price_source?: string
+          product_id?: string | null
+          quantity?: number
+          quote_id?: string
+          subtotal_cents?: number
+          unit_price_cents?: number
+          unit_snapshot?: string
+        }
+        Relationships: []
+      }
+      quote_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          organization_id: string
+          quote_id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at: string
+          id?: string
+          organization_id: string
+          quote_id: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          quote_id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          accepted_at: string | null
+          canceled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          declined_at: string | null
+          id: string
+          notes: string | null
+          order_id: string | null
+          organization_id: string
+          price_list_id: string | null
+          price_source: string
+          public_reference: string
+          sent_at: string | null
+          status: string
+          total_cents: number
+          updated_at: string
+          valid_until: string
+          version: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          declined_at?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          organization_id: string
+          price_list_id?: string | null
+          price_source?: string
+          public_reference: string
+          sent_at?: string | null
+          status?: string
+          total_cents: number
+          updated_at?: string
+          valid_until: string
+          version?: number
+        }
+        Update: {
+          accepted_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          declined_at?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          organization_id?: string
+          price_list_id?: string | null
+          price_source?: string
+          public_reference?: string
+          sent_at?: string | null
+          status?: string
+          total_cents?: number
+          updated_at?: string
+          valid_until?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      whatsapp_connections: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          last_error: string | null
+          organization_id: string
+          phone_number_id: string
+          status: string
+          token_ciphertext: string | null
+          updated_at: string
+          waba_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          organization_id: string
+          phone_number_id: string
+          status?: string
+          token_ciphertext?: string | null
+          updated_at?: string
+          waba_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          organization_id?: string
+          phone_number_id?: string
+          status?: string
+          token_ciphertext?: string | null
+          updated_at?: string
+          waba_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_events: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          outbox_id: string
+          payload: Json
+          provider_status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          outbox_id: string
+          payload?: Json
+          provider_status: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          outbox_id?: string
+          payload?: Json
+          provider_status?: string
+        }
+        Relationships: []
+      }
+      whatsapp_outbox: {
+        Row: {
+          attempts: number
+          blocked_reason: string | null
+          created_at: string
+          event: string
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          next_attempt_at: string | null
+          organization_id: string
+          order_id: string
+          payload: Json
+          provider_message_id: string | null
+          provider_status: string | null
+          recipient_phone: string
+          status: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          blocked_reason?: string | null
+          created_at?: string
+          event: string
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          next_attempt_at?: string | null
+          organization_id: string
+          order_id: string
+          payload?: Json
+          provider_message_id?: string | null
+          provider_status?: string | null
+          recipient_phone: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          blocked_reason?: string | null
+          created_at?: string
+          event?: string
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          next_attempt_at?: string | null
+          organization_id?: string
+          order_id?: string
+          payload?: Json
+          provider_message_id?: string | null
+          provider_status?: string | null
+          recipient_phone?: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          language: string
+          organization_id: string
+          status: string
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          language?: string
+          organization_id: string
+          status?: string
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          language?: string
+          organization_id?: string
+          status?: string
+          template_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      organization_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          revoked_at: string | null
+          role: string
+          token_hash: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          revoked_at?: string | null
+          role: string
+          token_hash: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          revoked_at?: string | null
+          role?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      organization_memberships: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          revoked_at: string | null
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          revoked_at?: string | null
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reorder_reminders: {
+        Row: {
+          channel: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          cycle_key: string
+          id: string
+          message: string
+          metadata: Json
+          opened_at: string | null
+          organization_id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          cycle_key: string
+          id?: string
+          message: string
+          metadata?: Json
+          opened_at?: string | null
+          organization_id: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          cycle_key?: string
+          id?: string
+          message?: string
+          metadata?: Json
+          opened_at?: string | null
+          organization_id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           access_state: string
           city: string | null
           created_at: string
           id: string
+          min_order_cents: number | null
+          min_order_items: number | null
+          reorder_min_history: number
+          reorder_tolerance_days: number
+          reorder_reminder_enabled: boolean
+          reorder_reminder_channel: string
+          reorder_reminder_frequency_days: number
           name: string
           owner_user_id: string
           slug: string
@@ -294,6 +913,13 @@ export type Database = {
           city?: string | null
           created_at?: string
           id?: string
+          min_order_cents?: number | null
+          min_order_items?: number | null
+          reorder_min_history?: number
+          reorder_tolerance_days?: number
+          reorder_reminder_enabled?: boolean
+          reorder_reminder_channel?: string
+          reorder_reminder_frequency_days?: number
           name: string
           owner_user_id: string
           slug: string
@@ -306,6 +932,13 @@ export type Database = {
           city?: string | null
           created_at?: string
           id?: string
+          min_order_cents?: number | null
+          min_order_items?: number | null
+          reorder_min_history?: number
+          reorder_tolerance_days?: number
+          reorder_reminder_enabled?: boolean
+          reorder_reminder_channel?: string
+          reorder_reminder_frequency_days?: number
           name?: string
           owner_user_id?: string
           slug?: string
@@ -315,15 +948,15 @@ export type Database = {
         }
         Relationships: []
       }
-      products: {
+      product_categories: {
         Row: {
           active: boolean
           created_at: string
           id: string
           name: string
           organization_id: string
-          price_cents: number | null
-          unit: string
+          position: number
+          slug: string
           updated_at: string
         }
         Insert: {
@@ -332,8 +965,8 @@ export type Database = {
           id?: string
           name: string
           organization_id: string
-          price_cents?: number | null
-          unit: string
+          position?: number
+          slug?: string
           updated_at?: string
         }
         Update: {
@@ -342,7 +975,94 @@ export type Database = {
           id?: string
           name?: string
           organization_id?: string
+          position?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_images: {
+        Row: {
+          alt_text: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_cover: boolean
+          organization_id: string
+          position: number
+          product_id: string
+          storage_path: string
+          thumb_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          alt_text: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_cover?: boolean
+          organization_id: string
+          position?: number
+          product_id: string
+          storage_path: string
+          thumb_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_cover?: boolean
+          organization_id?: string
+          position?: number
+          product_id?: string
+          storage_path?: string
+          thumb_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          active: boolean
+          category_id: string | null
+          created_at: string
+          id: string
+          name: string
+          organization_id: string
+          price_cents: number | null
+          sku: string | null
+          min_quantity: number
+          quantity_increment: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          organization_id: string
           price_cents?: number | null
+          sku?: string | null
+          min_quantity?: number
+          quantity_increment?: number
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          price_cents?: number | null
+          sku?: string | null
+          min_quantity?: number
+          quantity_increment?: number
           unit?: string
           updated_at?: string
         }
@@ -544,6 +1264,13 @@ export type Database = {
           city: string | null
           created_at: string
           id: string
+          min_order_cents: number | null
+          min_order_items: number | null
+          reorder_min_history: number
+          reorder_tolerance_days: number
+          reorder_reminder_enabled: boolean
+          reorder_reminder_channel: string
+          reorder_reminder_frequency_days: number
           name: string
           owner_user_id: string
           slug: string
@@ -570,6 +1297,28 @@ export type Database = {
       api_assert_entitlement: {
         Args: { p_organization_id: string; p_feature_key: string }
         Returns: boolean
+      }
+      api_reorder_radar: {
+        Args: {
+          p_organization_id: string
+          p_search?: string | null
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          customer_id: string
+          display_name: string
+          contact_phone: string
+          valid_order_count: number
+          last_order_at: string
+          median_interval_days: number | null
+          next_expected_at: string | null
+          days_since_last: number
+          overdue: boolean
+          insufficient: boolean
+          snoozed_until: string | null
+          total_count: number
+        }[]
       }
     }
     Enums: {

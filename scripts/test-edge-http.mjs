@@ -25,6 +25,7 @@ const DB_NAME = 'pedeoutra_edge'
 const JWT_SECRET = 'pedeoutra-edge-secret-with-at-least-32-characters'
 const USER_ID = 'eeeeeeee-1111-4111-8111-111111111111'
 const ADMIN_ID = 'eeeeeeee-9999-4999-8999-999999999999'
+const INVITEE_ID = 'eeeeeeee-aaaa-4aaa-8aaa-cccccccccccc'
 const ORG_ID = 'eeeeeeee-2222-4222-8222-222222222222'
 const ORG_SLUG = 'distribuidora-edge-abc123'
 const PRODUCT_1 = 'eeeeeeee-3333-4333-8333-333333333333'
@@ -32,10 +33,21 @@ const PRODUCT_2 = 'eeeeeeee-4444-4444-8444-444444444444'
 const PRODUCT_INACTIVE = 'eeeeeeee-5555-4555-8555-555555555555'
 const CUSTOMER_ID = 'eeeeeeee-6666-4666-8666-666666666666'
 const LINK_ID = 'eeeeeeee-7777-4777-8777-777777777777'
+const PRICE_LIST_ID = 'eeeeeeee-aaaa-4aaa-8aaa-bbbbbbbbbbbb'
+const CUSTOMER_NO_LIST_ID = 'eeeeeeee-9999-4999-8999-aaaaaaaaaaaa'
+const CATEGORY_ID = 'eeeeeeee-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const REORDER_TOKEN = Buffer.from(
   Array.from({ length: 32 }, (_, index) => (index * 37 + 11) % 256),
 ).toString('base64url')
 const REORDER_TOKEN_HASH = createHash('sha256').update(REORDER_TOKEN).digest('hex')
+const PRICE_TOKEN = Buffer.from(
+  Array.from({ length: 32 }, (_, index) => (index * 53 + 7) % 256),
+).toString('base64url')
+const PRICE_TOKEN_HASH = createHash('sha256').update(PRICE_TOKEN).digest('hex')
+const WHATSAPP_KEY = Buffer.from(Array.from({ length: 32 }, (_, index) => (index * 29 + 3) % 256)).toString('base64')
+const WHATSAPP_WEBHOOK_SECRET = 'whatsapp-webhook-test-secret'
+const WHATSAPP_WORKER_TOKEN = 'whatsapp-worker-test-token'
+const API_WEBHOOK_WORKER_TOKEN = 'api-webhook-worker-test-token'
 
 let passed = 0
 let failed = 0
@@ -163,9 +175,10 @@ function denoCommand() {
 }
 
 const SEED_SQL = `
-insert into auth.users (id, email) values
-  ('${USER_ID}', 'edge@example.test'),
-  ('${ADMIN_ID}', 'admin@example.test');
+insert into auth.users (id, email, email_confirmed_at) values
+  ('${USER_ID}', 'edge@example.test', now()),
+  ('${ADMIN_ID}', 'admin@example.test', now()),
+  ('${INVITEE_ID}', 'edge-invitee@example.test', now());
 
 insert into public.platform_admins (singleton, user_id) values (true, '${ADMIN_ID}');
 
@@ -175,14 +188,37 @@ values (
   '11999998888', 'São Paulo'
 );
 
-insert into public.products (id, organization_id, name, unit, price_cents, active)
+insert into public.product_categories (id, organization_id, name, slug, position)
+values ('${CATEGORY_ID}', '${ORG_ID}', 'Bebidas', 'bebidas', 1);
+
+insert into public.products (id, organization_id, name, unit, price_cents, active, category_id, sku)
 values
-  ('${PRODUCT_1}', '${ORG_ID}', 'Copo 200ml', 'cento', 1250, true),
-  ('${PRODUCT_2}', '${ORG_ID}', 'Água 5L', 'galão', 899, true),
-  ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false);
+  ('${PRODUCT_1}', '${ORG_ID}', 'Copo 200ml', 'cento', 1250, true, '${CATEGORY_ID}', 'COPO-200'),
+  ('${PRODUCT_2}', '${ORG_ID}', 'Água 5L', 'galão', 899, true, null, null),
+  ('${PRODUCT_INACTIVE}', '${ORG_ID}', 'Item pausado', 'un', 500, false, null, null);
 
 insert into public.customers (id, organization_id, display_name, contact_phone)
-values ('${CUSTOMER_ID}', '${ORG_ID}', 'Padaria Edge', '11977776666');
+values
+  ('${CUSTOMER_ID}', '${ORG_ID}', 'Padaria Edge', '11977776666'),
+  ('${CUSTOMER_NO_LIST_ID}', '${ORG_ID}', 'Mercado Sem Lista', '11966665555');
+
+insert into public.price_lists (id, organization_id, name)
+values ('${PRICE_LIST_ID}', '${ORG_ID}', 'Tabela Ouro Edge');
+
+insert into public.price_list_items
+  (organization_id, price_list_id, product_id, price_cents, valid_from)
+values ('${ORG_ID}', '${PRICE_LIST_ID}', '${PRODUCT_1}', 1000, now() - interval '1 day');
+
+insert into public.customer_price_list_assignments
+  (organization_id, customer_id, price_list_id)
+values ('${ORG_ID}', '${CUSTOMER_ID}', '${PRICE_LIST_ID}');
+
+insert into public.customer_price_tokens
+  (organization_id, customer_id, token_hash, expires_at, created_by)
+values (
+  '${ORG_ID}', '${CUSTOMER_ID}', '${PRICE_TOKEN_HASH}',
+  now() + interval '60 days', '${USER_ID}'
+);
 
 insert into public.reorder_links (
   id, organization_id, customer_id, token_hash, template_json, expires_at, created_by
@@ -251,6 +287,7 @@ async function main() {
 
     // supabase-js chama /rest/v1; encaminha para o PostgREST, que serve na raiz.
     const userToken = signJwt({ role: 'authenticated', sub: USER_ID })
+    const inviteeToken = signJwt({ role: 'authenticated', sub: INVITEE_ID })
     const adminToken = signJwt({
       role: 'authenticated',
       sub: ADMIN_ID,
@@ -277,6 +314,10 @@ async function main() {
       [
         `Bearer ${userToken}`,
         { id: USER_ID, email: 'edge@example.test', role: 'authenticated', aud: 'authenticated' },
+      ],
+      [
+        `Bearer ${inviteeToken}`,
+        { id: INVITEE_ID, email: 'edge-invitee@example.test', role: 'authenticated', aud: 'authenticated' },
       ],
       [
         `Bearer ${adminToken}`,
@@ -358,6 +399,10 @@ async function main() {
           APP_URL: 'http://127.0.0.1:5173',
           ADMIN_EMAIL: 'admin@example.test',
           ADMIN_BOOTSTRAP_TOKEN: 'bootstrap-test-token',
+          WHATSAPP_ENCRYPTION_KEY: WHATSAPP_KEY,
+          WHATSAPP_WEBHOOK_SECRET,
+          WHATSAPP_WORKER_TOKEN,
+          API_WEBHOOK_WORKER_TOKEN,
           EDGE_PORT: String(edgePort),
         },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -415,6 +460,12 @@ async function main() {
         'produto inativo exposto',
       )
       assert(data.accepting_orders === true, 'deveria aceitar pedidos')
+      assert(data.categories.length === 1, 'categoria pública ausente')
+      assert(data.categories[0].name === 'Bebidas', 'nome da categoria')
+      const categorized = data.products.find((item) => item.id === PRODUCT_1)
+      assert(categorized.category_id === CATEGORY_ID, 'produto sem categoria')
+      assert(categorized.sku === 'COPO-200', 'SKU público')
+      assert(Array.isArray(categorized.images), 'images ausente')
       assert(
         response.headers.get('access-control-allow-origin') === 'http://127.0.0.1:5173',
         'CORS',
@@ -589,15 +640,9 @@ async function main() {
     })
 
     await test('reorder-create autenticado emite link', async () => {
-      const customerRow = docker([
-        'exec', PG_CONTAINER,
-        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
-        `select id from public.customers where organization_id = '${ORG_ID}'`,
-      ]).stdout.trim()
-      assert(customerRow, 'cliente não encontrado')
       const response = await call(
         'reorder-create',
-        { customer_id: customerRow },
+        { customer_id: CUSTOMER_ID },
         { token: userToken },
       )
       assert(response.status === 201, `HTTP ${response.status} ${JSON.stringify(response.data)}`)
@@ -864,6 +909,1420 @@ async function main() {
       assert(data.audit.length >= 3, `audit default limit: ${data.audit.length}`)
       assert(actions.has('admin.org.suspend'), 'auditoria de suspensão')
       assert(actions.has('admin.org.reactivate'), 'auditoria de reativação')
+    })
+
+
+    console.log('[8/8] Categorias e mídia')
+
+    await test('product-image-list exige sessão e retorna lista vazia', async () => {
+      const anonymous = await fetch(`${edgeBase}/product-image-list`)
+      assert(anonymous.status === 401 || anonymous.status === 403, `anônimo ${anonymous.status}`)
+      const response = await fetch(`${edgeBase}/product-image-list`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status}`)
+      assert(Array.isArray(data.images) && data.images.length === 0, 'lista deveria estar vazia')
+    })
+
+    await test('upload de mídia rejeita formulário inválido e SVG', async () => {
+      const invalidForm = await call('product-image-upload', {}, { token: userToken })
+      assert(invalidForm.status === 400, `form HTTP ${invalidForm.status}`)
+
+      const form = new FormData()
+      form.append('product_id', PRODUCT_1)
+      form.append('alt_text', 'Copo de teste')
+      form.append(
+        'image',
+        new Blob([new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"></svg>')], {
+          type: 'image/svg+xml',
+        }),
+        'malicioso.svg',
+      )
+      const response = await fetch(`${edgeBase}/product-image-upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${userToken}` },
+        body: form,
+      })
+      const data = await response.json()
+      assert(response.status === 400, `SVG HTTP ${response.status}`)
+      assert(data.error === 'invalid_image', `erro ${JSON.stringify(data)}`)
+    })
+
+    await test('delete e capa de mídia validam o id', async () => {
+      const deleteResponse = await call(
+        'product-image-delete',
+        { image_id: 'inválido' },
+        { token: userToken },
+      )
+      assert(deleteResponse.status === 400, `delete HTTP ${deleteResponse.status}`)
+      const coverResponse = await call(
+        'product-image-cover',
+        { image_id: 'inválido' },
+        { token: userToken },
+      )
+      assert(coverResponse.status === 400, `cover HTTP ${coverResponse.status}`)
+    })
+
+
+    await test('product-import faz dry-run, commit e retry idempotente', async () => {
+      const rows = [
+        {
+          line: 2,
+          name: 'Produto Import Edge',
+          sku: 'IMP-EDGE',
+          category: 'Nova Categoria',
+          unit: 'un',
+          price_cents: 500,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+          action: 'auto',
+        },
+        {
+          line: 3,
+          name: 'Copo Edge Atualizado',
+          sku: 'COPO-200',
+          category: 'Bebidas',
+          unit: 'cento',
+          price_cents: 1300,
+          active: true,
+          min_quantity: 1,
+          quantity_increment: 1,
+          action: 'auto',
+        },
+      ]
+      const dry = await call('product-import', { mode: 'dry_run', rows }, { token: userToken })
+      assert(dry.status === 200, `dry HTTP ${dry.status} ${JSON.stringify(dry.data)}`)
+      assert(dry.data.summary.creates === 1, `creates ${dry.data.summary.creates}`)
+      assert(dry.data.summary.updates === 1, `updates ${dry.data.summary.updates}`)
+      assert(dry.data.summary.errors === 0, `errors ${dry.data.summary.errors}`)
+
+      const jobId = crypto.randomUUID()
+      const commit = await call(
+        'product-import',
+        { mode: 'commit', job_id: jobId, rows },
+        { token: userToken },
+      )
+      assert(commit.status === 200, `commit HTTP ${commit.status} ${JSON.stringify(commit.data)}`)
+      assert(commit.data.summary.created_count === 1, 'created_count')
+      assert(commit.data.summary.updated_count === 1, 'updated_count')
+
+      const retry = await call(
+        'product-import',
+        { mode: 'commit', job_id: jobId, rows },
+        { token: userToken },
+      )
+      assert(retry.status === 200, `retry HTTP ${retry.status}`)
+      assert(retry.data.summary.created_count === 1, 'retry não idempotente')
+      const count = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.products where organization_id = '${ORG_ID}' and sku = 'IMP-EDGE'`,
+      ]).stdout.trim()
+      assert(count === '1', `produto duplicado: ${count}`)
+    })
+
+    await test('product-import bloqueia linha inválida antes do commit', async () => {
+      const invalid = await call(
+        'product-import',
+        {
+          mode: 'dry_run',
+          rows: [
+            {
+              line: 2,
+              name: '<script>alert(1)</script>',
+              sku: 'BAD-1',
+              unit: 'un',
+              price_cents: 100,
+              active: true,
+              min_quantity: 1,
+              quantity_increment: 1,
+              action: 'auto',
+            },
+          ],
+        },
+        { token: userToken },
+      )
+      assert(invalid.status === 200, `dry HTTP ${invalid.status}`)
+      assert(invalid.data.summary.errors === 1, 'erro não detectado')
+      const commit = await call(
+        'product-import',
+        {
+          mode: 'commit',
+          job_id: crypto.randomUUID(),
+          rows: [
+            {
+              line: 2,
+              name: '<script>alert(1)</script>',
+              sku: 'BAD-1',
+              unit: 'un',
+              price_cents: 100,
+              active: true,
+              min_quantity: 1,
+              quantity_increment: 1,
+              action: 'auto',
+            },
+          ],
+        },
+        { token: userToken },
+      )
+      assert(commit.status === 400, `commit HTTP ${commit.status}`)
+      assert(commit.data.error === 'import_validation_failed', 'erro de validação')
+    })
+
+
+    await test('catalog-templates expõe cinco modelos sem preço', async () => {
+      const response = await fetch(`${edgeBase}/catalog-templates`)
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status}`)
+      assert(data.templates.length === 5, `templates ${data.templates.length}`)
+      const packaging = data.templates.find((template) => template.code === 'packaging')
+      assert(packaging.items.length > 0, 'template packaging vazio')
+      assert(!('price_cents' in packaging.items[0]), 'template não deve ter preço')
+      const empty = data.templates.find((template) => template.code === 'empty')
+      assert(empty.items.length === 0, 'template vazio')
+    })
+
+    await test('onboarding-seed valida, cria e é idempotente', async () => {
+      const items = [
+        {
+          item_key: 'copo-200',
+          name: 'Copo descartável 200ml',
+          category: 'Copos e potes',
+          unit: 'cento',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+        {
+          item_key: 'sacola',
+          name: 'Sacola plástica reforçada',
+          category: 'Sacolas e sacos',
+          unit: 'pacote',
+          min_quantity: 1,
+          quantity_increment: 1,
+        },
+      ]
+      const preview = await call(
+        'onboarding-seed',
+        { mode: 'preview', template_code: 'packaging', template_version: 1, items },
+        { token: userToken },
+      )
+      assert(preview.status === 200, `preview HTTP ${preview.status}`)
+      assert(preview.data.summary.conflicts === 0, 'preview deveria estar sem conflito')
+
+      const jobId = crypto.randomUUID()
+      const commit = await call(
+        'onboarding-seed',
+        {
+          mode: 'commit',
+          job_id: jobId,
+          template_code: 'packaging',
+          template_version: 1,
+          items,
+        },
+        { token: userToken },
+      )
+      assert(commit.status === 200, `commit HTTP ${commit.status}`)
+      assert(commit.data.summary.created_count === 2, 'created_count')
+      const retry = await call(
+        'onboarding-seed',
+        {
+          mode: 'commit',
+          job_id: jobId,
+          template_code: 'packaging',
+          template_version: 1,
+          items,
+        },
+        { token: userToken },
+      )
+      assert(retry.data.summary.created_count === 2, 'retry não idempotente')
+
+      const after = await call(
+        'onboarding-seed',
+        { mode: 'preview', template_code: 'packaging', template_version: 1, items },
+        { token: userToken },
+      )
+      assert(after.data.summary.conflicts === 2, 'conflito pós-seed não detectado')
+      const price = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select price_cents from public.products where organization_id = '${ORG_ID}' and name = 'Copo descartável 200ml'`,
+      ]).stdout.trim()
+      assert(price === '', `template inventou preço: ${price}`)
+    })
+
+    await test('onboarding-seed rejeita item fora do template', async () => {
+      const response = await call(
+        'onboarding-seed',
+        {
+          mode: 'preview',
+          template_code: 'packaging',
+          template_version: 1,
+          items: [
+            {
+              item_key: 'inventado',
+              name: 'Produto inventado',
+              category: 'X',
+              unit: 'un',
+              min_quantity: 1,
+              quantity_increment: 1,
+            },
+          ],
+        },
+        { token: userToken },
+      )
+      assert(response.status === 400, `HTTP ${response.status}`)
+      assert(response.data.error === 'invalid_seed_items', 'erro de item inválido')
+    })
+
+
+    await test('order-tracking cria, resolve sem PII e revoga', async () => {
+      const orderId = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select id from public.orders where public_reference = '${firstOrder.public_reference}'`,
+      ]).stdout.trim()
+      assert(orderId, 'pedido público não encontrado')
+
+      const created = await call(
+        'order-tracking-create',
+        { order_id: orderId },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status}`)
+      assert(created.data.url.includes('/acompanhar/'), 'url de acompanhamento')
+      const token = created.data.url.split('/').pop()
+
+      const response = await fetch(
+        `${edgeBase}/order-tracking-get?token=${encodeURIComponent(token)}`,
+      )
+      const data = await response.json()
+      assert(response.status === 200, `get HTTP ${response.status}`)
+      assert(data.reference === firstOrder.public_reference, 'referência')
+      assert(data.items.length >= 1, 'itens resumidos')
+      assert(Array.isArray(data.timeline), 'timeline')
+      const serialized = JSON.stringify(data)
+      assert(!serialized.includes('Padaria Edge'), 'nome do comprador vazou')
+      assert(!serialized.includes('11977776666'), 'telefone do comprador vazou')
+      assert(response.headers.get('x-robots-tag')?.includes('noindex'), 'noindex')
+
+      const revoked = await call(
+        'order-tracking-revoke',
+        { order_id: orderId },
+        { token: userToken },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      const afterRevoke = await fetch(
+        `${edgeBase}/order-tracking-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(afterRevoke.status === 404, `revogado HTTP ${afterRevoke.status}`)
+    })
+
+    await test('order-tracking falha neutro para token inválido/expirado e outro tenant', async () => {
+      const invalid = await fetch(`${edgeBase}/order-tracking-get?token=${'x'.repeat(43)}`)
+      assert(invalid.status === 404, `inválido HTTP ${invalid.status}`)
+
+      const orderId = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select id from public.orders where public_reference = '${firstOrder.public_reference}'`,
+      ]).stdout.trim()
+      const created = await call(
+        'order-tracking-create',
+        { order_id: orderId },
+        { token: userToken },
+      )
+      const token = created.data.url.split('/').pop()
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.order_tracking_links set created_at = now() - interval '40 days', expires_at = now() - interval '10 days' where order_id = '${orderId}'`,
+      ])
+      const expired = await fetch(
+        `${edgeBase}/order-tracking-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(expired.status === 404, `expirado HTTP ${expired.status}`)
+
+      const other = await call(
+        'order-tracking-create',
+        { order_id: crypto.randomUUID() },
+        { token: userToken },
+      )
+      assert(other.status === 404, `outro tenant HTTP ${other.status}`)
+    })
+
+
+    console.log('[9/9] Preços por comprador')
+
+    await test('private-catalog exige plano, aplica preço privado e não vaza PII', async () => {
+      const denied = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(PRICE_TOKEN)}`,
+      )
+      assert(denied.status === 404, `sem plano HTTP ${denied.status}`)
+
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+
+      const invalidOrder = await call('public-order', {
+        slug: ORG_SLUG,
+        items: [{ product_id: PRODUCT_1, quantity: 1 }],
+        company_website: '',
+        elapsed_ms: 2000,
+        consent: true,
+        request_id: crypto.randomUUID(),
+        price_token: 'x'.repeat(43),
+      }, { headers: { 'x-forwarded-for': '203.0.113.11' } })
+      assert(invalidOrder.status === 404, `token inválido HTTP ${invalidOrder.status}`)
+      assert(invalidOrder.data.error === 'price_link_unavailable', 'erro de link inválido')
+
+      const response = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(PRICE_TOKEN)}`,
+      )
+      const data = await response.json()
+      assert(response.status === 200, `HTTP ${response.status} ${JSON.stringify(data)}`)
+      assert(data.customer.name === 'Padaria Edge', 'cliente do link')
+      assert(data.price_list.name === 'Tabela Ouro Edge', 'tabela aplicada')
+      const privateProduct = data.products.find((product) => product.id === PRODUCT_1)
+      const publicProduct = data.products.find((product) => product.id === PRODUCT_2)
+      assert(privateProduct.price_cents === 1000, `preço privado ${privateProduct.price_cents}`)
+      assert(privateProduct.price_source === 'private', 'origem privada')
+      assert(publicProduct.price_cents === 899, `fallback ${publicProduct.price_cents}`)
+      assert(publicProduct.price_source === 'public', 'origem pública')
+      const serialized = JSON.stringify(data)
+      assert(!serialized.includes('11977776666'), 'telefone do cliente vazou')
+      assert(response.headers.get('x-robots-tag')?.includes('noindex'), 'noindex')
+      assert(response.headers.get('referrer-policy') === 'no-referrer', 'no-referrer')
+    })
+
+    await test('pedido privado usa token, não exige nome/telefone e preserva origem', async () => {
+      const orderRequest = crypto.randomUUID()
+      const response = await call('public-order', {
+        slug: ORG_SLUG,
+        note: 'Pedido com tabela privada',
+        items: [{ product_id: PRODUCT_1, quantity: 1 }],
+        company_website: '',
+        elapsed_ms: 2000,
+        consent: true,
+        request_id: orderRequest,
+        price_token: PRICE_TOKEN,
+      }, { headers: { 'x-forwarded-for': '203.0.113.10' } })
+      assert(response.status === 201, `HTTP ${response.status} ${JSON.stringify(response.data)}`)
+      assert(response.data.total_cents === 1000, `total ${response.data.total_cents}`)
+
+      const order = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select customer_id, buyer_name, buyer_phone, source, price_source, price_list_id
+           from public.orders where request_id = '${orderRequest}'`,
+      ]).stdout.trim()
+      const [customerId, buyerName, buyerPhone, source, priceSource, priceListId] =
+        order.split('|')
+      assert(customerId === CUSTOMER_ID, `cliente ${customerId}`)
+      assert(buyerName === '' && buyerPhone === '', 'PII do comprador foi persistida')
+      assert(source === 'private', `source ${source}`)
+      assert(priceSource === 'private', `price_source ${priceSource}`)
+      assert(priceListId === PRICE_LIST_ID, `price_list ${priceListId}`)
+    })
+
+    await test('link de preço exige tabela, expõe catálogo e revoga', async () => {
+      const missing = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_NO_LIST_ID },
+        { token: userToken },
+      )
+      assert(missing.status === 409, `sem tabela HTTP ${missing.status}`)
+      assert(missing.data.error === 'price_list_required', 'erro de tabela')
+
+      const created = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.url.includes('/p/'), 'url privada')
+      const token = created.data.url.split('/').pop()
+
+      const response = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(response.status === 200, `get HTTP ${response.status}`)
+
+      await clientQuery(`
+        delete from public.customer_price_list_assignments
+         where organization_id = '${ORG_ID}' and customer_id = '${CUSTOMER_ID}'
+      `)
+      const withoutList = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(withoutList.status === 404, `sem tabela HTTP ${withoutList.status}`)
+      await clientQuery(`
+        insert into public.customer_price_list_assignments
+          (organization_id, customer_id, price_list_id)
+        values ('${ORG_ID}', '${CUSTOMER_ID}', '${PRICE_LIST_ID}')
+      `)
+
+      const revoked = await call(
+        'customer-price-link-revoke',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      assert(revoked.data.revoked >= 1, 'nenhum token revogado')
+      const after = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(after.status === 404, `revogado HTTP ${after.status}`)
+    })
+
+    await test('token expirado e downgrade bloqueiam o catálogo privado', async () => {
+      const invalid = await fetch(`${edgeBase}/private-catalog-get?token=${'x'.repeat(43)}`)
+      assert(invalid.status === 404, `inválido HTTP ${invalid.status}`)
+
+      const created = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      const token = created.data.url.split('/').pop()
+      await clientQuery(`
+        update public.customer_price_tokens
+           set created_at = now() - interval '40 days',
+               expires_at = now() - interval '10 days'
+         where organization_id = '${ORG_ID}' and customer_id = '${CUSTOMER_ID}'
+           and revoked_at is null
+      `)
+      const expired = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(token)}`,
+      )
+      assert(expired.status === 404, `expirado HTTP ${expired.status}`)
+
+      const createdAgain = await call(
+        'customer-price-link-create',
+        { customer_id: CUSTOMER_ID },
+        { token: userToken },
+      )
+      const freshToken = createdAgain.data.url.split('/').pop()
+      await clientQuery(`
+        update public.subscriptions
+           set plan_code = 'essential', plan_version = 1, state = 'active',
+               current_period_end = now() + interval '20 days'
+         where organization_id = '${ORG_ID}'
+      `)
+      const downgraded = await fetch(
+        `${edgeBase}/private-catalog-get?token=${encodeURIComponent(freshToken)}`,
+      )
+      assert(downgraded.status === 404, `downgrade HTTP ${downgraded.status}`)
+
+      const blockedOrder = await call('public-order', {
+        slug: ORG_SLUG,
+        items: [{ product_id: PRODUCT_1, quantity: 1 }],
+        company_website: '',
+        elapsed_ms: 2000,
+        consent: true,
+        request_id: crypto.randomUUID(),
+        price_token: freshToken,
+      }, { headers: { 'x-forwarded-for': '203.0.113.12' } })
+      assert(blockedOrder.status === 403, `downgrade order HTTP ${blockedOrder.status}`)
+      assert(blockedOrder.data.error === 'plan_required', 'erro de plano')
+
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[10/10] Orçamentos B2B')
+
+    await test('orçamento HTTP cria, envia, aceita e repete sem duplicar', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+
+      const created = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [
+            { product_id: PRODUCT_1, quantity: 1 },
+            { product_id: PRODUCT_2, quantity: 1 },
+          ],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: 'Proposta HTTP',
+        },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.total_cents === 1899, `total ${created.data.total_cents}`)
+      assert(created.data.public_reference.startsWith('OR-'), 'referência')
+      const quoteId = created.data.quote_id
+
+      const updated = await call(
+        'quote-update',
+        {
+          quote_id: quoteId,
+          expected_version: 1,
+          items: [{ product_id: PRODUCT_1, quantity: 2 }],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: 'Proposta revisada',
+        },
+        { token: userToken },
+      )
+      assert(updated.status === 200, `update HTTP ${updated.status}`)
+      assert(updated.data.total_cents === 2000, `update total ${updated.data.total_cents}`)
+      assert(updated.data.version === 2, 'versão')
+
+      const sent = await call(
+        'quote-send',
+        { quote_id: quoteId, expected_version: 2 },
+        { token: userToken },
+      )
+      assert(sent.status === 201, `send HTTP ${sent.status} ${JSON.stringify(sent.data)}`)
+      assert(sent.data.url.includes('/o/'), 'url pública')
+      const token = sent.data.url.split('/').pop()
+
+      const publicQuote = await fetch(
+        `${edgeBase}/quote-get?token=${encodeURIComponent(token)}`,
+      )
+      const publicData = await publicQuote.json()
+      assert(publicQuote.status === 200, `get HTTP ${publicQuote.status}`)
+      assert(publicData.status === 'sent', 'status enviado')
+      assert(publicData.customer.name === 'Padaria Edge', 'cliente')
+      assert(publicData.items.length === 1, 'itens')
+      assert(publicData.can_accept === true, 'aceite disponível')
+      assert(!JSON.stringify(publicData).includes('11977776666'), 'telefone vazou')
+      assert(publicQuote.headers.get('x-robots-tag')?.includes('noindex'), 'noindex')
+
+      const requestId = crypto.randomUUID()
+      const accepted = await call(
+        'quote-accept',
+        {
+          token,
+          confirm: true,
+          request_id: requestId,
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.20' } },
+      )
+      assert(accepted.status === 201, `accept HTTP ${accepted.status} ${JSON.stringify(accepted.data)}`)
+      assert(accepted.data.total_cents === 2000, 'total aceito')
+      assert(accepted.data.order_reference, 'referência do pedido')
+
+      const replay = await call(
+        'quote-accept',
+        {
+          token,
+          confirm: true,
+          request_id: requestId,
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.20' } },
+      )
+      assert(replay.status === 200, `replay HTTP ${replay.status}`)
+      assert(replay.data.already_accepted === true, 'replay')
+      assert(
+        replay.data.order_reference === accepted.data.order_reference,
+        'pedido diferente',
+      )
+
+      const order = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select source, quote_id, buyer_name from public.orders where quote_id = '${quoteId}'`,
+      ]).stdout.trim()
+      assert(order.startsWith('quote|'), `origem ${order}`)
+      assert(order.endsWith('|'), `PII ${order}`)
+      const count = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.orders where quote_id = '${quoteId}'`,
+      ]).stdout.trim()
+      assert(count === '1', `pedidos ${count}`)
+
+      const after = await fetch(
+        `${edgeBase}/quote-get?token=${encodeURIComponent(token)}`,
+      )
+      const afterData = await after.json()
+      assert(after.status === 200, `get aceito HTTP ${after.status}`)
+      assert(afterData.status === 'accepted', 'status aceito')
+      assert(afterData.order_reference === accepted.data.order_reference, 'recibo')
+    })
+
+    await test('orçamento HTTP recusa, cancela e bloqueia token inválido', async () => {
+      const validUntil = new Date(Date.now() + 7 * 86400000).toISOString()
+      const created = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          valid_until: validUntil,
+          notes: null,
+        },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status}`)
+      const quoteId = created.data.quote_id
+      const sent = await call(
+        'quote-send',
+        { quote_id: quoteId, expected_version: 1 },
+        { token: userToken },
+      )
+      const token = sent.data.url.split('/').pop()
+
+      const declined = await call(
+        'quote-decline',
+        { token, confirm: true },
+        { headers: { 'x-forwarded-for': '203.0.113.21' } },
+      )
+      assert(declined.status === 200, `decline HTTP ${declined.status}`)
+      assert(declined.data.status === 'declined', 'status recusado')
+      const declinedGet = await fetch(
+        `${edgeBase}/quote-get?token=${encodeURIComponent(token)}`,
+      )
+      const declinedData = await declinedGet.json()
+      assert(declinedGet.status === 200, `get recusado HTTP ${declinedGet.status}`)
+      assert(declinedData.status === 'declined', 'status público recusado')
+
+      const canceledQuote = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          valid_until: validUntil,
+          notes: null,
+        },
+        { token: userToken },
+      )
+      const canceled = await call(
+        'quote-cancel',
+        { quote_id: canceledQuote.data.quote_id, expected_version: 1 },
+        { token: userToken },
+      )
+      assert(canceled.status === 200, `cancel HTTP ${canceled.status}`)
+      assert(canceled.data.status === 'canceled', 'status cancelado')
+
+      const invalid = await fetch(`${edgeBase}/quote-get?token=${'x'.repeat(43)}`)
+      assert(invalid.status === 404, `inválido HTTP ${invalid.status}`)
+      const invalidAccept = await call(
+        'quote-accept',
+        {
+          token: 'x'.repeat(43),
+          confirm: true,
+          request_id: crypto.randomUUID(),
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.22' } },
+      )
+      assert(invalidAccept.status === 404, `aceite inválido HTTP ${invalidAccept.status}`)
+    })
+
+    await test('preço alterado no orçamento HTTP exige revisão', async () => {
+      const created = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_1, quantity: 1 }],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: null,
+        },
+        { token: userToken },
+      )
+      const sent = await call(
+        'quote-send',
+        { quote_id: created.data.quote_id, expected_version: 1 },
+        { token: userToken },
+      )
+      const token = sent.data.url.split('/').pop()
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.price_list_items set price_cents = 1100 where price_list_id = '${PRICE_LIST_ID}' and product_id = '${PRODUCT_1}'`,
+      ])
+      const stale = await call(
+        'quote-accept',
+        {
+          token,
+          confirm: true,
+          request_id: crypto.randomUUID(),
+          company_website: '',
+          elapsed_ms: 2000,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.23' } },
+      )
+      assert(stale.status === 409, `stale HTTP ${stale.status}`)
+      assert(stale.data.error === 'quote_stale', `erro ${JSON.stringify(stale.data)}`)
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.price_list_items set price_cents = 1000 where price_list_id = '${PRICE_LIST_ID}' and product_id = '${PRODUCT_1}'`,
+      ])
+    })
+
+    await test('orçamento exige Profissional', async () => {
+      await clientQuery(`
+        update public.subscriptions
+           set plan_code = 'essential', plan_version = 1, state = 'active',
+               current_period_end = now() + interval '20 days'
+         where organization_id = '${ORG_ID}'
+      `)
+      const denied = await call(
+        'quote-create',
+        {
+          customer_id: CUSTOMER_ID,
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          valid_until: new Date(Date.now() + 7 * 86400000).toISOString(),
+          notes: null,
+        },
+        { token: userToken },
+      )
+      assert(denied.status === 403, `plano HTTP ${denied.status}`)
+      assert(denied.data.error === 'plan_required', 'erro de plano')
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[11/11] WhatsApp oficial: configuração e outbox desligado')
+
+    await test('opt-in cria outbox bloqueado sem integração pronta', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active',
+              current_period_end = now() + interval '20 days',
+              plan_code = 'professional',
+              plan_version = 1
+      `)
+      const requestId = crypto.randomUUID()
+      const response = await call(
+        'public-order',
+        {
+          slug: ORG_SLUG,
+          buyer_name: 'Padaria Edge',
+          buyer_phone: '11977776666',
+          items: [{ product_id: PRODUCT_2, quantity: 1 }],
+          company_website: '',
+          elapsed_ms: 2000,
+          consent: true,
+          whatsapp_updates: true,
+          request_id: requestId,
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.30' } },
+      )
+      assert(response.status === 201, `order HTTP ${response.status}`)
+      const order = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select id, whatsapp_opt_in from public.orders where request_id = '${requestId}'`,
+      ]).stdout.trim()
+      const [orderId, optIn] = order.split('|')
+      assert(optIn === 't', `opt-in ${optIn}`)
+      const outbox = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select status, blocked_reason from public.whatsapp_outbox where order_id = '${orderId}'`,
+      ]).stdout.trim()
+      assert(outbox === 'blocked|connection_not_ready', `outbox ${outbox}`)
+    })
+
+    await test('configuração cifra token e não o devolve', async () => {
+      const token = 'EAAG-edge-token-super-secreto-123456'
+      const connected = await call(
+        'whatsapp-connect',
+        { waba_id: 'waba-edge', phone_number_id: 'phone-edge', access_token: token },
+        { token: userToken },
+      )
+      assert(connected.status === 201, `connect HTTP ${connected.status} ${JSON.stringify(connected.data)}`)
+      assert(connected.data.status === 'pending_verification', 'status')
+      assert(connected.data.send_enabled === false, 'envio não pode estar ativo')
+      assert(!JSON.stringify(connected.data).includes(token), 'token retornado')
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select token_ciphertext from public.whatsapp_connections where organization_id = '${ORG_ID}'`,
+      ]).stdout.trim()
+      assert(stored && !stored.includes(token), 'token em texto aberto')
+
+      const config = await fetch(`${edgeBase}/whatsapp-config-get`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      const data = await config.json()
+      assert(config.status === 200, `config HTTP ${config.status}`)
+      assert(data.connection.status === 'pending_verification', 'config status')
+      assert(data.send_enabled === false, 'config envio')
+      assert(!JSON.stringify(data).includes(token), 'config vazou token')
+    })
+
+    await test('worker exige token e permanece desligado', async () => {
+      const wrong = await fetch(`${edgeBase}/whatsapp-worker`, {
+        method: 'POST',
+        headers: { 'x-whatsapp-worker-token': 'errado' },
+      })
+      assert(wrong.status === 401, `worker errado HTTP ${wrong.status}`)
+      const disabled = await fetch(`${edgeBase}/whatsapp-worker`, {
+        method: 'POST',
+        headers: { 'x-whatsapp-worker-token': WHATSAPP_WORKER_TOKEN },
+      })
+      const data = await disabled.json()
+      assert(disabled.status === 200, `worker HTTP ${disabled.status}`)
+      assert(data.disabled === true, 'worker deveria estar desligado')
+    })
+
+    await test('webhook valida HMAC e atualiza entrega sem PII', async () => {
+      const orderRow = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select id from public.orders where organization_id = '${ORG_ID}' order by created_at desc limit 1`,
+      ]).stdout.trim()
+      const outboxRow = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `insert into public.whatsapp_outbox
+           (organization_id, order_id, event, recipient_phone, status, provider_message_id, idempotency_key)
+         values ('${ORG_ID}', '${orderRow}', 'confirmed', '11977776666', 'sent', 'wamid.edge.1', 'webhook:${Date.now()}')
+         returning id`,
+      ]).stdout.trim().split('\n')[0]
+      assert(outboxRow, 'outbox não criada')
+      await clientQuery(`
+        update public.whatsapp_connections set status = 'connected'
+         where organization_id = '${ORG_ID}'
+      `)
+
+      const body = JSON.stringify({
+        entry: [
+          {
+            changes: [
+              {
+                value: {
+                  metadata: { phone_number_id: 'phone-edge' },
+                  statuses: [{ id: 'wamid.edge.1', status: 'delivered' }],
+                },
+              },
+            ],
+          },
+        ],
+      })
+      const invalid = await fetch(`${edgeBase}/whatsapp-webhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-hub-signature-256': 'sha256=errado' },
+        body,
+      })
+      assert(invalid.status === 401, `assinatura inválida HTTP ${invalid.status}`)
+
+      const signature = `sha256=${createHmac('sha256', WHATSAPP_WEBHOOK_SECRET).update(body).digest('hex')}`
+      const response = await fetch(`${edgeBase}/whatsapp-webhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-hub-signature-256': signature },
+        body,
+      })
+      const data = await response.json()
+      assert(response.status === 200, `webhook HTTP ${response.status}`)
+      assert(data.processed === 1, `processados ${data.processed}`)
+      const state = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select provider_status, status from public.whatsapp_outbox where id = '${outboxRow}'`,
+      ]).stdout.trim()
+      assert(state === 'delivered|sent', `estado ${state}`)
+      const events = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.whatsapp_events where outbox_id = '${outboxRow}'`,
+      ]).stdout.trim()
+      assert(events === '1', `eventos ${events}`)
+    })
+
+    await test('desconectar limpa token e desliga envio', async () => {
+      const response = await call('whatsapp-disconnect', {}, { token: userToken })
+      assert(response.status === 200, `disconnect HTTP ${response.status}`)
+      const row = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select status, token_ciphertext from public.whatsapp_connections where organization_id = '${ORG_ID}'`,
+      ]).stdout.trim()
+      assert(row === 'disabled|', `conexão ${row}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[12/12] Equipe e convites manuais')
+
+    await test('equipe exige AAL2, aceita convite e revoga acesso', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+
+      const withoutMfa = await fetch(`${edgeBase}/team-list`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      assert(withoutMfa.status === 403, `sem AAL2 HTTP ${withoutMfa.status}`)
+
+      const invited = await call(
+        'team-invite',
+        { email: 'edge-invitee@example.test', role: 'operator' },
+        { token: supplierAal2Token },
+      )
+      assert(invited.status === 201, `invite HTTP ${invited.status} ${JSON.stringify(invited.data)}`)
+      assert(invited.data.email_sent === false, 'não pode alegar envio')
+      assert(invited.data.url.includes('/convite/'), 'url do convite')
+      const inviteToken = invited.data.url.split('/').pop()
+
+      const accepted = await call(
+        'team-accept',
+        { token: inviteToken },
+        { token: inviteeToken },
+      )
+      assert(accepted.status === 200, `accept HTTP ${accepted.status} ${JSON.stringify(accepted.data)}`)
+      assert(accepted.data.role === 'operator', 'papel aceito')
+
+      const list = await fetch(`${edgeBase}/team-list`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      const data = await list.json()
+      assert(list.status === 200, `list HTTP ${list.status}`)
+      const member = data.members.find((item) => item.email === 'edge-invitee@example.test')
+      assert(member, 'membro não listado')
+
+      const role = await call(
+        'team-role',
+        { membership_id: member.id, role: 'viewer' },
+        { token: supplierAal2Token },
+      )
+      assert(role.status === 200, `role HTTP ${role.status}`)
+
+      const revoked = await call(
+        'team-revoke',
+        { membership_id: member.id },
+        { token: supplierAal2Token },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      assert(revoked.data.status === 'revoked', 'status revogado')
+
+      const replay = await call(
+        'team-accept',
+        { token: inviteToken },
+        { token: inviteeToken },
+      )
+      assert(replay.status === 404, `replay HTTP ${replay.status}`)
+    })
+
+    await test('limite de três usuários e AAL2 protegem convites', async () => {
+      const noMfa = await call(
+        'team-invite',
+        { email: 'blocked@example.test', role: 'viewer' },
+        { token: userToken },
+      )
+      assert(noMfa.status === 403, `convite sem AAL2 HTTP ${noMfa.status}`)
+
+      for (const email of ['pending-a@example.test', 'pending-b@example.test']) {
+        const response = await call( // NOSONAR: dois convites sequenciais para testar o limite.
+          'team-invite',
+          { email, role: 'viewer' },
+          { token: supplierAal2Token },
+        )
+        assert(response.status === 201, `convite ${email} HTTP ${response.status}`)
+      }
+      const overLimit = await call(
+        'team-invite',
+        { email: 'pending-c@example.test', role: 'viewer' },
+        { token: supplierAal2Token },
+      )
+      assert(overLimit.status === 409, `limite HTTP ${overLimit.status}`)
+      assert(overLimit.data.error === 'team_limit_reached', 'erro de limite')
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[13/13] Lembretes manuais de reposição')
+
+    await test('lembrete manual é idempotente, marca abertura e respeita opt-out', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+      await clientQuery(`
+        update public.organizations
+           set reorder_reminder_enabled = true, reorder_reminder_channel = 'manual'
+         where id = '${ORG_ID}'
+      `)
+      await clientQuery(`
+        update public.customers
+           set reorder_opt_in = true, reorder_opt_out_at = null
+         where id = '${CUSTOMER_ID}'
+      `)
+
+      const cycleKey = `manual-test-${Date.now()}`
+      const created = await call(
+        'reorder-reminder-create',
+        {
+          customer_id: CUSTOMER_ID,
+          cycle_key: cycleKey,
+          message: 'Olá! Já faz alguns dias desde o último pedido. Quer repetir?',
+        },
+        { token: userToken },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.status === 'suggested', 'status sugerido')
+
+      const repeated = await call(
+        'reorder-reminder-create',
+        {
+          customer_id: CUSTOMER_ID,
+          cycle_key: cycleKey,
+          message: 'Olá! Já faz alguns dias desde o último pedido. Quer repetir?',
+        },
+        { token: userToken },
+      )
+      assert(repeated.status === 201, `retry HTTP ${repeated.status}`)
+      assert(repeated.data.reminder_id === created.data.reminder_id, 'lembrete duplicado')
+      const count = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.reorder_reminders where cycle_key = '${cycleKey}'`,
+      ]).stdout.trim()
+      assert(count === '1', `lembretes ${count}`)
+
+      const opened = await call(
+        'reorder-reminder-open',
+        { reminder_id: created.data.reminder_id },
+        { token: userToken },
+      )
+      assert(opened.status === 200, `open HTTP ${opened.status}`)
+      assert(opened.data.status === 'manual_opened', 'status de abertura')
+      const sent = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select sent_at from public.reorder_reminders where id = '${created.data.reminder_id}'`,
+      ]).stdout.trim()
+      assert(sent === '', 'abertura manual não pode alegar envio')
+
+      await clientQuery(`
+        update public.customers set reorder_opt_out_at = now()
+         where id = '${CUSTOMER_ID}'
+      `)
+      const blocked = await call(
+        'reorder-reminder-create',
+        {
+          customer_id: CUSTOMER_ID,
+          cycle_key: `${cycleKey}-2`,
+          message: 'Mensagem que não deve ser criada',
+        },
+        { token: userToken },
+      )
+      assert(blocked.status === 409, `opt-out HTTP ${blocked.status}`)
+      assert(blocked.data.error === 'reminder_not_consented', 'erro de consentimento')
+
+      const isolated = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select count(*) from public.reorder_reminders where organization_id = '${ORG_ID}'`,
+      ]).stdout.trim()
+      assert(isolated === '1', `histórico ${isolated}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[14/14] Analytics first-party')
+
+    await test('analytics valida evento, mascara token e exige consentimento', async () => {
+      const sessionId = 'session-test-1234567890abcdef'
+      const valid = await call(
+        'analytics-ingest',
+        {
+          event: 'landing_view',
+          session_id: sessionId,
+          path: '/p/token-super-secreto',
+          consent_version: '2026-11-14',
+          referrer_class: 'organic',
+          utm_source: 'google',
+          metadata: { plan_code: 'essential', secret: 'não permitido' },
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.40' } },
+      )
+      assert(valid.status === 202, `ingest HTTP ${valid.status}`)
+
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select path, metadata::text from public.analytics_events
+          where session_id = '${sessionId}' order by created_at desc limit 1`,
+      ]).stdout.trim()
+      assert(stored.startsWith('/p/:token|'), `path ${stored}`)
+      assert(!stored.includes('token-super-secreto'), 'token vazou')
+      assert(!stored.includes('secret'), 'metadata não allowlisted')
+
+      const serverOnly = await call(
+        'analytics-ingest',
+        {
+          event: 'subscription_payment_confirmed',
+          session_id: sessionId,
+          path: '/',
+          consent_version: '2026-11-14',
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.40' } },
+      )
+      assert(serverOnly.status === 400, `server-only HTTP ${serverOnly.status}`)
+
+      const invalidSession = await call(
+        'analytics-ingest',
+        {
+          event: 'landing_view',
+          session_id: 'curta',
+          path: '/',
+          consent_version: '2026-11-14',
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.40' } },
+      )
+      assert(invalidSession.status === 400, `sessão HTTP ${invalidSession.status}`)
+
+      const consent = await call(
+        'analytics-consent',
+        {
+          session_id: sessionId,
+          analytics: true,
+          marketing: false,
+          consent_version: '2026-11-14',
+        },
+        { headers: { 'x-forwarded-for': '203.0.113.41' } },
+      )
+      assert(consent.status === 200, `consent HTTP ${consent.status}`)
+      assert(consent.data.analytics === true, 'consentimento analytics')
+      const consentRow = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select analytics, marketing from public.analytics_consents where session_id = '${sessionId}'`,
+      ]).stdout.trim()
+      assert(consentRow === 't|f', `consent ${consentRow}`)
+    })
+
+    await test('admin vê funil agregado apenas com AAL2', async () => {
+      const response = await fetch(`${edgeBase}/admin-api?view=analytics&days=30`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const data = await response.json()
+      assert(response.status === 200, `analytics HTTP ${response.status}`)
+      assert(data.days === 30, 'janela')
+      assert(Array.isArray(data.events), 'eventos')
+      assert(data.events.some((event) => event.event === 'landing_view'), 'landing_view')
+      assert(Array.isArray(data.sources), 'fontes')
+
+      const finance = await fetch(`${edgeBase}/admin-api?view=finance&days=30`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const financeData = await finance.json()
+      assert(finance.status === 200, `finance HTTP ${finance.status}`)
+      assert(Array.isArray(financeData.metrics), 'métricas financeiras')
+      assert(
+        financeData.metrics.some((metric) => metric.metric === 'mrr_total'),
+        'MRR ausente',
+      )
+      assert(
+        financeData.metrics.some(
+          (metric) => metric.metric === 'cost_meta_ads' && metric.observed === false,
+        ),
+        'custo ausente deveria ser indisponível',
+      )
+
+      const supplier = await fetch(`${edgeBase}/admin-api?view=analytics`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      assert(supplier.status === 403, `fornecedor HTTP ${supplier.status}`)
+    })
+
+
+    console.log('[15/15] API B2B v1')
+
+    await test('chave de API é única, escopada, auditável e revogável', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+
+      const created = await call(
+        'api-key-create',
+        { name: 'ERP Edge', scopes: ['catalog:read', 'orders:read', 'customers:read'] },
+        { token: supplierAal2Token },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.key.startsWith('po_live_'), 'prefixo da chave')
+      const rawKey = created.data.key
+      const keyId = created.data.id
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select key_hash from public.api_keys where id = '${keyId}'`,
+      ]).stdout.trim()
+      assert(stored.length === 64 && stored !== rawKey, 'chave em claro')
+
+      const list = await fetch(`${edgeBase}/api-key-list`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      const listData = await list.json()
+      assert(list.status === 200, `list HTTP ${list.status}`)
+      assert(listData.keys.some((key) => key.id === keyId), 'chave não listada')
+      assert(!JSON.stringify(listData).includes(rawKey), 'list vazou chave')
+
+      const headers = { Authorization: `Bearer ${rawKey}` }
+      const products = await fetch(`${edgeBase}/api-v1/v1/products?limit=5`, { headers })
+      const productsData = await products.json()
+      assert(products.status === 200, `products HTTP ${products.status}`)
+      assert(Array.isArray(productsData.data), 'produtos')
+      assert(productsData.data.length <= 5, 'limite')
+
+      const orders = await fetch(`${edgeBase}/api-v1/v1/orders?status=new`, { headers })
+      assert(orders.status === 200, `orders HTTP ${orders.status}`)
+      const me = await fetch(`${edgeBase}/api-v1/v1/me`, { headers })
+      const meData = await me.json()
+      assert(me.status === 200, `me HTTP ${me.status}`)
+      assert(meData.scopes.includes('catalog:read'), 'escopos')
+
+      const revoked = await call(
+        'api-key-revoke',
+        { key_id: keyId },
+        { token: supplierAal2Token },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      const after = await fetch(`${edgeBase}/api-v1/v1/products`, { headers })
+      assert(after.status === 401, `revogada HTTP ${after.status}`)
+
+      const invalid = await fetch(`${edgeBase}/api-v1/v1/products`, {
+        headers: { Authorization: `Bearer ${'po_live_' + 'A'.repeat(43)}` },
+      })
+      assert(invalid.status === 401, `inválida HTTP ${invalid.status}`)
+    })
+
+    await test('escopo insuficiente bloqueia rota de clientes', async () => {
+      const created = await call(
+        'api-key-create',
+        { name: 'Somente catálogo', scopes: ['catalog:read'] },
+        { token: supplierAal2Token },
+      )
+      assert(created.status === 201, `create HTTP ${created.status}`)
+      const headers = { Authorization: `Bearer ${created.data.key}` }
+      const catalog = await fetch(`${edgeBase}/api-v1/v1/products`, { headers })
+      assert(catalog.status === 200, `catálogo HTTP ${catalog.status}`)
+      const customers = await fetch(`${edgeBase}/api-v1/v1/customers`, { headers })
+      assert(customers.status === 403, `clientes HTTP ${customers.status}`)
+      const denied = await fetch(`${edgeBase}/api-key-list`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      assert(denied.status === 403, `list sem AAL2 HTTP ${denied.status}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
+
+    console.log('[16/16] Webhooks B2B')
+
+    await test('webhook assinado enfileira eventos de pedido e pode ser revogado', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+      const created = await call(
+        'api-webhook-create',
+        {
+          url: 'https://example.test/pedeoutra-webhook',
+          events: ['order.created', 'order.confirmed'],
+        },
+        { token: supplierAal2Token },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.secret.startsWith('whsec_'), 'segredo')
+      const webhookId = created.data.id
+      const secret = created.data.secret
+
+      const list = await fetch(`${edgeBase}/api-webhook-list`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      const listData = await list.json()
+      assert(list.status === 200, `list HTTP ${list.status}`)
+      assert(listData.webhooks.some((hook) => hook.id === webhookId), 'webhook não listado')
+      assert(!JSON.stringify(listData).includes(secret), 'list vazou segredo')
+
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select secret_ciphertext from public.api_webhooks where id = '${webhookId}'`,
+      ]).stdout.trim()
+      assert(stored && !stored.includes(secret), 'segredo em claro')
+
+      const orderId = crypto.randomUUID()
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `insert into public.orders
+           (id, organization_id, public_reference, status, total_cents, source)
+         values ('${orderId}', '${ORG_ID}', 'PD-WEBHOOK-${Date.now()}', 'new', 500, 'manual')`,
+      ])
+      docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-c',
+        `update public.orders set status = 'confirmed' where id = '${orderId}'`,
+      ])
+      const deliveries = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-F', '|', '-c',
+        `select event, count(*) from public.api_webhook_deliveries
+          where webhook_id = '${webhookId}' group by event order by event`,
+      ]).stdout.trim()
+      assert(deliveries.includes('order.created|1'), `created ${deliveries}`)
+      assert(deliveries.includes('order.confirmed|1'), `confirmed ${deliveries}`)
+
+      const workerWrong = await fetch(`${edgeBase}/api-webhook-worker`, {
+        method: 'POST',
+        headers: { 'x-api-webhook-worker-token': 'errado' },
+      })
+      assert(workerWrong.status === 401, `worker errado HTTP ${workerWrong.status}`)
+      const worker = await fetch(`${edgeBase}/api-webhook-worker`, {
+        method: 'POST',
+        headers: { 'x-api-webhook-worker-token': API_WEBHOOK_WORKER_TOKEN },
+      })
+      const workerData = await worker.json()
+      assert(worker.status === 200, `worker HTTP ${worker.status}`)
+      assert(workerData.disabled === true, 'worker deveria estar desligado')
+
+      const revoked = await call(
+        'api-webhook-revoke',
+        { webhook_id: webhookId },
+        { token: supplierAal2Token },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      assert(revoked.data.status === 'revoked', 'status revogado')
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
     })
 
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
