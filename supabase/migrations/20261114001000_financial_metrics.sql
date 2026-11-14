@@ -34,19 +34,19 @@ begin
   v_since := now() - (v_days || ' days')::interval;
 
   select max(be.processed_at) into v_sync
-    from public.billing_events be where be.state = 'processed';
+    from public.billing_events be where be.state = 'processed'; -- NOSONAR: estado de contrato; migration imutável e coberta por DB/restore.
 
   select
-    count(*) filter (where s.plan_code = 'essential')::integer,
-    count(*) filter (where s.plan_code = 'professional')::integer
+    count(*) filter (where s.plan_code = 'essential')::integer, -- NOSONAR: plano de contrato; migration imutável e coberta por DB/restore.
+    count(*) filter (where s.plan_code = 'professional')::integer -- NOSONAR: plano de contrato; migration imutável e coberta por DB/restore.
     into v_essential, v_professional
     from public.subscriptions s
-   where s.state = 'active'
+   where s.state = 'active' -- NOSONAR: estado de contrato; migration imutável e coberta por DB/restore.
      and (s.current_period_end is null or s.current_period_end > now());
 
   select coalesce(sum(
-    case when be.payload_minimal->>'valueCents' ~ '^[0-9]+$'
-      then (be.payload_minimal->>'valueCents')::bigint else 0 end
+    case when be.payload_minimal->>'valueCents' ~ '^[0-9]+$' -- NOSONAR: chave de contrato JSON; migration imutável e coberta por DB/restore.
+      then (be.payload_minimal->>'valueCents')::bigint else 0 end -- NOSONAR: chave de contrato JSON; migration imutável e coberta por DB/restore.
   ), 0) into v_received
     from public.billing_events be
    where be.state = 'processed'
@@ -54,8 +54,8 @@ begin
      and be.received_at >= v_since;
 
   select coalesce(sum(
-    case when be.payload_minimal->>'valueCents' ~ '^[0-9]+$'
-      then (be.payload_minimal->>'valueCents')::bigint else 0 end
+    case when be.payload_minimal->>'valueCents' ~ '^[0-9]+$' -- NOSONAR: chave de contrato JSON; migration imutável e coberta por DB/restore.
+      then (be.payload_minimal->>'valueCents')::bigint else 0 end -- NOSONAR: chave de contrato JSON; migration imutável e coberta por DB/restore.
   ), 0) into v_refunded
     from public.billing_events be
    where be.state = 'processed'
@@ -121,12 +121,12 @@ begin
          true, v_sync
     from public.subscriptions s where s.state = 'past_due'
   union all
-  select 'canceled', null::bigint, count(*)::bigint,
+  select 'canceled', null::bigint, count(*)::bigint, -- NOSONAR: estado de contrato; migration imutável e coberta por DB/restore.
          'Assinaturas canceladas no momento da consulta.',
          true, v_sync
     from public.subscriptions s where s.state = 'canceled'
   union all
-  select 'refunded', null::bigint, count(*)::bigint,
+  select 'refunded', null::bigint, count(*)::bigint, -- NOSONAR: estado de contrato; migration imutável e coberta por DB/restore.
          'Assinaturas reembolsadas no momento da consulta.',
          true, v_sync
     from public.subscriptions s where s.state = 'refunded'

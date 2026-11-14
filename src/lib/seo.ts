@@ -8,9 +8,15 @@ interface SeoInput {
   jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>
 }
 
+function stripTrailingSlashes(value: string): string {
+  let end = value.length
+  while (end > 0 && value[end - 1] === '/') end -= 1
+  return value.slice(0, end)
+}
+
 function baseUrl(): string {
   const configured = (import.meta.env.VITE_APP_URL as string | undefined)?.trim()
-  return (configured || window.location.origin).replace(/\/+$/, '')
+  return stripTrailingSlashes(configured || window.location.origin)
 }
 
 function setMeta(selector: string, attribute: 'name' | 'property', key: string, value: string) {
@@ -25,7 +31,8 @@ function setMeta(selector: string, attribute: 'name' | 'property', key: string, 
 
 export function useSeo(input: SeoInput): void {
   useEffect(() => {
-    const canonical = `${baseUrl()}${input.path.startsWith('/') ? input.path : `/${input.path}`}`
+    const suffix = input.path.startsWith('/') ? input.path : `/${input.path}`
+    const canonical = `${baseUrl()}${suffix}`
     document.title = input.title
     setMeta('meta[name="description"]', 'name', 'description', input.description)
     setMeta(
