@@ -6,8 +6,8 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 - Base SHA: `7db00c5b3c066cf3e75d0f8fedac107b26720a35`
-- HEAD no momento da geração: `d83d420e39d098fe2611960fcbd873c9a6158fb3`
-- Work Order: `PDA-V2-P02-WO-001 + incrementos Partes 3–5 (PROPOSED)`
+- HEAD no momento da geração: `b2266923aa1d14ffe4925b328c21b5ebba25b214`
+- Work Order: `PDA-V2-P02-WO-001 + Partes 3–5 escopo interno (PROPOSED)`
 
 ## Issues verificadas (sem duplicatas)
 
@@ -19,7 +19,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | Arquivo | SHA-256 |
 | --- | --- |
 | `.github/workflows/billing-reconcile.yml` | `8659f39309351494d1d4f25187bbf1e380807ded9871ab767e00b7b46c9d95e1` |
-| `.github/workflows/ci.yml` | `d5b8909db3cdd8909bff0bcdaffb7fb41f62750622437c50b3f01a27741a8cc8` |
+| `.github/workflows/ci.yml` | `5d3719de0f8a9359bac7268addc6665c3ffdcb501f898b4f6d1248d33d6ee243` |
 | `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
 | `.github/workflows/release-health.yml` | `c7c0eabaf13b1a95c1118e4f9f5b210ad8979ce8752da6e4886752ae21ce627d` |
 | `README.md` | `0e557d2db4285f99a4d14484af6288968bf9c7b66cac64a3fc33e8653546edb1` |
@@ -27,7 +27,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `c2343540773ce31ed4f72fe1a52ed5cb71bd9765baeae8afb667be8ae70b8240` |
+| `docs/checkpoint.md` | `8641a6408f84085fa51ffe0a1b55462a3b00f470d3ec15cafd54e6661c63f179` |
 | `docs/decisions-ledger.md` | `f498ac48a5b7cb7f92170cac2d8b05db11eaaa03ce22c2cb46bd93dd34729f9b` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `5d3b0cae2f2d7275ec0ffb52bd255f2a4ecbc0603217638379cda3bde0c3c93e` |
@@ -37,12 +37,13 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `docs/requirements.md` | `1e869a2f0b91ee7f5791846dbedcafd959764d634a49c7a03199c67f7376aabc` |
 | `docs/scope.md` | `837978ec4440565657cd6a1beb446afbab414a3a0cc6a254aafb7f66e83401eb` |
 | `docs/security.md` | `2e9fd6cf20d01ed764c80eb70b2fd1510ffff386ebdb75781b6d4ca8c96d4392` |
+| `docs/seo-runbook.md` | `765af9ce12d45debf5b49cd2a8b1a33774513775faeedbf2d426c56342fad447` |
 | `docs/support-runbook.md` | `06660ed0dc083c665ea9421a9a18ae66261af1714ba36e6e72bf5875bf16dec0` |
 | `docs/test-plan.md` | `0b51cdbd572475f2ffe21639f5a6a22d3c0b2aa0b8fcb90cb9953dbeba032185` |
 | `eslint.config.js` | `2ddebdcbb8cea828bab13a7aefb5244bdc66334455dc2387fff9ee6633098ffb` |
 | `index.html` | `4fabf7a6beda7fc31f4a546fd290bc968e88a9e9d17b2ada5620e99bb0e0f4bd` |
 | `package-lock.json` | `d1f7943c90873cd87368008bd30616bce731ee30581222008840987761ba2174` |
-| `package.json` | `04e0b0c794c57969ee0ef8c080326632539ef3f2fbaf3338ccdc9eb90b9efcfa` |
+| `package.json` | `d69f4aed34e0f17d12c42844179f17afac281ff9477492c14401e9f620707a9f` |
 | `public/favicon.svg` | `b597e83a256649e1ee8cb7c4e6ac7495c523dd702463139175e8487ccfadced3` |
 | `public/theme-init.js` | `8929d2e6ea8d7fb695291c806d9093f715310d3b03afb8327e13c85cacab0554` |
 | `scripts/context-lock.mjs` | `9a4ef91e459e30851ea4c48654a58bb08cfbf8dbeaf9b02809a7e30e173e7ef1` |
@@ -50,9 +51,11 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `scripts/edge-typecheck.mjs` | `a889d22856be6694413a71a6c8f8c004deb319b6a9ac16a043a256609d971a25` |
 | `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
 | `scripts/local-edge-router.ts` | `25c628431ee96b9eb628ab83ff392925ebbd283e7de16a3e1ea5f2b5ce279a09` |
+| `scripts/prerender.mjs` | `16f575acd4aaea51349f562eeb3be3f8680baca3bee32bede12c9c4203dd08cd` |
 | `scripts/prod-smoke.mjs` | `3062842803b4166b2298ae670862a0afa45880df8d1995edd7b9b58ba7c1e969` |
+| `scripts/seo-check.mjs` | `591d7ed5ddbcdc15d4f05bb51dd9b23235869a82b0b9540c246b20328f6656f3` |
 | `scripts/smoke.mjs` | `8f3a3f8be3e2b89d8d3855eb70f1efb56c3164cf9a2aa6b35940a4970befc0d4` |
-| `scripts/test-edge-http.mjs` | `95031a00b26580fcf0de76386b9088b9a5797d035d8a8cb6b9d5deac2430ae83` |
+| `scripts/test-edge-http.mjs` | `990a4e5055cbd0bbec1ede010074524767db16dd2c9542b02658a5d39bb4ce77` |
 | `scripts/test-full-local.mjs` | `f4dd01b4d2f477f523c768827de63c384c369d4344f71212e0214343d23ff2c7` |
 | `scripts/test-postgrest.mjs` | `6374291c12c196e3c925b9bc635391e315e1bf32b7f6d1a54e459c2403e5a89b` |
 | `scripts/verify-restore.mjs` | `ac954c4eeb9d012e7d195d0141c45ef8ab918ebf08deed27b19a890a197937da` |
@@ -97,10 +100,10 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `src/lib/supabase.ts` | `f900ffc9786b00d1493cb481d28c19dbe5d130ac4b872b0f4aaac40004d0525b` |
 | `src/lib/theme.test.ts` | `e5d935ea0b0203bba22a99cc8fe60d710d45c22684e5fb37fdb72b8333df0ef7` |
 | `src/lib/theme.ts` | `a4a0b2a328157edf4de187c5e0a52239dac1174abdd365bc3799fa3ace0c6f65` |
-| `src/lib/types.ts` | `f63aae34abe42791cc802febf0c92d0459a634a9c81adc921f28b6ae0b3a5992` |
+| `src/lib/types.ts` | `f4af15d6d1a3ea8b47c2e6a97811073a4a5250621d3e1283f24096daa29944e4` |
 | `src/main.tsx` | `b3f023da133154adff448b24c256c554072536939e52291490a6128a9cfc82f7` |
-| `src/pages/Admin.test.tsx` | `a07497b969ba349e00723d8cd33dcc39fada077f7f8bab3f1e62e41fbdbe762c` |
-| `src/pages/Admin.tsx` | `6d332ddfa135493ecb75d435cb6712ff0114ebd7a2161feaf6b37663a67d7363` |
+| `src/pages/Admin.test.tsx` | `783231be656f94750c4f0c728658aed9e023e51c118def3798c864dd9b6147c6` |
+| `src/pages/Admin.tsx` | `4ae91121d14dda6f4a7eaf7f0ed91fa036876f029cecdc2f54b618858d184df4` |
 | `src/pages/Billing.test.tsx` | `997591874ab224fc4547b34ec5d97733289aca6b3df468a94f88ff5dc6c0affc` |
 | `src/pages/Billing.tsx` | `730a445040b3e242b55bb3925f939146ab34fa7b49b989eb291b15488f28df5f` |
 | `src/pages/Catalog.private.test.tsx` | `9c5d53fe125eb11089490f9d5bbd3c178e5e3caa3037b7246dbc0299a4617abf` |
@@ -111,7 +114,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `src/pages/Demo.tsx` | `2cbafb6367f065a659c66ba75f6f545e113b7712810ca24743ec43bff3e834e4` |
 | `src/pages/ForgotPassword.tsx` | `7ca0edd303f21130f8fb37444be006addcd0bf7a62fd345eebcc77d24a97dc52` |
 | `src/pages/InviteAccept.tsx` | `e45c51e37e1056a842757fdc94abaa7c2655825c546f43cca1dad4dd321faed2` |
-| `src/pages/Landing.tsx` | `920c465ca4ff5dcbf8088025a40e6e74fb013683c48b83e37a0ce3868d4a07d8` |
+| `src/pages/Landing.tsx` | `46400d1f5d45ef22a66ad591c556bb7dfa71362423dfa4e6094197f9717fc3b1` |
 | `src/pages/Legal.tsx` | `a96c5c68384184855bddfbfa65e8c6072efa4191dac0eb2bc8876d7e5dcff16b` |
 | `src/pages/Login.tsx` | `55fbec6995d18df4356f126b3fe877780fcca7575a2dfc5841a1e485d989923d` |
 | `src/pages/NotFound.tsx` | `c78ec47ea4c925ce52da2893d508a8d7c78de49d10c5f8f2d29a5de5fc308108` |
@@ -138,7 +141,8 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `src/pages/Team.tsx` | `a622692b576b1ad9dbcbc3094b2e9c5183794a9fdf11f0256005fdfd2fccb639` |
 | `src/pages/Tracking.test.tsx` | `f56e1dc6c00d263ea8a67dd3def03e47b1cc66d96873515f8401e04cde202580` |
 | `src/pages/Tracking.tsx` | `ac4438741103de770bbf3723075e08a3ed4228556ab0ccaf5f075d5bc7864541` |
-| `src/styles.css` | `b2636516cbd7b138c04cfe39e52b52a19af9fb5e5f42a149235027470b01d1bf` |
+| `src/prerender/entry.tsx` | `bddc032a97d28eb2654c73d4bb1e0a3869e610ad96f4898f2a4af816934adeb9` |
+| `src/styles.css` | `23f5e363fcdb9541f2c79d928da46a569aa7c282569350d52f0112febc396823` |
 | `src/test/setup.ts` | `31f9b0650fa5a1fc26d640fce75f0a6bda14af4e40dd624576c5a075ff8d14ed` |
 | `src/vite-env.d.ts` | `424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92` |
 | `supabase/config.toml` | `dc1ee25bc52f655d5440fd2c46cd1d07bb400fe991895977862e68a918bedfe4` |
@@ -179,7 +183,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `supabase/functions/_shared/validation.ts` | `bb2364b3a88382e9d2548ceead4eae327f2391453071b750055edf46b17b6875` |
 | `supabase/functions/_shared/whatsapp-crypto.test.ts` | `288bb71a11f7483c06779ed23cbd3702f836c458b5ef126e561c6fb39f0a0abe` |
 | `supabase/functions/_shared/whatsapp-crypto.ts` | `3f96b95fe17caed9cde8f254ce1d643dd3bcd9d1de11db4cb4412b2a961e475d` |
-| `supabase/functions/admin-api/index.ts` | `495561e42c1918070435503827be5ead9a26bcc22ae318a0bd7214477962b173` |
+| `supabase/functions/admin-api/index.ts` | `42aff8529995426149807465bfb2293fbcfa39497ba9219224cf2ca617e86397` |
 | `supabase/functions/admin-bootstrap/index.ts` | `a420bb542cdb5270041e6ad60209b9610c99427ebd2365d9a79bac05e11e99d8` |
 | `supabase/functions/analytics-consent/index.ts` | `e80d25ac1c6c02ba9243b108b91b679229b7ba92b562802cf046a7da6a443ad9` |
 | `supabase/functions/analytics-ingest/index.ts` | `d22817213f8cdd907063143b09a970d32c7c0643eab869c22995f1c25a025503` |
@@ -258,6 +262,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `supabase/migrations/20261114001000_financial_metrics.sql` | `cc433abffc140b26a9dabd87669097fa552ddaf859d8e3fc06a446c86534bd42` |
 | `supabase/migrations/20261114001100_api_keys.sql` | `7bead02fd655cc8368e7c5c54067c2bfc7dfc2e4d45e9069359f8094708ace03` |
 | `supabase/migrations/20261114001200_api_webhooks.sql` | `36d1247d6c5d75fcbe9befdd962ed547aa202d8b3d2ecb6ea1647e0cc396a9fe` |
+| `supabase/migrations/20261114001300_admin_health.sql` | `b50acc4932681e521067dd6e38d1eacad1c380fc5ef6683b611e706ba68a3d36` |
 | `supabase/tests/00_bootstrap.sql` | `603ee9c1f79fbe367b93e37173b916c21ca3ac8ac83bccd94d8c52683bfdf2a0` |
 | `tsconfig.json` | `c262fbcbdeab927d2121cd18515ff7d01d3ca7261ba35bcdf0cdc561a268e768` |
 | `tsconfig.node.json` | `a95fd5db51e44d20a9f9087f480c9995fb922c72598bc5d0fdd16ff3a4e4fa9b` |
