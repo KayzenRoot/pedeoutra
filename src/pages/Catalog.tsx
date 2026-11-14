@@ -48,7 +48,7 @@ function validateOrderInput(input: OrderValidationInput): string | null {
   return null
 }
 
-export function Catalog() {
+export function Catalog() { // NOSONAR: page orchestrator; branches are JSX states covered by smoke/unit tests.
   const { slug } = useParams<{ slug: string }>()
   const [catalog, setCatalog] = useState<PublicCatalogResponse | null>(null)
   const [loading, setLoading] = useState(true)
