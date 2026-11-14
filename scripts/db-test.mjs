@@ -2575,6 +2575,44 @@ async function main() {
       )
     })
 
+
+    await test('chaves de API são service_role, hash único e escopos válidos', async () => {
+      await client.query(
+        `insert into public.api_keys
+           (organization_id, name, key_prefix, key_hash, scopes)
+         values ($1, 'DB Key', 'po_live_abc', $2, array['catalog:read'])`,
+        [orgA.id, 'e'.repeat(64)],
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.api_keys
+               (organization_id, name, key_prefix, key_hash)
+             values ($1, 'Duplicada', 'po_live_def', $2)`,
+            [orgA.id, 'e'.repeat(64)],
+          ),
+        'api_keys_hash_unique',
+        'hash duplicado',
+      )
+      await expectError(
+        () =>
+          client.query(
+            `insert into public.api_keys
+               (organization_id, name, key_prefix, key_hash, scopes)
+             values ($1, 'Escopo inválido', 'po_live_ghi', $2, array['admin:write'])`,
+            [orgA.id, 'f'.repeat(64)],
+          ),
+        'api_keys_scopes_check',
+        'escopo inválido',
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () => client.query('select id from public.api_keys limit 1')),
+        'permission denied',
+        'browser lendo chaves',
+      )
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

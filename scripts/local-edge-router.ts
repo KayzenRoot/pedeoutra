@@ -52,6 +52,10 @@ import { handler as reorderReminderCreate } from '../supabase/functions/reorder-
 import { handler as reorderReminderOpen } from '../supabase/functions/reorder-reminder-open/index.ts'
 import { handler as analyticsIngest } from '../supabase/functions/analytics-ingest/index.ts'
 import { handler as analyticsConsent } from '../supabase/functions/analytics-consent/index.ts'
+import { handler as apiKeyCreate } from '../supabase/functions/api-key-create/index.ts'
+import { handler as apiKeyList } from '../supabase/functions/api-key-list/index.ts'
+import { handler as apiKeyRevoke } from '../supabase/functions/api-key-revoke/index.ts'
+import { handler as apiV1 } from '../supabase/functions/api-v1/index.ts'
 
 type Handler = (request: Request) => Promise<Response>
 
@@ -105,6 +109,10 @@ const routes: Record<string, Handler> = {
   'reorder-reminder-open': reorderReminderOpen,
   'analytics-ingest': analyticsIngest,
   'analytics-consent': analyticsConsent,
+  'api-key-create': apiKeyCreate,
+  'api-key-list': apiKeyList,
+  'api-key-revoke': apiKeyRevoke,
+  'api-v1': apiV1,
 }
 
 const port = Number(Deno.env.get('EDGE_PORT') ?? '8000')
@@ -116,6 +124,8 @@ Deno.serve({ port, hostname: '127.0.0.1' }, (request) => {
       headers: { 'Content-Type': 'application/json' },
     })
   }
+
+  if (path.startsWith('/api-v1')) return apiV1(request)
 
   const name = path.split('/').filter(Boolean).pop() ?? ''
   const handler = routes[name]

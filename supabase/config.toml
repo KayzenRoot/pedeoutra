@@ -183,3 +183,15 @@ verify_jwt = false
 
 [functions.analytics-consent]
 verify_jwt = false
+
+[functions.api-key-create]
+verify_jwt = true
+
+[functions.api-key-list]
+verify_jwt = true
+
+[functions.api-key-revoke]
+verify_jwt = true
+
+[functions.api-v1]
+verify_jwt = false

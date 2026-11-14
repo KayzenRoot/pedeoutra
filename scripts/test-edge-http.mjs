@@ -2153,6 +2153,91 @@ async function main() {
       assert(supplier.status === 403, `fornecedor HTTP ${supplier.status}`)
     })
 
+
+    console.log('[15/15] API B2B v1')
+
+    await test('chave de API é única, escopada, auditável e revogável', async () => {
+      await clientQuery(`
+        insert into public.subscriptions
+          (organization_id, state, current_period_end, plan_code, plan_version)
+        values ('${ORG_ID}', 'active', now() + interval '20 days', 'professional', 1)
+        on conflict (organization_id) do update
+          set state = 'active', current_period_end = now() + interval '20 days',
+              plan_code = 'professional', plan_version = 1
+      `)
+
+      const created = await call(
+        'api-key-create',
+        { name: 'ERP Edge', scopes: ['catalog:read', 'orders:read', 'customers:read'] },
+        { token: supplierAal2Token },
+      )
+      assert(created.status === 201, `create HTTP ${created.status} ${JSON.stringify(created.data)}`)
+      assert(created.data.key.startsWith('po_live_'), 'prefixo da chave')
+      const rawKey = created.data.key
+      const keyId = created.data.id
+      const stored = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select key_hash from public.api_keys where id = '${keyId}'`,
+      ]).stdout.trim()
+      assert(stored.length === 64 && stored !== rawKey, 'chave em claro')
+
+      const list = await fetch(`${edgeBase}/api-key-list`, {
+        headers: { Authorization: `Bearer ${supplierAal2Token}` },
+      })
+      const listData = await list.json()
+      assert(list.status === 200, `list HTTP ${list.status}`)
+      assert(listData.keys.some((key) => key.id === keyId), 'chave não listada')
+      assert(!JSON.stringify(listData).includes(rawKey), 'list vazou chave')
+
+      const headers = { Authorization: `Bearer ${rawKey}` }
+      const products = await fetch(`${edgeBase}/api-v1/v1/products?limit=5`, { headers })
+      const productsData = await products.json()
+      assert(products.status === 200, `products HTTP ${products.status}`)
+      assert(Array.isArray(productsData.data), 'produtos')
+      assert(productsData.data.length <= 5, 'limite')
+
+      const orders = await fetch(`${edgeBase}/api-v1/v1/orders?status=new`, { headers })
+      assert(orders.status === 200, `orders HTTP ${orders.status}`)
+      const me = await fetch(`${edgeBase}/api-v1/v1/me`, { headers })
+      const meData = await me.json()
+      assert(me.status === 200, `me HTTP ${me.status}`)
+      assert(meData.scopes.includes('catalog:read'), 'escopos')
+
+      const revoked = await call(
+        'api-key-revoke',
+        { key_id: keyId },
+        { token: supplierAal2Token },
+      )
+      assert(revoked.status === 200, `revoke HTTP ${revoked.status}`)
+      const after = await fetch(`${edgeBase}/api-v1/v1/products`, { headers })
+      assert(after.status === 401, `revogada HTTP ${after.status}`)
+
+      const invalid = await fetch(`${edgeBase}/api-v1/v1/products`, {
+        headers: { Authorization: `Bearer ${'po_live_' + 'A'.repeat(43)}` },
+      })
+      assert(invalid.status === 401, `inválida HTTP ${invalid.status}`)
+    })
+
+    await test('escopo insuficiente bloqueia rota de clientes', async () => {
+      const created = await call(
+        'api-key-create',
+        { name: 'Somente catálogo', scopes: ['catalog:read'] },
+        { token: supplierAal2Token },
+      )
+      assert(created.status === 201, `create HTTP ${created.status}`)
+      const headers = { Authorization: `Bearer ${created.data.key}` }
+      const catalog = await fetch(`${edgeBase}/api-v1/v1/products`, { headers })
+      assert(catalog.status === 200, `catálogo HTTP ${catalog.status}`)
+      const customers = await fetch(`${edgeBase}/api-v1/v1/customers`, { headers })
+      assert(customers.status === 403, `clientes HTTP ${customers.status}`)
+      const denied = await fetch(`${edgeBase}/api-key-list`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      })
+      assert(denied.status === 403, `list sem AAL2 HTTP ${denied.status}`)
+      await clientQuery(`delete from public.subscriptions where organization_id = '${ORG_ID}'`)
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) console.error(`  - ${name}: ${error.message}`)
