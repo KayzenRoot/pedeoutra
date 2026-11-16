@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 - Base SHA: `7db00c5b3c066cf3e75d0f8fedac107b26720a35`
-- HEAD no momento da geração: `8b7542ed1e3205b1fe94b512197ba5d4bca8aa94`
+- HEAD no momento da geração: `7a57efea30a71312a91b31d28c642087cc8c3af1`
 - Work Order: `PDA-V2-P02-WO-001 + Partes 3–5 + #54/#56/#81/#59 (PROPOSED)`
 
 ## Issues verificadas (sem duplicatas)
@@ -28,7 +28,7 @@
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `931a4980e47a217ce01ef80707c5eff9e5b484d4549049b8e25a70b34963f878` |
+| `docs/checkpoint.md` | `864ebebca944edfa354ce932616cca05430ddad18f83406fe1cce12ea9672a4b` |
 | `docs/customer-insights.md` | `e4123b71a14f8503d5e8152047a81a317a75e23c1ad065bac863d29060c73574` |
 | `docs/decisions-ledger.md` | `2f8e479ad0ab2122c9f1adb0296a8569920e0efa5f0e6c1ac969561928f297fd` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
