@@ -133,7 +133,7 @@ async function runAxe(page, label) {
   await page.addScriptTag({ path: AXE_PATH })
   const result = await page.evaluate(async () => {
     return await globalThis.axe.run(globalThis.document, {
-      runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
+      runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
     })
   })
 
