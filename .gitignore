@@ -19,3 +19,5 @@ Thumbs.db
 
 # Logs de evidência versionados intencionalmente
 !evidence/logs/*.log
+
+.wrangler/
