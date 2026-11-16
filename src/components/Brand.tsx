@@ -2,7 +2,11 @@ import { Link } from 'react-router-dom'
 
 export function Brand({ to = '/', compact = false }: { to?: string; compact?: boolean }) {
   return (
-    <Link to={to} className="brand" aria-label="PedeOutra — início">
+    <Link
+      to={to}
+      className="brand"
+      aria-label={compact ? 'PedeOutra — início' : undefined}
+    >
       <span className="brand-mark" aria-hidden="true">
         <span>↻</span>
       </span>
