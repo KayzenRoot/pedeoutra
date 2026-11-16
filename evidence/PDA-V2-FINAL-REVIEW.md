@@ -31,7 +31,7 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | `npm run build` | exit 0 |
 | `npm run test:seo` | PASS HTML inicial, canonical/JSON-LD, sitemap, robots e 404 real |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, axe 0 violações |
-| SonarCloud | **0 issues; quality gate OK** (new-code duplication 2.7%) |
+| SonarCloud | última análise automática da main `7db00c5`: gate OK, 0.4% de duplicação; HEAD do branch não analisado |
 
 Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,test-full-local,test-restore,build,smoke}.log`.
 

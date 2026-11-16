@@ -28,7 +28,7 @@ Veredito: **APPROVED FOR DRAFT REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
 | restore | PASS |
 | SEO estático (`test:seo`) | PASS: HTML inicial, planos, canonical, JSON-LD, sitemap, robots, 404 real |
 | smoke | PASS light/dark/system desktop/mobile; axe 0 violações |
-| SonarCloud | 0 issues; quality gate OK; new-code duplication 0.9% |
+| SonarCloud | última análise automática da main `7db00c5`: gate OK, 0.4% de duplicação; HEAD do branch **não analisado** (sem token/análise automática só na main) |
 
 Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 
@@ -104,6 +104,7 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 ## Conclusão
 
 O branch está pronto para revisão técnica e demonstração interna, com evidência
-verde e sem issues Sonar. Não está autorizado para merge/deploy de produção nem
+verde; a última análise Sonar disponível é da main e o HEAD do branch ainda não
+foi analisado pelo SonarCloud. Não está autorizado para merge/deploy de produção nem
 para declarar `PROD READY`: os gates externos e a auditoria em ambiente real
 continuam abertos. `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` permanecem.
