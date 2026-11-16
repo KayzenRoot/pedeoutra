@@ -2,7 +2,7 @@
 
 Data: 2026-11-16
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
-PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
+PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Ready for review
 HEAD de código revisado: `48cca3d`
 Base de produção: `main` com Parte 1 ativa (`57511a3`)
 
@@ -10,7 +10,7 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 
 | Parte | Estado | Observação |
 | --- | --- | --- |
-| 1/5 | ativa em produção | admin bootstrap ainda pendente de TOTP/AAL2 |
+| 1/5 | ativa em produção | admin bootstrap concluído com TOTP/AAL2 em 2026-11-16 |
 | 2/5 | completa no branch | #46–#58, #63; sem deploy de produção |
 | 3/5 | parcial | #44/#45/#78/#79; #34–#42 dependem de DeepSeek/Resend/Meta e orçamento |
 | 4/5 | parcial | API B2B v1 leitura (#64/#65/#66/#67); #68–#71 dependem de Meta/DeepSeek |
@@ -73,12 +73,12 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 
 ## Bloqueios externos e pendências reais
 
-- `ADMIN_BOOTSTRAP_BLOCKED`: proprietário precisa cadastrar TOTP/AAL2 e rodar o bootstrap.
+- `ADMIN_BOOTSTRAP` resolvido em 2026-11-16 (TOTP/AAL2 + `platform_admins`).
 - SMTP próprio para envio automático de convites (o link manual já funciona).
 - WABA/Meta e templates aprovados para ativar WhatsApp automático.
 - Meta Ads/DeepSeek/Resend e orçamento da Central de Crescimento (#34–#42/#68–#71).
-- Prerender/status HTTP de SPA (#73), GSC (#76), landing final (#82), design system (#81), auditoria final (#72/#83).
-- Deploy da Parte 2–5 em produção e qualquer cobrança real dependem de autorização explícita.
+- GSC/Core Web Vitals de campo (#76) e auditoria em ambiente real (#72/#83).
+- Deploy da Parte 2–5 em produção e qualquer cobrança real dependem de autorização explícita; runbook em `docs/deployment.md`.
 
 ## Veredito proposto
 

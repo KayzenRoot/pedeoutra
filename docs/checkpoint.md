@@ -163,3 +163,23 @@ gates de lançamento.
 - **Bloqueios mantidos:** deploy do SHA, admin TOTP, SMTP, WABA/Meta,
   DeepSeek/Resend/Meta Ads, backup/PITR, legal/suporte, primeira cobrança real e
   aprovação financeira específica para conceder recompensa de indicação.
+
+## Checkpoint Delta — Admin bootstrap concluído (2026-11-16)
+
+- **ADMIN_BOOTSTRAP_BLOCKED resolvido:** superadmin `goodzlanchonete@gmail.com`
+  com TOTP verificado e AAL2 confirmado; `platform_admins` contém o UUID
+  `a249ea32-857a-45ae-a123-049704e0069a` e o evento
+  `admin.bootstrap` foi registrado em `platform_audit_events` às
+  `2026-11-16T14:51:39Z`.
+- O QR de enrollment foi exibido em JPEG e removido após a confirmação; nenhum
+  segredo TOTP foi versionado ou colocado em evidência.
+- **PR #90** passou de Draft para **Ready for review**; continua sem merge e sem
+  deploy de produção.
+- **Deploy:** runbook completo em `docs/deployment.md` (backup, 19 migrations,
+  42 Edge Functions, merge, verificação e rollback). Status
+  `BLOCKED_AUTHORIZATION`: exige autorização explícita do proprietário e backup
+  verificado.
+- **Indicações:** ADR-015 PROPOSED recomenda 1 mês de crédito interno, com teto
+  anual e custo máximo estimado; nenhuma concessão financeira foi ativada.
+- **Externo ainda bloqueado:** SMTP, WABA/Meta, DeepSeek/Resend/Meta Ads,
+  backup/PITR, legal/suporte e primeira cobrança real.

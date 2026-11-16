@@ -1,7 +1,9 @@
 # Bootstrap do superadmin — passo a passo
 
-O console `/admin` exige **AAL2 (TOTP)**. Enquanto o proprietário não concluir
-este passo, o estado correto é `ADMIN_BOOTSTRAP_BLOCKED`.
+O console `/admin` exige **AAL2 (TOTP)**. **Concluído em 2026-11-16** para
+`goodzlanchonete@gmail.com`: TOTP verificado, AAL2 confirmado, `platform_admins`
+e evento `admin.bootstrap` auditados. Este guia permanece para recuperação ou
+uma futura troca de autenticador.
 
 ## Pré-requisitos
 

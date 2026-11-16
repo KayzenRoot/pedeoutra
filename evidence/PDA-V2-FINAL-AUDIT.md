@@ -4,7 +4,7 @@ Data: 2026-11-16
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
 HEAD de código auditado: `48cca3d`
-Veredito: **APPROVED FOR DRAFT REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
+Veredito: **APPROVED FOR REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
 
 ## Escopo auditado
 
@@ -82,11 +82,12 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 
 ## Bloqueios e o que falta para PROD READY
 
-1. **ADMIN_BOOTSTRAP_BLOCKED:** proprietário precisa rodar
-   `C:\Users\csn19\pedeoutra-secrets\bootstrap-admin.mjs` e confirmar TOTP/AAL2.
-2. **DEPLOY_DA_PARTE 2–5 NÃO AUTORIZADO:** PR Draft; migrations/functions não
-   aplicadas em produção. Auditoria em ambiente real exige deploy do SHA e
-   autorização.
+1. **ADMIN_BOOTSTRAP — RESOLVIDO em 2026-11-16:** TOTP/AAL2 confirmado para
+   `goodzlanchonete@gmail.com`; `platform_admins` e `admin.bootstrap` auditados.
+   Ver `docs/checkpoint.md`.
+2. **DEPLOY_DA_PARTE 2–5 NÃO AUTORIZADO:** PR Ready for review; migrations/
+   functions não aplicadas em produção. Auditoria em ambiente real exige
+   autorização explícita e backup verificado (`docs/deployment.md`).
 3. **SMTP_BLOCKED:** convites manuais funcionam; e-mail automático não.
 4. **META/WABA_BLOCKED:** WhatsApp oficial sem envio real; WABA/templates/Meta.
 5. **GROWTH_BLOCKED:** Meta Ads/DeepSeek/Resend e orçamento (#34–#42/#68–#71).
