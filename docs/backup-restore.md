@@ -1,14 +1,14 @@
 # Backup e Restore
 
-## Estado atual (2026-11-13)
+## Estado atual (2026-11-16)
 
 - Projeto Supabase: `waygtbclkxklexnabwvj`, região East US/Ohio, plano **Free**.
-- Free **não possui backup automático nem PITR**. O keepalive diário reduz o
-  risco de pausa, mas não é backup.
+- Free **não possui PITR**. O keepalive diário reduz o risco de pausa, mas não é
+  backup.
 - `npm run test:restore` prova export/restore com dados sintéticos em ambiente
   isolado (contagens e checksums idênticos).
-- Não há export periódico de produção configurado. Enquanto isso, backup de
-  produção permanece **BLOCKED** para lançamento pago.
+- **Backup lógico diário criptografado configurado** no GitHub Actions, com
+  retenção de 30 dias (ver seção abaixo). Ainda não substitui PITR.
 
 ## Opções e custos
 
@@ -22,6 +22,36 @@
 Referências oficiais: página de preços Supabase e guia de backups/PITR. A região
 `sa-east-1` existe, mas migrar exige recriar projeto, chaves, Auth, secrets,
 Edge Functions e webhook Asaas, com janela e novo smoke.
+
+## Backup automático criptografado (2026-11-16)
+
+O workflow `.github/workflows/backup.yml` roda diariamente às 06:00 UTC
+(03:00 em America/Sao_Paulo) e também pode ser disparado manualmente:
+
+1. Linka o projeto de produção com `SUPABASE_ACCESS_TOKEN` e
+   `SUPABASE_DB_PASSWORD` (GitHub Secrets).
+2. Exporta schema público, schema `auth` e dados.
+3. Compacta e cifra com GPG AES-256 usando `BACKUP_PASSPHRASE` (GitHub Secret).
+4. Publica o artefato cifrado + SHA-256 com retenção de **30 dias**.
+
+Segredos configurados em 2026-11-16: `SUPABASE_ACCESS_TOKEN`,
+`SUPABASE_DB_PASSWORD`, `BACKUP_PASSPHRASE`. A passphrase também está em
+`C:\Users\csn19\pedeoutra-secrets\backup-passphrase.txt`, fora do repositório.
+Nunca versionar a passphrase, o dump ou o artefato decifrado.
+
+Restore do artefato:
+
+```bash
+gh run download <run-id> -n pedeoutra-backup-<run-id>
+sha256sum -c backup.tar.gz.gpg.sha256
+gpg --decrypt --batch --passphrase "$BACKUP_PASSPHRASE" \
+  -o backup.tar.gz backup.tar.gz.gpg
+tar -xzf backup.tar.gz
+```
+
+Depois seguir a seção “Restore (ambiente isolado)”. O backup lógico diário
+**não substitui PITR**: RPO de até 24h, não 2 minutos. Para lançamento pago com
+garantia de continuidade, manter ADR-009/Pro como decisão separada.
 
 ## Export manual (quando aprovado)
 
