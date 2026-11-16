@@ -314,7 +314,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | `npm run test:edge-http` | **57 PASS, 0 FAIL** |
 | `npm run test:unit` | **161 PASS, 0 FAIL** (34 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
-| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe, lembretes, analytics, API keys e webhooks |
+| `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe, lembretes, analytics, API keys, webhooks e indicações |
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |

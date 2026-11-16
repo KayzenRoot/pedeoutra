@@ -35,6 +35,53 @@ values (
   'Distribuidora Restore', 'distribuidora-restore-abc123', '11999998888', 'São Paulo'
 );
 
+insert into auth.users (id, email, email_confirmed_at)
+values ('bbbbbbbb-1111-4111-8111-111111111111', 'referred@restore.test', now());
+
+insert into public.organizations (id, owner_user_id, name, slug, whatsapp, city)
+values (
+  'bbbbbbbb-2222-4222-8222-222222222222',
+  'bbbbbbbb-1111-4111-8111-111111111111',
+  'Indicado Restore', 'indicado-restore-abc123', '11988887777', 'São Paulo'
+);
+
+insert into public.referral_codes (id, organization_id, code, created_by)
+values (
+  'bbbbbbbb-3333-4333-8333-333333333333',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'bbbbbbbbbbbbbbbbbbbbbbbb',
+  'aaaaaaaa-1111-4111-8111-111111111111'
+);
+
+insert into public.referrals (
+  id, referrer_organization_id, code_id, referred_organization_id,
+  referred_user_id, status, qualified_at, idempotency_key
+) values (
+  'bbbbbbbb-4444-4444-8444-444444444444',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'bbbbbbbb-3333-4333-8333-333333333333',
+  'bbbbbbbb-2222-4222-8222-222222222222',
+  'bbbbbbbb-1111-4111-8111-111111111111',
+  'reward_pending', now(), 'restore:referral'
+);
+
+insert into public.reward_ledger (
+  id, referral_id, organization_id, status, note
+) values (
+  'bbbbbbbb-5555-4555-8555-555555555555',
+  'bbbbbbbb-4444-4444-8444-444444444444',
+  'aaaaaaaa-2222-4222-8222-222222222222',
+  'pending', 'Restore sem efeito financeiro.'
+);
+
+insert into public.referral_events (id, referral_id, code_id, event, metadata)
+values (
+  'bbbbbbbb-6666-4666-8666-666666666666',
+  'bbbbbbbb-4444-4444-8444-444444444444',
+  'bbbbbbbb-3333-4333-8333-333333333333',
+  'qualified', '{"source":"restore"}'::jsonb
+);
+
 insert into public.organization_memberships (
   id, organization_id, user_id, email, role, status, invited_by
 ) values (
@@ -447,6 +494,10 @@ select
   (select count(*) from public.api_keys) as api_keys,
   (select count(*) from public.api_webhooks) as api_webhooks,
   (select count(*) from public.api_webhook_deliveries) as api_webhook_deliveries,
+  (select count(*) from public.referral_codes) as referral_codes,
+  (select count(*) from public.referrals) as referrals,
+  (select count(*) from public.reward_ledger) as reward_ledger,
+  (select count(*) from public.referral_events) as referral_events,
   (select md5(string_agg(id::text || ':' || public_reference || ':' || status || ':' || price_source || ':' || coalesce(price_list_id::text, ''), ',' order by id)) from public.orders) as orders_hash,
   (select md5(string_agg(name_snapshot || ':' || quantity, ',' order by id)) from public.order_items) as items_hash,
   (select md5(string_agg(plan_code || ':' || price_cents || ':' || currency, ',' order by plan_code)) from public.plan_catalog) as plans_hash,
@@ -468,7 +519,11 @@ select
   (select md5(string_agg(session_id || ':' || analytics || ':' || marketing, ',' order by session_id)) from public.analytics_consents) as analytics_consents_hash,
   (select md5(string_agg(id::text || ':' || name || ':' || status, ',' order by id)) from public.api_keys) as api_keys_hash,
   (select md5(string_agg(id::text || ':' || url || ':' || status, ',' order by id)) from public.api_webhooks) as api_webhooks_hash,
-  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.api_webhook_deliveries) as api_deliveries_hash
+  (select md5(string_agg(id::text || ':' || event || ':' || status, ',' order by id)) from public.api_webhook_deliveries) as api_deliveries_hash,
+  (select md5(string_agg(id::text || ':' || code || ':' || status, ',' order by id)) from public.referral_codes) as referral_codes_hash,
+  (select md5(string_agg(id::text || ':' || status || ':' || referred_organization_id::text, ',' order by id)) from public.referrals) as referrals_hash,
+  (select md5(string_agg(id::text || ':' || status || ':' || kind, ',' order by id)) from public.reward_ledger) as reward_ledger_hash,
+  (select md5(string_agg(id::text || ':' || event, ',' order by id)) from public.referral_events) as referral_events_hash
 `
 
 async function main() {
@@ -585,7 +640,18 @@ async function main() {
       'api_keys',
       'api_webhooks',
       'api_webhook_deliveries',
+      'referral_codes',
+      'referrals',
+      'reward_ledger',
+      'referral_events',
       'orders_hash',
+      'items_hash',
+      'plans_hash',
+      'subscriptions_hash',
+      'trials_hash',
+      'platform_audit_hash',
+      'categories_hash',
+      'images_hash',
       'price_lists_hash',
       'price_items_hash',
       'quotes_hash',
@@ -600,13 +666,10 @@ async function main() {
       'api_keys_hash',
       'api_webhooks_hash',
       'api_deliveries_hash',
-      'items_hash',
-      'plans_hash',
-      'subscriptions_hash',
-      'trials_hash',
-      'platform_audit_hash',
-      'categories_hash',
-      'images_hash',
+      'referral_codes_hash',
+      'referrals_hash',
+      'reward_ledger_hash',
+      'referral_events_hash',
     ]
     const values = source.split('|')
     columns.forEach((name, index) => console.log(`  ${name}=${values[index]}`))
