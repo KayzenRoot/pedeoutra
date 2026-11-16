@@ -4,7 +4,7 @@ Data: 2026-11-16
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
 HEAD de código auditado: `48cca3d`
-Veredito: **APPROVED FOR REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
+Veredito: **DEPLOYED / POST_DEPLOY_VERIFICATION_PARTIAL / COMMERCIAL_BLOCKED**
 
 ## Escopo auditado
 
@@ -85,9 +85,10 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 1. **ADMIN_BOOTSTRAP — RESOLVIDO em 2026-11-16:** TOTP/AAL2 confirmado para
    `goodzlanchonete@gmail.com`; `platform_admins` e `admin.bootstrap` auditados.
    Ver `docs/checkpoint.md`.
-2. **DEPLOY_DA_PARTE 2–5 NÃO AUTORIZADO:** PR Ready for review; migrations/
-   functions não aplicadas em produção. Auditoria em ambiente real exige
-   autorização explícita e backup verificado (`docs/deployment.md`).
+2. **DEPLOY DAS PARTES 2–5 — CONCLUÍDO em 2026-11-16:** backup verificado,
+   19 migrations aplicadas, 57 Edge Functions ativas e Pages atualizado.
+   Evidência: `evidence/PDA-V2-DEPLOY-2026-11-16.md`. Auditoria de produção
+   completa com usuário real/TOTP permanece parcial.
 3. **SMTP_BLOCKED:** convites manuais funcionam; e-mail automático não.
 4. **META/WABA_BLOCKED:** WhatsApp oficial sem envio real; WABA/templates/Meta.
 5. **GROWTH_BLOCKED:** Meta Ads/DeepSeek/Resend e orçamento (#34–#42/#68–#71).
@@ -104,7 +105,7 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 
 ## Conclusão
 
-O branch está pronto para revisão técnica e demonstração interna, com evidência
-verde e SonarCloud sem issues abertas no PR #90. Não está autorizado para merge/deploy de produção nem
-para declarar `PROD READY`: os gates externos e a auditoria em ambiente real
+O branch foi mergeado e as Partes 2–5 estão em produção, com evidência verde,
+SonarCloud sem issues e verificação pós-deploy de rotas, catálogo e RPCs
+administrativas. A auditoria de produção completa e os gates comerciais externos
 continuam abertos. `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` permanecem.
