@@ -55,6 +55,9 @@ executado.
   `api_admin_health` 9 métricas, `api_admin_financial` 17 métricas,
   `api_admin_analytics` 5 eventos — todas OK via service_role.
 - Relatório e indicações foram validados no clone de produção antes do deploy.
+- Sessão real AAL1 via magic link: `api_customer_insights_summary` retornou
+  `plan_required` (esperado para trial expirado); `admin-api` retornou **403**
+  sem AAL2. Nenhuma mutação de plano ou dado real.
 
 ## Estado
 
