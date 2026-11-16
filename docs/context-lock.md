@@ -2,16 +2,16 @@
 
 ## Identificação
 
-- Data do lock: 2026-11-14
+- Data do lock: 2026-11-16
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 - Base SHA: `7db00c5b3c066cf3e75d0f8fedac107b26720a35`
-- HEAD no momento da geração: `b2266923aa1d14ffe4925b328c21b5ebba25b214`
-- Work Order: `PDA-V2-P02-WO-001 + Partes 3–5 escopo interno (PROPOSED)`
+- HEAD no momento da geração: `c20960fbee61b4ac71883262df29f5a0a7f64ce5`
+- Work Order: `PDA-V2-P02-WO-001 + Partes 3–5 + #54/#56/#81/#59 (PROPOSED)`
 
 ## Issues verificadas (sem duplicatas)
 
-Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Links:
+#24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Links:
 `https://github.com/KayzenRoot/pedeoutra/issues/<n>`.
 
 ## Hashes SHA-256 dos arquivos críticos
@@ -27,13 +27,16 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `8641a6408f84085fa51ffe0a1b55462a3b00f470d3ec15cafd54e6661c63f179` |
+| `docs/checkpoint.md` | `ac56ee15242d9233f02f577c67088e9becc75d862d42f4d04fba6a5fa309a23e` |
+| `docs/customer-insights.md` | `e4123b71a14f8503d5e8152047a81a317a75e23c1ad065bac863d29060c73574` |
 | `docs/decisions-ledger.md` | `f498ac48a5b7cb7f92170cac2d8b05db11eaaa03ce22c2cb46bd93dd34729f9b` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
 | `docs/deployment.md` | `5d3b0cae2f2d7275ec0ffb52bd255f2a4ecbc0603217638379cda3bde0c3c93e` |
+| `docs/design-system.md` | `cf585f41c545cc105667f55e3409c83a70d585801d8be9ea8c44e43682be2685` |
 | `docs/part1-activation.md` | `dfa1885848420ed387856ea8ef7fcabbe8c44a2b7ed834bac0c4219a3459fc34` |
 | `docs/plan-matrix.md` | `fc7908b9bfd9a20ed76b0a9571b98cea1177d08c2868f735fb5beb5e80bedebf` |
 | `docs/project-overview.md` | `c3e76045101c0dbdabb59b038a4d28c49848b4a8e21f9facb32c2eb4623d278b` |
+| `docs/referrals.md` | `e681c67fe1fd2868560dadd1539f5fad9c7feeddf940ece0342a5a718c3b1f46` |
 | `docs/requirements.md` | `1e869a2f0b91ee7f5791846dbedcafd959764d634a49c7a03199c67f7376aabc` |
 | `docs/scope.md` | `837978ec4440565657cd6a1beb446afbab414a3a0cc6a254aafb7f66e83401eb` |
 | `docs/security.md` | `2e9fd6cf20d01ed764c80eb70b2fd1510ffff386ebdb75781b6d4ca8c96d4392` |
@@ -47,7 +50,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `public/favicon.svg` | `b597e83a256649e1ee8cb7c4e6ac7495c523dd702463139175e8487ccfadced3` |
 | `public/theme-init.js` | `8929d2e6ea8d7fb695291c806d9093f715310d3b03afb8327e13c85cacab0554` |
 | `scripts/context-lock.mjs` | `9a4ef91e459e30851ea4c48654a58bb08cfbf8dbeaf9b02809a7e30e173e7ef1` |
-| `scripts/db-test.mjs` | `713fadcc2ef2819ef5201bb1ddd7fb27b2cbf4a0a98e1a91f1e727bbfd52d81e` |
+| `scripts/db-test.mjs` | `d77f4485056932fecf3957cffafd7e1a6fb214b7a9d376f6e4336c4dc6d90df0` |
 | `scripts/edge-typecheck.mjs` | `a889d22856be6694413a71a6c8f8c004deb319b6a9ac16a043a256609d971a25` |
 | `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
 | `scripts/local-edge-router.ts` | `25c628431ee96b9eb628ab83ff392925ebbd283e7de16a3e1ea5f2b5ce279a09` |
@@ -55,14 +58,14 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `scripts/prod-smoke.mjs` | `3062842803b4166b2298ae670862a0afa45880df8d1995edd7b9b58ba7c1e969` |
 | `scripts/seo-check.mjs` | `591d7ed5ddbcdc15d4f05bb51dd9b23235869a82b0b9540c246b20328f6656f3` |
 | `scripts/smoke.mjs` | `8f3a3f8be3e2b89d8d3855eb70f1efb56c3164cf9a2aa6b35940a4970befc0d4` |
-| `scripts/test-edge-http.mjs` | `990a4e5055cbd0bbec1ede010074524767db16dd2c9542b02658a5d39bb4ce77` |
+| `scripts/test-edge-http.mjs` | `95a9b63919d3b2e4ed2a58097aa89b85f5fa5d9543729b8f1257b9895060b43d` |
 | `scripts/test-full-local.mjs` | `f4dd01b4d2f477f523c768827de63c384c369d4344f71212e0214343d23ff2c7` |
 | `scripts/test-postgrest.mjs` | `6374291c12c196e3c925b9bc635391e315e1bf32b7f6d1a54e459c2403e5a89b` |
 | `scripts/verify-restore.mjs` | `ac954c4eeb9d012e7d195d0141c45ef8ab918ebf08deed27b19a890a197937da` |
-| `src/App.tsx` | `1326f62e32b2621b4705aabfcc60cd4ea52c9b082d2b3a9c00389bd0e9248b95` |
+| `src/App.tsx` | `98f6e5b2b87a7a61505844a535de27072b6d3eac46d89862c28c37fe23f66171` |
 | `src/components/ApiKeysPanel.tsx` | `199bc54de4fe365e884cd96c323446d7fd457f4515cdc886cec39d04a0a552aa` |
 | `src/components/ApiWebhooksPanel.tsx` | `3b8a140dfd58c98e736a645d153c95394462a7b00fd9547ad1d81684a3f5a006` |
-| `src/components/AppShell.tsx` | `21ddb3ae206111c76ad59c4813560f27339a47a2e1ac86c08a54332121f24009` |
+| `src/components/AppShell.tsx` | `453200c9b21b8b7d2b2d5409a771b7577bf10b233a779568f07f625ab2dfc603` |
 | `src/components/AuthLayout.tsx` | `2d793e1cef445d3d9a2caf96289ed792cbeb5ba75d458048411a1bbd71f32ea2` |
 | `src/components/Brand.tsx` | `270b850ed4b611f0ea950c253ca422dba36d1c78056f65ed2a56897600934d82` |
 | `src/components/CatalogQrPanel.test.tsx` | `3c5344ff75f061d8c944cb33b90df7039e263b27bddfc3cb6401632578dbbc93` |
@@ -73,14 +76,20 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `src/components/ProductImportPanel.tsx` | `35dca8e82ef0d5096d62fea2d94f019eb6beb0460a364c3599a328b8d05e346a` |
 | `src/components/ProductMediaManager.tsx` | `f6b3856b088dee9ae2a8b01bc435ac5cdc46ea202eeaac19ae6c726f12fa58f3` |
 | `src/components/ProtectedRoute.tsx` | `6ed279f45f355dcaedf8709290cc0ae5ac620ad6d2a1aa9170aa8fe8b0de3916` |
+| `src/components/ReferralPanel.test.tsx` | `e0101e974803c118ed701e2fb4882bc66be2cbb00d54c3bf8d9137be863241e3` |
+| `src/components/ReferralPanel.tsx` | `017cf493770c6c692a596e9f466ebd9768cc1d3c1343692614241082b814d453` |
 | `src/components/ThemeToggle.tsx` | `b97405fb4a9ab0164b9b95358311186b9451df178de53e9c808f39ae14406e01` |
 | `src/components/WhatsAppPanel.tsx` | `fd3b9239f41a015a7a7d8fb5adf3fabc12210d5facbe25f19c363130e86ff046` |
-| `src/components/ui.tsx` | `96388b6be0e4de6e94c08f3b63e74c975ca228d24061aadbf21c0973f1de476d` |
+| `src/components/design.test.tsx` | `f968e591f475a10a07ec4bced654973d8d7ef6fb3ae5fcad54c9006aa7fa8da0` |
+| `src/components/design.tsx` | `b36124d8dd6dd01a0073851c3ba80ae8919cd584702ecab2a9efaee4727e0315` |
+| `src/components/ui.tsx` | `0b2a17867c1edce7615e4094b591d6fe8b93412dd0a9f702cb902b2ad6159f71` |
 | `src/context/AuthContext.tsx` | `9d31aaf7956771f18650019583fd6d2a13b245dd58cda25e2526948e817c3dec` |
 | `src/context/auth-context.ts` | `44765936593518823187ad76cee116aa12d103477b8d5b8cec131968a0bb7286` |
 | `src/lib/access.ts` | `193b810fc35452fecea93fcdf7eafbd902c1ba304f4fcfcdc01bfc622d13aa5b` |
 | `src/lib/analytics.ts` | `dc6d33bc96887d31752d0ad7553c9009604dfe9ad0e74ea93e8f70439a510728` |
-| `src/lib/database.types.ts` | `834f042aa157f4ca9f520f2289ac54b6b337961bce66fdfbfc5c03de5cb3873c` |
+| `src/lib/customer-report.test.ts` | `11bf6f29fa789285bc69d92ffd41644926b05c385188a6cb63425be6acb26178` |
+| `src/lib/customer-report.ts` | `6ffe39416d8b8a7b415fe4b7251ab28aefc33a316a6220310426b10e363971f7` |
+| `src/lib/database.types.ts` | `36ec95692cded8843c271a06a78d19d5ec136cd385706adde27a5a7918c0dfa9` |
 | `src/lib/edge.ts` | `90d3e706d6c6e06d35ad04d7a1060dd31bd29f5158f47f08492c4f35cd41388f` |
 | `src/lib/format.test.ts` | `9130efa8c5714456a28fb5c2cc2e3c5207d53f7ca8ef817eff98b9618f1526c3` |
 | `src/lib/format.ts` | `67419a037fda19fe19c88f8232dd0239290162faa9b150d2f4dd6bcdef454a5c` |
@@ -100,25 +109,27 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `src/lib/supabase.ts` | `f900ffc9786b00d1493cb481d28c19dbe5d130ac4b872b0f4aaac40004d0525b` |
 | `src/lib/theme.test.ts` | `e5d935ea0b0203bba22a99cc8fe60d710d45c22684e5fb37fdb72b8333df0ef7` |
 | `src/lib/theme.ts` | `a4a0b2a328157edf4de187c5e0a52239dac1174abdd365bc3799fa3ace0c6f65` |
-| `src/lib/types.ts` | `f4af15d6d1a3ea8b47c2e6a97811073a4a5250621d3e1283f24096daa29944e4` |
+| `src/lib/types.ts` | `945efc9ad1d7e7363c2d5c31a2589db971540ed4a80e87d7de67ccf6321d8591` |
 | `src/main.tsx` | `b3f023da133154adff448b24c256c554072536939e52291490a6128a9cfc82f7` |
 | `src/pages/Admin.test.tsx` | `783231be656f94750c4f0c728658aed9e023e51c118def3798c864dd9b6147c6` |
-| `src/pages/Admin.tsx` | `4ae91121d14dda6f4a7eaf7f0ed91fa036876f029cecdc2f54b618858d184df4` |
+| `src/pages/Admin.tsx` | `adbaaa9d102708bfaab627edf8acd846001d214c527d6863c641437ce67c10e0` |
 | `src/pages/Billing.test.tsx` | `997591874ab224fc4547b34ec5d97733289aca6b3df468a94f88ff5dc6c0affc` |
 | `src/pages/Billing.tsx` | `730a445040b3e242b55bb3925f939146ab34fa7b49b989eb291b15488f28df5f` |
 | `src/pages/Catalog.private.test.tsx` | `9c5d53fe125eb11089490f9d5bbd3c178e5e3caa3037b7246dbc0299a4617abf` |
 | `src/pages/Catalog.tsx` | `1e3e6d413c7a63b2369702de7558e838e3a990f4272b9de320da8da10c0ec04f` |
-| `src/pages/Customers.tsx` | `4c429790a773d335a7627b349f4108a45c6a2ded8ae9d0b30ab4ad5cca4bc8b8` |
+| `src/pages/CustomerReport.test.tsx` | `6126b2df93ce738467705ed8056c605cf79d281d9496d4bb32b306eca8028373` |
+| `src/pages/CustomerReport.tsx` | `83eb8f5798494cba1189a2db3391680793edc10a1b61f5d0306a357214aa35b2` |
+| `src/pages/Customers.tsx` | `4501042a1925f48cb2a9a38d13ffda4a4b0bebbb89a68f427768c2c219e18b5a` |
 | `src/pages/Dashboard.tsx` | `5dcf30160a353fd66feada8f0e0277e5b7e362dfe150bbec926a50be454252f6` |
 | `src/pages/Demo.test.tsx` | `6bc133ba4a474bbd8d51183c516f1d88babcd279c9fcd73cbeb285d29fa61646` |
 | `src/pages/Demo.tsx` | `2cbafb6367f065a659c66ba75f6f545e113b7712810ca24743ec43bff3e834e4` |
 | `src/pages/ForgotPassword.tsx` | `7ca0edd303f21130f8fb37444be006addcd0bf7a62fd345eebcc77d24a97dc52` |
 | `src/pages/InviteAccept.tsx` | `e45c51e37e1056a842757fdc94abaa7c2655825c546f43cca1dad4dd321faed2` |
-| `src/pages/Landing.tsx` | `46400d1f5d45ef22a66ad591c556bb7dfa71362423dfa4e6094197f9717fc3b1` |
+| `src/pages/Landing.tsx` | `969d5033c40ede856616936825236ef67a10b9adcb080b6a2ceb6dafccddc37c` |
 | `src/pages/Legal.tsx` | `a96c5c68384184855bddfbfa65e8c6072efa4191dac0eb2bc8876d7e5dcff16b` |
 | `src/pages/Login.tsx` | `55fbec6995d18df4356f126b3fe877780fcca7575a2dfc5841a1e485d989923d` |
 | `src/pages/NotFound.tsx` | `c78ec47ea4c925ce52da2893d508a8d7c78de49d10c5f8f2d29a5de5fc308108` |
-| `src/pages/Onboarding.tsx` | `95e3d9edc704287922aebb600ac6c9605b1d0212e4dcf6d0cbc94ac0532fc07a` |
+| `src/pages/Onboarding.tsx` | `a9f0981c73ea8f0f65ad8e16020f2a726294298ec0a47a6068796655f9d09015` |
 | `src/pages/OrderDetail.tsx` | `c1641cde833327d298fcf312635718fe2dcc7b0d06d33cc8b48d2b766fe6d06d` |
 | `src/pages/Orders.tsx` | `fd782b03abfdf185ebff01a0b6a9826b9a18bcccda762101128210e78fb7b81d` |
 | `src/pages/PasswordReset.test.tsx` | `2a65404a067a7a21f29558566cfa4b11da3735de2be61d681e36e4a86ad43164` |
@@ -134,15 +145,15 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `src/pages/Reorder.tsx` | `0ac605ee282354bc7a2f5391977cfa9a2ae16d618da762870cc6c51b8e5187e2` |
 | `src/pages/ResetPassword.tsx` | `07443cdbee5ba5d07f3955f6c58877c938301cd12f3bdca7d0bbcc2b86d82976` |
 | `src/pages/Sector.tsx` | `bc9ba770a392a14c56d5d43bac0f8871f63c6520aeafccf8388057ed6e947b13` |
-| `src/pages/Settings.test.tsx` | `26a60827e610c9632885d932c9a37f5b6fc00c17288558948e025f54140218e0` |
-| `src/pages/Settings.tsx` | `3996e9dc913ee5a84a691817f7de14c16209e8d04902362b67fb2f29f1f643df` |
-| `src/pages/Signup.tsx` | `eec3d6ee5d25c1b1c1ccf431300069b8385c031b8de3ca59a1df3df61acbe46a` |
+| `src/pages/Settings.test.tsx` | `6262fbbc2e131e46c85b9bc98e9f2b5c1ba6d083c420976ca14f169162f48792` |
+| `src/pages/Settings.tsx` | `8dafd8a2fcae6a14a7acf0ed258461b420e726b8800354f5db2dec709dd2b769` |
+| `src/pages/Signup.tsx` | `1decf26bcee45ede42fdb9f6fa0cb3131fd57b733c20dfbbe1a3c5e7f70e8463` |
 | `src/pages/Team.test.tsx` | `0f50e1aee694fa27eb30357782abc263c476e4f7bc0bfc3c88b1da39c9e3fb43` |
 | `src/pages/Team.tsx` | `a622692b576b1ad9dbcbc3094b2e9c5183794a9fdf11f0256005fdfd2fccb639` |
 | `src/pages/Tracking.test.tsx` | `f56e1dc6c00d263ea8a67dd3def03e47b1cc66d96873515f8401e04cde202580` |
 | `src/pages/Tracking.tsx` | `ac4438741103de770bbf3723075e08a3ed4228556ab0ccaf5f075d5bc7864541` |
 | `src/prerender/entry.tsx` | `bddc032a97d28eb2654c73d4bb1e0a3869e610ad96f4898f2a4af816934adeb9` |
-| `src/styles.css` | `23f5e363fcdb9541f2c79d928da46a569aa7c282569350d52f0112febc396823` |
+| `src/styles.css` | `6c46f4e626c082404ff118e2bc8337dd7c98f7c1434c48731b5de6a1b891d41c` |
 | `src/test/setup.ts` | `31f9b0650fa5a1fc26d640fce75f0a6bda14af4e40dd624576c5a075ff8d14ed` |
 | `src/vite-env.d.ts` | `424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92` |
 | `supabase/config.toml` | `dc1ee25bc52f655d5440fd2c46cd1d07bb400fe991895977862e68a918bedfe4` |
@@ -157,7 +168,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `supabase/functions/_shared/auth.ts` | `42141cf1f7d14885b2e3398ea77a3837fc000d13280ce5b40ff3f22b8ea35eb2` |
 | `supabase/functions/_shared/background.ts` | `dff7a17de7838e1b9cdf0860c73a0a62c08ed5237f09d5dde35398e25da7489b` |
 | `supabase/functions/_shared/billing-event.ts` | `4ce020b0971cff3b0bb38fced7be4cc1ea837cf391289d8db7d8ca7e4b8c4d07` |
-| `supabase/functions/_shared/billing-processor.ts` | `b9222cbdb2547d32ea219adad4ae4d656f73b267640015cd784f7b9feddaf218` |
+| `supabase/functions/_shared/billing-processor.ts` | `66cef6447575fbb0178e7ef8b0cb94ae3e19ea01d15f68ff11dae8ccbe26961f` |
 | `supabase/functions/_shared/billing.test.ts` | `9787480409169243dd7d2d73fb820364bf35882c787a1709a3719839acb0d5ce` |
 | `supabase/functions/_shared/billing.ts` | `f20f6267f51c6d3d8e8efde06854baf1c06c3d093baea2ae51b14d57f5e0803b` |
 | `supabase/functions/_shared/catalog.ts` | `e9f1969937281e7a70cdd83748fe5e9745a7fcacb6e67474465b32d50731296e` |
@@ -183,7 +194,7 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `supabase/functions/_shared/validation.ts` | `bb2364b3a88382e9d2548ceead4eae327f2391453071b750055edf46b17b6875` |
 | `supabase/functions/_shared/whatsapp-crypto.test.ts` | `288bb71a11f7483c06779ed23cbd3702f836c458b5ef126e561c6fb39f0a0abe` |
 | `supabase/functions/_shared/whatsapp-crypto.ts` | `3f96b95fe17caed9cde8f254ce1d643dd3bcd9d1de11db4cb4412b2a961e475d` |
-| `supabase/functions/admin-api/index.ts` | `42aff8529995426149807465bfb2293fbcfa39497ba9219224cf2ca617e86397` |
+| `supabase/functions/admin-api/index.ts` | `db14b2c8b378361412a41e792378dccca2687bc1860a386a1d7d7fb4a4a1ed89` |
 | `supabase/functions/admin-bootstrap/index.ts` | `a420bb542cdb5270041e6ad60209b9610c99427ebd2365d9a79bac05e11e99d8` |
 | `supabase/functions/analytics-consent/index.ts` | `e80d25ac1c6c02ba9243b108b91b679229b7ba92b562802cf046a7da6a443ad9` |
 | `supabase/functions/analytics-ingest/index.ts` | `d22817213f8cdd907063143b09a970d32c7c0643eab869c22995f1c25a025503` |
@@ -263,6 +274,8 @@ Issues #24–#88 verificadas; PR #90. Nenhuma issue foi criada ou duplicada. Lin
 | `supabase/migrations/20261114001100_api_keys.sql` | `7bead02fd655cc8368e7c5c54067c2bfc7dfc2e4d45e9069359f8094708ace03` |
 | `supabase/migrations/20261114001200_api_webhooks.sql` | `36d1247d6c5d75fcbe9befdd962ed547aa202d8b3d2ecb6ea1647e0cc396a9fe` |
 | `supabase/migrations/20261114001300_admin_health.sql` | `b50acc4932681e521067dd6e38d1eacad1c380fc5ef6683b611e706ba68a3d36` |
+| `supabase/migrations/20261115000100_customer_insights.sql` | `8bc6710c5dabc60e24c87edab1c6a81786e6ded623fe9c4202848563467f784e` |
+| `supabase/migrations/20261115000200_referrals.sql` | `4cb45533b838a1f5adb01c03480dcbe95e9cdd5a522e5d75e54c13e5dc060450` |
 | `supabase/tests/00_bootstrap.sql` | `603ee9c1f79fbe367b93e37173b916c21ca3ac8ac83bccd94d8c52683bfdf2a0` |
 | `tsconfig.json` | `c262fbcbdeab927d2121cd18515ff7d01d3ca7261ba35bcdf0cdc561a268e768` |
 | `tsconfig.node.json` | `a95fd5db51e44d20a9f9087f480c9995fb922c72598bc5d0fdd16ff3a4e4fa9b` |
