@@ -228,11 +228,7 @@ export function Icon({
         <path d="M12 3v4M21 12h-4M12 21v-4M3 12h4" />
       </>
     ),
-    reports: (
-      <>
-        <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
-      </>
-    ),
+    reports: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
     prices: (
       <>
         <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />

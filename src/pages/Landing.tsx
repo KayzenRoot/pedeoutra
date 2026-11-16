@@ -360,11 +360,11 @@ export function Landing() {
                   badgeTone="pill-lime"
                   title="Catálogo e pedidos"
                   items={[
-                    <><Icon name="check" /> Catálogo público com categorias e fotos</>,
-                    <><Icon name="check" /> SKU, busca e pedido por lista</>,
-                    <><Icon name="check" /> Mínimos, múltiplos e importação CSV/XLSX</>,
-                    <><Icon name="check" /> QR code e acompanhamento por link</>,
-                    <><Icon name="check" /> Comprovante PDF não fiscal</>,
+                    'Catálogo público com categorias e fotos',
+                    'SKU, busca e pedido por lista',
+                    'Mínimos, múltiplos e importação CSV/XLSX',
+                    'QR code e acompanhamento por link',
+                    'Comprovante PDF não fiscal',
                   ]}
                 />
               </TiltCard>
@@ -373,11 +373,11 @@ export function Landing() {
                   badge="Profissional"
                   title="Relacionamento e retenção"
                   items={[
-                    <><Icon name="check" /> Tabelas de preço por comprador</>,
-                    <><Icon name="check" /> Orçamentos com aceite por link</>,
-                    <><Icon name="check" /> Radar de recompra por cadência real</>,
-                    <><Icon name="check" /> Lembretes manuais com opt-in</>,
-                    <><Icon name="check" /> Analytics first-party consentido</>,
+                    'Tabelas de preço por comprador',
+                    'Orçamentos com aceite por link',
+                    'Radar de recompra por cadência real',
+                    'Lembretes manuais com opt-in',
+                    'Analytics first-party consentido',
                   ]}
                 />
               </TiltCard>
@@ -386,11 +386,11 @@ export function Landing() {
                   badge="Profissional"
                   title="Escala e integrações"
                   items={[
-                    <><Icon name="check" /> Equipe com RBAC e convites</>,
-                    <><Icon name="check" /> API REST de leitura, chaves e quota</>,
-                    <><Icon name="check" /> Webhooks assinados de pedidos</>,
-                    <><Icon name="check" /> WhatsApp oficial — requer WABA/Meta</>,
-                    <><Icon name="check" /> Meta Ads/DeepSeek — integrações futuras</>,
+                    'Equipe com RBAC e convites',
+                    'API REST de leitura, chaves e quota',
+                    'Webhooks assinados de pedidos',
+                    'WhatsApp oficial — requer WABA/Meta',
+                    'Meta Ads/DeepSeek — integrações futuras',
                   ]}
                 />
               </TiltCard>

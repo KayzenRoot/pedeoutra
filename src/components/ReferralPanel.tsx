@@ -83,6 +83,10 @@ export function ReferralPanel() {
       }
       if (!listResult.error) setRows((listResult.data ?? []) as ReferralRow[])
       setLoading(false)
+    }).catch(() => {
+      if (!active) return
+      setError('Não foi possível carregar as indicações agora.')
+      setLoading(false)
     })
     return () => {
       active = false

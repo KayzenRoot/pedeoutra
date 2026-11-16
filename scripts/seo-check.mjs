@@ -16,10 +16,14 @@ const REDIRECTS = readFileSync(join(ROOT, 'public', '_redirects'), 'utf8')
   .map((line) => {
     const [pattern, target, status] = line.split(/\s+/)
     const source = pattern.endsWith('/*')
-      ? new RegExp(`^${pattern.slice(0, -2).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/.*$`)
+      ? new RegExp(String.raw`^${escapeRegex(pattern.slice(0, -2))}/.*$`)
       : null
     return { pattern, source, target, status: Number(status) }
   })
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+}
 
 function contentType(path) {
   if (path.endsWith('.html')) return 'text/html; charset=utf-8'
@@ -117,7 +121,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+try {
+  await main()
+} catch (error) {
   console.error(error)
   process.exit(1)
-})
+}

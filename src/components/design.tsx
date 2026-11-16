@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Icon } from './ui'
 
 /**
  * Componentes visuais reutilizáveis (#81). Sem lógica de negócio e sem
@@ -10,12 +11,12 @@ export function SectionHeading({
   title,
   description,
   id,
-}: {
+}: Readonly<{
   eyebrow: string
   title: string
   description?: string
   id?: string
-}) {
+}>) {
   return (
     <div className="section-heading" id={id}>
       <span className="eyebrow">{eyebrow}</span>
@@ -28,10 +29,10 @@ export function SectionHeading({
 export function GlassCard({
   children,
   className = '',
-}: {
+}: Readonly<{
   children: ReactNode
   className?: string
-}) {
+}>) {
   return <div className={`glass-card ${className}`.trim()}>{children}</div>
 }
 
@@ -41,13 +42,13 @@ export function StatCard({
   detail,
   accent = false,
   children,
-}: {
+}: Readonly<{
   label: string
   value: ReactNode
   detail?: ReactNode
   accent?: boolean
   children?: ReactNode
-}) {
+}>) {
   return (
     <article className={accent ? 'stat-card stat-card-accent' : 'stat-card'}>
       <span>{label}</span>
@@ -63,19 +64,21 @@ export function FeatureCard({
   badgeTone = '',
   title,
   items,
-}: {
+}: Readonly<{
   badge: string
   badgeTone?: string
   title: string
-  items: ReactNode[]
-}) {
+  items: string[]
+}>) {
   return (
     <article className="feature-card">
       <span className={`pill ${badgeTone}`.trim()}>{badge}</span>
       <h3>{title}</h3>
       <ul>
-        {items.map((item, index) => (
-          <li key={index}>{item}</li>
+        {items.map((item) => (
+          <li key={item}>
+            <Icon name="check" /> {item}
+          </li>
         ))}
       </ul>
     </article>
@@ -85,10 +88,10 @@ export function FeatureCard({
 export function PricingCard({
   children,
   professional = false,
-}: {
+}: Readonly<{
   children: ReactNode
   professional?: boolean
-}) {
+}>) {
   return (
     <article className={professional ? 'price-card price-card-pro' : 'price-card'}>
       {children}
@@ -101,12 +104,12 @@ export function IconButton({
   onClick,
   children,
   className = '',
-}: {
+}: Readonly<{
   label: string
   onClick: () => void
   children: ReactNode
   className?: string
-}) {
+}>) {
   return (
     <button
       type="button"
@@ -144,10 +147,10 @@ function finePointer(): boolean {
 export function TiltCard({
   children,
   className = '',
-}: {
+}: Readonly<{
   children: ReactNode
   className?: string
-}) {
+}>) {
   const ref = useRef<HTMLDivElement>(null)
 
   function reset() {
@@ -191,11 +194,11 @@ export function Reveal({
   children,
   className = '',
   delay = 0,
-}: {
+}: Readonly<{
   children: ReactNode
   className?: string
   delay?: number
-}) {
+}>) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
 

@@ -9,7 +9,7 @@ describe('componentes visuais', () => {
         badge="Essencial"
         badgeTone="pill-lime"
         title="Catálogo"
-        items={[<>Primeiro item</>, <>Segundo item</>]}
+        items={['Primeiro item', 'Segundo item']}
       />,
     )
     expect(screen.getByRole('heading', { name: 'Catálogo' })).toBeInTheDocument()

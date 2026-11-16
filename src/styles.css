@@ -4149,6 +4149,14 @@ svg {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .price-card:hover,
+  .feature-card:hover,
+  .step-card:hover {
+    transform: none;
+  }
+}
+
 @media (max-width: 900px) {
   .feature-grid {
     grid-template-columns: 1fr;
@@ -4316,7 +4324,7 @@ svg {
 
 @media (prefers-reduced-motion: reduce) {
   .tilt-wrap {
-    transform: none !important;
+    transform: none;
     transition: none;
   }
 

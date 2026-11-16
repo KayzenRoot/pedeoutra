@@ -67,11 +67,11 @@ function CustomerInsightList({
   loading,
   rows,
   onHistory,
-}: {
+}: Readonly<{
   loading: boolean
   rows: CustomerInsightRow[]
   onHistory: (row: CustomerInsightRow) => void
-}) {
+}>) {
   if (loading) return <p className="muted">Calculando métricas…</p>
   if (rows.length === 0) {
     return (
@@ -211,6 +211,10 @@ export function CustomerReport() {
       } else {
         setSummary(((summaryResult.data ?? [])[0] ?? null) as CustomerInsightsSummary | null)
       }
+      setLoading(false)
+    }).catch(() => {
+      if (!active) return
+      setError('Não foi possível calcular o relatório agora.')
       setLoading(false)
     })
     return () => {
@@ -491,11 +495,11 @@ export function CustomerReport() {
             </button>
           </div>
           {historyError && <FormMessage>{historyError}</FormMessage>}
-          {historyLoading ? (
-            <p className="muted">Carregando pedidos…</p>
-          ) : history.length === 0 ? (
+          {historyLoading && <p className="muted">Carregando pedidos…</p>}
+          {!historyLoading && history.length === 0 && (
             <p className="muted">Nenhum pedido registrado para este cliente.</p>
-          ) : (
+          )}
+          {!historyLoading && history.length > 0 && (
             <div className="table-wrap">
               <table className="data-table">
                 <thead>

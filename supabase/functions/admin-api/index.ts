@@ -213,30 +213,38 @@ function readActionInput(body: Record<string, unknown>): AdminActionInput {
   return { action, organizationId, reason }
 }
 
+async function handleReferralReverse(
+  supabase: SupabaseClient,
+  adminId: string,
+  body: Record<string, unknown>,
+  req: Request,
+): Promise<Response | null> {
+  if (body.action !== 'referral.reverse') return null
+  const referralId = body.referral_id
+  const reason = typeof body.reason === 'string' ? body.reason.trim() : ''
+  if (!isUuid(referralId)) {
+    throw new HttpError(400, 'invalid_referral', 'Indicação inválida.')
+  }
+  if (reason.length < 5 || reason.length > 500) {
+    throw new HttpError(400, 'invalid_reason', 'Informe um motivo entre 5 e 500 caracteres.')
+  }
+  const { data, error } = await supabase.rpc('api_admin_referral_reverse', {
+    p_actor_id: adminId,
+    p_referral_id: referralId,
+    p_reason: reason,
+  })
+  if (error) throw rpcError(error)
+  return jsonResponse(req, { ok: true, result: data })
+}
+
 async function handlePost(
   supabase: SupabaseClient,
   adminId: string,
   req: Request,
 ): Promise<Response> {
   const body = (await readJson(req)) as Record<string, unknown>
-
-  if (body.action === 'referral.reverse') {
-    const referralId = body.referral_id
-    const reason = typeof body.reason === 'string' ? body.reason.trim() : ''
-    if (!isUuid(referralId)) {
-      throw new HttpError(400, 'invalid_referral', 'Indicação inválida.')
-    }
-    if (reason.length < 5 || reason.length > 500) {
-      throw new HttpError(400, 'invalid_reason', 'Informe um motivo entre 5 e 500 caracteres.')
-    }
-    const { data, error } = await supabase.rpc('api_admin_referral_reverse', {
-      p_actor_id: adminId,
-      p_referral_id: referralId,
-      p_reason: reason,
-    })
-    if (error) throw rpcError(error)
-    return jsonResponse(req, { ok: true, result: data })
-  }
+  const referralResponse = await handleReferralReverse(supabase, adminId, body, req)
+  if (referralResponse) return referralResponse
 
   const { action, organizationId, reason } = readActionInput(body)
 

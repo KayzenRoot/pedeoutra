@@ -70,7 +70,7 @@ function escapeAttr(value) {
 
 function setMeta(html, attribute, key, value) {
   const pattern = new RegExp(
-    `<meta\\s+${attribute}="${key}"\\s+content="[^"]*"\\s*/?>`,
+    String.raw`<meta\s+${attribute}="${key}"\s+content="[^"]*"\s*/?>`,
   )
   const tag = `<meta ${attribute}="${key}" content="${escapeAttr(value)}" />`
   if (pattern.test(html)) return html.replace(pattern, tag)
@@ -104,7 +104,7 @@ function withHead(template, route, baseUrl) {
 }
 
 async function main() {
-  const baseUrl = (process.env.VITE_APP_URL || 'https://pedeoutra.pages.dev').replace(/\/+$/, '')
+  const baseUrl = (process.env.VITE_APP_URL || 'https://pedeoutra.pages.dev').replace(/\/$/, '')
   const template = await readFile(join(DIST, 'index.html'), 'utf8')
   const vite = await createServer({
     root: ROOT,
@@ -115,17 +115,19 @@ async function main() {
 
   try {
     const { renderPage } = await vite.ssrLoadModule('/src/prerender/entry.tsx')
-    for (const route of ROUTES) {
-      const markup = renderPage(route.path)
-      const html = withHead(template, route, baseUrl).replace(
-        /<div id="root"><\/div>/,
-        `<div id="root">${markup}</div>`,
-      )
-      const output = join(DIST, route.out)
-      await mkdir(dirname(output), { recursive: true })
-      await writeFile(output, html, 'utf8')
-      console.log(`  prerender ${route.path} -> ${route.out}`)
-    }
+    await Promise.all(
+      ROUTES.map(async (route) => {
+        const markup = renderPage(route.path)
+        const html = withHead(template, route, baseUrl).replace(
+          /<div id="root"><\/div>/,
+          `<div id="root">${markup}</div>`,
+        )
+        const output = join(DIST, route.out)
+        await mkdir(dirname(output), { recursive: true })
+        await writeFile(output, html, 'utf8')
+        console.log(`  prerender ${route.path} -> ${route.out}`)
+      }),
+    )
 
     const notFoundMarkup = renderPage('/404')
     const notFound = withHead(
@@ -148,7 +150,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+try {
+  await main()
+} catch (error) {
   console.error(error)
   process.exit(1)
-})
+}
