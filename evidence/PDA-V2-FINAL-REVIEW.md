@@ -11,10 +11,10 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | Parte | Estado | Observação |
 | --- | --- | --- |
 | 1/5 | ativa em produção | admin bootstrap concluído com TOTP/AAL2 em 2026-11-16 |
-| 2/5 | completa no branch | #46–#58, #63; sem deploy de produção |
-| 3/5 | parcial | #44/#45/#78/#79; #34–#42 dependem de DeepSeek/Resend/Meta e orçamento |
-| 4/5 | parcial | API B2B v1 leitura (#64/#65/#66/#67); #68–#71 dependem de Meta/DeepSeek |
-| 5/5 | implementado no escopo interno | #73–#76/#80/#82; #81 parcial; #72/#83 produção BLOCKED_DEPLOY |
+| 2/5 | **deployada em produção** | #46–#58, #63; backup + 19 migrations + 57 funções em 2026-11-16 |
+| 3/5 | deployada no escopo interno | #44/#45/#78/#79; #34–#42 dependem de DeepSeek/Resend/Meta e orçamento |
+| 4/5 | deployada no escopo interno | API B2B v1 leitura (#64/#65/#66/#67); #68–#71 dependem de Meta/DeepSeek |
+| 5/5 | **deployada no escopo interno** | #73–#76/#80–#82; #72/#83 produção parcial |
 
 ## Evidência final (HEAD 4718946)
 
@@ -57,7 +57,8 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 - #78 analytics first-party consentido, com admin agregado.
 - #79 métricas financeiras e #80 dashboard interno com período, saúde e integrações.
 - #73 prerender comercial + 404 real; #74/#75 SEO/setores; #76 monitoramento SEO em CI; #82 landing V2; #81 componentes visuais, tilt e Reveal acessíveis.
-- #83 auditoria integrada interna aprovada; #72 gate de produção BLOCKED_DEPLOY.
+- #83 auditoria integrada interna aprovada; #72 gate de produção com deploy
+  concluído em 2026-11-16 e verificação pós-deploy parcial.
 
 ## Invariantes de segurança verificados
 
@@ -78,10 +79,11 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 - WABA/Meta e templates aprovados para ativar WhatsApp automático.
 - Meta Ads/DeepSeek/Resend e orçamento da Central de Crescimento (#34–#42/#68–#71).
 - GSC/Core Web Vitals de campo (#76) e auditoria em ambiente real (#72/#83).
-- Deploy da Parte 2–5 em produção e qualquer cobrança real dependem de autorização explícita; runbook em `docs/deployment.md`.
+- Deploy das Partes 2–5 concluído em 2026-11-16 (`evidence/PDA-V2-DEPLOY-2026-11-16.md`); qualquer cobrança real continua dependendo de autorização explícita.
 
 ## Veredito proposto
 
-`PART 2–5 IMPLEMENTED IN BRANCH / INTERNAL AUDIT APPROVED — BLOCKED_DEPLOY / COMMERCIAL_BLOCKED`
-com `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` mantidos. Nenhum merge ou deploy
-produtivo foi executado.
+`PART 2–5 DEPLOYED / POST_DEPLOY_VERIFICATION_PARTIAL / COMMERCIAL_BLOCKED`
+com `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` mantidos. O merge e o deploy
+produtivo foram executados em 2026-11-16 com autorização explícita; nenhuma
+cobrança, e-mail, WhatsApp ou crédito real foi executado.

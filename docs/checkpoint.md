@@ -197,3 +197,21 @@ gates de lançamento.
 - Evidência: `evidence/PDA-V2-PROD-DRY-RUN.md`.
 - Deploy continua `BLOCKED_AUTHORIZATION`; o runbook em `docs/deployment.md`
   exige backup fresco na janela e autorização explícita.
+
+## Checkpoint Delta — Deploy das Partes 2–5 (2026-11-16)
+
+- Autorização explícita do proprietário para merge/deploy do PR #90.
+- Backup verificado antes das migrations: schema público, `auth` e dados; SHA-256
+  e restauração de teste com contagens idênticas.
+- **19 migrations aplicadas** em produção via `supabase db push --linked`; dados
+  reais preservados (1 org/produto/pedido/usuário/assinatura/platform admin).
+- **57 Edge Functions ACTIVE**; `verify_jwt` conferido; `admin-api` 401 sem
+  token; `plan-catalog` e `public-catalog` 200.
+- PR #90 mergeado em `main` (`9d3298f`); Pages produção atualizado.
+- Incidente: `_redirects` com alvo `/index.html` quebrou `/app`, `/admin` e links
+  opacos; corrigido para `/` no PR #92 (`ff8736c`), deploy final `11a318a2`.
+- Verificação: rotas SPA 200, 404 real, noindex em `/app/*`, catálogo real e
+  RPCs administrativas OK.
+- Evidência: `evidence/PDA-V2-DEPLOY-2026-11-16.md`.
+- Pendências comerciais mantidas: SMTP, WABA/Meta, growth, backup/PITR,
+  legal/suporte, primeira cobrança e aprovação financeira de recompensa.
