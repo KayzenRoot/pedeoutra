@@ -183,3 +183,17 @@ gates de lançamento.
   anual e custo máximo estimado; nenhuma concessão financeira foi ativada.
 - **Externo ainda bloqueado:** SMTP, WABA/Meta, DeepSeek/Resend/Meta Ads,
   backup/PITR, legal/suporte e primeira cobrança real.
+
+## Checkpoint Delta — Dry-run de produção (2026-11-16)
+
+- Clone local dos dados reais de produção (schema público, `auth` e dados)
+  recebeu as **19 migrations novas sem erro**; contagens reais preservadas
+  (`organizations=1`, `products=1`, `orders=1`, `users=1`, `subscriptions=1`,
+  `platform_admins=1`).
+- RPCs novas de relatório e indicações presentes e exercitadas no clone com o
+  usuário real em transação revertida.
+- Dumps e container foram removidos após o teste; nenhum dado real foi
+  versionado.
+- Evidência: `evidence/PDA-V2-PROD-DRY-RUN.md`.
+- Deploy continua `BLOCKED_AUTHORIZATION`; o runbook em `docs/deployment.md`
+  exige backup fresco na janela e autorização explícita.
