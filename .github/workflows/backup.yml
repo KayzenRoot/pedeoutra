@@ -1,0 +1,68 @@
+name: Production backup
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link production project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref waygtbclkxklexnabwvj --yes
+
+      - name: Dump schema, auth schema and data
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p backup
+          supabase db dump --linked --file backup/schema.sql
+          supabase db dump --linked --schema auth --file backup/auth-schema.sql
+          supabase db dump --linked --data-only --file backup/data.sql
+          test -s backup/schema.sql
+          test -s backup/auth-schema.sql
+          test -s backup/data.sql
+
+      - name: Encrypt backup
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          tar -czf backup.tar.gz backup
+          gpg --symmetric --cipher-algo AES256 --batch --yes \
+            --passphrase "$BACKUP_PASSPHRASE" \
+            -o backup.tar.gz.gpg backup.tar.gz
+          sha256sum backup.tar.gz.gpg > backup.tar.gz.gpg.sha256
+          rm -rf backup backup.tar.gz
+
+      - name: Upload encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: pedeoutra-backup-${{ github.run_id }}
+          path: |
+            backup.tar.gz.gpg
+            backup.tar.gz.gpg.sha256
+          retention-days: 30
+          if-no-files-found: error
