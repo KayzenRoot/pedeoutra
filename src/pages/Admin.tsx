@@ -21,6 +21,8 @@ import type {
   AdminOrganization,
   AdminOrganizationsResponse,
   AdminOverview,
+  AdminReferral,
+  AdminReferralsResponse,
   PlanCode,
 } from '../lib/types'
 
@@ -51,6 +53,17 @@ function financialValue(metric: AdminFinancialMetric): string {
   return String(metric.value_count ?? 0)
 }
 
+const REFERRAL_STATUS_LABELS: Record<string, string> = {
+  invited: 'Convidada',
+  signed_up: 'Cadastro',
+  trial: 'Trial',
+  qualified: 'Qualificada',
+  reward_pending: 'Recompensa pendente',
+  reward_granted: 'Recompensa concedida',
+  rejected: 'Rejeitada',
+  reversed: 'Revertida',
+}
+
 function accessLabel(state: string): string {
   if (state === 'trial') return 'Trial'
   if (state === 'active') return 'Ativo'
@@ -69,6 +82,7 @@ export function Admin() {
   const [analyticsSources, setAnalyticsSources] = useState<AdminAnalyticsSource[]>([])
   const [financial, setFinancial] = useState<AdminFinancialMetric[]>([])
   const [health, setHealth] = useState<AdminHealthMetric[]>([])
+  const [referrals, setReferrals] = useState<AdminReferral[]>([])
   const [days, setDays] = useState(30)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
@@ -85,8 +99,15 @@ export function Admin() {
       setLoading(true)
       setError(null)
       try {
-        const [overviewData, listData, auditData, analyticsData, financialData, healthData] =
-          await Promise.all([
+        const [
+          overviewData,
+          listData,
+          auditData,
+          analyticsData,
+          financialData,
+          healthData,
+          referralData,
+        ] = await Promise.all([
           callAuthedGet<{ overview: AdminOverview }>('admin-api', { view: 'overview' }),
           callAuthedGet<AdminOrganizationsResponse>('admin-api', {
             view: 'organizations',
@@ -110,6 +131,11 @@ export function Admin() {
             days,
           }),
           callAuthedGet<AdminHealthResponse>('admin-api', { view: 'health' }),
+          callAuthedGet<AdminReferralsResponse>('admin-api', {
+            view: 'referrals',
+            limit: 50,
+            offset: 0,
+          }),
         ])
         setOverview(overviewData.overview)
         setOrganizations(listData.organizations ?? [])
@@ -119,6 +145,7 @@ export function Admin() {
         setAnalyticsSources(analyticsData.sources ?? [])
         setFinancial(financialData.metrics ?? [])
         setHealth(healthData.health ?? [])
+        setReferrals(referralData.referrals ?? [])
       } catch (loadError) {
         setError(
           loadError instanceof EdgeFunctionError
@@ -147,6 +174,43 @@ export function Admin() {
   useEffect(() => {
     if (session && level === 'aal2') void load(page)
   }, [session, level, load, page])
+
+  async function reverseReferral(referral: AdminReferral) {
+    const reason = window.prompt(
+      `Motivo da reversão da indicação ${referral.referral_id.slice(0, 8)} (5 a 500 caracteres):`,
+    )
+    if (reason === null) return
+    if (reason.trim().length < 5) {
+      setNotice('O motivo precisa ter pelo menos 5 caracteres.')
+      return
+    }
+    if (
+      !window.confirm(
+        'Reverter esta indicação? A recompensa pendente será marcada como revertida e a ação será auditada. Nenhum valor no Asaas será alterado.',
+      )
+    ) {
+      return
+    }
+    setLoading(true)
+    setNotice(null)
+    try {
+      await callAuthedFunction('admin-api', {
+        action: 'referral.reverse',
+        referral_id: referral.referral_id,
+        reason: reason.trim(),
+      })
+      setNotice('Indicação revertida e registrada na auditoria.')
+      await load(page)
+    } catch (actionError) {
+      setError(
+        actionError instanceof EdgeFunctionError
+          ? actionError
+          : new EdgeFunctionError('request_failed', 'Falha na reversão da indicação.', 500),
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   async function act(
     organization: AdminOrganization,
@@ -343,6 +407,75 @@ export function Admin() {
               <li><strong>Resend/SMTP:</strong> não conectado; envio automático indisponível.</li>
               <li><strong>Search Console:</strong> não conectado; requer verificação externa.</li>
             </ul>
+          </section>
+
+          <section className="card">
+            <div className="card-heading">
+              <div>
+                <span className="eyebrow">Crescimento</span>
+                <h2>Indicações</h2>
+              </div>
+              <span className="muted">recompensa pendente não movimenta o Asaas</span>
+            </div>
+            {referrals.length === 0 ? (
+              <p className="muted">Nenhuma indicação registrada.</p>
+            ) : (
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Indicador</th>
+                      <th>Indicado</th>
+                      <th>Status</th>
+                      <th>Recompensa</th>
+                      <th>Sinais</th>
+                      <th>Criada</th>
+                      <th aria-label="Ações" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {referrals.map((referral) => (
+                      <tr key={referral.referral_id}>
+                        <td data-label="Indicador">{referral.referrer_name}</td>
+                        <td data-label="Indicado">{referral.referred_name}</td>
+                        <td data-label="Status">
+                          {REFERRAL_STATUS_LABELS[referral.status] ?? referral.status}
+                          {referral.review_required && (
+                            <small className="cell-sub">Revisão obrigatória</small>
+                          )}
+                        </td>
+                        <td data-label="Recompensa">
+                          {referral.reward_status ?? '—'}
+                          {referral.reward_amount_cents !== null &&
+                            ` · ${formatBRL(referral.reward_amount_cents)}`}
+                        </td>
+                        <td data-label="Sinais">
+                          {referral.fraud_flags.length > 0
+                            ? referral.fraud_flags.join(', ')
+                            : '—'}
+                        </td>
+                        <td data-label="Criada">{formatDateTime(referral.created_at)}</td>
+                        <td data-label="Ações" className="table-actions">
+                          {referral.status !== 'reversed' && referral.status !== 'rejected' && (
+                            <button
+                              type="button"
+                              className="text-button"
+                              onClick={() => void reverseReferral(referral)}
+                            >
+                              Reverter
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <p className="form-note">
+              A reversão apenas registra a decisão e bloqueia a recompensa pendente. Nenhum
+              crédito, estorno ou cancelamento é enviado ao Asaas por este console.
+            </p>
           </section>
 
           <section className="card">

@@ -1320,6 +1320,112 @@ export type Database = {
           total_count: number
         }[]
       }
+      api_customer_insights: {
+        Args: {
+          p_organization_id: string
+          p_inactive_days?: number
+          p_segment?: string
+          p_search?: string | null
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          customer_id: string
+          display_name: string
+          contact_phone: string | null
+          valid_order_count: number
+          last_order_at: string | null
+          days_since_last: number | null
+          orders_value_cents: number
+          confirmed_value_cents: number
+          completed_value_cents: number
+          median_interval_days: number | null
+          frequency_trend: 'up' | 'down' | 'stable' | 'insufficient'
+          segment: 'no_purchases' | 'inactive' | 'regular' | 'overdue' | 'reactivated' | 'insufficient'
+          total_count: number
+        }[]
+      }
+      api_customer_insights_summary: {
+        Args: { p_organization_id: string; p_inactive_days?: number }
+        Returns: {
+          total_customers: number
+          active_customers: number
+          inactive_customers: number
+          reactivated_customers: number
+          no_purchase_customers: number
+          insufficient_customers: number
+          valid_order_count: number
+          orders_value_cents: number
+          confirmed_value_cents: number
+          completed_value_cents: number
+          inactive_days: number
+          window_start: string
+          generated_at: string
+        }[]
+      }
+      api_customer_order_history: {
+        Args: {
+          p_organization_id: string
+          p_customer_id: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          order_id: string
+          public_reference: string
+          status: string
+          total_cents: number | null
+          item_count: number
+          created_at: string
+          total_count: number
+        }[]
+      }
+      api_referral_code_get_or_create: {
+        Args: { p_organization_id: string }
+        Returns: {
+          code: string
+          link_path: string
+          status: string
+          max_uses: number
+          uses_count: number
+          expires_at: string
+          created_at: string
+        }[]
+      }
+      api_referral_code_rotate: {
+        Args: { p_organization_id: string }
+        Returns: {
+          code: string
+          link_path: string
+          status: string
+          max_uses: number
+          uses_count: number
+          expires_at: string
+          created_at: string
+        }[]
+      }
+      api_referral_code_revoke: {
+        Args: { p_organization_id: string }
+        Returns: boolean
+      }
+      api_referral_attribute: {
+        Args: { p_code: string }
+        Returns: { attributed: boolean; reason: string }[]
+      }
+      api_referral_list: {
+        Args: { p_organization_id: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          referral_id: string
+          display_label: string
+          status: string
+          review_required: boolean
+          reward_status: string | null
+          reward_amount_cents: number | null
+          created_at: string
+          qualified_at: string | null
+          total_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

@@ -5,6 +5,7 @@ import { WhatsAppPanel } from '../components/WhatsAppPanel'
 import { ApiKeysPanel } from '../components/ApiKeysPanel'
 import { ApiWebhooksPanel } from '../components/ApiWebhooksPanel'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { ReferralPanel } from '../components/ReferralPanel'
 import { FormMessage, PageHeader } from '../components/ui'
 import { useAuth } from '../context/auth-context'
 import { getPlanCatalog } from '../lib/edge'
@@ -293,6 +294,8 @@ export function Settings() {
             pagamento confirmado e da implementação correspondente.
           </p>
         </section>
+
+        <ReferralPanel />
 
         <section className="card">
           <span className="eyebrow">Segurança</span>

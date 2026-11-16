@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 import { supabase } from '../lib/supabase'
 import type { Customer } from '../lib/types'
@@ -141,7 +142,14 @@ export function Customers() {
         eyebrow="Relacionamento"
         title="Clientes"
         description="Dados privados do seu negócio. Nome comercial e telefone bastam para manter o histórico e criar links de recompra."
-        action={<span className="muted">{customers.length} cadastrados</span>}
+        action={
+          <div className="inline-actions">
+            <span className="muted">{customers.length} cadastrados</span>
+            <Link to="/app/relatorios" className="button button-secondary">
+              Relatório
+            </Link>
+          </div>
+        }
       />
 
       {loadError && <FormMessage>{loadError}</FormMessage>}

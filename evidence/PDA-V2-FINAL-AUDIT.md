@@ -20,10 +20,10 @@ Veredito: **APPROVED FOR DRAFT REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
 | Verificação | Resultado |
 | --- | --- |
 | lint/typecheck/build | 0 erros |
-| unit | 150 PASS |
-| DB/RLS | 71 PASS |
+| unit | 161 PASS |
+| DB/RLS | 79 PASS |
 | Edge Functions | 57 typechecked |
-| Edge HTTP | 56 PASS |
+| Edge HTTP | 57 PASS |
 | full-local | 7 PASS |
 | restore | PASS |
 | SEO estático (`test:seo`) | PASS: HTML inicial, planos, canonical, JSON-LD, sitemap, robots, 404 real |
@@ -53,9 +53,12 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 
 ### Design/landing (#81–#82)
 - [x] landing com dois planos, recursos por grupo, setores, FAQ e CTAs reais.
-- [x] glass com fallback sólido, hover somente em pointer fine, reduced motion.
-- [x] dark/light/system, mobile, axe.
-- [ ] biblioteca completa de componentes/motion do #81 permanece parcial.
+- [x] componentes visual-only `GlassCard`, `FeatureCard`, `PricingCard`,
+  `StatCard`, `SectionHeading`, `IconButton`, `TiltCard` e `Reveal`.
+- [x] tilt ≤4° só em ponteiro fino; toque/teclado/reduced motion sem transform.
+- [x] glass com fallback sólido, entrada por IntersectionObserver sem esconder
+  conteúdo no prerender, dark/light/system, mobile e axe 0 violações.
+- [x] doc `docs/design-system.md`; CWV de campo segue externo.
 
 ### Segurança/tenant
 - [x] RLS A/B em preços, quotes, tracking, WhatsApp, equipe, analytics, API e webhooks.
@@ -64,6 +67,14 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 - [x] API keys com escopos, quota e revogação; webhooks com HMAC/idempotência.
 - [x] WhatsApp e webhooks com entrega desligada por padrão.
 - [x] Nenhum pedido B2B tratado como receita SaaS.
+
+### Relatório de clientes e indicações (#54/#56)
+- [x] segmentos honestos, cancelados excluídos e valores rotulados como pedidos.
+- [x] métricas no servidor, RLS A/B, viewer sem telefone e Essencial bloqueado.
+- [x] CSV com limite e proteção de fórmula.
+- [x] indicação opaca, primeira atribuição, autoindicação e telefone igual bloqueados.
+- [x] recompensa só após pagamento confirmado, sempre pendente e sem Asaas.
+- [x] reversão por refund/admin com auditoria; nenhum crédito concedido.
 
 ### Regressão (#59)
 - [x] catálogo, pedido público, recompra, tracking, billing, admin e restore verdes.

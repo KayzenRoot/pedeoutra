@@ -284,6 +284,25 @@ export interface AdminAnalyticsResponse {
   sources: AdminAnalyticsSource[]
 }
 
+export interface AdminReferral {
+  referral_id: string
+  referrer_name: string
+  referred_name: string
+  status: string
+  review_required: boolean
+  fraud_flags: string[]
+  reward_status: string | null
+  reward_amount_cents: number | null
+  created_at: string
+  qualified_at: string | null
+  total_count: number
+}
+
+export interface AdminReferralsResponse {
+  referrals: AdminReferral[]
+  total: number
+}
+
 export interface OrderWithCustomer extends Order {
   customers: { display_name: string } | null
 }

@@ -22,10 +22,10 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | --- | --- |
 | `npm run lint` | exit 0 |
 | `npm run typecheck` | exit 0 |
-| `npm run test:unit` | **150 PASS, 0 FAIL** (30 arquivos) |
-| `npm run test:db` | **71 PASS, 0 FAIL** |
+| `npm run test:unit` | **161 PASS, 0 FAIL** (34 arquivos) |
+| `npm run test:db` | **79 PASS, 0 FAIL** |
 | `npm run test:edge` | **57 Edge Functions** typechecked |
-| `npm run test:edge-http` | **56 PASS, 0 FAIL** |
+| `npm run test:edge-http` | **57 PASS, 0 FAIL** |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
 | `npm run test:restore` | PASS, contagens/checksums idênticos |
 | `npm run build` | exit 0 |
@@ -45,7 +45,9 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 - #51 orçamentos com aceite opaco, lock, idempotência e conversão única.
 - #52 categorias e mídia privada com magic bytes.
 - #53 QR local e downloads seguros.
+- #54 relatório de clientes inativos, recorrência e valor em pedidos, com CSV seguro e histórico.
 - #55 comprovante PDF A4 não fiscal, com versão sem PII.
+- #56 indicações com código opaco, antifraude e recompensa pendente sem efeito financeiro.
 - #57 templates de catálogo idempotentes.
 - #58 equipe/RBAC, convites manuais AAL2, limite de 3 e revogação.
 - #29–#31 contrato WhatsApp, opt-in, outbox, worker/webhook; envio desligado.
@@ -54,7 +56,7 @@ Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,
 - #44/#45 radar de recompra e lembretes manuais com opt-in.
 - #78 analytics first-party consentido, com admin agregado.
 - #79 métricas financeiras e #80 dashboard interno com período, saúde e integrações.
-- #73 prerender comercial + 404 real; #74/#75 SEO/setores; #76 monitoramento SEO em CI; #82 landing V2; #81 glass/motion parcial.
+- #73 prerender comercial + 404 real; #74/#75 SEO/setores; #76 monitoramento SEO em CI; #82 landing V2; #81 componentes visuais, tilt e Reveal acessíveis.
 - #83 auditoria integrada interna aprovada; #72 gate de produção BLOCKED_DEPLOY.
 
 ## Invariantes de segurança verificados

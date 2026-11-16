@@ -2647,6 +2647,500 @@ async function main() {
       )
     })
 
+    console.log('\n[13/13] Relatório de clientes (#54)')
+
+    await test('relatório segmenta clientes, exclui cancelados e não inventa receita', async () => {
+      const insertOrder = async (customerId, daysAgo, status, totalCents, suffix) => {
+        await client.query(
+          `insert into public.orders
+             (organization_id, customer_id, public_reference, status, total_cents, source, created_at)
+           values ($1, $2, $3, $4, $5, 'manual', now() - ($6 || ' days')::interval)`,
+          [
+            orgA.id,
+            customerId,
+            `PD-INSIGHT-${suffix}-${crypto.randomUUID().slice(0, 8)}`,
+            status,
+            totalCents,
+            daysAgo,
+          ],
+        )
+      }
+      const inactive = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Insight Inativo', '11933334444'),
+      )
+      const reactivated = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Insight Reativado', '11933335555'),
+      )
+      const regular = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Insight Regular', '11933336666'),
+      )
+      await asUser(USER_A, () => insertCustomer(orgA.id, 'Insight Sem Compra', '11933337777'))
+      const single = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Insight Um Pedido', '11933338888'),
+      )
+      const overdue = await asUser(USER_A, () =>
+        insertCustomer(orgA.id, 'Insight Atrasado', '11933339999'),
+      )
+
+      await insertOrder(inactive.id, 100, 'confirmed', 1000, 'a')
+      await insertOrder(inactive.id, 80, 'completed', 1000, 'b')
+      await insertOrder(inactive.id, 2, 'canceled', 999999, 'c')
+      await insertOrder(reactivated.id, 90, 'completed', 2000, 'd')
+      await insertOrder(reactivated.id, 5, 'confirmed', 3000, 'e')
+      await insertOrder(regular.id, 10, 'confirmed', 4000, 'f')
+      await insertOrder(regular.id, 3, 'completed', 5000, 'g')
+      await insertOrder(single.id, 5, 'confirmed', 6000, 'h')
+      await insertOrder(overdue.id, 53, 'completed', 700, 'i')
+      await insertOrder(overdue.id, 28, 'completed', 800, 'j')
+      await insertOrder(overdue.id, 21, 'completed', 900, 'k')
+
+      const list = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_customer_insights($1, 30, 'all', 'Insight', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      const byName = Object.fromEntries(list.rows.map((row) => [row.display_name, row]))
+      assert(byName['Insight Inativo'].segment === 'inactive', 'inativo mal classificado')
+      assert(byName['Insight Inativo'].valid_order_count === 2, 'cancelado entrou na contagem')
+      assert(Number(byName['Insight Inativo'].orders_value_cents) === 2000, 'cancelado inflou valor')
+      assert(
+        Number(byName['Insight Inativo'].confirmed_value_cents) === 1000 &&
+          Number(byName['Insight Inativo'].completed_value_cents) === 1000,
+        'separação confirmado/concluído',
+      )
+      assert(byName['Insight Reativado'].segment === 'reactivated', 'reativado mal classificado')
+      assert(byName['Insight Regular'].segment === 'regular', 'regular mal classificado')
+      assert(byName['Insight Sem Compra'].segment === 'no_purchases', 'sem compra mal classificado')
+      assert(byName['Insight Sem Compra'].last_order_at === null, 'sem compra com data')
+      assert(byName['Insight Um Pedido'].segment === 'insufficient', 'histórico curto mal classificado')
+      assert(
+        byName['Insight Atrasado'].segment === 'overdue',
+        `atrasado mal classificado: ${JSON.stringify(byName['Insight Atrasado'])}`,
+      )
+      assert(Number(byName['Insight Atrasado'].median_interval_days) === 16, 'mediana do atrasado')
+      assert(list.rows[0].total_count >= 6, 'total_count do relatório')
+
+      const onlyInactive = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_customer_insights($1, 30, 'inactive', 'Insight Inativo', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(onlyInactive.rows.length === 1, 'filtro inactive')
+
+      const wideWindow = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_customer_insights($1, 90, 'reactivated', 'Insight Inativo', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(wideWindow.rows[0]?.segment === 'reactivated', 'janela de 90 dias')
+
+      const wide = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_customer_insights($1, 200, 'overdue', 'Insight Inativo', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(wide.rows[0]?.segment === 'overdue', 'janela de 200 dias')
+
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `select * from public.api_customer_insights($1, 30, 'perdidos', null, 50, 0)`,
+              [orgA.id],
+            ),
+          ),
+        'invalid_segment',
+        'segmento inválido',
+      )
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(
+              `select * from public.api_customer_insights($1, 30, 'all', null, 50, 0)`,
+              [orgA.id],
+            ),
+          ),
+        'forbidden',
+        'B acessando relatório de A',
+      )
+    })
+
+    await test('resumo do relatório é coerente e separa pedidos de receita', async () => {
+      const summary = await asUser(USER_A, () =>
+        client.query(`select * from public.api_customer_insights_summary($1, 30)`, [orgA.id]),
+      )
+      const row = summary.rows[0]
+      assert(row, 'resumo ausente')
+      assert(
+        Number(row.total_customers) ===
+          Number(row.active_customers) +
+            Number(row.inactive_customers) +
+            Number(row.no_purchase_customers),
+        'total não fecha',
+      )
+      assert(Number(row.inactive_customers) >= 1, 'resumo sem inativos')
+      assert(Number(row.reactivated_customers) >= 1, 'resumo sem reativados')
+      assert(Number(row.no_purchase_customers) >= 1, 'resumo sem compras')
+      assert(Number(row.insufficient_customers) >= 1, 'resumo sem histórico curto')
+      assert(
+        Number(row.orders_value_cents) ===
+          Number(row.confirmed_value_cents) + Number(row.completed_value_cents),
+        'valor total difere de confirmados + concluídos',
+      )
+      assert(Number(row.inactive_days) === 30, 'janela do resumo')
+      assert(row.window_start, 'window_start ausente')
+      assert(row.generated_at, 'generated_at ausente')
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(`select * from public.api_customer_insights_summary($1, 30)`, [orgA.id]),
+          ),
+        'forbidden',
+        'B acessando resumo de A',
+      )
+    })
+
+    await test('histórico do cliente é paginado, isolado e exige vínculo', async () => {
+      const inactive = await asUser(USER_A, () =>
+        client.query(
+          `select id from public.customers
+            where organization_id = $1 and display_name = 'Insight Inativo'`,
+          [orgA.id],
+        ),
+      )
+      const history = await asUser(USER_A, () =>
+        client.query(
+          `select * from public.api_customer_order_history($1, $2, 20, 0)`,
+          [orgA.id, inactive.rows[0].id],
+        ),
+      )
+      assert(history.rows.length === 3, `histórico com ${history.rows.length} pedidos`)
+      assert(
+        history.rows.some((order) => order.status === 'canceled'),
+        'histórico deve mostrar o cancelado sem somá-lo às métricas',
+      )
+      assert(history.rows[0].total_count === 3, 'total_count do histórico')
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `select * from public.api_customer_order_history($1, $2, 20, 0)`,
+              [orgA.id, crypto.randomUUID()],
+            ),
+          ),
+        'customer_not_found',
+        'cliente inexistente',
+      )
+      await expectError(
+        () =>
+          asUser(USER_B, () =>
+            client.query(
+              `select * from public.api_customer_order_history($1, $2, 20, 0)`,
+              [orgA.id, inactive.rows[0].id],
+            ),
+          ),
+        'forbidden',
+        'B lendo histórico de A',
+      )
+    })
+
+    await test('viewer lê o relatório sem telefone e plano Essencial é bloqueado', async () => {
+      const viewerId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+      await client.query(
+        `insert into auth.users (id, email, email_confirmed_at)
+         values ($1, 'insight-viewer@example.test', now())
+         on conflict (id) do nothing`,
+        [viewerId],
+      )
+      await client.query(
+        `insert into public.organization_memberships
+           (organization_id, user_id, email, role, status)
+         values ($1, $2, 'insight-viewer@example.test', 'viewer', 'active')`,
+        [orgA.id, viewerId],
+      )
+      const asViewer = await asUser(viewerId, () =>
+        client.query(
+          `select * from public.api_customer_insights($1, 30, 'inactive', 'Insight Inativo', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(asViewer.rows.length === 1, 'viewer não leu relatório')
+      assert(asViewer.rows[0].contact_phone === null, 'viewer recebeu telefone')
+      const phoneSearch = await asUser(viewerId, () =>
+        client.query(
+          `select * from public.api_customer_insights($1, 30, 'all', '11933334444', 50, 0)`,
+          [orgA.id],
+        ),
+      )
+      assert(phoneSearch.rows.length === 0, 'viewer buscou por telefone')
+
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'essential', plan_version = 1
+          where organization_id = $1`,
+        [orgA.id],
+      )
+      await expectError(
+        () =>
+          asUser(USER_A, () =>
+            client.query(
+              `select * from public.api_customer_insights($1, 30, 'all', null, 50, 0)`,
+              [orgA.id],
+            ),
+          ),
+        'plan_required',
+        'Essencial acessando relatório',
+      )
+      await client.query(
+        `update public.subscriptions
+            set plan_code = 'professional', plan_version = 1
+          where organization_id = $1`,
+        [orgA.id],
+      )
+    })
+
+    console.log('\n[14/14] Programa de indicações (#56)')
+
+    await test('indicação atribui uma vez, bloqueia autoindicação e mesmo telefone', async () => {
+      const users = {
+        L: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        M: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+        N: 'ffffffff-ffff-4fff-8fff-ffffffffffff',
+        O: '99999999-9999-4999-8999-999999999998',
+      }
+      await client.query(
+        `insert into auth.users (id, email, email_confirmed_at) values
+           ($1, 'ref-l@example.test', now()),
+           ($2, 'ref-m@example.test', now()),
+           ($3, 'ref-n@example.test', now()),
+           ($4, 'ref-o@example.test', now())
+         on conflict (id) do nothing`,
+        [users.L, users.M, users.N, users.O],
+      )
+      const orgL = await createOrg(users.L, 'Indicado L', '11922221111')
+      const orgM = await createOrg(users.M, 'Mesmo Telefone', '11999998888')
+      const orgN = await createOrg(users.N, 'Indicado N', '11922223333')
+      const orgO = await createOrg(users.O, 'Indicado O', '11922224444')
+
+      const codeResult = await asUser(USER_A, () =>
+        client.query(`select * from public.api_referral_code_get_or_create($1)`, [orgA.id]),
+      )
+      const code = codeResult.rows[0].code
+      assert(/^[a-f0-9]{24}$/.test(code), `código inválido: ${code}`)
+      assert(codeResult.rows[0].link_path.endsWith(code), 'link sem código')
+
+      const self = await asUser(USER_A, () =>
+        client.query(`select * from public.api_referral_attribute($1)`, [code]),
+      )
+      assert(self.rows[0].attributed === false, 'autoindicação atribuída')
+      assert(self.rows[0].reason === 'self_referral', 'motivo da autoindicação')
+
+      const valid = await asUser(users.L, () =>
+        client.query(`select * from public.api_referral_attribute($1)`, [code]),
+      )
+      assert(valid.rows[0].attributed === true, 'indicação válida não atribuída')
+
+      const duplicate = await asUser(users.L, () =>
+        client.query(`select * from public.api_referral_attribute($1)`, [code]),
+      )
+      assert(duplicate.rows[0].reason === 'already_attributed', 'atribuição duplicada')
+
+      const samePhone = await asUser(users.M, () =>
+        client.query(`select * from public.api_referral_attribute($1)`, [code]),
+      )
+      assert(samePhone.rows[0].reason === 'review_required', 'telefone igual não revisado')
+      const rejected = await client.query(
+        `select * from public.referrals where referred_organization_id = $1`,
+        [orgM.id],
+      )
+      assert(rejected.rows[0].status === 'rejected', 'telefone igual não rejeitado')
+      assert(rejected.rows[0].review_required === true, 'revisão não marcada')
+      assert(rejected.rows[0].fraud_flags.includes('same_phone'), 'flag same_phone')
+
+      await expectError(
+        () =>
+          asUser(USER_G, () =>
+            client.query(`select * from public.api_referral_code_get_or_create($1)`, [orgA.id]),
+          ),
+        'forbidden',
+        'manager lendo código do owner',
+      )
+      await expectError(
+        () =>
+          asUser(users.L, () =>
+            client.query(`select * from public.api_referral_list($1, 25, 0)`, [orgA.id]),
+          ),
+        'forbidden',
+        'indicado lendo lista do indicador',
+      )
+      assert(orgL.id && orgN.id && orgO.id, 'organizações sintéticas')
+    })
+
+    await test('recompensa fica pendente, qualifica uma vez e reverte sem Asaas', async () => {
+      const referral = await client.query(
+        `select r.* from public.referrals r
+          join public.organizations o on o.id = r.referred_organization_id
+         where o.name = 'Indicado L'`,
+      )
+      const first = await asService(() =>
+        client.query(`select public.api_referral_qualify($1)`, [
+          referral.rows[0].referred_organization_id,
+        ]),
+      )
+      assert(first.rows[0].api_referral_qualify === true, 'qualificação falhou')
+      const second = await asService(() =>
+        client.query(`select public.api_referral_qualify($1)`, [
+          referral.rows[0].referred_organization_id,
+        ]),
+      )
+      assert(second.rows[0].api_referral_qualify === false, 'qualificação duplicada')
+
+      const ledger = await client.query(
+        `select * from public.reward_ledger where referral_id = $1`,
+        [referral.rows[0].id],
+      )
+      assert(ledger.rows.length === 1, 'recompensa duplicada')
+      assert(ledger.rows[0].status === 'pending', 'recompensa não pendente')
+      assert(ledger.rows[0].amount_cents === null, 'recompensa com valor financeiro')
+
+      const list = await asUser(USER_A, () =>
+        client.query(`select * from public.api_referral_list($1, 25, 0)`, [orgA.id]),
+      )
+      const row = list.rows.find((item) => item.referral_id === referral.rows[0].id)
+      assert(row.status === 'reward_pending', `status ${row.status}`)
+      assert(row.reward_status === 'pending', 'ledger não visível ao owner')
+      assert(row.display_label.startsWith('Indicação '), 'rótulo do indicado')
+      assert(!('referred_name' in row), 'identidade do indicado exposta')
+
+      const reversed = await asService(() =>
+        client.query(`select public.api_referral_reverse($1, 'refund_confirmed')`, [
+          referral.rows[0].referred_organization_id,
+        ]),
+      )
+      assert(reversed.rows[0].api_referral_reverse === true, 'reversão falhou')
+      const after = await asUser(USER_A, () =>
+        client.query(`select * from public.api_referral_list($1, 25, 0)`, [orgA.id]),
+      )
+      const reversedRow = after.rows.find((item) => item.referral_id === referral.rows[0].id)
+      assert(reversedRow.status === 'reversed', 'status não revertido')
+      assert(reversedRow.reward_status === 'reversed', 'ledger não revertido')
+    })
+
+    await test('rotação, expiração e limite de usos são aplicados no servidor', async () => {
+      const rotated = await asUser(USER_A, () =>
+        client.query(`select * from public.api_referral_code_rotate($1)`, [orgA.id]),
+      )
+      const oldCode = (await client.query(
+        `select code from public.referral_codes
+          where organization_id = $1 and status = 'revoked'
+          order by revoked_at desc limit 1`,
+        [orgA.id],
+      )).rows[0].code
+      const newCode = rotated.rows[0].code
+      assert(newCode !== oldCode, 'rotação manteve código')
+
+      const orgN = await client.query(
+        `select id from public.organizations where name = 'Indicado N'`,
+      )
+      const orgO = await client.query(
+        `select id from public.organizations where name = 'Indicado O'`,
+      )
+      const oldAttempt = await asUser(
+        'ffffffff-ffff-4fff-8fff-ffffffffffff',
+        () => client.query(`select * from public.api_referral_attribute($1)`, [oldCode]),
+      )
+      assert(oldAttempt.rows[0].reason === 'code_unavailable', 'código revogado aceito')
+
+      await client.query(
+        `update public.referral_codes set expires_at = now() - interval '1 day' where code = $1`,
+        [newCode],
+      )
+      const expired = await asUser(
+        'ffffffff-ffff-4fff-8fff-ffffffffffff',
+        () => client.query(`select * from public.api_referral_attribute($1)`, [newCode]),
+      )
+      assert(expired.rows[0].reason === 'code_unavailable', 'código expirado aceito')
+
+      const third = await asUser(USER_A, () =>
+        client.query(`select * from public.api_referral_code_rotate($1)`, [orgA.id]),
+      )
+      const thirdCode = third.rows[0].code
+      const validN = await asUser(
+        'ffffffff-ffff-4fff-8fff-ffffffffffff',
+        () => client.query(`select * from public.api_referral_attribute($1)`, [thirdCode]),
+      )
+      assert(validN.rows[0].attributed === true, 'indicação N não atribuída')
+
+      await client.query(
+        `update public.referral_codes set max_uses = 1 where code = $1`,
+        [thirdCode],
+      )
+      const limited = await asUser(
+        '99999999-9999-4999-8999-999999999998',
+        () => client.query(`select * from public.api_referral_attribute($1)`, [thirdCode]),
+      )
+      assert(limited.rows[0].reason === 'code_unavailable', 'limite de usos ignorado')
+      assert(orgN.rows[0].id && orgO.rows[0].id, 'organizações do teste')
+    })
+
+    await test('admin audita e reverte indicação com motivo', async () => {
+      const referred = await client.query(
+        `select r.* from public.referrals r
+          join public.organizations o on o.id = r.referred_organization_id
+         where o.name = 'Indicado N'`,
+      )
+      await asService(() =>
+        client.query(`select public.api_referral_qualify($1)`, [
+          referred.rows[0].referred_organization_id,
+        ]),
+      )
+      const adminList = await asService(() =>
+        client.query(`select * from public.api_admin_referrals($1, null, 50, 0)`, [USER_A]),
+      )
+      assert(adminList.rows.length >= 1, 'admin sem indicações')
+      assert(
+        adminList.rows.some((row) => row.referral_id === referred.rows[0].id),
+        'indicação N ausente no admin',
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_admin_referrals($1, null, 50, 0)`, [USER_B]),
+          ),
+        'admin_forbidden',
+        'não-admin lendo indicações',
+      )
+      await expectError(
+        () =>
+          asService(() =>
+            client.query(`select * from public.api_admin_referral_reverse($1, $2, 'abc')`, [
+              USER_A,
+              referred.rows[0].id,
+            ]),
+          ),
+        'invalid_reason',
+        'motivo curto',
+      )
+      const reversed = await asService(() =>
+        client.query(`select * from public.api_admin_referral_reverse($1, $2, $3)`, [
+          USER_A,
+          referred.rows[0].id,
+          'revisão manual de fraude',
+        ]),
+      )
+      assert(reversed.rows[0].status === 'reversed', 'admin não reverteu')
+      const audit = await client.query(
+        `select * from public.platform_audit_events
+          where action = 'referral.reversed' and metadata->>'referral_id' = $1`,
+        [referred.rows[0].id],
+      )
+      assert(audit.rows.length === 1, 'reversão admin sem auditoria')
+    })
+
     console.log(`\nResultado: ${passed} PASS, ${failed} FAIL`)
     if (failed > 0) {
       for (const { name, error } of failures) {

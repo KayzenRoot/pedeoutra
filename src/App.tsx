@@ -8,6 +8,7 @@ import { track } from './lib/analytics'
 import { Billing } from './pages/Billing'
 import { Catalog } from './pages/Catalog'
 import { Customers } from './pages/Customers'
+import { CustomerReport } from './pages/CustomerReport'
 import { Dashboard } from './pages/Dashboard'
 import { Demo } from './pages/Demo'
 import { ForgotPassword } from './pages/ForgotPassword'
@@ -86,6 +87,7 @@ export default function App() {
             <Route path="pedidos/:orderId" element={<OrderDetail />} />
             <Route path="produtos" element={<Products />} />
             <Route path="clientes" element={<Customers />} />
+            <Route path="relatorios" element={<CustomerReport />} />
             <Route path="precos" element={<PrivatePrices />} />
             <Route path="orcamentos" element={<Quotes />} />
             <Route path="equipe" element={<Team />} />

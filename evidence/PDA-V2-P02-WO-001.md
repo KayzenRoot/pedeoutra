@@ -152,6 +152,34 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   `audit_events`.
 - UI `/app/equipe` (owner), página `/convite/:token` e navegação por papel.
 
+## #54 — relatório de clientes
+
+- Segmentos `no_purchases`, `inactive`, `insufficient`, `reactivated`,
+  `overdue` e `regular`; janela 30/60/90; métricas e resumo calculados no
+  servidor. Cancelados ficam fora de contagem, valor, última compra e cadência.
+- Valores separados em confirmado/concluído e rotulados como pedidos, não
+  receita recebida. Histórico do cliente inclui cancelados com status, sem
+  somá-los às métricas.
+- CSV limitado a 2.000 clientes, com BOM e proteção de fórmula; viewer não
+  recebe telefone e não busca por telefone. RPC exige `reports.read` +
+  `inactive_customers`; tenant A nunca lê B.
+- UI `/app/relatorios`, atalho em Clientes e metodologia visível. Testes DB,
+  unitários e axe/smoke verdes. Doc: `docs/customer-insights.md`.
+
+## #56 — indicações em modo seguro
+
+- Código opaco de 24 hex, rotação, revogação, expiração e limite de 25 usos.
+  Atribuição no onboarding; primeira indicação vence e o indicado não vê a
+  identidade do indicador.
+- Autoindicação bloqueada; telefone comercial idêntico gera `review_required`,
+  flag `same_phone` e nenhuma recompensa.
+- Qualificação só no primeiro `PAYMENT_RECEIVED`/`PAYMENT_CONFIRMED` real.
+  `reward_ledger` fica `pending`, com valor nulo e sem qualquer chamada ao
+  Asaas. Refund e reversão admin marcam `reversed` e auditam.
+- Painel em Configurações, visão `admin-api?view=referrals`, ação
+  `referral.reverse` com motivo e auditoria. Nenhum crédito foi concedido.
+  Doc: `docs/referrals.md`.
+
 ## #44/#45 — radar e lembretes manuais
 
 - `api_reorder_radar` calcula mediana dos intervalos entre pedidos
@@ -269,18 +297,22 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
   cards têm elevação/hover sutil apenas em `hover: hover` e `pointer: fine`, com
   `prefers-reduced-motion` respeitado. Contraste/axe e mobile/light/dark
   continuam passando.
-- A biblioteca completa de componentes GlassCard/FeatureCard/StatCard e motion
-  por IntersectionObserver do #81 permanece parcial; a landing usa os
-  componentes existentes e CSS sem dependência nova.
+- `src/components/design.tsx` entrega `GlassCard`, `FeatureCard`, `PricingCard`,
+  `StatCard`, `SectionHeading`, `IconButton`, `TiltCard` e `Reveal`; landing e
+  relatório usam os componentes.
+- Tilt é limitado a 4°/180ms e só roda em `hover: hover` + `pointer: fine`;
+  toque, teclado e `prefers-reduced-motion` não recebem transform. `Reveal` usa
+  IntersectionObserver sem esconder conteúdo quando não há JS/IO.
+- Doc: `docs/design-system.md`. Sem biblioteca nova e sem listener de scroll.
 
 ## Evidência local (HEAD de trabalho)
 
 | Verificação | Resultado |
 | --- | --- |
-| `npm run test:db` | **71 PASS, 0 FAIL** |
+| `npm run test:db` | **79 PASS, 0 FAIL** |
 | `npm run test:edge` | typecheck de **57 Edge Functions** |
-| `npm run test:edge-http` | **56 PASS, 0 FAIL** |
-| `npm run test:unit` | **150 PASS, 0 FAIL** (30 arquivos) |
+| `npm run test:edge-http` | **57 PASS, 0 FAIL** |
+| `npm run test:unit` | **161 PASS, 0 FAIL** (34 arquivos) |
 | `npm run test:full-local` | **7 PASS, 0 FAIL** |
 | `npm run test:restore` | PASS; inclui preços, quotes, WhatsApp, equipe, lembretes, analytics, API keys e webhooks |
 | `npm run lint` / `npm run typecheck` | 0 erros |

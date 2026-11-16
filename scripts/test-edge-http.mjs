@@ -36,6 +36,11 @@ const LINK_ID = 'eeeeeeee-7777-4777-8777-777777777777'
 const PRICE_LIST_ID = 'eeeeeeee-aaaa-4aaa-8aaa-bbbbbbbbbbbb'
 const CUSTOMER_NO_LIST_ID = 'eeeeeeee-9999-4999-8999-aaaaaaaaaaaa'
 const CATEGORY_ID = 'eeeeeeee-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+const REF_USER_ID = 'eeeeeeee-1234-4234-8234-123456789abc'
+const REF_ORG_ID = 'eeeeeeee-2345-4345-8345-23456789abcd'
+const REF_CODE_ID = 'eeeeeeee-3456-4456-8456-3456789abcde'
+const REFERRAL_ID = 'eeeeeeee-4567-4567-8567-456789abcdef'
+const REF_CODE = 'b'.repeat(24)
 const REORDER_TOKEN = Buffer.from(
   Array.from({ length: 32 }, (_, index) => (index * 37 + 11) % 256),
 ).toString('base64url')
@@ -178,7 +183,8 @@ const SEED_SQL = `
 insert into auth.users (id, email, email_confirmed_at) values
   ('${USER_ID}', 'edge@example.test', now()),
   ('${ADMIN_ID}', 'admin@example.test', now()),
-  ('${INVITEE_ID}', 'edge-invitee@example.test', now());
+  ('${INVITEE_ID}', 'edge-invitee@example.test', now()),
+  ('${REF_USER_ID}', 'edge-referred@example.test', now());
 
 insert into public.platform_admins (singleton, user_id) values (true, '${ADMIN_ID}');
 
@@ -186,7 +192,26 @@ insert into public.organizations (id, owner_user_id, name, slug, whatsapp, city)
 values (
   '${ORG_ID}', '${USER_ID}', 'Distribuidora Edge', '${ORG_SLUG}',
   '11999998888', 'São Paulo'
+),
+(
+  '${REF_ORG_ID}', '${REF_USER_ID}', 'Indicado Edge', 'indicado-edge-abc123',
+  '11988887777', 'São Paulo'
 );
+
+insert into public.referral_codes (id, organization_id, code, created_by)
+values ('${REF_CODE_ID}', '${ORG_ID}', '${REF_CODE}', '${USER_ID}');
+
+insert into public.referrals (
+  id, referrer_organization_id, code_id, referred_organization_id,
+  referred_user_id, status, idempotency_key
+)
+values (
+  '${REFERRAL_ID}', '${ORG_ID}', '${REF_CODE_ID}', '${REF_ORG_ID}',
+  '${REF_USER_ID}', 'reward_pending', 'seed:${REFERRAL_ID}'
+);
+
+insert into public.reward_ledger (referral_id, organization_id, status, note)
+values ('${REFERRAL_ID}', '${ORG_ID}', 'pending', 'Seed de teste; sem efeito financeiro.');
 
 insert into public.product_categories (id, organization_id, name, slug, position)
 values ('${CATEGORY_ID}', '${ORG_ID}', 'Bebidas', 'bebidas', 1);
@@ -745,6 +770,42 @@ async function main() {
       const audit = await auditResponse.json()
       assert(auditResponse.status === 200, `HTTP ${auditResponse.status}`)
       assert(Array.isArray(audit.audit), 'auditoria')
+    })
+
+    await test('admin-api lista e reverte indicação sem efeito financeiro', async () => {
+      const listResponse = await fetch(`${edgeBase}/admin-api?view=referrals`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const list = await listResponse.json()
+      assert(listResponse.status === 200, `HTTP ${listResponse.status}`)
+      assert(list.referrals.length >= 1, 'lista de indicações')
+      assert(
+        list.referrals.some((row) => row.referral_id === REFERRAL_ID),
+        'indicação semeada ausente',
+      )
+
+      const reverse = await call(
+        'admin-api',
+        {
+          action: 'referral.reverse',
+          referral_id: REFERRAL_ID,
+          reason: 'teste de reversão administrativa',
+        },
+        { token: adminToken },
+      )
+      assert(reverse.status === 200, `HTTP ${reverse.status} ${JSON.stringify(reverse.data)}`)
+      const status = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select status from public.referrals where id = '${REFERRAL_ID}'`,
+      ]).stdout.trim()
+      assert(status === 'reversed', `status ${status}`)
+      const ledger = docker([
+        'exec', PG_CONTAINER,
+        'psql', '-U', 'postgres', '-d', DB_NAME, '-t', '-A', '-c',
+        `select status from public.reward_ledger where referral_id = '${REFERRAL_ID}'`,
+      ]).stdout.trim()
+      assert(ledger === 'reversed', 'ledger não revertido')
     })
 
     await test('admin-bootstrap exige token dedicado e e-mail do ambiente', async () => {

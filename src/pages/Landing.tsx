@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
+import { FeatureCard, PricingCard, Reveal, SectionHeading, TiltCard } from '../components/design'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Icon } from '../components/ui'
 import { track } from '../lib/analytics'
@@ -346,70 +347,71 @@ export function Landing() {
         </section>
 
         <section id="recursos" className="section">
-          <div className="section-heading">
-            <span className="eyebrow">Recursos</span>
-            <h2>Do catálogo à recorrência, sem planilha paralela</h2>
-            <p>
-              Recursos marcados como Profissional dependem do plano ativo. Integrações externas
-              aparecem com o requisito real, sem prometer o que ainda não está conectado.
-            </p>
-          </div>
-          <div className="feature-grid">
-            <article className="feature-card">
-              <span className="pill pill-lime">Essencial</span>
-              <h3>Catálogo e pedidos</h3>
-              <ul>
-                <li><Icon name="check" /> Catálogo público com categorias e fotos</li>
-                <li><Icon name="check" /> SKU, busca e pedido por lista</li>
-                <li><Icon name="check" /> Mínimos, múltiplos e importação CSV/XLSX</li>
-                <li><Icon name="check" /> QR code e acompanhamento por link</li>
-                <li><Icon name="check" /> Comprovante PDF não fiscal</li>
-              </ul>
-            </article>
-            <article className="feature-card">
-              <span className="pill">Profissional</span>
-              <h3>Relacionamento e retenção</h3>
-              <ul>
-                <li><Icon name="check" /> Tabelas de preço por comprador</li>
-                <li><Icon name="check" /> Orçamentos com aceite por link</li>
-                <li><Icon name="check" /> Radar de recompra por cadência real</li>
-                <li><Icon name="check" /> Lembretes manuais com opt-in</li>
-                <li><Icon name="check" /> Analytics first-party consentido</li>
-              </ul>
-            </article>
-            <article className="feature-card">
-              <span className="pill">Profissional</span>
-              <h3>Escala e integrações</h3>
-              <ul>
-                <li><Icon name="check" /> Equipe com RBAC e convites</li>
-                <li><Icon name="check" /> API REST de leitura, chaves e quota</li>
-                <li><Icon name="check" /> Webhooks assinados de pedidos</li>
-                <li><Icon name="check" /> WhatsApp oficial — requer WABA/Meta</li>
-                <li><Icon name="check" /> Meta Ads/DeepSeek — integrações futuras</li>
-              </ul>
-            </article>
-          </div>
+          <SectionHeading
+            eyebrow="Recursos"
+            title="Do catálogo à recorrência, sem planilha paralela"
+            description="Recursos marcados como Profissional dependem do plano ativo. Integrações externas aparecem com o requisito real, sem prometer o que ainda não está conectado."
+          />
+          <Reveal>
+            <div className="feature-grid">
+              <TiltCard>
+                <FeatureCard
+                  badge="Essencial"
+                  badgeTone="pill-lime"
+                  title="Catálogo e pedidos"
+                  items={[
+                    <><Icon name="check" /> Catálogo público com categorias e fotos</>,
+                    <><Icon name="check" /> SKU, busca e pedido por lista</>,
+                    <><Icon name="check" /> Mínimos, múltiplos e importação CSV/XLSX</>,
+                    <><Icon name="check" /> QR code e acompanhamento por link</>,
+                    <><Icon name="check" /> Comprovante PDF não fiscal</>,
+                  ]}
+                />
+              </TiltCard>
+              <TiltCard>
+                <FeatureCard
+                  badge="Profissional"
+                  title="Relacionamento e retenção"
+                  items={[
+                    <><Icon name="check" /> Tabelas de preço por comprador</>,
+                    <><Icon name="check" /> Orçamentos com aceite por link</>,
+                    <><Icon name="check" /> Radar de recompra por cadência real</>,
+                    <><Icon name="check" /> Lembretes manuais com opt-in</>,
+                    <><Icon name="check" /> Analytics first-party consentido</>,
+                  ]}
+                />
+              </TiltCard>
+              <TiltCard>
+                <FeatureCard
+                  badge="Profissional"
+                  title="Escala e integrações"
+                  items={[
+                    <><Icon name="check" /> Equipe com RBAC e convites</>,
+                    <><Icon name="check" /> API REST de leitura, chaves e quota</>,
+                    <><Icon name="check" /> Webhooks assinados de pedidos</>,
+                    <><Icon name="check" /> WhatsApp oficial — requer WABA/Meta</>,
+                    <><Icon name="check" /> Meta Ads/DeepSeek — integrações futuras</>,
+                  ]}
+                />
+              </TiltCard>
+            </div>
+          </Reveal>
         </section>
 
         <section id="preco" className="section pricing-section">
-          <div className="section-heading">
-            <span className="eyebrow">Planos</span>
-            <h2>Essencial para começar. Profissional para crescer.</h2>
-            <p>
-              O Essencial libera o catálogo e os pedidos. O Profissional adiciona preços
-              por comprador, orçamentos e equipe. Nenhum plano cobra pedidos dos seus
-              clientes.
-            </p>
-          </div>
-          <div className="pricing-grid">
+          <SectionHeading
+            eyebrow="Planos"
+            title="Essencial para começar. Profissional para crescer."
+            description="O Essencial libera o catálogo e os pedidos. O Profissional adiciona preços por comprador, orçamentos e equipe. Nenhum plano cobra pedidos dos seus clientes."
+          />
+          <Reveal>
+            <div className="pricing-grid">
             {plans.map((plan) => {
               const enabledFeatures = plan.features.filter((feature) => feature.enabled)
               const isProfessional = plan.plan_code === 'professional'
               return (
-                <article
-                  className={isProfessional ? 'price-card price-card-pro' : 'price-card'}
-                  key={plan.plan_code}
-                >
+                <TiltCard key={plan.plan_code}>
+                  <PricingCard professional={isProfessional}>
                   <div className="price-head">
                     <span className={plan.available ? 'pill pill-lime' : 'pill'}>
                       {plan.available ? 'Disponível' : 'Em preparação'}
@@ -459,10 +461,12 @@ export function Landing() {
                       ? 'Recursos Pro em validação. Sem promessa de disponibilidade, cobrança ou envio automático nesta fase.'
                       : 'Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do fornecedor, em cartão, via Asaas.'}
                   </p>
-                </article>
+                  </PricingCard>
+                </TiltCard>
               )
             })}
-          </div>
+            </div>
+          </Reveal>
         </section>
 
         <section id="faq" className="section faq-section">

@@ -29,8 +29,12 @@ function rpcError(error: { message?: string }): HttpError {
   if (message.includes('admin_forbidden')) {
     return new HttpError(403, 'admin_forbidden', 'Acesso administrativo negado.')
   }
-  if (message.includes('organization_not_found') || message.includes('trial_not_found')) {
-    return new HttpError(404, 'not_found', 'Organização não encontrada.')
+  if (
+    message.includes('organization_not_found') ||
+    message.includes('trial_not_found') ||
+    message.includes('referral_not_found')
+  ) {
+    return new HttpError(404, 'not_found', 'Registro não encontrado.')
   }
   if (message.includes('invalid_')) {
     return new HttpError(400, 'invalid_request', 'Dados inválidos para a ação administrativa.')
@@ -146,6 +150,26 @@ async function getAnalytics(
   })
 }
 
+async function getReferrals(
+  supabase: SupabaseClient,
+  req: Request,
+  url: URL,
+  adminId: string,
+): Promise<Response> {
+  const { data, error } = await supabase.rpc('api_admin_referrals', {
+    p_actor_id: adminId,
+    p_status: url.searchParams.get('status')?.trim() || null,
+    p_limit: intParam(url.searchParams.get('limit'), 50, 1, 200),
+    p_offset: intParam(url.searchParams.get('offset'), 0, 0, 100000),
+  })
+  if (error) throw rpcError(error)
+  const rows = (data ?? []) as Array<{ total_count: number }>
+  return jsonResponse(req, {
+    referrals: rows,
+    total: rows[0]?.total_count ?? 0,
+  })
+}
+
 async function handleGet(
   supabase: SupabaseClient,
   adminId: string,
@@ -161,6 +185,7 @@ async function handleGet(
   if (view === 'analytics') return getAnalytics(supabase, req, url, adminId)
   if (view === 'finance') return getFinance(supabase, req, url, adminId)
   if (view === 'health') return getHealth(supabase, req, adminId)
+  if (view === 'referrals') return getReferrals(supabase, req, url, adminId)
   throw new HttpError(400, 'invalid_view', 'Visão administrativa inválida.')
 }
 
@@ -194,6 +219,25 @@ async function handlePost(
   req: Request,
 ): Promise<Response> {
   const body = (await readJson(req)) as Record<string, unknown>
+
+  if (body.action === 'referral.reverse') {
+    const referralId = body.referral_id
+    const reason = typeof body.reason === 'string' ? body.reason.trim() : ''
+    if (!isUuid(referralId)) {
+      throw new HttpError(400, 'invalid_referral', 'Indicação inválida.')
+    }
+    if (reason.length < 5 || reason.length > 500) {
+      throw new HttpError(400, 'invalid_reason', 'Informe um motivo entre 5 e 500 caracteres.')
+    }
+    const { data, error } = await supabase.rpc('api_admin_referral_reverse', {
+      p_actor_id: adminId,
+      p_referral_id: referralId,
+      p_reason: reason,
+    })
+    if (error) throw rpcError(error)
+    return jsonResponse(req, { ok: true, result: data })
+  }
+
   const { action, organizationId, reason } = readActionInput(body)
 
   if (action === 'org.suspend' || action === 'org.reactivate') {

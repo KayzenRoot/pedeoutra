@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { to: '/app/produtos', label: 'Produtos', icon: 'products' as const, roles: ALL_ROLES },
   { to: '/app/clientes', label: 'Clientes', icon: 'customers' as const, roles: ALL_ROLES },
   { to: '/app/radar', label: 'Radar', icon: 'radar' as const, roles: ALL_ROLES },
+  { to: '/app/relatorios', label: 'Relatórios', icon: 'reports' as const, roles: ALL_ROLES },
   { to: '/app/precos', label: 'Preços', icon: 'prices' as const, roles: ['owner', 'manager'] },
   { to: '/app/orcamentos', label: 'Orçamentos', icon: 'quotes' as const, roles: ['owner', 'manager'] },
   { to: '/app/equipe', label: 'Equipe', icon: 'team' as const, roles: ['owner'] },
@@ -21,7 +22,10 @@ const NAV_ITEMS = [
 ]
 
 const MOBILE_NAV_ITEMS = NAV_ITEMS.filter(
-  (item) => item.to !== '/app/orcamentos' && item.to !== '/app/equipe',
+  (item) =>
+    item.to !== '/app/orcamentos' &&
+    item.to !== '/app/equipe' &&
+    item.to !== '/app/relatorios',
 )
 
 export function AppShell() {

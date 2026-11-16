@@ -191,6 +191,7 @@ export function Icon({
     | 'products'
     | 'customers'
     | 'radar'
+    | 'reports'
     | 'prices'
     | 'quotes'
     | 'team'
@@ -225,6 +226,11 @@ export function Icon({
         <circle cx="12" cy="12" r="9" />
         <circle cx="12" cy="12" r="4" />
         <path d="M12 3v4M21 12h-4M12 21v-4M3 12h4" />
+      </>
+    ),
+    reports: (
+      <>
+        <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
       </>
     ),
     prices: (

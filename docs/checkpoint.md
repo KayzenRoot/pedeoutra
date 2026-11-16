@@ -137,3 +137,29 @@ gates de lançamento.
 - **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (TOTP/AAL2 do proprietário),
   SMTP próprio para convites, WABA/templates para WhatsApp e
   `COMMERCIAL_BLOCKED`/`GO_LIVE_BLOCKED`.
+
+## Checkpoint Delta — #54/#56/#81/#59 (PROPOSED)
+
+- **Data:** 2026-11-16
+- **Branch/PR:** `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`, PR #90 Draft.
+- **Entregue:** relatório de clientes inativos/recorrência/valor (#54), programa
+  de indicações em modo seguro sem custeio (#56), biblioteca visual/motion do
+  #81 (`design.tsx`) e matriz de aceitação #59. Nada foi aplicado em produção.
+- **#54:** RPCs server-side, segmentos honestos, cancelados fora das métricas,
+  valores separados confirmado/concluído, CSV com proteção de fórmula, viewer
+  sem telefone e gate Profissional. UI `/app/relatorios`.
+- **#56:** código opaco com rotação/limite/expiração, atribuição no onboarding,
+  autoindicação/telefone igual bloqueados, qualificação só por pagamento
+  confirmado, recompensa sempre `pending` e sem Asaas, reversão auditada.
+- **#81:** `GlassCard`, `FeatureCard`, `PricingCard`, `StatCard`,
+  `SectionHeading`, `IconButton`, `TiltCard` e `Reveal`; tilt ≤4° só em ponteiro
+  fino; reduced motion/toque/teclado sem transform; IntersectionObserver não
+  esconde conteúdo no prerender.
+- **#59:** `evidence/PDA-V2-ACCEPTANCE-MATRIX.md` mapeia #44–#58, complementos
+  #29–#31/#63–#83, testes, evidência e bloqueios.
+- **Evidência local:** 161 unit, 79 DB, 57 Edge HTTP, 57 Edge Functions
+  typechecked, 7 full-local, restore PASS, build/SEO/smoke PASS. Nenhum dado
+  real, cobrança, crédito ou envio externo.
+- **Bloqueios mantidos:** deploy do SHA, admin TOTP, SMTP, WABA/Meta,
+  DeepSeek/Resend/Meta Ads, backup/PITR, legal/suporte, primeira cobrança real e
+  aprovação financeira específica para conceder recompensa de indicação.

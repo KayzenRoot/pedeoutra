@@ -361,6 +361,27 @@ export async function processBillingEventById(
       },
     })
 
+    // Indicação só qualifica com pagamento confirmado, nunca com trial,
+    // successUrl ou evento simulado. A recompensa nasce pendente e sem
+    // qualquer alteração financeira no Asaas.
+    if (requiresPaymentVerification(event.type) && decision.state === 'active') {
+      const { error: referralError } = await supabase.rpc('api_referral_qualify', {
+        p_organization_id: subscription.organization_id,
+      })
+      if (referralError) {
+        logError('referral_qualify', referralError, { event_type: event.type })
+      }
+    }
+    if (event.type === 'PAYMENT_REFUNDED' || decision.state === 'refunded') {
+      const { error: referralError } = await supabase.rpc('api_referral_reverse', {
+        p_organization_id: subscription.organization_id,
+        p_reason: 'payment_refunded',
+      })
+      if (referralError) {
+        logError('referral_reverse', referralError, { event_type: event.type })
+      }
+    }
+
     await markEvent(supabase, eventId, 'processed', null)
     return 'processed'
   } catch (error) {

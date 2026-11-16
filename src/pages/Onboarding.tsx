@@ -6,6 +6,7 @@ import { FormMessage } from '../components/ui'
 import { useAuth } from '../context/auth-context'
 import { track } from '../lib/analytics'
 import { slugify } from '../lib/format'
+import { supabase } from '../lib/supabase'
 
 export function Onboarding() {
   const { createOrganization, user, organization } = useAuth()
@@ -28,6 +29,15 @@ export function Onboarding() {
     try {
       await createOrganization({ name, whatsapp, city })
       track('trial_started')
+      try {
+        const referral = window.sessionStorage.getItem('pedeoutra_referral')
+        if (referral && supabase) {
+          await supabase.rpc('api_referral_attribute', { p_code: referral })
+          window.sessionStorage.removeItem('pedeoutra_referral')
+        }
+      } catch {
+        // Atribuição é secundária e nunca bloqueia a criação da organização.
+      }
       setStep('template')
     } catch (submitError) {
       setError(
