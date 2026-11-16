@@ -62,7 +62,10 @@ function serve(req, res) {
   }
   const redirect = redirectFor(url.pathname)
   if (redirect) {
-    const target = join(DIST, redirect.target.replace(/^\//, ''))
+    const target =
+      redirect.target === '/'
+        ? join(DIST, 'index.html')
+        : join(DIST, redirect.target.replace(/^\//, ''))
     if (existsSync(target)) {
       res.writeHead(redirect.status, { 'Content-Type': contentType(target) })
       createReadStream(target).pipe(res)
