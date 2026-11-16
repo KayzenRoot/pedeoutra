@@ -61,3 +61,4 @@ Veredito: **INTERNAL_SCOPE_ACCEPTED / PRODUCTION_BLOCKED**
 | restore | PASS |
 | SEO estático | PASS |
 | smoke/axe | PASS light/dark/system desktop/mobile, 0 violações |
+| SonarCloud PR #90 | 0 issues; gate OK; duplicação 1.2%; migrations imutáveis excluídas e cobertas por DB/restore |

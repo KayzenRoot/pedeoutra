@@ -318,7 +318,7 @@ PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) (Draft)
 | `npm run lint` / `npm run typecheck` | 0 erros |
 | `npm run build` | 0 erros |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, 0 violações axe |
-| SonarCloud | última análise automática da main `7db00c5`: gate OK, 0.4% de duplicação; HEAD do branch não analisado |
+| SonarCloud PR #90 | **0 issues; quality gate OK**; duplicação new-code 1.2%; migrations imutáveis excluídas e cobertas por DB/restore |
 
 Logs locais usados durante a implementação:
 `evidence/logs/test-db.log`, `evidence/logs/test-edge-http.log`,

@@ -1,9 +1,9 @@
 # PedeOutra V2 — auditoria integrada (#83) e gate final (#72)
 
-Data: 2026-11-14
+Data: 2026-11-16
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
-HEAD auditado: `80e9a16`
+HEAD de código auditado: `48cca3d`
 Veredito: **APPROVED FOR DRAFT REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
 
 ## Escopo auditado
@@ -28,7 +28,7 @@ Veredito: **APPROVED FOR DRAFT REVIEW / BLOCKED_DEPLOY / COMMERCIAL_BLOCKED**
 | restore | PASS |
 | SEO estático (`test:seo`) | PASS: HTML inicial, planos, canonical, JSON-LD, sitemap, robots, 404 real |
 | smoke | PASS light/dark/system desktop/mobile; axe 0 violações |
-| SonarCloud | última análise automática da main `7db00c5`: gate OK, 0.4% de duplicação; HEAD do branch **não analisado** (sem token/análise automática só na main) |
+| SonarCloud PR #90 | **0 issues; quality gate OK**; duplicação new-code 1.2% (HEAD `48cca3d`); migrations imutáveis excluídas da análise estática e cobertas por DB/restore |
 
 Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 
@@ -104,7 +104,6 @@ Logs: `evidence/logs/` e `evidence/PDA-V2-FINAL-REVIEW.md`.
 ## Conclusão
 
 O branch está pronto para revisão técnica e demonstração interna, com evidência
-verde; a última análise Sonar disponível é da main e o HEAD do branch ainda não
-foi analisado pelo SonarCloud. Não está autorizado para merge/deploy de produção nem
+verde e SonarCloud sem issues abertas no PR #90. Não está autorizado para merge/deploy de produção nem
 para declarar `PROD READY`: os gates externos e a auditoria em ambiente real
 continuam abertos. `COMMERCIAL_BLOCKED` e `GO_LIVE_BLOCKED` permanecem.

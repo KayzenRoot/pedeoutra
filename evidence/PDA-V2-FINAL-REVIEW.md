@@ -1,9 +1,9 @@
 # PedeOutra V2 — revisão final do branch (PROPOSED)
 
-Data: 2026-11-14
+Data: 2026-11-16
 Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 PR: [#90](https://github.com/KayzenRoot/pedeoutra/pull/90) — Draft
-HEAD de código revisado: `4718946`
+HEAD de código revisado: `48cca3d`
 Base de produção: `main` com Parte 1 ativa (`57511a3`)
 
 ## Estado por parte
@@ -31,7 +31,7 @@ Base de produção: `main` com Parte 1 ativa (`57511a3`)
 | `npm run build` | exit 0 |
 | `npm run test:seo` | PASS HTML inicial, canonical/JSON-LD, sitemap, robots e 404 real |
 | `npm run smoke:preview` | PASS light/dark/system desktop/mobile, axe 0 violações |
-| SonarCloud | última análise automática da main `7db00c5`: gate OK, 0.4% de duplicação; HEAD do branch não analisado |
+| SonarCloud PR #90 | **0 issues; quality gate OK**; duplicação new-code 1.2% |
 
 Logs: `evidence/logs/{lint,typecheck,test-unit,test-db,test-edge,test-edge-http,test-full-local,test-restore,build,smoke}.log`.
 
