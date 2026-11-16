@@ -215,3 +215,14 @@ gates de lançamento.
 - Evidência: `evidence/PDA-V2-DEPLOY-2026-11-16.md`.
 - Pendências comerciais mantidas: SMTP, WABA/Meta, growth, backup/PITR,
   legal/suporte, primeira cobrança e aprovação financeira de recompensa.
+
+## Checkpoint Delta — Auditoria de produção e acessibilidade (2026-11-16)
+
+- Produção na main `cf3b690`, Pages `d5a49b04`.
+- Auditoria de rotas: SPA 200, 404 real, noindex em `/app/*`.
+- axe-core WCAG 2.1 A/AA em produção: **0 violações** em landing, demo, legal,
+  setor, 404, shell de relatórios/admin e mobile.
+- Corrigido `label-content-name-mismatch` no link da marca; smoke local agora
+  cobre WCAG 2.1.
+- Catálogo público real, planos e gates AAL2 verificados; dados preservados.
+- Evidência: `evidence/PDA-V2-PRODUCTION-AUDIT.md`.
