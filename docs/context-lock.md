@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 - Base SHA: `7db00c5b3c066cf3e75d0f8fedac107b26720a35`
-- HEAD no momento da geração: `c20960fbee61b4ac71883262df29f5a0a7f64ce5`
+- HEAD no momento da geração: `d9bb4ee38bee04a5a78bcf02dada1086f33895d4`
 - Work Order: `PDA-V2-P02-WO-001 + Partes 3–5 + #54/#56/#81/#59 (PROPOSED)`
 
 ## Issues verificadas (sem duplicatas)
@@ -54,14 +54,14 @@
 | `scripts/edge-typecheck.mjs` | `a889d22856be6694413a71a6c8f8c004deb319b6a9ac16a043a256609d971a25` |
 | `scripts/integration-local.mjs` | `80053d4fe90fafdc2962dd77e5de8112e5481bce4adbe8edd28c3eb7479d2914` |
 | `scripts/local-edge-router.ts` | `25c628431ee96b9eb628ab83ff392925ebbd283e7de16a3e1ea5f2b5ce279a09` |
-| `scripts/prerender.mjs` | `16f575acd4aaea51349f562eeb3be3f8680baca3bee32bede12c9c4203dd08cd` |
+| `scripts/prerender.mjs` | `e7824ce3b4f2eb7f16dcfb14530e7606b7dad38877d46387d75ee48d4f876aca` |
 | `scripts/prod-smoke.mjs` | `3062842803b4166b2298ae670862a0afa45880df8d1995edd7b9b58ba7c1e969` |
-| `scripts/seo-check.mjs` | `591d7ed5ddbcdc15d4f05bb51dd9b23235869a82b0b9540c246b20328f6656f3` |
+| `scripts/seo-check.mjs` | `3b6524917b1b2f7bc9ad828a1a98443ae8733590b28a7581c14afd295b88adb4` |
 | `scripts/smoke.mjs` | `8f3a3f8be3e2b89d8d3855eb70f1efb56c3164cf9a2aa6b35940a4970befc0d4` |
 | `scripts/test-edge-http.mjs` | `95a9b63919d3b2e4ed2a58097aa89b85f5fa5d9543729b8f1257b9895060b43d` |
 | `scripts/test-full-local.mjs` | `f4dd01b4d2f477f523c768827de63c384c369d4344f71212e0214343d23ff2c7` |
 | `scripts/test-postgrest.mjs` | `6374291c12c196e3c925b9bc635391e315e1bf32b7f6d1a54e459c2403e5a89b` |
-| `scripts/verify-restore.mjs` | `ac954c4eeb9d012e7d195d0141c45ef8ab918ebf08deed27b19a890a197937da` |
+| `scripts/verify-restore.mjs` | `a3c76cb86119471176393fcb1889a055a5b5176a0df967413fdc07053f01f164` |
 | `src/App.tsx` | `98f6e5b2b87a7a61505844a535de27072b6d3eac46d89862c28c37fe23f66171` |
 | `src/components/ApiKeysPanel.tsx` | `199bc54de4fe365e884cd96c323446d7fd457f4515cdc886cec39d04a0a552aa` |
 | `src/components/ApiWebhooksPanel.tsx` | `3b8a140dfd58c98e736a645d153c95394462a7b00fd9547ad1d81684a3f5a006` |
@@ -77,18 +77,18 @@
 | `src/components/ProductMediaManager.tsx` | `f6b3856b088dee9ae2a8b01bc435ac5cdc46ea202eeaac19ae6c726f12fa58f3` |
 | `src/components/ProtectedRoute.tsx` | `6ed279f45f355dcaedf8709290cc0ae5ac620ad6d2a1aa9170aa8fe8b0de3916` |
 | `src/components/ReferralPanel.test.tsx` | `e0101e974803c118ed701e2fb4882bc66be2cbb00d54c3bf8d9137be863241e3` |
-| `src/components/ReferralPanel.tsx` | `017cf493770c6c692a596e9f466ebd9768cc1d3c1343692614241082b814d453` |
+| `src/components/ReferralPanel.tsx` | `3d45e2d8774c5017f34a711c69e74425a501ab56690620af556e62cc9962cc45` |
 | `src/components/ThemeToggle.tsx` | `b97405fb4a9ab0164b9b95358311186b9451df178de53e9c808f39ae14406e01` |
 | `src/components/WhatsAppPanel.tsx` | `fd3b9239f41a015a7a7d8fb5adf3fabc12210d5facbe25f19c363130e86ff046` |
-| `src/components/design.test.tsx` | `f968e591f475a10a07ec4bced654973d8d7ef6fb3ae5fcad54c9006aa7fa8da0` |
-| `src/components/design.tsx` | `b36124d8dd6dd01a0073851c3ba80ae8919cd584702ecab2a9efaee4727e0315` |
-| `src/components/ui.tsx` | `0b2a17867c1edce7615e4094b591d6fe8b93412dd0a9f702cb902b2ad6159f71` |
+| `src/components/design.test.tsx` | `4f4bc72b6c5d92085563b70dd26b326b99c98409cbde7304cdc5a308dcf682b4` |
+| `src/components/design.tsx` | `5e91b66ff87b6fed6190417f05552c5b6b0821d1b7f2b9bd276155614503c1a6` |
+| `src/components/ui.tsx` | `cd715bf73b7d0aebf509d533a9ae40dee1f63c709435b92248f688c4b0730a06` |
 | `src/context/AuthContext.tsx` | `9d31aaf7956771f18650019583fd6d2a13b245dd58cda25e2526948e817c3dec` |
 | `src/context/auth-context.ts` | `44765936593518823187ad76cee116aa12d103477b8d5b8cec131968a0bb7286` |
 | `src/lib/access.ts` | `193b810fc35452fecea93fcdf7eafbd902c1ba304f4fcfcdc01bfc622d13aa5b` |
 | `src/lib/analytics.ts` | `dc6d33bc96887d31752d0ad7553c9009604dfe9ad0e74ea93e8f70439a510728` |
 | `src/lib/customer-report.test.ts` | `11bf6f29fa789285bc69d92ffd41644926b05c385188a6cb63425be6acb26178` |
-| `src/lib/customer-report.ts` | `6ffe39416d8b8a7b415fe4b7251ab28aefc33a316a6220310426b10e363971f7` |
+| `src/lib/customer-report.ts` | `76263ecd6fb1ba1f1c1700c38b8998d753d5ffdbfcdf2ba9d82f50f61c39f562` |
 | `src/lib/database.types.ts` | `36ec95692cded8843c271a06a78d19d5ec136cd385706adde27a5a7918c0dfa9` |
 | `src/lib/edge.ts` | `90d3e706d6c6e06d35ad04d7a1060dd31bd29f5158f47f08492c4f35cd41388f` |
 | `src/lib/format.test.ts` | `9130efa8c5714456a28fb5c2cc2e3c5207d53f7ca8ef817eff98b9618f1526c3` |
@@ -118,14 +118,14 @@
 | `src/pages/Catalog.private.test.tsx` | `9c5d53fe125eb11089490f9d5bbd3c178e5e3caa3037b7246dbc0299a4617abf` |
 | `src/pages/Catalog.tsx` | `1e3e6d413c7a63b2369702de7558e838e3a990f4272b9de320da8da10c0ec04f` |
 | `src/pages/CustomerReport.test.tsx` | `6126b2df93ce738467705ed8056c605cf79d281d9496d4bb32b306eca8028373` |
-| `src/pages/CustomerReport.tsx` | `83eb8f5798494cba1189a2db3391680793edc10a1b61f5d0306a357214aa35b2` |
+| `src/pages/CustomerReport.tsx` | `a6102bb8fc9a2b0199406642513bbcbe6efbd656809dda2d694056e43142ce26` |
 | `src/pages/Customers.tsx` | `4501042a1925f48cb2a9a38d13ffda4a4b0bebbb89a68f427768c2c219e18b5a` |
 | `src/pages/Dashboard.tsx` | `5dcf30160a353fd66feada8f0e0277e5b7e362dfe150bbec926a50be454252f6` |
 | `src/pages/Demo.test.tsx` | `6bc133ba4a474bbd8d51183c516f1d88babcd279c9fcd73cbeb285d29fa61646` |
 | `src/pages/Demo.tsx` | `2cbafb6367f065a659c66ba75f6f545e113b7712810ca24743ec43bff3e834e4` |
 | `src/pages/ForgotPassword.tsx` | `7ca0edd303f21130f8fb37444be006addcd0bf7a62fd345eebcc77d24a97dc52` |
 | `src/pages/InviteAccept.tsx` | `e45c51e37e1056a842757fdc94abaa7c2655825c546f43cca1dad4dd321faed2` |
-| `src/pages/Landing.tsx` | `969d5033c40ede856616936825236ef67a10b9adcb080b6a2ceb6dafccddc37c` |
+| `src/pages/Landing.tsx` | `0b7a3070e32485731d0532a60b46bc610021724bf98cd3f8522afb0623920e6e` |
 | `src/pages/Legal.tsx` | `a96c5c68384184855bddfbfa65e8c6072efa4191dac0eb2bc8876d7e5dcff16b` |
 | `src/pages/Login.tsx` | `55fbec6995d18df4356f126b3fe877780fcca7575a2dfc5841a1e485d989923d` |
 | `src/pages/NotFound.tsx` | `c78ec47ea4c925ce52da2893d508a8d7c78de49d10c5f8f2d29a5de5fc308108` |
@@ -153,7 +153,7 @@
 | `src/pages/Tracking.test.tsx` | `f56e1dc6c00d263ea8a67dd3def03e47b1cc66d96873515f8401e04cde202580` |
 | `src/pages/Tracking.tsx` | `ac4438741103de770bbf3723075e08a3ed4228556ab0ccaf5f075d5bc7864541` |
 | `src/prerender/entry.tsx` | `bddc032a97d28eb2654c73d4bb1e0a3869e610ad96f4898f2a4af816934adeb9` |
-| `src/styles.css` | `6c46f4e626c082404ff118e2bc8337dd7c98f7c1434c48731b5de6a1b891d41c` |
+| `src/styles.css` | `473900557bb6dcbc995d11607f4319d815a7d4501d54cf56e849785722766c4b` |
 | `src/test/setup.ts` | `31f9b0650fa5a1fc26d640fce75f0a6bda14af4e40dd624576c5a075ff8d14ed` |
 | `src/vite-env.d.ts` | `424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92` |
 | `supabase/config.toml` | `dc1ee25bc52f655d5440fd2c46cd1d07bb400fe991895977862e68a918bedfe4` |
@@ -168,7 +168,7 @@
 | `supabase/functions/_shared/auth.ts` | `42141cf1f7d14885b2e3398ea77a3837fc000d13280ce5b40ff3f22b8ea35eb2` |
 | `supabase/functions/_shared/background.ts` | `dff7a17de7838e1b9cdf0860c73a0a62c08ed5237f09d5dde35398e25da7489b` |
 | `supabase/functions/_shared/billing-event.ts` | `4ce020b0971cff3b0bb38fced7be4cc1ea837cf391289d8db7d8ca7e4b8c4d07` |
-| `supabase/functions/_shared/billing-processor.ts` | `66cef6447575fbb0178e7ef8b0cb94ae3e19ea01d15f68ff11dae8ccbe26961f` |
+| `supabase/functions/_shared/billing-processor.ts` | `4984e3323a410a34986e350c19679bca59c0df41d4f7ba1b45e7b426c2056a6d` |
 | `supabase/functions/_shared/billing.test.ts` | `9787480409169243dd7d2d73fb820364bf35882c787a1709a3719839acb0d5ce` |
 | `supabase/functions/_shared/billing.ts` | `f20f6267f51c6d3d8e8efde06854baf1c06c3d093baea2ae51b14d57f5e0803b` |
 | `supabase/functions/_shared/catalog.ts` | `e9f1969937281e7a70cdd83748fe5e9745a7fcacb6e67474465b32d50731296e` |
@@ -194,7 +194,7 @@
 | `supabase/functions/_shared/validation.ts` | `bb2364b3a88382e9d2548ceead4eae327f2391453071b750055edf46b17b6875` |
 | `supabase/functions/_shared/whatsapp-crypto.test.ts` | `288bb71a11f7483c06779ed23cbd3702f836c458b5ef126e561c6fb39f0a0abe` |
 | `supabase/functions/_shared/whatsapp-crypto.ts` | `3f96b95fe17caed9cde8f254ce1d643dd3bcd9d1de11db4cb4412b2a961e475d` |
-| `supabase/functions/admin-api/index.ts` | `db14b2c8b378361412a41e792378dccca2687bc1860a386a1d7d7fb4a4a1ed89` |
+| `supabase/functions/admin-api/index.ts` | `c60863afe079e052c576ea91bd21ad670b97448c156078b77d06d648d914d9fd` |
 | `supabase/functions/admin-bootstrap/index.ts` | `a420bb542cdb5270041e6ad60209b9610c99427ebd2365d9a79bac05e11e99d8` |
 | `supabase/functions/analytics-consent/index.ts` | `e80d25ac1c6c02ba9243b108b91b679229b7ba92b562802cf046a7da6a443ad9` |
 | `supabase/functions/analytics-ingest/index.ts` | `d22817213f8cdd907063143b09a970d32c7c0643eab869c22995f1c25a025503` |
