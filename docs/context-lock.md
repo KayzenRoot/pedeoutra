@@ -6,7 +6,7 @@
 - Repositório: `https://github.com/KayzenRoot/pedeoutra`
 - Branch: `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`
 - Base SHA: `7db00c5b3c066cf3e75d0f8fedac107b26720a35`
-- HEAD no momento da geração: `6ec2b3814e34b7a217f1315b014bc7ea345db41c`
+- HEAD no momento da geração: `8b7542ed1e3205b1fe94b512197ba5d4bca8aa94`
 - Work Order: `PDA-V2-P02-WO-001 + Partes 3–5 + #54/#56/#81/#59 (PROPOSED)`
 
 ## Issues verificadas (sem duplicatas)
@@ -23,16 +23,16 @@
 | `.github/workflows/keepalive.yml` | `d0516705411517bc8c804498f36c1330edf1dee70b989e7c1e76faf8772c5432` |
 | `.github/workflows/release-health.yml` | `c7c0eabaf13b1a95c1118e4f9f5b210ad8979ce8752da6e4886752ae21ce627d` |
 | `README.md` | `0e557d2db4285f99a4d14484af6288968bf9c7b66cac64a3fc33e8653546edb1` |
-| `docs/admin-bootstrap.md` | `9640a8d0f5562ade99fb1aa50f79252070cc1b40dc4ff9830b9b8e4e1dccad83` |
+| `docs/admin-bootstrap.md` | `bb3ce70955b4663f0e372b8f4d695d7c9519af15429c1d0db237bcc142980447` |
 | `docs/api.md` | `ac212315b04f6e5ecf325602e30ae154d4a9ed2baaab69ac5e9fd800c7cd05c2` |
 | `docs/architecture.md` | `a0488444b5654b19df2d102d24ebaa36c588c57e5557c46db9933f8af3b2af8a` |
 | `docs/backlog.md` | `0c3d9d28f1c8068a1d399cad9b37fdc2ed9d3a2dfe2072a18b68ffbb9482f6d3` |
 | `docs/backup-restore.md` | `bcc40998b6cd803ba37a065d7a69cbd72d111f0e47d4cc20b2cf87bb69b36f54` |
-| `docs/checkpoint.md` | `ac56ee15242d9233f02f577c67088e9becc75d862d42f4d04fba6a5fa309a23e` |
+| `docs/checkpoint.md` | `931a4980e47a217ce01ef80707c5eff9e5b484d4549049b8e25a70b34963f878` |
 | `docs/customer-insights.md` | `e4123b71a14f8503d5e8152047a81a317a75e23c1ad065bac863d29060c73574` |
-| `docs/decisions-ledger.md` | `f498ac48a5b7cb7f92170cac2d8b05db11eaaa03ce22c2cb46bd93dd34729f9b` |
+| `docs/decisions-ledger.md` | `2f8e479ad0ab2122c9f1adb0296a8569920e0efa5f0e6c1ac969561928f297fd` |
 | `docs/definition-of-done.md` | `585f427d27946900e4172bd74ed14fbe53ba89288a5b7163ee5c736da12b843e` |
-| `docs/deployment.md` | `5d3b0cae2f2d7275ec0ffb52bd255f2a4ecbc0603217638379cda3bde0c3c93e` |
+| `docs/deployment.md` | `d60868f7bbd385d0a14414c3546f5d02635cc1df2051b5683ccff836e41952cc` |
 | `docs/design-system.md` | `cf585f41c545cc105667f55e3409c83a70d585801d8be9ea8c44e43682be2685` |
 | `docs/part1-activation.md` | `dfa1885848420ed387856ea8ef7fcabbe8c44a2b7ed834bac0c4219a3459fc34` |
 | `docs/plan-matrix.md` | `fc7908b9bfd9a20ed76b0a9571b98cea1177d08c2868f735fb5beb5e80bedebf` |
