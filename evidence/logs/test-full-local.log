@@ -1,0 +1,45 @@
+
+> pedeoutra@0.1.0 test:full-local
+> node scripts/test-full-local.mjs
+
+PedeOutra FULL local E2E — proxy http://127.0.0.1:59562
+[1/7] GoTrue real
+  PASS  GoTrue saudável
+[2/7] Bootstrap, migrations e PostgREST
+  applied 20261112000100_core.sql
+  applied 20261112000200_rls.sql
+  applied 20261112000300_rpc.sql
+  applied 20261112000400_api_wrappers.sql
+  applied 20261113000100_plans_entitlements.sql
+  applied 20261113000200_admin_trial.sql
+  applied 20261113000300_catalog_media.sql
+  applied 20261113000400_product_sku.sql
+  applied 20261113000500_order_rules.sql
+  applied 20261113000600_product_import.sql
+  applied 20261114000100_catalog_seed.sql
+  applied 20261114000200_order_tracking.sql
+  applied 20261114000300_customer_prices.sql
+  applied 20261114000400_quotes.sql
+  applied 20261114000500_whatsapp_contract.sql
+  applied 20261114000600_team_rbac.sql
+  applied 20261114000700_reorder_radar.sql
+  applied 20261114000800_reorder_reminders.sql
+  applied 20261114000900_analytics.sql
+  applied 20261114001000_financial_metrics.sql
+  applied 20261114001100_api_keys.sql
+  applied 20261114001200_api_webhooks.sql
+  PASS  PostgREST saudável
+[3/7] Proxy, Asaas mock e roteador Deno
+(node:1868) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+  PASS  proxy e roteador prontos
+[4/7] Supabase Auth real (signup/login)
+  PASS  signup/login/GoTrue getUser reais
+[5/7] Organização, produto e pedido
+  PASS  organização, produto, catálogo, pedido e vínculo reais
+[6/7] Recompra real
+  PASS  recompra, PII, revogação reais
+[7/7] Billing real com Asaas mock
+  PASS  checkout, webhook, duplicado, valor, cancelamento, reembolso e reconcile
+
+Resultado: 7 PASS, 0 FAIL

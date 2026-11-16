@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/auth-context'
 import { supabase } from '../lib/supabase'
 import type { Customer } from '../lib/types'
@@ -9,9 +10,10 @@ interface CustomerForm {
   id: string | null
   name: string
   phone: string
+  reorderOptIn: boolean
 }
 
-const EMPTY_FORM: CustomerForm = { id: null, name: '', phone: '' }
+const EMPTY_FORM: CustomerForm = { id: null, name: '', phone: '', reorderOptIn: false }
 
 function databaseMessage(message: string): string {
   if (message.includes('row-level security')) {
@@ -77,6 +79,7 @@ export function Customers() {
       id: customer.id,
       name: customer.display_name,
       phone: formatPhone(customer.contact_phone),
+      reorderOptIn: customer.reorder_opt_in ?? false,
     })
     setFormError(null)
     setSuccess(null)
@@ -107,7 +110,11 @@ export function Customers() {
     }
 
     setSaving(true)
-    const payload = { display_name: name, contact_phone: phone }
+    const payload = {
+      display_name: name,
+      contact_phone: phone,
+      reorder_opt_in: form.reorderOptIn,
+    }
     const result = form.id
       ? await supabase
           .from('customers')
@@ -135,7 +142,14 @@ export function Customers() {
         eyebrow="Relacionamento"
         title="Clientes"
         description="Dados privados do seu negócio. Nome comercial e telefone bastam para manter o histórico e criar links de recompra."
-        action={<span className="muted">{customers.length} cadastrados</span>}
+        action={
+          <div className="inline-actions">
+            <span className="muted">{customers.length} cadastrados</span>
+            <Link to="/app/relatorios" className="button button-secondary">
+              Relatório
+            </Link>
+          </div>
+        }
       />
 
       {loadError && <FormMessage>{loadError}</FormMessage>}
@@ -189,7 +203,10 @@ export function Customers() {
                         <td data-label="Cliente">
                           <strong>{customer.display_name}</strong>
                         </td>
-                        <td data-label="Telefone">{formatPhone(customer.contact_phone)}</td>
+                        <td data-label="Telefone">
+                          {formatPhone(customer.contact_phone)}
+                          {customer.reorder_opt_in && <small className="cell-sub">Lembretes on</small>}
+                        </td>
                         <td data-label="Ações" className="table-actions">
                           <button
                             type="button"
@@ -248,6 +265,14 @@ export function Customers() {
                 onChange={(event) => setForm({ ...form, phone: event.target.value })}
                 placeholder="(11) 97777-6666"
               />
+            </label>
+            <label className="checkbox-field">
+              <input
+                type="checkbox"
+                checked={form.reorderOptIn}
+                onChange={(event) => setForm({ ...form, reorderOptIn: event.target.checked })}
+              />
+              <span>Cliente autorizou lembretes manuais de reposição</span>
             </label>
             <button type="submit" className="button button-primary button-block" disabled={saving}>
               {saving ? 'Salvando…' : form.id ? 'Salvar alterações' : 'Cadastrar cliente'}

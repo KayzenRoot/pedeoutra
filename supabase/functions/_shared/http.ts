@@ -90,13 +90,16 @@ export function getBearerToken(req: Request): string | null {
   return token || null
 }
 
-export async function readJson(req: Request): Promise<unknown> {
+export async function readJson(
+  req: Request,
+  maxBytes: number = MAX_BODY_BYTES,
+): Promise<unknown> {
   const contentLength = Number(req.headers.get('content-length') ?? '0')
-  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
     throw new HttpError(413, 'payload_too_large')
   }
   const text = await req.text()
-  if (text.length > MAX_BODY_BYTES) throw new HttpError(413, 'payload_too_large')
+  if (text.length > maxBytes) throw new HttpError(413, 'payload_too_large')
   if (!text.trim()) throw new HttpError(400, 'empty_body')
   try {
     return JSON.parse(text) as unknown

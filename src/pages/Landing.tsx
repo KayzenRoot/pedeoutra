@@ -1,9 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
+import { FeatureCard, PricingCard, Reveal, SectionHeading, TiltCard } from '../components/design'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Icon } from '../components/ui'
 import { track } from '../lib/analytics'
+import { useSeo } from '../lib/seo'
+import { getPlanCatalog } from '../lib/edge'
+import { featureLabel, PLAN_NAMES } from '../lib/plans'
+import type { PlanCatalogResponse, PublicPlan } from '../lib/types'
 
 const FAQ = [
   {
@@ -32,15 +37,104 @@ const FAQ = [
       'No MVP, não. Você compartilha links de WhatsApp pré-preenchidos com um clique. Nenhuma mensagem é enviada automaticamente.',
   },
   {
+    question: 'A API e a equipe estão incluídas?',
+    answer:
+      'A API de leitura e até 3 usuários fazem parte do Profissional. A API tem 10.000 requisições por mês e 60 por minuto por chave; equipe tem owner, gerente, operador e visualizador.',
+  },
+  {
+    question: 'O WhatsApp automático está disponível?',
+    answer:
+      'Ainda não como envio automático. O WhatsApp manual funciona em todos os planos. O envio oficial exige WABA, templates aprovados e consentimento; o custo é do fornecedor e a integração fica desligada por padrão.',
+  },
+  {
+    question: 'O PedeOutra cobra uma taxa por pedido?',
+    answer:
+      'Não. A assinatura é a única cobrança do PedeOutra. Os pedidos dos seus clientes são combinados diretamente entre você e eles, sem pagamento dentro da plataforma.',
+  },
+  {
     question: 'Meus dados ficam separados de outros fornecedores?',
     answer:
       'Sim. O banco aplica isolamento por organização (RLS) e as APIs públicas só devolvem dados estritamente públicos do catálogo.',
   },
 ]
 
+function planOrder(code: PublicPlan['plan_code']): number {
+  return code === 'essential' ? 0 : 1
+}
+
+const FALLBACK_PLANS: PublicPlan[] = [
+  {
+    plan_code: 'essential',
+    plan_version: 1,
+    price_cents: 2990,
+    currency: 'BRL',
+    trial_days: 7,
+    available: true,
+    unavailable_reason: null,
+    features: [
+      ['catalog_public', 'products', 'customers', 'orders', 'order_tracking_link'],
+      ['reorder_manual', 'whatsapp_manual', 'dashboard_basic', 'import_csv', 'pdf_nonfiscal'],
+      ['qr_code', 'onboarding_templates', 'sku_quick_order', 'order_minimum'],
+    ].flatMap((keys) =>
+      keys.map((key) => ({ key, enabled: true, limit_value: null, limit_window: null })),
+    ),
+  },
+  {
+    plan_code: 'professional',
+    plan_version: 1,
+    price_cents: 6990,
+    currency: 'BRL',
+    trial_days: 0,
+    available: false,
+    unavailable_reason: 'PRO_PLAN_CHECKOUT_DISABLED',
+    features: [
+      ['private_prices', 'quotes', 'team', 'whatsapp_automation', 'api_access'],
+      ['import_csv', 'pdf_nonfiscal', 'qr_code', 'sku_quick_order', 'order_minimum'],
+    ].flatMap((keys) =>
+      keys.map((key) => ({ key, enabled: true, limit_value: null, limit_window: null })),
+    ),
+  },
+]
+
 export function Landing() {
+  useSeo({
+    title: 'PedeOutra — Pediu uma vez? Pede outra!',
+    description:
+      'Catálogo B2B, pedidos organizados e links de recompra para pequenos distribuidores. Teste o Essencial por 7 dias sem cartão.',
+    path: '/',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'PedeOutra',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description:
+        'Catálogo e pedidos recorrentes para pequenos distribuidores, com catálogo público e links de recompra.',
+      offers: {
+        '@type': 'Offer',
+        price: '29.90',
+        priceCurrency: 'BRL',
+      },
+    },
+  })
+
+  const [plans, setPlans] = useState<PublicPlan[]>(FALLBACK_PLANS)
+
   useEffect(() => {
     track('landing_view')
+    track('plan_view')
+    let active = true
+    void getPlanCatalog<PlanCatalogResponse>()
+      .then((data) => {
+        if (!active || !data.plans?.length) return
+        setPlans(
+          [...data.plans].sort((a, b) => planOrder(a.plan_code) - planOrder(b.plan_code)),
+        )
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
+    }
   }, [])
 
   return (
@@ -49,6 +143,7 @@ export function Landing() {
         <Brand />
         <nav className="site-nav" aria-label="Navegação do site">
           <a href="#como-funciona">Como funciona</a>
+          <a href="#recursos">Recursos</a>
           <a href="#preco">Preço</a>
           <a href="#faq">Dúvidas</a>
           <Link to="/demo">Demonstração</Link>
@@ -79,7 +174,11 @@ export function Landing() {
               planilha no WhatsApp.
             </p>
             <div className="hero-actions">
-              <Link to="/criar-conta" className="button button-primary button-large">
+              <Link
+                to="/criar-conta"
+                className="button button-primary button-large"
+                onClick={() => track('cta_click', { event_target: 'hero_signup' })}
+              >
                 Testar 7 dias grátis
               </Link>
               <Link to="/demo" className="button button-secondary button-large">
@@ -155,11 +254,11 @@ export function Landing() {
 
         <section className="logos-strip" aria-label="Perfis de uso">
           <span>Feito para quem vende de novo:</span>
-          <strong>embalagens</strong>
-          <strong>limpeza</strong>
-          <strong>água e gelo</strong>
-          <strong>descartáveis</strong>
-          <strong>insumos</strong>
+          <Link to="/setores/embalagens">embalagens</Link>
+          <Link to="/setores/limpeza">limpeza</Link>
+          <Link to="/setores/agua-gelo">água e gelo</Link>
+          <Link to="/setores/descartaveis">descartáveis</Link>
+          <Link to="/setores/insumos">insumos</Link>
         </section>
 
         <section id="como-funciona" className="section">
@@ -247,52 +346,127 @@ export function Landing() {
           </div>
         </section>
 
+        <section id="recursos" className="section">
+          <SectionHeading
+            eyebrow="Recursos"
+            title="Do catálogo à recorrência, sem planilha paralela"
+            description="Recursos marcados como Profissional dependem do plano ativo. Integrações externas aparecem com o requisito real, sem prometer o que ainda não está conectado."
+          />
+          <Reveal>
+            <div className="feature-grid">
+              <TiltCard>
+                <FeatureCard
+                  badge="Essencial"
+                  badgeTone="pill-lime"
+                  title="Catálogo e pedidos"
+                  items={[
+                    'Catálogo público com categorias e fotos',
+                    'SKU, busca e pedido por lista',
+                    'Mínimos, múltiplos e importação CSV/XLSX',
+                    'QR code e acompanhamento por link',
+                    'Comprovante PDF não fiscal',
+                  ]}
+                />
+              </TiltCard>
+              <TiltCard>
+                <FeatureCard
+                  badge="Profissional"
+                  title="Relacionamento e retenção"
+                  items={[
+                    'Tabelas de preço por comprador',
+                    'Orçamentos com aceite por link',
+                    'Radar de recompra por cadência real',
+                    'Lembretes manuais com opt-in',
+                    'Analytics first-party consentido',
+                  ]}
+                />
+              </TiltCard>
+              <TiltCard>
+                <FeatureCard
+                  badge="Profissional"
+                  title="Escala e integrações"
+                  items={[
+                    'Equipe com RBAC e convites',
+                    'API REST de leitura, chaves e quota',
+                    'Webhooks assinados de pedidos',
+                    'WhatsApp oficial — requer WABA/Meta',
+                    'Meta Ads/DeepSeek — integrações futuras',
+                  ]}
+                />
+              </TiltCard>
+            </div>
+          </Reveal>
+        </section>
+
         <section id="preco" className="section pricing-section">
-          <div className="section-heading">
-            <span className="eyebrow">Preço simples</span>
-            <h2>Essencial agora. Profissional em preparação.</h2>
-            <p>
-              Comece grátis por 7 dias no Essencial. Depois, R$ 29,90 por mês. O
-              Profissional (R$ 69,90) será liberado após a Parte 2/4.
-            </p>
-          </div>
-          <div className="price-card">
-            <div className="price-head">
-              <span className="pill pill-lime">Teste sem cartão</span>
-              <h3>PedeOutra Essencial</h3>
-              <p>Para pequenos distribuidores e fornecedores de recompra.</p>
+          <SectionHeading
+            eyebrow="Planos"
+            title="Essencial para começar. Profissional para crescer."
+            description="O Essencial libera o catálogo e os pedidos. O Profissional adiciona preços por comprador, orçamentos e equipe. Nenhum plano cobra pedidos dos seus clientes."
+          />
+          <Reveal>
+            <div className="pricing-grid">
+            {plans.map((plan) => {
+              const enabledFeatures = plan.features.filter((feature) => feature.enabled)
+              const isProfessional = plan.plan_code === 'professional'
+              return (
+                <TiltCard key={plan.plan_code}>
+                  <PricingCard professional={isProfessional}>
+                  <div className="price-head">
+                    <span className={plan.available ? 'pill pill-lime' : 'pill'}>
+                      {plan.available ? 'Disponível' : 'Em preparação'}
+                    </span>
+                    <h3>PedeOutra {PLAN_NAMES[plan.plan_code]}</h3>
+                    <p>
+                      {isProfessional
+                        ? 'Para quem vende com tabela por cliente, orçamentos e equipe.'
+                        : 'Para pequenos distribuidores e fornecedores de recompra.'}
+                    </p>
+                  </div>
+                  <div className="price-amount">
+                    <span>R$</span>
+                    <strong>{(plan.price_cents / 100).toFixed(2).replace('.', ',')}</strong>
+                    <small>/mês</small>
+                  </div>
+                  <ul className="price-list">
+                    {enabledFeatures.slice(0, 7).map((feature) => (
+                      <li key={feature.key}>
+                        <Icon name="check" /> {featureLabel(feature.key)}
+                      </li>
+                    ))}
+                    {isProfessional && (
+                      <li className="price-list-muted">
+                        WhatsApp automático depende de WABA/templates aprovados
+                      </li>
+                    )}
+                  </ul>
+                  {plan.available ? (
+                    <Link
+                      to="/criar-conta"
+                      className="button button-primary button-block button-large"
+                    >
+                      Começar {plan.trial_days > 0 ? `teste de ${plan.trial_days} dias` : 'agora'}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className="button button-secondary button-block button-large"
+                      disabled
+                    >
+                      Checkout em preparação
+                    </button>
+                  )}
+                  <p className="price-note">
+                    {isProfessional
+                      ? 'Recursos Pro em validação. Sem promessa de disponibilidade, cobrança ou envio automático nesta fase.'
+                      : 'Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do fornecedor, em cartão, via Asaas.'}
+                  </p>
+                  </PricingCard>
+                </TiltCard>
+              )
+            })}
             </div>
-            <div className="price-amount">
-              <span>R$</span>
-              <strong>29,90</strong>
-              <small>/mês</small>
-            </div>
-            <ul className="price-list">
-              <li>
-                <Icon name="check" /> Catálogo público ilimitado
-              </li>
-              <li>
-                <Icon name="check" /> Pedidos e clientes ilimitados
-              </li>
-              <li>
-                <Icon name="check" /> Links de recompra com revogação
-              </li>
-              <li>
-                <Icon name="check" /> WhatsApp manual e histórico
-              </li>
-              <li>
-                <Icon name="check" /> Um fornecedor por conta
-              </li>
-            </ul>
-            <Link to="/criar-conta" className="button button-primary button-block button-large">
-              Começar teste de 7 dias
-            </Link>
-            <p className="price-note">
-              Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do
-              fornecedor, em cartão, via Asaas. O Profissional está em preparação e não é
-              vendido nesta fase.
-            </p>
-          </div>
+          </Reveal>
         </section>
 
         <section id="faq" className="section faq-section">
@@ -302,7 +476,15 @@ export function Landing() {
           </div>
           <div className="faq-list">
             {FAQ.map((item) => (
-              <details key={item.question} className="faq-item">
+              <details
+                key={item.question}
+                className="faq-item"
+                onToggle={(event) => {
+                  if (event.currentTarget.open) {
+                    track('faq_expand', { event_target: item.question.slice(0, 80) })
+                  }
+                }}
+              >
                 <summary>{item.question}</summary>
                 <p>{item.answer}</p>
               </details>
@@ -315,7 +497,11 @@ export function Landing() {
             <span className="eyebrow">Próximo pedido</span>
             <h2>Seu cliente já sabe o que quer. Facilite a repetição.</h2>
           </div>
-          <Link to="/criar-conta" className="button button-lime button-large">
+          <Link
+            to="/criar-conta"
+            className="button button-lime button-large"
+            onClick={() => track('cta_click', { event_target: 'final_signup' })}
+          >
             Criar catálogo grátis
           </Link>
         </section>

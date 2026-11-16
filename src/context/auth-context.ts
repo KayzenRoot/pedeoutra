@@ -14,6 +14,7 @@ export interface AuthContextValue {
   user: User | null
   organization: Organization | null
   subscription: Subscription | null
+  membershipRole: string | null
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string) => Promise<SignUpResult>
   signOut: () => Promise<void>

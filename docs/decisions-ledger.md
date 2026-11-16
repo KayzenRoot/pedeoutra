@@ -198,3 +198,47 @@ funcionalidade real da Parte 2/4 estar pronta e auditada.
 **Consequências:** nenhuma cobrança real é feita nesta WO; upgrade/downgrade
 têm contrato e testes de decisão, mas a mutação no provedor fica explicitamente
 bloqueada até validação em sandbox/autorização específica.
+
+## ADR PDA-ADR-014 — Categorias e mídia de produto com Storage privado (PROPOSED)
+
+**Status:** PROPOSED (Parte 2/5; depende da Parte 1 ativa)
+**Data:** 2026-11-13
+**Contexto:** o catálogo precisa de categorias ordenáveis e fotos sem expor
+objetos privados entre tenants, sem depender de transformação paga e sem
+aceitar SVG/arquivo ativo.
+**Decisão proposta:** categorias são linhas por organização, opcionais e
+ordenáveis; produtos antigos permanecem sem categoria. Fotos ficam em bucket
+privado `product-images`, acessado apenas por Edge Function com `service_role`;
+o upload valida tenant, produto, tamanho, MIME real por magic bytes
+(JPEG/PNG/WebP) e rejeita SVG. O navegador gera uma miniatura local; a Edge
+grava imagem + thumb e o metadado em `product_images`. O catálogo público
+recebe apenas URLs assinadas e de curta duração para imagens de produtos
+ativos; produto inativo ou imagem órfã não é servido. Limites iniciais: 5 MB
+por imagem, 1 MB por thumb, até 8 imagens por produto.
+**Consequências:** não há policy de Storage para `anon/authenticated`; todo
+acesso passa pela Edge. Excluir imagem remove metadado e objetos; órfãos são
+tratados por rotina administrativa. Custo de Storage Free é monitorado e não
+há transformação paga.
+
+## ADR PDA-ADR-015 — Recompensa de indicação em modo pendente (PROPOSED)
+
+**Status:** PROPOSED; nenhum efeito financeiro autorizado
+**Data:** 2026-11-16
+**Contexto:** o programa de indicações (#56) já registra atribuição,
+qualificação por primeiro pagamento confirmado e reversão, mas conceder mês
+grátis/crédito altera cobrança e exige decisão de custo. O Asaas não deve ser
+mutado por um fluxo de marketing sem aprovação específica.
+**Decisão proposta:** manter `reward_ledger` em `pending`, com valor nulo e sem
+chamada ao Asaas, até que o proprietário escolha e aprove um benefício. O
+benefício recomendado para a primeira campanha é **1 mês de crédito interno no
+plano do indicador**, limitado a 1 recompensa por indicação qualificada e a 12
+recompensas por ano por organização, sem saque, transferência ou dinheiro.
+Custo máximo estimado: R$ 29,90 (Essencial) ou R$ 69,90 (Profissional) por
+recompensa; teto anual por indicador de R$ 358,80 ou R$ 838,80,
+respectivamente. A concessão futura deve ser idempotente por `referral_id`,
+registrada no ledger e aplicada somente após confirmação de que a assinatura do
+indicador segue ativa e sem outra recompensa no mesmo ciclo.
+**Consequências:** nenhuma cobrança, crédito ou cancelamento é executado nesta
+fase; o modo atual é seguro e auditável. Ativar a concessão exige ADR aceito,
+simulação de custo, compatibilidade Asaas e autorização explícita. Reembolso ou
+chargeback do indicado reverte/bloqueia a recompensa.

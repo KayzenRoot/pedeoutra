@@ -1,5 +1,5 @@
 import { adminClient } from '../_shared/supabase.ts'
-import { requireSupplier } from '../_shared/auth.ts'
+import { requireSupplier , assertRole} from '../_shared/auth.ts'
 import { auditEvent } from '../_shared/audit.ts'
 import {
   HttpError,
@@ -15,7 +15,8 @@ export const handler = (req: Request) =>
     if (req.method !== 'POST') return methodNotAllowed(req, ['POST', 'OPTIONS'])
 
     const supabase = adminClient()
-    const { user, organization } = await requireSupplier(req, supabase)
+    const { user, organization, role } = await requireSupplier(req, supabase)
+    assertRole(role, ['owner'])
 
     const config = asaasConfigFromEnv((name) => Deno.env.get(name))
     if (!config) {

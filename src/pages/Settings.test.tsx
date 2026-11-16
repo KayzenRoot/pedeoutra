@@ -29,6 +29,7 @@ const auth = vi.hoisted(() => ({
 }))
 
 const supabaseMock = vi.hoisted(() => ({
+  rpc: vi.fn(),
   auth: {
     mfa: {
       getAuthenticatorAssuranceLevel: vi.fn(),
@@ -51,6 +52,8 @@ vi.mock('../lib/edge', async (importOriginal) => {
 
 describe('configurações da conta', () => {
   beforeEach(() => {
+    supabaseMock.rpc.mockReset()
+    supabaseMock.rpc.mockResolvedValue({ data: [], error: null })
     supabaseMock.auth.mfa.getAuthenticatorAssuranceLevel.mockReset()
     supabaseMock.auth.mfa.listFactors.mockReset()
     supabaseMock.auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({

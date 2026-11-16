@@ -4,6 +4,8 @@
  */
 export const REORDER_TOKEN_BYTES = 32
 export const REORDER_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
+/** Mesmo formato opaco para links de preço por comprador. */
+export const OPAQUE_TOKEN_PATTERN = REORDER_TOKEN_PATTERN
 
 function base64UrlEncode(bytes: Uint8Array): string {
   let binary = ''

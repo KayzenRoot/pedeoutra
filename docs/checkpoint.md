@@ -105,3 +105,95 @@ gates de lançamento.
   de cartão não validado para troca sem dupla cobrança).
 - **Não promovido:** ADR-010 a ADR-013 permanecem PROPOSED; ADR-007/009 e o
   veredito comercial não foram alterados.
+
+## Checkpoint Delta — PDA-V2-P02-WO-001 (PROPOSED)
+
+- **Branch/PR:** `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`,
+  [#90](https://github.com/KayzenRoot/pedeoutra/pull/90), Draft; nada da Parte 2
+  foi aplicado em produção.
+- **Entregue:** categorias/fotos privadas (#52), SKU e pedido rápido (#47),
+  mínimos/múltiplos (#49), importação CSV/XLSX (#46), templates (#57), QR (#53),
+  acompanhamento por token (#50), preços por comprador (#48), orçamentos com
+  aceite opaco (#51), comprovante PDF não fiscal (#55), comparação comercial dos
+  planos (#63), contrato WhatsApp oficial com envio desligado (#29–#31) e
+  equipe/RBAC com convites manuais (#58), radar de recompra (#44), lembretes
+  manuais (#45), analytics first-party do funil (#78), financeiro administrativo
+  (#79), dashboard 360° parcial (#80), SEO técnico (#74) e API B2B v1 de
+  leitura (#64/#65/#67), webhooks B2B (#66), páginas setoriais (#75),
+  prerender/404 real (#73), monitoramento SEO em CI (#76) e dashboard 360°
+  interno (#80), landing V2 (#82), glass/motion parcial (#81) e auditoria
+  integrada interna (#83); gate final (#72) segue BLOCKED_DEPLOY.
+- **Evidência local no HEAD de trabalho:** 71 DB, 56 Edge HTTP, 150 unit,
+  57 Edge Functions typechecked, 7 grupos full-local, restore com preço,
+  orçamento, WhatsApp, equipe, lembretes, analytics, API e webhooks, e smoke
+  light/dark/system.
+- **Segurança #48/#51:** RLS por tenant, entitlements `private_prices`/`quotes`,
+  tokens opacos com SHA-256/TTL/revogação, snapshots de preço, aceite idempotente
+  com lock e um pedido por quote, headers `noindex`/`no-referrer`/`no-store`;
+  RPCs internas restritas a `service_role`.
+- **Pendente na Parte 2:** SMTP para envio automático de convites e ativação
+  real do WhatsApp (WABA/templates/Meta); o envio permanece desligado por
+  padrão e o convite manual já funciona.
+- **Bloqueios mantidos:** `ADMIN_BOOTSTRAP_BLOCKED` (TOTP/AAL2 do proprietário),
+  SMTP próprio para convites, WABA/templates para WhatsApp e
+  `COMMERCIAL_BLOCKED`/`GO_LIVE_BLOCKED`.
+
+## Checkpoint Delta — #54/#56/#81/#59 (PROPOSED)
+
+- **Data:** 2026-11-16
+- **Branch/PR:** `feat/PDA-V2-P02-WO-001-catalog-team-whatsapp`, PR #90 Draft.
+- **Entregue:** relatório de clientes inativos/recorrência/valor (#54), programa
+  de indicações em modo seguro sem custeio (#56), biblioteca visual/motion do
+  #81 (`design.tsx`) e matriz de aceitação #59. Nada foi aplicado em produção.
+- **#54:** RPCs server-side, segmentos honestos, cancelados fora das métricas,
+  valores separados confirmado/concluído, CSV com proteção de fórmula, viewer
+  sem telefone e gate Profissional. UI `/app/relatorios`.
+- **#56:** código opaco com rotação/limite/expiração, atribuição no onboarding,
+  autoindicação/telefone igual bloqueados, qualificação só por pagamento
+  confirmado, recompensa sempre `pending` e sem Asaas, reversão auditada.
+- **#81:** `GlassCard`, `FeatureCard`, `PricingCard`, `StatCard`,
+  `SectionHeading`, `IconButton`, `TiltCard` e `Reveal`; tilt ≤4° só em ponteiro
+  fino; reduced motion/toque/teclado sem transform; IntersectionObserver não
+  esconde conteúdo no prerender.
+- **#59:** `evidence/PDA-V2-ACCEPTANCE-MATRIX.md` mapeia #44–#58, complementos
+  #29–#31/#63–#83, testes, evidência e bloqueios.
+- **Evidência local:** 161 unit, 79 DB, 57 Edge HTTP, 57 Edge Functions
+  typechecked, 7 full-local, restore PASS, build/SEO/smoke PASS. Nenhum dado
+  real, cobrança, crédito ou envio externo.
+- **Bloqueios mantidos:** deploy do SHA, admin TOTP, SMTP, WABA/Meta,
+  DeepSeek/Resend/Meta Ads, backup/PITR, legal/suporte, primeira cobrança real e
+  aprovação financeira específica para conceder recompensa de indicação.
+
+## Checkpoint Delta — Admin bootstrap concluído (2026-11-16)
+
+- **ADMIN_BOOTSTRAP_BLOCKED resolvido:** superadmin `goodzlanchonete@gmail.com`
+  com TOTP verificado e AAL2 confirmado; `platform_admins` contém o UUID
+  `a249ea32-857a-45ae-a123-049704e0069a` e o evento
+  `admin.bootstrap` foi registrado em `platform_audit_events` às
+  `2026-11-16T14:51:39Z`.
+- O QR de enrollment foi exibido em JPEG e removido após a confirmação; nenhum
+  segredo TOTP foi versionado ou colocado em evidência.
+- **PR #90** passou de Draft para **Ready for review**; continua sem merge e sem
+  deploy de produção.
+- **Deploy:** runbook completo em `docs/deployment.md` (backup, 19 migrations,
+  42 Edge Functions, merge, verificação e rollback). Status
+  `BLOCKED_AUTHORIZATION`: exige autorização explícita do proprietário e backup
+  verificado.
+- **Indicações:** ADR-015 PROPOSED recomenda 1 mês de crédito interno, com teto
+  anual e custo máximo estimado; nenhuma concessão financeira foi ativada.
+- **Externo ainda bloqueado:** SMTP, WABA/Meta, DeepSeek/Resend/Meta Ads,
+  backup/PITR, legal/suporte e primeira cobrança real.
+
+## Checkpoint Delta — Dry-run de produção (2026-11-16)
+
+- Clone local dos dados reais de produção (schema público, `auth` e dados)
+  recebeu as **19 migrations novas sem erro**; contagens reais preservadas
+  (`organizations=1`, `products=1`, `orders=1`, `users=1`, `subscriptions=1`,
+  `platform_admins=1`).
+- RPCs novas de relatório e indicações presentes e exercitadas no clone com o
+  usuário real em transação revertida.
+- Dumps e container foram removidos após o teste; nenhum dado real foi
+  versionado.
+- Evidência: `evidence/PDA-V2-PROD-DRY-RUN.md`.
+- Deploy continua `BLOCKED_AUTHORIZATION`; o runbook em `docs/deployment.md`
+  exige backup fresco na janela e autorização explícita.

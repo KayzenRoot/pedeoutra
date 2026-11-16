@@ -9,6 +9,8 @@ export interface PublicOrganization {
   whatsapp: string
   trial_ends_at: string
   access_state: string
+  min_order_cents: number | null
+  min_order_items: number | null
   accepting_orders: boolean
 }
 
@@ -20,6 +22,8 @@ interface OrgRow {
   whatsapp: string
   trial_ends_at: string
   access_state: string
+  min_order_cents: number | null
+  min_order_items: number | null
 }
 
 async function toPublicOrganization(
@@ -40,6 +44,8 @@ async function toPublicOrganization(
     whatsapp: row.whatsapp,
     trial_ends_at: row.trial_ends_at,
     access_state: row.access_state,
+    min_order_cents: row.min_order_cents,
+    min_order_items: row.min_order_items,
     accepting_orders: isWriteAllowed({
       trial_ends_at: row.trial_ends_at,
       access_state: row.access_state,
@@ -54,7 +60,7 @@ export async function findPublicOrganization(
 ): Promise<PublicOrganization | null> {
   const { data: organization, error } = await supabase
     .from('organizations')
-    .select('id, name, slug, city, whatsapp, trial_ends_at, access_state')
+    .select('id, name, slug, city, whatsapp, trial_ends_at, access_state, min_order_cents, min_order_items')
     .eq('slug', slug)
     .maybeSingle()
 
@@ -69,7 +75,7 @@ export async function findPublicOrganizationById(
 ): Promise<PublicOrganization | null> {
   const { data: organization, error } = await supabase
     .from('organizations')
-    .select('id, name, slug, city, whatsapp, trial_ends_at, access_state')
+    .select('id, name, slug, city, whatsapp, trial_ends_at, access_state, min_order_cents, min_order_items')
     .eq('id', id)
     .maybeSingle()
 

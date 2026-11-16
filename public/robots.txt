@@ -1,5 +1,12 @@
 User-agent: *
 Disallow: /app
 Disallow: /onboarding
+Disallow: /admin
+Disallow: /convite/
+Disallow: /acompanhar/
+Disallow: /p/
+Disallow: /o/
 Disallow: /r/
 Allow: /
+
+Sitemap: https://pedeoutra.pages.dev/sitemap.xml

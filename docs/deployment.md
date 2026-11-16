@@ -25,8 +25,8 @@ decisão de backup/continuidade (ADR-009 PROPOSED) e auditoria. `pedeoutra.pages
 | Repositório Pages | `KayzenRoot/pedeoutra`, branch de produção `main` |
 | Build Pages | `npm run build`; output `dist`; Node 22; auto-deploy a cada push em `main` |
 | Supabase | project ref `waygtbclkxklexnabwvj` (região East US/Ohio) |
-| Migrations | **6 migrations aplicadas** (4 MVP + 2 V2) |
-| Edge Functions | **15 publicadas** (11 MVP + 4 V2); 4 da Parte 2 no repositório, **não publicadas** |
+| Migrations | **6 aplicadas em produção** (4 MVP + 2 V2); migrations da Parte 2 no repositório, **não aplicadas** |
+| Edge Functions | **15 publicadas** (11 MVP + 4 V2); 30 da Parte 2 + 4 da Parte 3 + 8 da Parte 4 no repositório, **não publicadas** |
 | Auth | Site URL/redirects do Pages; fluxo de recuperação de senha; `mailer_autoconfirm=true` até configurar SMTP próprio |
 | Asaas | Produção configurada (API key, checkout e webhook); Sandbox removido/limpo |
 | Webhook Asaas produção | id `71177108-9a90-43be-92b3-a9cf91595169`, 13 eventos, `enabled=true` |
@@ -227,3 +227,62 @@ deve permanecer indisponível até o bootstrap autorizado com MFA.
   disso deve ser tratado como go-live automático.
 - `pedeoutra.pages.dev` é a URL aprovada; domínio próprio não é requisito desta
   fase.
+
+## Runbook — promoção do PR #90 (Partes 2–5)
+
+**Status:** `BLOCKED_AUTHORIZATION`. Não executar sem autorização explícita do
+proprietário para merge/deploy do SHA exato e sem backup verificado. Nenhuma
+cobrança, e-mail ou mensagem real faz parte deste runbook.
+
+### Pré-condições
+
+- PR #90 com CI 12/12 verde, SonarCloud 0 issues e branch atualizada.
+- SHA de deploy registrado em `docs/context-lock.md` e no Evidence Bundle.
+- Janela sem campanha/cobrança; dados reais preservados.
+- Backup manual do Supabase de produção (Free não tem PITR):
+  `pg_dump`/`supabase db dump` com `SUPABASE_DB_PASSWORD`, arquivo fora do
+  repositório, checksum SHA-256 registrado e restauração de teste validada.
+- Confirmar secrets das Edge Functions no Supabase (não versionar valores).
+
+### Ordem de execução
+
+1. **Backup e verificação**
+   - Exportar schema + dados.
+   - Rodar `pg_restore`/`psql` em banco isolado e comparar contagens/checksums.
+2. **Migrations (19 novas)**
+   - Aplicar em ordem cronológica via `supabase db push` ou `psql` com
+     `ON_ERROR_STOP=1`.
+   - Conferir `supabase_migrations.schema_migrations` e os objetos novos.
+3. **Edge Functions (42 novas; 57 no total)**
+   - Publicar todas as funções do branch com `supabase functions deploy`.
+   - Confirmar `verify_jwt` e secrets por função; nenhum `service_role` no
+     frontend.
+4. **Merge do PR #90**
+   - Somente após autorização explícita; respeitar ruleset
+     `main-release-protection`, sem bypass/force-push.
+   - Merge commit em `main` dispara o Cloudflare Pages.
+5. **Frontend**
+   - Confirmar deployment Pages do merge commit e `npm run test:seo` contra a
+     URL pública.
+   - Smoke light/dark/mobile e axe.
+6. **Verificação funcional em produção**
+   - `/admin` com AAL2; overview, organizações, saúde, financeiro, analytics e
+     indicações.
+   - Catálogo público, pedido, recompra, tracking, relatório de clientes e
+     indicações (recompensa permanece pendente).
+   - API v1 com chave de teste temporária; webhooks com entrega desligada.
+   - Nenhuma cobrança, e-mail, WhatsApp ou crédito real.
+7. **Rollback**
+   - Reverter o merge em `main` e o deployment do Pages.
+   - Restaurar o dump se houver alteração destrutiva (não esperada: migrations
+     são aditivas).
+   - Republicar versões anteriores das Edge Functions se necessário.
+   - Registrar incidente e evidência; nunca reescrever dados reais.
+
+### Critérios de parada
+
+- Backup ausente/ inválido.
+- Migration falha ou bloqueio de lock.
+- CI/Sonar vermelho no SHA.
+- Qualquer cobrança, e-mail ou envio real não autorizado.
+- Divergência de contagem/checksum após restore.

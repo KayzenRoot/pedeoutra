@@ -1,23 +1,101 @@
 
-> pedeoutra@0.1.0 test:unit
-> vitest run
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mD:/Projects/pedeoutra[39m
 
+[90mstderr[2m | src/pages/QuotePublic.test.tsx[2m > [22m[2morçamento público[2m > [22m[2mmostra itens sem PII e aceita com confirmação explícita
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
 
-[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mD:/Projects/pedeoutra[39m
+ [32m✓[39m src/pages/QuotePublic.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 2267[2mms[22m[39m
+   [32m✓[39m orçamento público [2m(2)[22m
+     [33m[2m✓[22m[39m mostra itens sem PII e aceita com confirmação explícita[33m 1713[2mms[22m[39m
+     [33m[2m✓[22m[39m não oferece aceite quando o orçamento foi recusado[33m 546[2mms[22m[39m
+ [32m✓[39m src/pages/PasswordReset.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 2547[2mms[22m[39m
+   [32m✓[39m recuperação de senha [2m(3)[22m
+     [33m[2m✓[22m[39m solicita o link e mostra mensagem genérica[33m 760[2mms[22m[39m
+     [33m[2m✓[22m[39m bloqueia senhas diferentes antes de chamar o backend[33m 1742[2mms[22m[39m
+[90mstderr[2m | src/pages/Catalog.private.test.tsx[2m > [22m[2mcatálogo com preço privado[2m > [22m[2mmostra a tabela, não pede PII e envia o token no pedido
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
 
- [32m✓[39m supabase/functions/_shared/asaas.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 76[2mms[22m[39m
- [32m✓[39m supabase/functions/_shared/billing.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 56[2mms[22m[39m
- [32m✓[39m supabase/functions/_shared/validation.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 29[2mms[22m[39m
- [32m✓[39m supabase/functions/_shared/tokens.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 78[2mms[22m[39m
- [32m✓[39m supabase/functions/_shared/access.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 19[2mms[22m[39m
- [32m✓[39m src/lib/format.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 29[2mms[22m[39m
- [32m✓[39m src/pages/Demo.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 1079[2mms[22m[39m
-   [33m[2m✓[22m[39m demonstração pública[2m > [22msimula envio com sucesso e deixa claro que nada foi enviado [33m 817[2mms[22m[39m
- [32m✓[39m supabase/functions/_shared/request-ip.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/pages/Catalog.private.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 637[2mms[22m[39m
+   [32m✓[39m catálogo com preço privado [2m(2)[22m
+     [33m[2m✓[22m[39m mostra a tabela, não pede PII e envia o token no pedido[33m 610[2mms[22m[39m
+ [32m✓[39m src/pages/Demo.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 826[2mms[22m[39m
+   [32m✓[39m demonstração pública [2m(2)[22m
+     [33m[2m✓[22m[39m simula envio com sucesso e deixa claro que nada foi enviado[33m 707[2mms[22m[39m
+[90mstderr[2m | src/pages/Settings.test.tsx[2m > [22m[2mconfigurações da conta[2m > [22m[2mmostra plano, limites, tema e integrações desabilitadas
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
 
-[2m Test Files [22m [1m[32m8 passed[39m[22m[90m (8)[39m
-[2m      Tests [22m [1m[32m70 passed[39m[22m[90m (70)[39m
-[2m   Start at [22m 20:04:31
-[2m   Duration [22m 9.74s[2m (transform 1.61s, setup 5.16s, collect 3.28s, tests 1.38s, environment 27.44s, prepare 5.90s)[22m
+ [32m✓[39m src/pages/Settings.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 473[2mms[22m[39m
+   [32m✓[39m configurações da conta [2m(2)[22m
+     [33m[2m✓[22m[39m mostra plano, limites, tema e integrações desabilitadas[33m 381[2mms[22m[39m
+ [32m✓[39m src/components/CatalogQrPanel.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 448[2mms[22m[39m
+[90mstderr[2m | src/pages/Tracking.test.tsx[2m > [22m[2macompanhamento público[2m > [22m[2mmostra status, itens e timeline sem PII
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
 
-exit=0
+[90mstderr[2m | src/pages/Billing.test.tsx[2m > [22m[2massinatura e planos[2m > [22m[2mmostra Essencial disponível e Profissional em preparação
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/pages/Tracking.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 374[2mms[22m[39m
+   [32m✓[39m acompanhamento público [2m(2)[22m
+     [33m[2m✓[22m[39m mostra status, itens e timeline sem PII[33m 332[2mms[22m[39m
+ [32m✓[39m src/pages/Billing.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 543[2mms[22m[39m
+   [32m✓[39m assinatura e planos [2m(3)[22m
+     [33m[2m✓[22m[39m mostra Essencial disponível e Profissional em preparação[33m 429[2mms[22m[39m
+[90mstderr[2m | src/pages/Admin.test.tsx[2m > [22m[2mconsole administrativo[2m > [22m[2mpede login quando não há sessão
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+[90mstderr[2m | src/pages/Quotes.test.tsx[2m > [22m[2morçamentos[2m > [22m[2mmostra upsell quando o plano não é Profissional
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/pages/Quotes.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 437[2mms[22m[39m
+ [32m✓[39m src/pages/Admin.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 647[2mms[22m[39m
+[90mstderr[2m | src/pages/Radar.test.tsx[2m > [22m[2mradar de recompra[2m > [22m[2mmostra cliente atrasado e ação manual
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+[90mstderr[2m | src/pages/PrivatePrices.test.tsx[2m > [22m[2mpreços por comprador[2m > [22m[2mmostra upsell quando o plano não é Profissional
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/pages/Radar.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 336[2mms[22m[39m
+ [32m✓[39m src/pages/PrivatePrices.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 366[2mms[22m[39m
+ [32m✓[39m src/lib/qr.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+[90mstderr[2m | src/pages/Team.test.tsx[2m > [22m[2mequipe[2m > [22m[2mlista membros e convites para o proprietário
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/pages/Team.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 390[2mms[22m[39m
+   [32m✓[39m equipe [2m(2)[22m
+     [33m[2m✓[22m[39m lista membros e convites para o proprietário[33m 355[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/validation.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/billing.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/asaas.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m src/lib/order-pdf.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/whatsapp-crypto.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/lib/format.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/lib/navigation.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/tokens.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/lib/import.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/lib/theme.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/lib/sku.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/onboarding-templates.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/import.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/request-ip.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/image.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m supabase/functions/_shared/access.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m30 passed[39m[22m[90m (30)[39m
+[2m      Tests [22m [1m[32m150 passed[39m[22m[90m (150)[39m
+[2m   Start at [22m 14:45:27
+[2m   Duration [22m 33.44s[2m (environment 60%, tests 19%, setup 10%, import 8%, worker 1%, transform 1%)[22m
+
+[2mEnvironment [22m [33mjsdom was created 30 times[39m[2m · 34.38s total, 60% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
+

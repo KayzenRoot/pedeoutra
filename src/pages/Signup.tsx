@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { BackendNotice, FormMessage } from '../components/ui'
 import { useAuth } from '../context/auth-context'
+import { track } from '../lib/analytics'
 
 export function Signup() {
   const { configured, signUp } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -36,7 +38,16 @@ export function Signup() {
 
     setSubmitting(true)
     try {
+      const referral = (searchParams.get('ref') ?? '').trim().toLowerCase()
+      if (/^[a-f0-9]{24}$/.test(referral)) {
+        try {
+          window.sessionStorage.setItem('pedeoutra_referral', referral)
+        } catch {
+          // Sem sessionStorage a conta continua; apenas a atribuição é perdida.
+        }
+      }
       const result = await signUp(email.trim(), password)
+      track('signup_completed')
       if (result.needsEmailConfirmation) {
         setNeedsConfirmation(true)
       } else {

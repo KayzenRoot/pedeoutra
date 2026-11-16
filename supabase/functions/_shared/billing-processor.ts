@@ -267,6 +267,30 @@ async function persistDecision(
   if (error) throw new Error('subscription_update_failed')
 }
 
+async function processReferralSideEffects(
+  supabase: SupabaseClient,
+  organizationId: string,
+  eventType: string,
+  state: SubscriptionState,
+): Promise<void> {
+  // Indicação só qualifica com pagamento confirmado, nunca com trial,
+  // successUrl ou evento simulado. A recompensa nasce pendente e sem
+  // qualquer alteração financeira no Asaas.
+  if (requiresPaymentVerification(eventType) && state === 'active') {
+    const { error } = await supabase.rpc('api_referral_qualify', {
+      p_organization_id: organizationId,
+    })
+    if (error) logError('referral_qualify', error, { event_type: eventType })
+  }
+  if (eventType === 'PAYMENT_REFUNDED' || state === 'refunded') {
+    const { error } = await supabase.rpc('api_referral_reverse', {
+      p_organization_id: organizationId,
+      p_reason: 'payment_refunded',
+    })
+    if (error) logError('referral_reverse', error, { event_type: eventType })
+  }
+}
+
 export async function processBillingEventById(
   supabase: SupabaseClient,
   eventId: string,
@@ -360,6 +384,13 @@ export async function processBillingEventById(
         provider_event_id: event.id,
       },
     })
+
+    await processReferralSideEffects(
+      supabase,
+      subscription.organization_id,
+      event.type,
+      decision.state,
+    )
 
     await markEvent(supabase, eventId, 'processed', null)
     return 'processed'

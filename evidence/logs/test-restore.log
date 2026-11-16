@@ -2,12 +2,30 @@
 > pedeoutra@0.1.0 test:restore
 > node scripts/verify-restore.mjs
 
-PedeOutra restore test — container pedeoutra-restore-28428 na porta 57441
+PedeOutra restore test — container pedeoutra-restore-30064 na porta 54961
 [1/5] Bootstrap e migrations
   applied 20261112000100_core.sql
   applied 20261112000200_rls.sql
   applied 20261112000300_rpc.sql
   applied 20261112000400_api_wrappers.sql
+  applied 20261113000100_plans_entitlements.sql
+  applied 20261113000200_admin_trial.sql
+  applied 20261113000300_catalog_media.sql
+  applied 20261113000400_product_sku.sql
+  applied 20261113000500_order_rules.sql
+  applied 20261113000600_product_import.sql
+  applied 20261114000100_catalog_seed.sql
+  applied 20261114000200_order_tracking.sql
+  applied 20261114000300_customer_prices.sql
+  applied 20261114000400_quotes.sql
+  applied 20261114000500_whatsapp_contract.sql
+  applied 20261114000600_team_rbac.sql
+  applied 20261114000700_reorder_radar.sql
+  applied 20261114000800_reorder_reminders.sql
+  applied 20261114000900_analytics.sql
+  applied 20261114001000_financial_metrics.sql
+  applied 20261114001100_api_keys.sql
+  applied 20261114001200_api_webhooks.sql
 [2/5] Dados sintéticos
   seeded
 [3/5] pg_dump
@@ -24,8 +42,57 @@ PedeOutra restore test — container pedeoutra-restore-28428 na porta 57441
   subscriptions=1
   billing_events=1
   audit_events=1
-  orders_hash=3fff98e55f8bfbcb12c3ea221b45c4e1
-  items_hash=0a3f2e08dc731ef40ab56e2c2a72ac08
+  plan_catalog=2
+  plan_features=48
+  trial_grants=1
+  trial_signals=2
+  platform_admins=1
+  platform_audit_events=1
+  plan_changes=1
+  quota_usage=1
+  product_categories=1
+  product_images=1
+  price_lists=1
+  price_list_items=1
+  price_assignments=1
+  price_tokens=1
+  quotes=1
+  quote_items=1
+  quote_events=1
+  quote_links=1
+  whatsapp_connections=1
+  whatsapp_templates=1
+  whatsapp_outbox=1
+  whatsapp_events=1
+  team_members=2
+  team_invitations=1
+  reorder_reminders=1
+  analytics_events=1
+  analytics_consents=1
+  api_keys=1
+  api_webhooks=1
+  api_webhook_deliveries=1
+  orders_hash=30e72256f937421d3f17f0b4e817816a
+  price_lists_hash=0a3f2e08dc731ef40ab56e2c2a72ac08
+  price_items_hash=3ecabd5970fbe753e2eb9cd4db2e3615
+  quotes_hash=b8f5b5226d0f23a7437d27ff51c980f2
+  quote_items_hash=a415d545b15dd3c5b41faad4dfe0802a
+  whatsapp_connections_hash=26230d3bd169ef172dea692f5d88d2b4
+  whatsapp_outbox_hash=889767b243ef129a67a5a73fa3abca2b
+  team_members_hash=a47b19212058f96858bd3f0e848e0c6e
+  team_invitations_hash=7e092a70ffc1f897769575adfa303bd5
+  reorder_reminders_hash=3f1faf0ce49c4e696e9f583ea538f184
+  analytics_events_hash=643df1d44684e682f862451284183fdc
+  analytics_consents_hash=76f40c848242a7c04c4fd1d3f268faa5
+  api_keys_hash=b41a8899385b75e64ee201d633d392b6
+  api_webhooks_hash=3f97d8cc2582de7277542efa0c3a1fba
+  api_deliveries_hash=4c547fd84b9b5d9df32261d7dba2f424
+  items_hash=29346a25634d74100b22a9ab337ae633
+  plans_hash=dd8142d36ec32af83e9251a6c5903a68
+  subscriptions_hash=0a294caabe2c2139c45fb983edd12058
+  trials_hash=0a0c328d791dc004e9be0cd195d8e98a
+  platform_audit_hash=b62c0f531b794201c8adb9e935c833d6
+  categories_hash=7b010e2dcc62c572422f277e8dbc8a86
+  images_hash=b30e1bf0043850abe1094663713503e8
 
 PASS restore: contagens e checksums idênticos em dados sintéticos
-exit=0
