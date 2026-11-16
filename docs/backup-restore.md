@@ -39,6 +39,10 @@ Segredos configurados em 2026-11-16: `SUPABASE_ACCESS_TOKEN`,
 `C:\Users\csn19\pedeoutra-secrets\backup-passphrase.txt`, fora do repositório.
 Nunca versionar a passphrase, o dump ou o artefato decifrado.
 
+Teste real: run `43908416616` concluído; artefato baixado, SHA-256 validado e
+GPG decifrado com sucesso; arquivos decifrados removidos. Evidência:
+`evidence/PDA-V2-BACKUP-AUTOMATION.md`.
+
 Restore do artefato:
 
 ```bash
