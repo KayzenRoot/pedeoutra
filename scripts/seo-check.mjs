@@ -16,7 +16,7 @@ const REDIRECTS = readFileSync(join(ROOT, 'public', '_redirects'), 'utf8')
   .map((line) => {
     const [pattern, target, status] = line.split(/\s+/)
     const source = pattern.endsWith('/*')
-      ? new RegExp(String.raw`^${escapeRegex(pattern.slice(0, -2))}/.*$`)
+      ? new RegExp(`^${escapeRegex(pattern.slice(0, -2))}/.*$`)
       : null
     return { pattern, source, target, status: Number(status) }
   })
