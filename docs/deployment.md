@@ -205,10 +205,11 @@ Variáveis **novas** de Edge Function (nunca no frontend):
 - `ADMIN_BOOTSTRAP_TOKEN` — token one-time dedicado ao bootstrap; não versionar.
 - `TRIAL_HMAC_SECRET` — segredo ≥32 bytes para HMAC de sinais de trial; rotação
   exige plano de migração dos hashes.
-- `PRO_PLAN_CHECKOUT_ENABLED` — `false` por padrão; só habilitar após a
-  funcionalidade Profissional estar implementada/testada e houver autorização.
-- `PLAN_CHANGE_MODE` — `disabled` por padrão; mudança automática só com caminho
-  Asaas validado em sandbox, sem duas recorrências.
+- `PRO_PLAN_CHECKOUT_ENABLED` — habilitado em `2026-11-18` após as Partes 2–5
+  estarem em produção e validadas; `false` volta a esconder o checkout
+  Profissional sem alterar assinaturas existentes.
+- `PLAN_CHANGE_MODE` — `disabled`; mudança automática só com caminho Asaas
+  validado em sandbox, sem duas recorrências. A troca segue exigindo suporte.
 
 Migrations novas são aditivas; `supabase db push` só após dry-run local,
 restore sintético e autorização. O deploy do frontend desta PR é Draft e não
