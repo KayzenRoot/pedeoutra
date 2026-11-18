@@ -36,7 +36,7 @@ function LegalLayout({
         </p>
         {launch && (
           <p className="legal-meta">
-            PedeOutra é operado por {launchIdentity(launch)}. Suporte:{' '}
+            Identificação: {launchIdentity(launch)}. Suporte:{' '}
             <a href={`mailto:${launch.supportEmail}`}>{launch.supportEmail}</a> · Privacidade:{' '}
             <a href={`mailto:${launch.privacyEmail}`}>{launch.privacyEmail}</a>.
           </p>
@@ -237,7 +237,7 @@ export function Terms() {
         <>
           <h2>9. Contato</h2>
           <p>
-            PedeOutra é operado por {launchIdentity(LAUNCH_INFO)}. Suporte:{' '}
+            Identificação: {launchIdentity(LAUNCH_INFO)}. Suporte:{' '}
             <a href={`mailto:${LAUNCH_INFO.supportEmail}`}>{LAUNCH_INFO.supportEmail}</a>.
             Privacidade:{' '}
             <a href={`mailto:${LAUNCH_INFO.privacyEmail}`}>{LAUNCH_INFO.privacyEmail}</a>.
