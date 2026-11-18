@@ -104,7 +104,7 @@ describe('configurações da conta', () => {
 
     expect(await screen.findByRole('heading', { name: 'Profissional' })).toBeInTheDocument()
     expect(
-      screen.getByText(
+      await screen.findByText(
         (_content, element) =>
           element?.tagName === 'DD' &&
           Boolean(element.textContent?.includes('10.000')) &&

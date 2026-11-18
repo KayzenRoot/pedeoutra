@@ -262,8 +262,9 @@ gates de lançamento.
 
 - CNPJ `30.317.383/0001-97` e contatos oficiais publicados; o CPF informado
   não foi exposto e o endereço foi omitido por decisão do proprietário.
-- `legalReview: 'pending'`: páginas mostram “Documento em revisão”, CNPJ e
-  canais, mas mantêm o aviso de revisão jurídica humana.
+- `legalReview: 'approved'` em 18/11/2026 por decisão do proprietário; não
+  houve parecer jurídico externo, recomendado antes da primeira cobrança.
+  Páginas passam a “Documento vigente” com “Aprovação do proprietário”.
 - `suporte@pedeoutra.com.br` e `admin@pedeoutra.com.br` publicados; o domínio
   ainda é NXDOMAIN, sem MX/SMTP, então não recebem mensagens até a ativação.
 - Três estados testados (preliminar, em revisão, vigente); 38 arquivos verdes,
