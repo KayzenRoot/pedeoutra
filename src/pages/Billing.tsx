@@ -175,8 +175,8 @@ export function Billing() {
               </p>
             ) : (
               <p className="muted">
-                Escolha o Essencial abaixo. O Profissional só será liberado depois da
-                implementação e da auditoria da Parte 2/4.
+                Escolha um plano abaixo para continuar. O acesso Premium é liberado somente
+                após o pagamento confirmado.
               </p>
             )}
             {canCancel && (
