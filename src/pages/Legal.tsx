@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
+import { LAUNCH_INFO } from '../lib/launch-info'
 import { useSeo } from '../lib/seo'
 
 function LegalLayout({
@@ -10,6 +11,8 @@ function LegalLayout({
   title: string
   children: ReactNode
 }) {
+  const launch = LAUNCH_INFO
+
   return (
     <div className="legal-page">
       <header className="public-header">
@@ -19,16 +22,25 @@ function LegalLayout({
         </Link>
       </header>
       <main className="legal-main">
-        <span className="eyebrow">Documento preliminar</span>
+        <span className="eyebrow">{launch ? 'Documento vigente' : 'Documento preliminar'}</span>
         <h1>{title}</h1>
         <p className="legal-meta">
-          Última atualização: 12/11/2026 · Revisão jurídica humana pendente. Este texto não
-          substitui parecer jurídico.
+          {launch
+            ? `Última atualização: ${launch.updatedAt}.`
+            : 'Última atualização: 12/11/2026 · Revisão jurídica humana pendente. Este texto não substitui parecer jurídico.'}
         </p>
+        {launch && (
+          <p className="legal-meta">
+            PedeOutra é operado por {launch.legalName}, CNPJ {launch.taxId}, com endereço em{' '}
+            {launch.address}. Suporte:{' '}
+            <a href={`mailto:${launch.supportEmail}`}>{launch.supportEmail}</a> · Privacidade:{' '}
+            <a href={`mailto:${launch.privacyEmail}`}>{launch.privacyEmail}</a>.
+          </p>
+        )}
         <div className="legal-body">{children}</div>
       </main>
       <footer className="public-footer">
-        <span>PedeOutra — MVP em validação.</span>
+        <span>{launch ? `PedeOutra — ${launch.legalName}` : 'PedeOutra — MVP em validação.'}</span>
         <Link to="/privacidade">Privacidade</Link>
         <Link to="/termos">Termos</Link>
       </footer>
@@ -121,13 +133,22 @@ export function Privacy() {
       </p>
 
       <h2>9. Contato e alterações</h2>
-      <p>
-        O canal oficial de privacidade e suporte será publicado antes do lançamento
-        comercial. Enquanto ele não estiver disponível e a revisão jurídica não for
-        concluída, o serviço não deve ser vendido ao público. Solicitações de titulares
-        serão tratadas pelo responsável indicado nesse canal. Este aviso pode mudar; a
-        data de atualização será revisada.
-      </p>
+      {LAUNCH_INFO ? (
+        <p>
+          Solicitações de titulares e dúvidas sobre privacidade podem ser enviadas para{' '}
+          <a href={`mailto:${LAUNCH_INFO.privacyEmail}`}>{LAUNCH_INFO.privacyEmail}</a>. O
+          responsável pelo tratamento é {LAUNCH_INFO.legalName}. Este aviso pode mudar; a data
+          de atualização será revisada.
+        </p>
+      ) : (
+        <p>
+          O canal oficial de privacidade e suporte será publicado antes do lançamento
+          comercial. Enquanto ele não estiver disponível e a revisão jurídica não for
+          concluída, o serviço não deve ser vendido ao público. Solicitações de titulares
+          serão tratadas pelo responsável indicado nesse canal. Este aviso pode mudar; a
+          data de atualização será revisada.
+        </p>
+      )}
     </LegalLayout>
   )
 }
@@ -151,17 +172,18 @@ export function Terms() {
       <h2>2. Conta e organização</h2>
       <p>
         O fornecedor é responsável pelas credenciais, pelos dados da organização e pelas
-        informações que publica. No MVP, cada conta administra uma organização.
+        informações que publica. Nesta versão, cada conta administra uma organização.
       </p>
 
       <h2>3. Teste, assinatura, cancelamento e reembolso</h2>
       <p>
         O teste é de 7 dias, sem cartão. Após o teste, o plano Essencial custa R$ 29,90 por mês e
-        é cobrado em cartão via Asaas Checkout recorrente. O plano Profissional (R$ 69,90/mês)
-        está em preparação e não pode ser contratado nesta fase. A cobrança é apenas da
-        assinatura do fornecedor. O cancelamento interrompe a renovação e mantém o acesso até o fim do período
-        já pago. Reembolso, quando cabível, revoga o acesso pago; um trial ainda vigente não é
-        estendido. O PedeOutra não recebe nem armazena dados de cartão.
+        o plano Profissional custa R$ 69,90 por mês, ambos cobrados em cartão via Asaas Checkout
+        recorrente. A troca entre planos exige atendimento para evitar cobrança duplicada. A
+        cobrança é apenas da assinatura do fornecedor. O cancelamento interrompe a renovação e
+        mantém o acesso até o fim do período já pago. Reembolso, quando cabível, revoga o acesso
+        pago; um trial ainda vigente não é estendido. O PedeOutra não recebe nem armazena dados
+        de cartão.
       </p>
 
       <h2>4. Pedidos dos compradores</h2>
@@ -181,7 +203,7 @@ export function Terms() {
 
       <h2>6. Disponibilidade e limitações</h2>
       <p>
-        O MVP é oferecido em evolução e pode ter indisponibilidades. Não há SLA enterprise nesta
+        O serviço é oferecido em evolução e pode ter indisponibilidades. Não há SLA enterprise nesta
         fase. O serviço depende de provedores externos (Supabase, Cloudflare, Asaas), cujos
         limites e políticas se aplicam. Não há promessa de aumento de faturamento.
       </p>
@@ -195,9 +217,24 @@ export function Terms() {
       <h2>8. Privacidade e lei aplicável</h2>
       <p>
         O tratamento de dados segue o <Link to="/privacidade">aviso de privacidade</Link>. Estes
-        termos são regidos pela lei brasileira. Este documento é preliminar e será revisado
-        antes do lançamento comercial.
+        termos são regidos pela lei brasileira.
+        {LAUNCH_INFO
+          ? ' Dúvidas sobre estes termos podem ser enviadas ao canal de suporte indicado abaixo.'
+          : ' Este documento é preliminar e será revisado antes do lançamento comercial.'}
       </p>
+
+      {LAUNCH_INFO && (
+        <>
+          <h2>9. Contato</h2>
+          <p>
+            PedeOutra é operado por {LAUNCH_INFO.legalName}, CNPJ {LAUNCH_INFO.taxId}, com
+            endereço em {LAUNCH_INFO.address}. Suporte:{' '}
+            <a href={`mailto:${LAUNCH_INFO.supportEmail}`}>{LAUNCH_INFO.supportEmail}</a>.
+            Privacidade:{' '}
+            <a href={`mailto:${LAUNCH_INFO.privacyEmail}`}>{LAUNCH_INFO.privacyEmail}</a>.
+          </p>
+        </>
+      )}
     </LegalLayout>
   )
 }

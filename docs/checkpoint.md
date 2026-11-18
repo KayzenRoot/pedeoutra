@@ -245,3 +245,15 @@ gates de lançamento.
 - Evidência: `evidence/PDA-V2-PROFESSIONAL-PLAN.md`.
 - Permanecem: SMTP/domínio (depois), legal/suporte (último), Supabase Free até
   receita mínima, primeira cobrança real (último), WhatsApp/growth/PITR.
+
+## Checkpoint Delta — Preparação legal (2026-11-18)
+
+- `src/lib/launch-info.ts` centraliza razão social, CNPJ, endereço e canais;
+  enquanto for `null`, os documentos seguem como preliminares.
+- Termos corrigidos: Profissional disponível a R$ 69,90/mês e troca exige
+  suporte; removida a frase “em preparação/não pode ser contratado”.
+- Landing e onboarding trocaram “MVP” por “nesta versão” onde era só estado.
+- Checklist, dados pendentes e sequência em `docs/legal-launch.md`.
+- Testes novos cobrem os estados configurado e não configurado; 36 arquivos
+  verdes, build, SEO e smoke com axe PASS.
+- Nenhuma mudança visível em produção até o proprietário preencher os dados.

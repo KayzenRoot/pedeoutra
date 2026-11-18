@@ -98,7 +98,7 @@ export function Onboarding() {
           <span className="eyebrow">Último passo</span>
           <h1>Crie sua organização</h1>
           <p>
-            Uma conta, uma organização no MVP. Esses dados aparecem no catálogo público e na
+            Uma conta, uma organização nesta versão. Esses dados aparecem no catálogo público e na
             assinatura. Você pode ajustar nome, WhatsApp e cidade depois.
           </p>
           <ul className="onboarding-list">
