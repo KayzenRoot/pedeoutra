@@ -115,7 +115,7 @@ export function Billing() {
       <PageHeader
         eyebrow="Planos e assinatura"
         title="Seu acesso ao PedeOutra"
-        description="O Essencial mantém o preço de R$ 29,90/mês. O Profissional está em preparação e ainda não pode ser contratado."
+        description="Essencial por R$ 29,90/mês e Profissional por R$ 69,90/mês. A troca entre planos exige atendimento para evitar cobrança duplicada."
       />
 
       {checkoutNotice && (
@@ -239,7 +239,7 @@ export function Billing() {
               <p>
                 {plan.plan_code === 'essential'
                   ? 'Para pequenos distribuidores que vendem de novo com frequência.'
-                  : 'Recursos avançados de recompra, equipe limitada e API. Disponível após a Parte 2/4.'}
+                  : 'Preços por comprador, orçamentos, equipe e API de leitura para quem já vende com recorrência.'}
               </p>
               <div className="price-amount price-amount-small">
                 <span>R$</span>

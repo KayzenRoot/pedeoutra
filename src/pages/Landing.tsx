@@ -85,8 +85,8 @@ const FALLBACK_PLANS: PublicPlan[] = [
     price_cents: 6990,
     currency: 'BRL',
     trial_days: 0,
-    available: false,
-    unavailable_reason: 'PRO_PLAN_CHECKOUT_DISABLED',
+    available: true,
+    unavailable_reason: null,
     features: [
       ['private_prices', 'quotes', 'team', 'whatsapp_automation', 'api_access'],
       ['import_csv', 'pdf_nonfiscal', 'qr_code', 'sku_quick_order', 'order_minimum'],
@@ -457,9 +457,8 @@ export function Landing() {
                     </button>
                   )}
                   <p className="price-note">
-                    {isProfessional
-                      ? 'Recursos Pro em validação. Sem promessa de disponibilidade, cobrança ou envio automático nesta fase.'
-                      : 'Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do fornecedor, em cartão, via Asaas.'}
+                    Sem plano anual, cupom ou taxa por pedido. Cobrança apenas da assinatura do
+                    fornecedor, em cartão, via Asaas.
                   </p>
                   </PricingCard>
                 </TiltCard>
