@@ -1,24 +1,26 @@
 # Legal e suporte para o lançamento comercial
 
 Data: 2026-11-18
-Status: **PREPARAÇÃO — nenhum dado oficial preenchido**
+Status: **DADOS PREENCHIDOS / REVISÃO JURÍDICA PENDENTE**
 Este documento organiza o que falta e onde preencher. Não substitui parecer
 jurídico humano.
 
-## 1. Dados que só o proprietário pode definir
+## 1. Dados oficiais
 
-| Campo | Exemplo | Onde aparece |
+| Campo | Definido | Observação |
 | --- | --- | --- |
-| Razão social / nome empresarial | PedeOutra Tecnologia Ltda. | Termos, privacidade, rodapé |
-| CNPJ ou MEI | 00.000.000/0001-00 | Termos, privacidade, rodapé |
-| Endereço comercial completo | Rua, número, complemento, bairro, cidade/UF, CEP | Termos, privacidade |
-| E-mail de suporte | suporte@pedeoutra.com.br | Termos, landing, suporte |
-| E-mail de privacidade/titulares | privacidade@pedeoutra.com.br | Aviso de privacidade |
-| Encarregado LGPD (nome/canal) | proprietário ou terceiro | Aviso de privacidade |
-| Data da revisão jurídica | 18/11/2026 | Cabeçalho dos documentos |
+| Razão social / nome empresarial | PedeOutra | — |
+| CNPJ | 30.317.383/0001-97 | CNPJ informado; CPF não será publicado |
+| Endereço comercial | **omitido** | Decisão do proprietário; a cláusula não aparece |
+| E-mail de suporte | suporte@pedeoutra.com.br | Domínio ainda não registrado |
+| E-mail de privacidade/titulares | admin@pedeoutra.com.br | Escolha do proprietário |
+| Encarregado LGPD | Clayton | Canal: admin@pedeoutra.com.br |
+| Data de atualização | 18/11/2026 | — |
+| Revisão jurídica humana | **PENDENTE** | Bloqueia “Documento vigente” |
 
-Definir também se os e-mails usarão domínio próprio. Hoje o produto está em
-`pedeoutra.pages.dev` e o SMTP ainda não está configurado.
+O domínio `pedeoutra.com.br` ainda não existe (NXDOMAIN). Os e-mails oficiais
+foram publicados por decisão do proprietário, mas só receberão mensagens depois
+do registro do domínio, DNS/MX e SMTP.
 
 ## 2. Onde preencher no código
 
@@ -26,29 +28,27 @@ Arquivo: `src/lib/launch-info.ts`
 
 ```ts
 export const LAUNCH_INFO: LaunchInfo | null = {
-  legalName: '...',
-  taxId: '...',
-  address: '...',
-  supportEmail: '...',
-  privacyEmail: '...',
-  updatedAt: 'DD/MM/AAAA',
+  legalName: 'PedeOutra',
+  taxId: '30.317.383/0001-97',
+  supportEmail: 'suporte@pedeoutra.com.br',
+  privacyEmail: 'admin@pedeoutra.com.br',
+  updatedAt: '18/11/2026',
+  legalReview: 'pending',
 }
 ```
 
-Enquanto `LAUNCH_INFO` for `null`:
+Estados possíveis:
 
-- `/termos` e `/privacidade` continuam com “Documento preliminar” e o aviso de
-  que o serviço não deve ser vendido.
-- A landing continua com o aviso de MVP em validação.
-- A frase que dizia que o Profissional estava em preparação já foi corrigida;
-  os dois planos aparecem como disponíveis.
+- `LAUNCH_INFO = null`: “Documento preliminar”, aviso de MVP e de que o serviço
+  não deve ser vendido. Coberto por `Legal.test.tsx`.
+- `legalReview: 'pending'`: “Documento em revisão”, CNPJ e contatos visíveis,
+  aviso de revisão jurídica mantido. Estado atual, coberto por
+  `Legal.pending.test.tsx`.
+- `legalReview: 'approved'`: “Documento vigente”, aviso de revisão removido.
+  Coberto por `Legal.configured.test.tsx`.
 
-Quando preenchido:
-
-- Os documentos passam a “Documento vigente”.
-- Razão social, CNPJ, endereço e canais aparecem nos dois documentos.
-- O rodapé da landing troca o aviso de MVP pela identificação oficial.
-- O aviso de revisão jurídica pendente desaparece.
+O campo `address` é opcional; quando ausente, `launchIdentity` não inclui a
+cláusula de endereço. A landing usa a mesma fonte para mostrar CNPJ e suporte.
 
 ## 3. Checklist de revisão jurídica humana
 
@@ -101,17 +101,20 @@ Quando preenchido:
 
 ## 5. Sequência para fechar a parte 3
 
-1. Proprietário define entidade, CNPJ, endereço, canais e encarregado.
-2. Preencher `src/lib/launch-info.ts`.
-3. Rodar lint, typecheck, testes, build e SEO; abrir PR.
+1. ~~Proprietário define entidade, CNPJ, endereço, canais e encarregado.~~ Feito.
+2. ~~Preencher `src/lib/launch-info.ts`.~~ Feito com `legalReview: 'pending'`.
+3. ~~Rodar lint, typecheck, testes, build e SEO; abrir PR.~~ Feito.
 4. Advogado revisa `/termos` e `/privacidade` no preview do Pages.
-5. Aplicar ajustes finais e publicar.
+5. Aplicar ajustes e mudar `legalReview` para `'approved'`.
 6. Só então remover avisos residuais de MVP e liberar a primeira cobrança.
+7. Ativar domínio, DNS/MX e SMTP para os e-mails oficiais funcionarem.
 
 ## 6. Cobertura atual no código
 
-- `src/lib/launch-info.ts` centraliza a identidade e os contatos.
-- `src/pages/Legal.tsx` alterna entre documento preliminar e vigente.
+- `src/lib/launch-info.ts` centraliza a identidade, os contatos, a formatação de
+  CNPJ/CPF e a cláusula opcional de endereço.
+- `src/pages/Legal.tsx` alterna entre preliminar, em revisão e vigente.
 - `src/pages/Landing.tsx` usa a mesma fonte no rodapé.
-- `src/pages/Legal.test.tsx` e `Legal.configured.test.tsx` cobrem os dois
-  estados.
+- `src/pages/Legal.test.tsx`, `Legal.pending.test.tsx` e
+  `Legal.configured.test.tsx` cobrem os três estados.
+- `src/lib/launch-info.test.ts` cobre rótulo/formatação e endereço opcional.

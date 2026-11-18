@@ -1,6 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('../lib/launch-info', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/launch-info')>()
+  return { ...actual, LAUNCH_INFO: null }
+})
+
 import { Privacy, Terms } from './Legal'
 
 describe('documentos legais sem identidade de lançamento', () => {
