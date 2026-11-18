@@ -250,7 +250,7 @@ export function Billing() {
                 {enabledFeatures.slice(0, 6).map((feature) => (
                   <li key={feature.key}>{featureLabel(feature.key)}</li>
                 ))}
-                {plan.plan_code === 'professional' && (
+                {plan.plan_code === 'professional' && !plan.available && (
                   <li className="muted">Recursos previstos, ainda não contratáveis.</li>
                 )}
               </ul>
