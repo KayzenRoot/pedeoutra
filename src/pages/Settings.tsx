@@ -290,8 +290,8 @@ export function Settings() {
             Ver planos e assinatura →
           </Link>
           <p className="form-note">
-            O Profissional está em preparação. Nenhum recurso Premium é liberado antes de
-            pagamento confirmado e da implementação correspondente.
+            O Profissional está disponível para contratação. Recursos Premium são liberados
+            somente após pagamento confirmado.
           </p>
         </section>
 
@@ -312,16 +312,16 @@ export function Settings() {
               Nenhuma mensagem automática.
             </li>
             <li>
-              <strong>WhatsApp oficial:</strong> previsto para a Parte 2; exige conta e custos
-              do fornecedor, com revisão da Meta. Não disponível.
+              <strong>WhatsApp oficial:</strong> conexão e templates implementados; o envio
+              automático permanece desligado até WABA e templates aprovados pela Meta.
             </li>
             <li>
               <strong>Meta Ads:</strong> exclusivo da operadora PedeOutra; nunca é herdado por
               Essencial ou Profissional.
             </li>
             <li>
-              <strong>API REST:</strong> contrato do Profissional previsto para a Parte 4. Não
-              há chaves ativas nesta fase.
+              <strong>API REST:</strong> incluída no Profissional, com chaves, escopos e quota.
+              Crie e revogue as chaves abaixo.
             </li>
           </ul>
         </section>
@@ -341,8 +341,8 @@ export function Settings() {
             permanecem privados por organização.
           </p>
           <p className="form-note">
-            PedeOutra 2.0 em preparação — Parte 1/5. O lançamento comercial continua bloqueado
-            até SMTP, backup/continuidade, suporte/legal e autorização da primeira cobrança.
+            PedeOutra 2.0. O lançamento comercial continua bloqueado até SMTP,
+            backup/continuidade, suporte/legal e autorização da primeira cobrança.
             Nenhuma versão é declarada pronta apenas por esta tela.
           </p>
         </section>
