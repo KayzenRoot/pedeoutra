@@ -1,9 +1,9 @@
 # Legal e suporte para o lançamento comercial
 
 Data: 2026-11-18
-Status: **DADOS PREENCHIDOS / REVISÃO JURÍDICA PENDENTE**
-Este documento organiza o que falta e onde preencher. Não substitui parecer
-jurídico humano.
+Status: **APROVADO PELO PROPRIETÁRIO / PARECER EXTERNO RECOMENDADO**
+Este documento organiza decisões e pendências. Não substitui parecer jurídico
+externo.
 
 ## 1. Dados oficiais
 
@@ -16,7 +16,7 @@ jurídico humano.
 | E-mail de privacidade/titulares | admin@pedeoutra.com.br | Escolha do proprietário |
 | Encarregado LGPD | Clayton | Canal: admin@pedeoutra.com.br |
 | Data de atualização | 18/11/2026 | — |
-| Revisão jurídica humana | **PENDENTE** | Bloqueia “Documento vigente” |
+| Aprovação dos documentos | **APROVADA PELO PROPRIETÁRIO** | Em 18/11/2026; sem parecer externo |
 
 O domínio `pedeoutra.com.br` ainda não existe (NXDOMAIN). Os e-mails oficiais
 foram publicados por decisão do proprietário, mas só receberão mensagens depois
@@ -33,7 +33,7 @@ export const LAUNCH_INFO: LaunchInfo | null = {
   supportEmail: 'suporte@pedeoutra.com.br',
   privacyEmail: 'admin@pedeoutra.com.br',
   updatedAt: '18/11/2026',
-  legalReview: 'pending',
+  legalReview: 'approved',
 }
 ```
 
@@ -42,15 +42,14 @@ Estados possíveis:
 - `LAUNCH_INFO = null`: “Documento preliminar”, aviso de MVP e de que o serviço
   não deve ser vendido. Coberto por `Legal.test.tsx`.
 - `legalReview: 'pending'`: “Documento em revisão”, CNPJ e contatos visíveis,
-  aviso de revisão jurídica mantido. Estado atual, coberto por
-  `Legal.pending.test.tsx`.
-- `legalReview: 'approved'`: “Documento vigente”, aviso de revisão removido.
-  Coberto por `Legal.configured.test.tsx`.
+  aviso de revisão jurídica mantido. Coberto por `Legal.pending.test.tsx`.
+- `legalReview: 'approved'`: “Documento vigente” e “Aprovação do proprietário”.
+  Estado atual, coberto por `Legal.configured.test.tsx`.
 
 O campo `address` é opcional; quando ausente, `launchIdentity` não inclui a
 cláusula de endereço. A landing usa a mesma fonte para mostrar CNPJ e suporte.
 
-## 3. Checklist de revisão jurídica humana
+## 3. Checklist para parecer jurídico externo (recomendado)
 
 ### Termos de uso
 
@@ -102,11 +101,12 @@ cláusula de endereço. A landing usa a mesma fonte para mostrar CNPJ e suporte.
 ## 5. Sequência para fechar a parte 3
 
 1. ~~Proprietário define entidade, CNPJ, endereço, canais e encarregado.~~ Feito.
-2. ~~Preencher `src/lib/launch-info.ts`.~~ Feito com `legalReview: 'pending'`.
+2. ~~Preencher `src/lib/launch-info.ts`.~~ Feito com `legalReview: 'approved'`.
 3. ~~Rodar lint, typecheck, testes, build e SEO; abrir PR.~~ Feito.
-4. Advogado revisa `/termos` e `/privacidade` no preview do Pages.
-5. Aplicar ajustes e mudar `legalReview` para `'approved'`.
-6. Só então remover avisos residuais de MVP e liberar a primeira cobrança.
+4. Proprietário aprovou os documentos em 18/11/2026, sem parecer externo.
+5. Parecer jurídico externo segue recomendado antes da primeira cobrança.
+6. Avisos residuais de MVP removidos; primeira cobrança continua bloqueada
+   por SMTP/domínio e pela decisão do proprietário.
 7. Ativar domínio, DNS/MX e SMTP para os e-mails oficiais funcionarem.
 
 ## 6. Cobertura atual no código

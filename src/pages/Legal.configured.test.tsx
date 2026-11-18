@@ -29,6 +29,7 @@ describe('documentos legais com identidade de lançamento', () => {
     )
 
     expect(screen.getByText('Documento vigente')).toBeInTheDocument()
+    expect(screen.getByText(/Aprovação do proprietário/i)).toBeInTheDocument()
     expect(screen.getAllByText(/PedeOutra Tecnologia Ltda\./).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/00\.000\.000\/0001-00/).length).toBeGreaterThan(0)
     expect(

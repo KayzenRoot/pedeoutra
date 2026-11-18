@@ -16,9 +16,9 @@ export interface LaunchInfo {
   supportEmail: string
   /** Canal oficial de privacidade e titulares de dados. */
   privacyEmail: string
-  /** Data da última revisão jurídica, no formato DD/MM/AAAA. */
+  /** Data da última atualização, no formato DD/MM/AAAA. */
   updatedAt: string
-  /** Revisão jurídica humana concluída? */
+  /** Aprovação dos documentos concluída (proprietário ou jurídico). */
   legalReview: 'pending' | 'approved'
 }
 
@@ -28,7 +28,7 @@ export const LAUNCH_INFO: LaunchInfo | null = {
   supportEmail: 'suporte@pedeoutra.com.br',
   privacyEmail: 'admin@pedeoutra.com.br',
   updatedAt: '18/11/2026',
-  legalReview: 'pending',
+  legalReview: 'approved',
 }
 
 export function taxIdLabel(value: string): 'CNPJ' | 'CPF' | 'Documento' {

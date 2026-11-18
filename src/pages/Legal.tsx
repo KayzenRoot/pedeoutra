@@ -29,9 +29,9 @@ function LegalLayout({
         <h1>{title}</h1>
         <p className="legal-meta">
           {launch
-            ? `Última atualização: ${launch.updatedAt}.${
-                reviewed ? '' : ' Revisão jurídica humana pendente. Este texto não substitui parecer jurídico.'
-              }`
+            ? reviewed
+              ? `Última atualização: ${launch.updatedAt} · Aprovação do proprietário.`
+              : `Última atualização: ${launch.updatedAt} · Revisão jurídica humana pendente. Este texto não substitui parecer jurídico.`
             : 'Última atualização: 12/11/2026 · Revisão jurídica humana pendente. Este texto não substitui parecer jurídico.'}
         </p>
         {launch && (
