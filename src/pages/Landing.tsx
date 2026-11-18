@@ -8,7 +8,7 @@ import { track } from '../lib/analytics'
 import { useSeo } from '../lib/seo'
 import { getPlanCatalog } from '../lib/edge'
 import { featureLabel, PLAN_NAMES } from '../lib/plans'
-import { LAUNCH_INFO } from '../lib/launch-info'
+import { formatTaxId, LAUNCH_INFO, taxIdLabel } from '../lib/launch-info'
 import type { PlanCatalogResponse, PublicPlan } from '../lib/types'
 
 const FAQ = [
@@ -512,7 +512,7 @@ export function Landing() {
           <Brand />
           <p>
             {LAUNCH_INFO
-              ? `PedeOutra é operado por ${LAUNCH_INFO.legalName}, CNPJ ${LAUNCH_INFO.taxId}. Suporte: ${LAUNCH_INFO.supportEmail}.`
+              ? `PedeOutra · ${taxIdLabel(LAUNCH_INFO.taxId)} ${formatTaxId(LAUNCH_INFO.taxId)} · Suporte: ${LAUNCH_INFO.supportEmail}`
               : 'PedeOutra é um MVP em validação. Preço, marca e domínio são hipóteses sujeitas a verificação.'}
           </p>
         </div>

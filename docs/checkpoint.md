@@ -257,3 +257,14 @@ gates de lançamento.
 - Testes novos cobrem os estados configurado e não configurado; 36 arquivos
   verdes, build, SEO e smoke com axe PASS.
 - Nenhuma mudança visível em produção até o proprietário preencher os dados.
+
+## Checkpoint Delta — Identidade legal publicada (2026-11-18)
+
+- CNPJ `30.317.383/0001-97` e contatos oficiais publicados; o CPF informado
+  não foi exposto e o endereço foi omitido por decisão do proprietário.
+- `legalReview: 'pending'`: páginas mostram “Documento em revisão”, CNPJ e
+  canais, mas mantêm o aviso de revisão jurídica humana.
+- `suporte@pedeoutra.com.br` e `admin@pedeoutra.com.br` publicados; o domínio
+  ainda é NXDOMAIN, sem MX/SMTP, então não recebem mensagens até a ativação.
+- Três estados testados (preliminar, em revisão, vigente); 38 arquivos verdes,
+  build/SEO/smoke PASS.

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Brand } from '../components/Brand'
-import { LAUNCH_INFO } from '../lib/launch-info'
+import { formatTaxId, LAUNCH_INFO, launchIdentity, taxIdLabel } from '../lib/launch-info'
 import { useSeo } from '../lib/seo'
 
 function LegalLayout({
@@ -12,6 +12,7 @@ function LegalLayout({
   children: ReactNode
 }) {
   const launch = LAUNCH_INFO
+  const reviewed = launch?.legalReview === 'approved'
 
   return (
     <div className="legal-page">
@@ -22,17 +23,20 @@ function LegalLayout({
         </Link>
       </header>
       <main className="legal-main">
-        <span className="eyebrow">{launch ? 'Documento vigente' : 'Documento preliminar'}</span>
+        <span className="eyebrow">
+          {launch ? (reviewed ? 'Documento vigente' : 'Documento em revisão') : 'Documento preliminar'}
+        </span>
         <h1>{title}</h1>
         <p className="legal-meta">
           {launch
-            ? `Última atualização: ${launch.updatedAt}.`
+            ? `Última atualização: ${launch.updatedAt}.${
+                reviewed ? '' : ' Revisão jurídica humana pendente. Este texto não substitui parecer jurídico.'
+              }`
             : 'Última atualização: 12/11/2026 · Revisão jurídica humana pendente. Este texto não substitui parecer jurídico.'}
         </p>
         {launch && (
           <p className="legal-meta">
-            PedeOutra é operado por {launch.legalName}, CNPJ {launch.taxId}, com endereço em{' '}
-            {launch.address}. Suporte:{' '}
+            PedeOutra é operado por {launchIdentity(launch)}. Suporte:{' '}
             <a href={`mailto:${launch.supportEmail}`}>{launch.supportEmail}</a> · Privacidade:{' '}
             <a href={`mailto:${launch.privacyEmail}`}>{launch.privacyEmail}</a>.
           </p>
@@ -40,7 +44,11 @@ function LegalLayout({
         <div className="legal-body">{children}</div>
       </main>
       <footer className="public-footer">
-        <span>{launch ? `PedeOutra — ${launch.legalName}` : 'PedeOutra — MVP em validação.'}</span>
+        <span>
+          {launch
+            ? `PedeOutra — ${taxIdLabel(launch.taxId)} ${formatTaxId(launch.taxId)}`
+            : 'PedeOutra — MVP em validação.'}
+        </span>
         <Link to="/privacidade">Privacidade</Link>
         <Link to="/termos">Termos</Link>
       </footer>
@@ -219,7 +227,9 @@ export function Terms() {
         O tratamento de dados segue o <Link to="/privacidade">aviso de privacidade</Link>. Estes
         termos são regidos pela lei brasileira.
         {LAUNCH_INFO
-          ? ' Dúvidas sobre estes termos podem ser enviadas ao canal de suporte indicado abaixo.'
+          ? LAUNCH_INFO.legalReview === 'approved'
+            ? ' Dúvidas sobre estes termos podem ser enviadas ao canal de suporte indicado abaixo.'
+            : ' Este documento está em revisão jurídica humana.'
           : ' Este documento é preliminar e será revisado antes do lançamento comercial.'}
       </p>
 
@@ -227,8 +237,7 @@ export function Terms() {
         <>
           <h2>9. Contato</h2>
           <p>
-            PedeOutra é operado por {LAUNCH_INFO.legalName}, CNPJ {LAUNCH_INFO.taxId}, com
-            endereço em {LAUNCH_INFO.address}. Suporte:{' '}
+            PedeOutra é operado por {launchIdentity(LAUNCH_INFO)}. Suporte:{' '}
             <a href={`mailto:${LAUNCH_INFO.supportEmail}`}>{LAUNCH_INFO.supportEmail}</a>.
             Privacidade:{' '}
             <a href={`mailto:${LAUNCH_INFO.privacyEmail}`}>{LAUNCH_INFO.privacyEmail}</a>.
