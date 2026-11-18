@@ -8,6 +8,7 @@ import { track } from '../lib/analytics'
 import { useSeo } from '../lib/seo'
 import { getPlanCatalog } from '../lib/edge'
 import { featureLabel, PLAN_NAMES } from '../lib/plans'
+import { LAUNCH_INFO } from '../lib/launch-info'
 import type { PlanCatalogResponse, PublicPlan } from '../lib/types'
 
 const FAQ = [
@@ -34,7 +35,7 @@ const FAQ = [
   {
     question: 'Preciso integrar WhatsApp?',
     answer:
-      'No MVP, não. Você compartilha links de WhatsApp pré-preenchidos com um clique. Nenhuma mensagem é enviada automaticamente.',
+      'Nesta versão, não. Você compartilha links de WhatsApp pré-preenchidos com um clique. Nenhuma mensagem é enviada automaticamente.',
   },
   {
     question: 'A API e a equipe estão incluídas?',
@@ -510,8 +511,9 @@ export function Landing() {
         <div>
           <Brand />
           <p>
-            PedeOutra é um MVP em validação. Preço, marca e domínio são hipóteses sujeitas a
-            verificação.
+            {LAUNCH_INFO
+              ? `PedeOutra é operado por ${LAUNCH_INFO.legalName}, CNPJ ${LAUNCH_INFO.taxId}. Suporte: ${LAUNCH_INFO.supportEmail}.`
+              : 'PedeOutra é um MVP em validação. Preço, marca e domínio são hipóteses sujeitas a verificação.'}
           </p>
         </div>
         <div className="footer-links">
