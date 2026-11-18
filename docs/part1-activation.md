@@ -96,6 +96,9 @@ supabase secrets set PLAN_CHANGE_MODE=disabled
 
 Não configurar `PRO_PLAN_CHECKOUT_ENABLED=true` antes da Parte 2/4. O token de
 bootstrap é one-time e não deve ir para o repositório, logs ou screenshots.
+**Atualização 2026-11-18:** as Partes 2–5 estão em produção e o checkout
+Profissional foi habilitado; este trecho registra apenas o estado original da
+ativação da Parte 1.
 
 ### 5. Bootstrap do superadmin
 

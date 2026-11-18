@@ -226,3 +226,22 @@ gates de lançamento.
   cobre WCAG 2.1.
 - Catálogo público real, planos e gates AAL2 verificados; dados preservados.
 - Evidência: `evidence/PDA-V2-PRODUCTION-AUDIT.md`.
+
+## Checkpoint Delta — Checkout Profissional habilitado (2026-11-18)
+
+- `PRO_PLAN_CHECKOUT_ENABLED=true` em produção; `plan-catalog` retorna
+  Profissional disponível a R$ 69,90/mês com 24 recursos.
+- Textos de landing, billing e configurações alinhados ao checkout ativo;
+  HTML pré-renderizado com dois selos “Disponível”.
+- PR #100 (`98b8c39`): 12 checks verdes; CI da `main` success.
+- PRs #101 (`f21f599`) e #102 (`51f8338`) removeram avisos antigos de que o
+  Profissional dependia da Parte 2/4; checks e Pages verdes.
+- Chrome em produção: 8 rotas + mobile, 0 violações WCAG 2.1 A/AA;
+  `/app/assinatura` autenticada mostra os dois botões de assinatura sem clicar
+  em cobrança; sessão encerrada.
+- Dados reais preservados (1 org/produto/pedido/assinatura/usuário/admin);
+  assinatura segue `expired/essential`.
+- Backup manual `44300162401` success em `2026-11-18T12:03:33Z`.
+- Evidência: `evidence/PDA-V2-PROFESSIONAL-PLAN.md`.
+- Permanecem: SMTP/domínio (depois), legal/suporte (último), Supabase Free até
+  receita mínima, primeira cobrança real (último), WhatsApp/growth/PITR.
